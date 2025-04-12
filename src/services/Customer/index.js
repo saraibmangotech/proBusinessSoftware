@@ -1,0 +1,211 @@
+import { post, get, patch,deleted } from 'services';
+import routes from './routes';
+
+const CustomerServices = {
+  requestBuyerId: async (obj) => {
+    const data = await post(routes.requestBuyerId, obj);
+    return data;
+  },
+  DeleteVoucher: async (obj) => {
+    const data = await deleted(routes.DeleteVoucher, obj);
+    return data;
+  },
+  CreateWPS: async (obj) => {
+    const data = await post(routes.CreateWPS, obj);
+    return data;
+  },
+  CreateAddOnService: async (obj) => {
+    const data = await post(routes.CreateAddOnService, obj);
+    return data;
+  },
+  CreateCertificate: async (obj) => {
+    const data = await post(routes.CreateCertificate, obj);
+    return data;
+  },
+  CreateCategory: async (obj) => {
+    const data = await post(routes.CreateCategory, obj);
+    return data;
+  },
+  UpdateWPStatus: async (obj) => {
+    const data = await patch(routes.UpdateWPStatus, obj);
+    return data;
+  },
+  CustomerStatus: async (obj) => {
+    const data = await patch(routes.CustomerStatus, obj);
+    return data;
+  },
+  UpdateAddOnService: async (obj) => {
+    const data = await patch(routes.UpdateAddOnService, obj);
+    return data;
+  },
+  UpdateCandidate: async (obj) => {
+    const data = await patch(routes.UpdateCandidate, obj);
+    return data;
+  },
+  UpdateCertificate: async (obj) => {
+    const data = await patch(routes.UpdateCertificate, obj);
+    return data;
+  },
+  CreateMemo: async (obj) => {
+    const data = await post(routes.CreateMemo, obj);
+    return data;
+  },
+  AddVisa: async (obj) => {
+    const data = await post(routes.AddVisa, obj);
+    return data;
+  },
+  getAgents: async (params) => {
+    const data = await get(routes.getAgents, params);
+    return data;
+  },
+  getRejectedVisa: async (params) => {
+    const data = await get(routes.getRejectedVisa, params);
+    return data;
+  },
+  getCandidateDetail: async (params) => {
+    const data = await get(routes.getCandidateDetail, params);
+    return data;
+  },
+  VisaProcessing: async (params) => {
+    const data = await get(routes.VisaProcessing, params);
+    return data;
+  },
+  getWPSList: async (params) => {
+    const data = await get(routes.getWPSList, params);
+    return data;
+  },
+  getCategoryList: async (params) => {
+    const data = await get(routes.getCategoryList, params);
+    return data;
+  },
+  checkWPS: async (params) => {
+    const data = await get(routes.checkWPS, params);
+    return data;
+  },
+  getCandidateLists: async (params) => {
+    const data = await get(routes.getCandidateLists, params);
+    return data;
+  },
+  getCertificates: async (params) => {
+    const data = await get(routes.getCertificates, params);
+    return data;
+  },
+  ServiceInvoiceDetail: async (params) => {
+    const data = await get(routes.ServiceInvoiceDetail, params);
+    return data;
+  },
+  getInvoices: async (params) => {
+    const data = await get(routes.getInvoices, params);
+    return data;
+  },
+  addCustomer: async (obj) => {
+    const data = await post(routes.addCustomer, obj);
+    return data;
+  },
+  UpdateCustomer: async (obj) => {
+    const data = await patch(routes.UpdateCustomer, obj);
+    return data;
+  },
+  UpdateAddOnservice: async (obj) => {
+    const data = await patch(routes.UpdateAddOnservice, obj);
+    return data;
+  },
+  CreateNotifcation: async (obj) => {
+    const data = await post(routes.CreateNotifcation, obj);
+    return data;
+  },
+  CreateSubCustomer: async (obj) => {
+    const data = await post(routes.CreateSubCustomer, obj);
+    return data;
+  },
+  ChangeBranch: async (obj) => {
+    const data = await patch(routes.ChangeBranch, obj);
+    return data;
+  },
+  SelectCustomer: async (obj) => {
+    const data = await patch(routes.SelectCustomer, obj);
+    return data;
+  },
+  ChangeType: async (obj) => {
+    const data = await patch(routes.ChangeType, obj);
+    return data;
+  },
+  requestBuyerIdAgain: async (obj) => {
+    const data = await post(routes.requestBuyerIdAgain, obj);
+    return data;
+  },
+  deleteId: async (params) => {
+    const data = await deleted(routes.deleteId, params);
+    return data;
+  },
+  handleDeleteCustomer: async (params) => {
+    const data = await deleted(routes.handleDeleteCustomer, params);
+    return data;
+  },
+  handleDeleteDraft: async (params) => {
+    const data = await deleted(routes.handleDeleteDraft, params);
+    return data;
+  },
+  getCustomerDropDown: async (params) => {
+    const data = await get(routes.getCustomerDropDown, params);
+    return data;
+  },
+  getSubCustomerList: async (params) => {
+    const data = await get(routes.getSubCustomerList, params);
+    return data;
+  },
+  getGalaxyCustomerList: async (params) => {
+    const data = await get(routes.getGalaxyCustomerList, params);
+    return data;
+  },
+  getCustomerQueue: async (params) => {
+    const data = await get(routes.getCustomerQueue, params);
+    return data;
+  },
+  getCustomerDetail: async (params) => {
+    const data = await get(routes.getCustomerDetail, params);
+    return data;
+  },
+  getBuyerIdDetail: async (params) => {
+    const data = await get(routes.getBuyerIdDetail, params);
+    return data;
+  },
+  getBuyerIdByAuctionId: async (params) => {
+    const data = await get(routes.getBuyerIdByAuctionId, params);
+    return data;
+  },
+  verifyFinance: async (obj) => {
+    const data = await post(routes.verifyFinance, obj);
+    return data;
+  },
+  allocateBuyerId: async (obj) => {
+    const data = await post(routes.allocateBuyerId, obj);
+    return data;
+  },
+  deallocateBuyerId: async (obj) => {
+    const data = await post(routes.deallocateBuyerId, obj);
+    return data;
+  },
+  changeAllocationStatus: async (obj) => {
+    const data = await patch(routes.changeAllocationStatus, obj);
+    return data;
+  },
+  getMessages: async (params) => {
+    const data = await get(routes.getMessages, params);
+    return data;
+  },
+  sendMessage: async (obj) => {
+    const data = await post(routes.sendMessage, obj);
+    return data;
+  },
+  getCustomerBooking: async (params) => {
+    const data = await get(routes.getCustomerBooking, params);
+    return data;
+  },
+  getCustomerBuyerId: async (params) => {
+    const data = await get(routes.getCustomerBuyerId, params);
+    return data;
+  },
+}
+
+export default CustomerServices

@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Import",
+    "icon": "importCustomer"
+  },
+  {
+    "label": "Export",
+    "icon": "exportCustomer"
+  }
+]

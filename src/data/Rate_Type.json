@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Normal Bike"
+  },
+  {
+    "id": 2,
+    "name": "Oversize Bike"
+  },
+  {
+    "id": 3,
+    "name": "Auto"
+  },
+  {
+    "id": 4,
+    "name": "Container Price"
+  },
+  {
+    "id": 5,
+    "name": "Scrap Price"
+  },
+  {
+    "id": 6,
+    "name": "Cutting"
+  }
+]

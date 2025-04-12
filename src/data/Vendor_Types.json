@@ -1,0 +1,14 @@
+[
+  {
+    "id": "shipping",
+    "name": "Shipping"
+  },
+  {
+    "id": "clearance",
+    "name": "Clearance"
+  },
+  {
+    "id": "towings",
+    "name": "Towings"
+  }
+]

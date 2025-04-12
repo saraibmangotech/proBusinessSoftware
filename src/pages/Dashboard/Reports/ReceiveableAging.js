@@ -1,0 +1,879 @@
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  tableCellClasses,
+  IconButton,
+  CircularProgress,
+  Chip,
+  Grid,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+  ListItemText,
+  Tooltip,
+  Checkbox,
+  InputAdornment,
+  Button,
+} from "@mui/material";
+import {
+  AllocateIcon,
+  CheckIcon,
+  EyeIcon,
+  FontFamily,
+  Images,
+  MessageIcon,
+  PendingIcon,
+  RequestBuyerIdIcon,
+} from "assets";
+import styled from "@emotion/styled";
+import { useNavigate } from "react-router-dom";
+import Colors from "assets/Style/Colors";
+import { CircleLoading } from "components/Loaders";
+import { ErrorToaster, SuccessToaster } from "components/Toaster";
+import FinanceStatusDialog from "components/Dialog/FinanceStatusDialog";
+import AllocateStatusDialog from "components/Dialog/AllocateStatusDialog";
+import AllocateDialog from "components/Dialog/AllocateDialog";
+import CustomerServices from "services/Customer";
+import { makeStyles } from "@mui/styles";
+import Pagination from "components/Pagination";
+import {
+  CleanTypes,
+  Debounce,
+  encryptData,
+  formatPermissionData,
+  getFileSize,
+  handleDownload,
+  handleExportWithComponent,
+} from "utils";
+import InputField from "components/Input";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { addPermission } from "redux/slices/navigationDataSlice";
+import SimpleDialog from "components/Dialog/SimpleDialog";
+import { PrimaryButton } from "components/Buttons";
+import SelectField from "components/Select";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import SearchIcon from "@mui/icons-material/Search";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { PDFExport } from "@progress/kendo-react-pdf";
+import moment from "moment";
+import CommissionServices from "services/Commission";
+import LabelCustomInput from "components/Input/LabelCustomInput";
+import { showErrorToast, showPromiseToast } from "components/NewToaster";
+import { adjustSectionValue } from "@mui/x-date-pickers/internals/hooks/useField/useField.utils";
+import DatePicker from "components/DatePicker";
+import VisaServices from "services/Visa";
+import { CloudUpload } from "@mui/icons-material";
+import instance from "config/axios";
+import routes from "services/System/routes";
+import { BoxTypes } from "devextreme-react/cjs/box";
+import { mt } from "date-fns/locale";
+import InvoiceServices from "services/Invoicing";
+import { CSVLink } from "react-csv";
+
+// *For Table Style
+const Row = styled(TableRow)(({ theme }) => ({
+  border: 0,
+}));
+
+const Cell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    fontSize: 14,
+    fontFamily: "Public Sans",
+    border: "1px solid #EEEEEE",
+    padding: "15px",
+    textAlign: "left",
+    whiteSpace: "nowrap",
+    color: "#434343",
+    paddingRight: "50px",
+    background: "transparent",
+    fontWeight: "bold",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    fontFamily: "Public Sans",
+
+    textWrap: "nowrap",
+    padding: "5px !important",
+    paddingLeft: "15px !important",
+    ".MuiBox-root": {
+      display: "flex",
+      gap: "6px",
+      alignItems: "center",
+      justifyContent: "center",
+      ".MuiBox-root": {
+        cursor: "pointer",
+      },
+    },
+    svg: {
+      width: "auto",
+      height: "24px",
+    },
+    ".MuiTypography-root": {
+      textTransform: "capitalize",
+      fontFamily: FontFamily.NunitoRegular,
+      textWrap: "nowrap",
+    },
+    ".MuiButtonBase-root": {
+      padding: "8px",
+      width: "28px",
+      height: "28px",
+    },
+  },
+}));
+
+const useStyles = makeStyles({
+  loaderWrap: {
+    display: "flex",
+    height: 100,
+    "& svg": {
+      width: "40px !important",
+      height: "40px !important",
+    },
+  },
+});
+
+function ReceivableAging() {
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm();
+  const {
+    register: register2,
+    handleSubmit: handleSubmit2,
+    setValue: setValue2,
+    getValues: getValues2,
+    formState: { errors: errors2 },
+  } = useForm();
+  // *For Deposit Slip
+  const [progress, setProgress] = useState(0);
+  const [uploadedSize, setUploadedSize] = useState(0);
+  const [slipDetail, setSlipDetail] = useState([]);
+  const [slipLink, setSlipLink] = useState("");
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [csvData, setCsvData] = useState([]);
+  const [comparisonCsvData, setComparisonCsvData] = useState([]);
+
+  const navigate = useNavigate();
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const contentRef = useRef(null);
+  const [statusDialog, setStatusDialog] = useState(false);
+  const [paymentDialog, setPaymentDialog] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [payment, setPayment] = useState(null);
+  const [selectedVisa, setSelectedVisa] = useState();
+  const [selectedItem, setSelectedItem] = useState(null);
+  const csvLink = useRef();
+
+  const tableHead = [
+    { name: "Client", key: "created_at" },
+    { name: "Request ID", key: "name" },
+    { name: "Request Date", key: "commission_visa" },
+    { name: "Invoice Number", key: "commission_monthly" },
+    { name: "Invoice Date", key: "commission_monthly" },
+    { name: "Due Date", key: "commission_monthly" },
+    { name: "Total Amount", key: "commission_monthly" },
+    { name: "Not Due", key: "commission_monthly" },
+    { name: "0-30 Days Over Due", key: "commission_monthly" },
+    { name: "30-60 Days Over Due", key: "commission_monthly" },
+    { name: "60-90 Days Over Due", key: "commission_monthly" },
+    { name: "90-120 Days Over Due", key: "commission_monthly" },
+    { name: "More Than 120 Days Over Due", key: "commission_monthly" },
+  ];
+
+  const allowFilesType = ["application/pdf"];
+
+  const [loader, setLoader] = useState(false);
+
+  const [sort, setSort] = useState("asc");
+
+  // *For Customer Queue
+  const [invoices, setInvoices] = useState([]);
+
+  // *For setPermissions
+  const [totalCount, setTotalCount] = useState(0);
+  const [pageLimit, setPageLimit] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [itemAmount, setItemAmount] = useState();
+
+  // *For Filters
+  const [filters, setFilters] = useState({});
+
+  // *For Permissions
+  const [permissions, setPermissions] = useState();
+
+  const [loading, setLoading] = useState(false);
+
+  // *For Upload Document
+  const handleUploadDocument = async (e) => {
+    try {
+      e.preventDefault();
+      const file = e.target.files[0];
+      let arr = [
+        {
+          name: file?.name,
+          file: "",
+          type: file?.type.split("/")[1],
+          size: getFileSize(file.size),
+          isUpload: false,
+        },
+      ];
+      if (allowFilesType.includes(file.type)) {
+        handleUpload(file, arr);
+        const path = await handleUpload(file, arr);
+        console.log("Uploaded file path:", path);
+        setSlipLink(path);
+        console.log(path, "pathpathpath");
+        return path;
+      } else {
+        ErrorToaster(`Only ${CleanTypes(allowFilesType)} formats is supported`);
+      }
+    } catch (error) {
+      ErrorToaster(error);
+    }
+  };
+
+  const handleRadioChange = (item) => {
+    setSelectedItem(item);
+  };
+  const handleUpload = async (file, docs) => {
+    setProgress(0);
+    try {
+      const formData = new FormData();
+      formData.append("document", file);
+      console.log(file);
+      const { data } = await instance.post(routes.uploadDocuments, formData, {
+        onUploadProgress: (progressEvent) => {
+          const uploadedBytes = progressEvent.loaded;
+          const percentCompleted = Math.round(
+            (uploadedBytes * 100) / progressEvent.total
+          );
+
+          setProgress(percentCompleted);
+          console.log(getFileSize(uploadedBytes));
+          setUploadedSize(getFileSize(uploadedBytes));
+        },
+      });
+      if (data) {
+        docs[0].isUpload = true;
+        docs[0].file = data?.data?.nations;
+        setSlipDetail(docs);
+        console.log(data, "asddasasd");
+        return data?.data?.path;
+      }
+    } catch (error) {
+      ErrorToaster(error);
+    }
+  };
+
+  // *For Get Customer Queue
+  const getInvoices = async (page, limit, filter) => {
+    // setLoader(true)
+    try {
+      const Page = page ? page : currentPage;
+      const Limit = limit ? limit : pageLimit;
+      const Filter = filter ? { ...filters, ...filter } : null;
+      setCurrentPage(Page);
+      setPageLimit(Limit);
+      setFilters(Filter);
+      let params = {
+        page: Page,
+        limit: Limit,
+      };
+      params = { ...params, ...Filter };
+
+      const { data } = await InvoiceServices.getInvoices(params);
+      let updatedData = data?.rows?.filter(
+        (item) => item?.payment_status == "unpaid"
+      );
+      console.log(updatedData);
+
+      setInvoices(updatedData);
+      setTotalCount(data?.count);
+    } catch (error) {
+      showErrorToast(error);
+    } finally {
+      // setLoader(false)
+    }
+  };
+
+  // const downloadExcel = () => {
+  //     // Define headers and data separately
+  //     const headers = tableHead.map(header => header.name);
+  //     const data = invoices;
+
+  //     // Extract values from objects and create an array for each row
+  //     const rows = data.map((item, index) => {
+  //         const diffInDays = moment(item?.due_date).diff(moment(), 'days');
+
+  //         return [
+  //             item?.customer_name ?? '-',
+  //             item?.reference_id ?? '-',
+  //             moment(item?.created_at).format('MM-DD-YYYY') ?? '-',
+  //             item?.id,
+  //             moment(item?.created_at).format('MM-DD-YYYY') ?? '-',
+  //             moment(item?.due_date).format('MM-DD-YYYY') ?? '-',
+  //             item?.total_amount,
+  //             diffInDays < 0 ? item?.total_amount : '',
+  //             diffInDays > 0 && diffInDays < 30 ? item?.total_amount : '',
+  //             diffInDays > 30 && diffInDays < 60 ? item?.total_amount : '',
+  //             diffInDays > 60 && diffInDays < 90 ? item?.total_amount : '',
+  //             diffInDays > 90 && diffInDays < 120 ? item?.total_amount : '',
+  //             diffInDays > 120 ? item?.total_amount : ''
+  //         ];
+  //     });
+
+  //     // Create a workbook with a worksheet
+  //     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  //     const wb = XLSX.utils.book_new();
+  //     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+  //     // Convert the workbook to an array buffer
+  //     const buf = XLSX.write(wb, {
+  //         bookType: "xlsx",
+  //         type: "array",
+  //         mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  //     });
+
+  //     // Save the file using FileSaver.js
+  //     saveAs(new Blob([buf]), "data.xlsx");
+  // };
+
+  // *For Handle Filter
+  const handleFilter = () => {
+    let data = {
+      search: getValues("search"),
+    };
+    Debounce(() => getInvoices(1, "", data));
+  };
+
+  const handleSort = (key) => {
+    let data = {
+      sort_by: key,
+      sort_order: sort,
+    };
+    Debounce(() => getInvoices(1, "", data));
+  };
+
+  useEffect(() => {
+    getInvoices();
+  }, []);
+
+  const downloadExcel = async () => {
+    console.log("Downloading Excel...");
+    setCsvLoading(true);
+
+    try {
+      const allDataLimit = 9999;
+      const allDataPage = 1;
+
+      const params = {
+        page: allDataPage,
+        limit: allDataLimit,
+        ...filters,
+      };
+
+      const { data } = await InvoiceServices.getInvoices(params);
+      let updatedData = data?.rows?.filter(
+        (item) => item?.payment_status == "unpaid"
+      );
+
+      const csvHeaders = [
+        { label: "Sr No", key: "sr_no" },
+        { label: "Client", key: "created_at" },
+        { label: "Request ID", key: "name" },
+        { label: "Request Date", key: "commission_visa" },
+        { label: "Invoice Number", key: "commission_monthly" },
+        { label: "Invoice Date", key: "commission_monthly" },
+        { label: "Due Date", key: "commission_monthly" },
+        { label: "Total Amount", key: "commission_monthly" },
+        { label: "Not Due", key: "commission_monthly" },
+        { label: "0-30 Days Over Due", key: "commission_monthly" },
+        { label: "30-60 Days Over Due", key: "commission_monthly" },
+        { label: "60-90 Days Over Due", key: "commission_monthly" },
+        { label: "90-120 Days Over Due", key: "commission_monthly" },
+        { label: "More Than 120 Days Over Due", key: "commission_monthly" },
+      ];
+
+      const csvData = updatedData?.map((item, index) => {
+        const diffInDays = moment(item?.due_date)
+          .startOf("day")
+          .diff(moment().startOf("day"), "days");
+
+        return {
+          sr_no: index + 1,
+          customer_name: item?.customer_name || "-",
+          reference_id: item?.reference_id || "-",
+          created_at: item?.created_at
+            ? moment(item?.created_at).format("MM-DD-YYYY")
+            : "-",
+          invoice_id: item?.id || "-",
+          invoice_date:item?.created_at ?moment(item?.created_at).format( "MM-DD-YYYY" ):"-",
+          due_date: item?.due_date
+            ? moment(item?.due_date).format("MM-DD-YYYY")
+            : "-",
+          total_amount: item?.total_amount || "-",
+          overdue: diffInDays < 0 ? item?.total_amount : "-",
+          due_in_30_days:
+            diffInDays > 0 && diffInDays <= 30 ? item?.total_amount : "-",
+          due_in_60_days:
+            diffInDays > 30 && diffInDays <= 60 ? item?.total_amount : "-",
+          due_in_90_days:
+            diffInDays > 60 && diffInDays <= 90 ? item?.total_amount : "-",
+          due_in_120_days:
+            diffInDays > 90 && diffInDays <= 120 ? item?.total_amount : "-",
+          due_over_120_days: diffInDays > 120 ? item?.total_amount : "-",
+        };
+      });
+
+      setCsvData([
+        csvHeaders.map((header) => header.label),
+        ...csvData.map((row) => Object.values(row)),
+      ]);
+    } catch (error) {
+      console.error("Error generating CSV data: ", error);
+      ErrorToaster("Failed to generate CSV data: " + error.message);
+    } finally {
+      setCsvLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (csvData.length > 0) {
+      csvLink?.current.link.click();
+    }
+  }, [csvData, comparisonCsvData]);
+  return (
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
+          Customer Account Receivable Aging Report
+        </Typography>
+
+        {invoices?.length > 0 && (
+          <Box sx={{ display: "flex", gap: "10px" }}>
+            <PrimaryButton
+              title="Download PDF"
+              type="button"
+              style={{ backgroundColor: Colors.bluishCyan }}
+              onClick={() => handleExportWithComponent(contentRef)}
+            />
+            <CSVLink
+              ref={csvLink}
+              data={csvData}
+              filename={`Customer_Account_Receivable_Aging_Report${moment().format(
+                "DD-MMM-YYYY_HHmmss"
+              )}.csv`}
+              target="_blank"
+            ></CSVLink>
+            <PrimaryButton
+              title="Download Excel"
+              type="button"
+              style={{ backgroundColor: Colors.bluishCyan }}
+              onClick={() => {
+                downloadExcel();
+              }}
+              loading={csvLoading}
+            />
+            {/* <PrimaryButton
+                        title={"Download Excel"}
+                        onClick={() => downloadExcel()}
+                    /> */}
+          </Box>
+        )}
+      </Box>
+
+      {/* Filters */}
+      <Box>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <LabelCustomInput
+              type={"text"}
+              bgcolor={"#FAFAFA"}
+              color={Colors.primary}
+              border={"3px solid #FAFAFA"}
+              StartLabel={"Search"}
+              placeholder={"Search"}
+              register={register("search")}
+            />
+          </Grid>
+          {/* <Grid item xs={3} >
+                        <LabelCustomInput type={'text'} bgcolor={'#FAFAFA'} color={Colors.primary} border={'3px solid #FAFAFA'} StartLabel={'By Customers'} placeholder={'Enter Name'}   register={register("payroll")} />
+                    </Grid>
+                    <Grid item xs={3} >
+                        <LabelCustomInput bgcolor={'#FAFAFA'} color={Colors.primary} border={'3px solid #FAFAFA'} StartLabel={'By Commission'} placeholder={'Enter Name'}   register={register("payroll")} />
+                    </Grid>
+                    <Grid item xs={3} >
+                        <LabelCustomInput bgcolor={'#FAFAFA'} color={Colors.primary} border={'2px solid #FAFAFA'} StartLabel={'By Date'} placeholder={'Enter Name'}   register={register("payroll")} />
+                    </Grid> */}
+          <Grid
+            item
+            xs={6}
+            display={"flex"}
+            justifyContent={"flex-end"}
+            gap={2}
+          >
+            <PrimaryButton
+              bgcolor={"#0076bf"}
+              textcolor={Colors.white}
+              // border={`1px solid ${Colors.primary}`}
+              title="Reset"
+              onClick={() => {
+                getInvoices(1, "", null);
+                setValue("search", "");
+              }}
+              loading={loading}
+            />
+            <PrimaryButton
+              bgcolor={Colors.buttonBg}
+              title="Search"
+              onClick={() => handleFilter()}
+              loading={loading}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid item md={11}>
+          {invoices && (
+            <Box>
+              <Grid container></Grid>
+
+              {invoices && (
+                <Fragment>
+                  <PDFExport
+                    ref={contentRef}
+                    landscape={true}
+                    paperSize="A4"
+                    margin={5}
+                    fileName="Data"
+                    pageTemplate={({ pageNumber, totalPages }) => (
+                      <>
+                        {/* Header */}
+                        <Box
+                          style={{
+                            position: "absolute",
+                            top: "20px",
+                            left: "0",
+                            right: "0",
+                            textAlign: "center",
+
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          <Box
+                            style={{
+                              alignItems: "center",
+                            }}
+                          >
+                            <Box>
+                              <img
+                                style={{ width: "300px", height: "20px" }}
+                                src={Images.pdfLogo}
+                              />
+                              <Box
+                                style={{
+                                  color: "#155368",
+                                  flexDirection: "column",
+                                }}
+                              >
+                                <Typography
+                                  style={{
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  <span style={{ display: "block" }}>
+                                    MABDE TRADING L.L.C
+                                  </span>
+                                </Typography>
+                                <Typography
+                                  style={{
+                                    color: "#155368",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    marginLeft: "30px",
+                                  }}
+                                >
+                                  <span style={{ display: "block" }}>
+                                    TEL: 04-3400000, FAX: 04-3488448
+                                  </span>
+                                </Typography>
+                                <Typography
+                                  style={{
+                                    color: "#155368",
+                                    fontWeight: "bold",
+
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  <span style={{ display: "block" }}>
+                                    P.O.BOX 81, DUBAI, UAE
+                                  </span>
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Box>
+
+                          <Typography
+                            className="pdf-myfont"
+                            sx={{
+                              fontSize: "24px",
+                              fontWeight: "bold",
+                              textAlign: "left",
+                              fontFamily: "Arial, Helvetica, sans-serif",
+                            }}
+                          >
+                            Customer Account Receivable Aging Report
+                          </Typography>
+
+                          {/* <Box
+            className="pdf-center"
+            style={{ textAlign: "center", margin: "0 auto !important" }}
+            mb={4}
+          >
+            <center>
+              <Typography
+                className="pdf-center"
+                style={{
+                  fontSize: "15px",
+                  fontWeight: "bold",
+                  letterSpacing: "11px",
+                  textAlign: "center",
+                  textDecoration: "underline",
+                  marginLeft: "10px !important",
+                }}
+              >
+                TAX INVOICE
+              </Typography>
+            </center>
+          </Box> */}
+                        </Box>
+
+                        {/* Footer */}
+                        {/* <Box style={{
+                                                    position: 'absolute',
+                                                    bottom: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    height: '50px',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center'
+                                                }}>
+                                                    <img src={Images.invoiceHeader} style={{ width: '100%' }} alt="Footer" />
+                                                </Box> */}
+                      </>
+                    )}
+                  >
+                    {/* Main content */}
+                    <TableContainer
+                      component={Paper}
+                      className="main-table"
+                      sx={{
+                        maxHeight: "100%",
+                        mt: 2,
+                        backgroundColor: "transparent",
+                        boxShadow: "none !important",
+                        borderRadius: "0px !important",
+                        paddingTop: "10px", // Adjust for header height
+                        paddingBottom: "60px", // Adjust for footer height
+                      }}
+                    >
+                      <Table stickyHeader sx={{ minWidth: 500 }}>
+                        <TableHead>
+                          <Row>
+                            {tableHead.map((cell, index) => (
+                              <Cell
+                                style={{
+                                  textAlign:
+                                    cell?.name === "Select" ? "center" : "left",
+                                  paddingRight:
+                                    cell?.name === "Select" ? "15px" : "20px",
+                                }}
+                                className="pdf-table pdf-table-head2"
+                                key={index}
+                              >
+                                <Box
+                                  component={"div"}
+                                  className=" pdf-table pdf-table-head2"
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "flex-end",
+                                  }}
+                                >
+                                  {cell?.name}
+                                  {cell?.name === "Date" && (
+                                    <>
+                                      &nbsp;
+                                      <span
+                                        style={{
+                                          height: "20px",
+                                          cursor: "pointer",
+                                        }}
+                                      >
+                                        <Box
+                                          component={"img"}
+                                          onClick={() => {
+                                            setSort(
+                                              sort === "asc" ? "desc" : "asc"
+                                            );
+                                            handleSort(cell?.key);
+                                          }}
+                                          src={Images.sortIcon}
+                                          width={"18px"}
+                                        ></Box>
+                                      </span>
+                                    </>
+                                  )}
+                                </Box>
+                              </Cell>
+                            ))}
+                          </Row>
+                        </TableHead>
+                        <TableBody>
+                          {invoices?.map((item, index) => {
+                            const diffInDays = moment(item?.due_date)
+                              .startOf("day")
+                              .diff(moment().startOf("day"), "days");
+                            console.log(item?.customer_name, diffInDays);
+
+                            return (
+                              <Row
+                                key={index}
+                                sx={{ border: "1px solid #EEEEEE !important" }}
+                              >
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {item?.customer_name}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {item?.reference_id}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {moment(item?.created_at).format(
+                                    "MM-DD-YYYY"
+                                  )}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {item?.id}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {moment(item?.created_at).format(
+                                    "MM-DD-YYYY"
+                                  )}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {moment(item?.due_date).format("MM-DD-YYYY")}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {item?.total_amount}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {diffInDays < 0 ? item?.total_amount : "-"}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {diffInDays > 0 && diffInDays < 30
+                                    ? item?.total_amount
+                                    : "-"}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {diffInDays > 30 && diffInDays < 60
+                                    ? item?.total_amount
+                                    : "-"}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {diffInDays > 60 && diffInDays < 90
+                                    ? item?.total_amount
+                                    : "-"}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {diffInDays > 90 && diffInDays < 120
+                                    ? item?.total_amount
+                                    : "-"}
+                                </Cell>
+                                <Cell
+                                  style={{ textAlign: "left" }}
+                                  className="pdf-table2"
+                                >
+                                  {diffInDays > 120 ? item?.total_amount : "-"}
+                                </Cell>
+                              </Row>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </PDFExport>
+
+                  {/* ========== Pagination ========== */}
+                  <Pagination
+                    currentPage={currentPage}
+                    pageSize={pageLimit}
+                    onPageSizeChange={(size) =>
+                      getInvoices(1, size.target.value)
+                    }
+                    tableCount={invoices?.length}
+                    totalCount={totalCount}
+                    onPageChange={(page) => getInvoices(page, "")}
+                  />
+                </Fragment>
+              )}
+
+              {loader && <CircleLoading />}
+            </Box>
+          )}
+        </Grid>
+      </Box>
+    </Box>
+  );
+}
+
+export default ReceivableAging;

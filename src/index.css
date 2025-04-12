@@ -1,0 +1,1396 @@
+@font-face {
+  font-family: "DM Sans";
+  src: local("DM Sans"), url("assets/Fonts/DMSans/DMSans-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Nunito-Regular";
+  src: local("Nunito-Regular"), url("assets/Fonts/Nunito/Nunito-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Nunito-Italic";
+  src: local("Nunito-Italic"), url("assets/Fonts/Nunito/Nunito-Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: local("Montserrat"), url("assets/Fonts/Montserrat/Montserrat-Regular.ttf") format("truetype");
+}
+
+
+:root {
+  --primary: #232323;
+
+  --primaryGradient: linear-gradient(94.06deg, #4CAF4F -1.21%, #6BBD6D 50.75%, #358437 102.71%);
+  --secondary: #232323;
+  --white: #ffffff;
+  --lightScrollbar: #232323;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--white);
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+  padding: 0px 4px;
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--lightScrollbar);
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Public Sans';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+code {
+  font-family: 'DM Sans';
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.text-truncate {
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+.heading-divider {
+  background: var(--primaryGradient);
+  height: 4px;
+  width: 50px;
+  transform: skewX(-43deg);
+  -webkit-transform: skewX(-43deg);
+  -moz-transform: skewX(-43deg);
+  -ms-transform: skewX(-43deg);
+  -o-transform: skewX(-43deg);
+}
+
+.custom-divider {
+  border-top: 1px solid var(--primary);
+  width: 90px;
+  position: relative;
+}
+
+.custom-divider::before {
+  content: "";
+  top: -2px;
+  width: 28px;
+  border-bottom: solid var(--white) 2px;
+}
+
+.custom-divider::after {
+  content: "❯❯";
+  top: -11px;
+  color: var(--primary);
+  font-size: 17px;
+  letter-spacing: -1px;
+  height: 20px;
+  width: 26px;
+}
+
+.custom-divider::before,
+.custom-divider::after {
+  position: absolute;
+  left: 0;
+  line-height: 20px;
+  font-weight: 600;
+  text-align: center;
+  animation: divider-move 7s infinite linear;
+  -webkit-animation: divider-move 7s infinite linear;
+}
+
+@keyframes divider-move {
+  0% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+
+  50% {
+    transform: translateX(72px);
+    -webkit-transform: translateX(72px);
+    -moz-transform: translateX(72px);
+    -ms-transform: translateX(72px);
+    -o-transform: translateX(72px);
+  }
+
+  100% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+}
+
+@-webkit-keyframes divider-move {
+  0% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+
+  50% {
+    transform: translateX(72px);
+    -webkit-transform: translateX(72px);
+    -moz-transform: translateX(72px);
+    -ms-transform: translateX(72px);
+    -o-transform: translateX(72px);
+  }
+
+  100% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+}
+
+@-moz-keyframes divider-move {
+  0% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+
+  50% {
+    transform: translateX(72px);
+    -webkit-transform: translateX(72px);
+    -moz-transform: translateX(72px);
+    -ms-transform: translateX(72px);
+    -o-transform: translateX(72px);
+  }
+
+  100% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+}
+
+@-o-keyframes divider-move {
+  0% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+
+  50% {
+    transform: translateX(72px);
+    -webkit-transform: translateX(72px);
+    -moz-transform: translateX(72px);
+    -ms-transform: translateX(72px);
+    -o-transform: translateX(72px);
+  }
+
+  100% {
+    transform: translateX(-1px);
+    -webkit-transform: translateX(-1px);
+    -moz-transform: translateX(-1px);
+    -ms-transform: translateX(-1px);
+    -o-transform: translateX(-1px);
+  }
+}
+
+.up-down-animation {
+  animation: up-down 2s infinite linear;
+  -webkit-animation: up-down 2s infinite linear;
+}
+
+@keyframes up-down {
+  0% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+    -webkit-transform: translateY(-15px);
+    -moz-transform: translateY(-15px);
+    -ms-transform: translateY(-15px);
+    -o-transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+}
+
+@-webkit-keyframes up-down {
+  0% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+    -webkit-transform: translateY(-15px);
+    -moz-transform: translateY(-15px);
+    -ms-transform: translateY(-15px);
+    -o-transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+}
+
+@-moz-keyframes up-down {
+  0% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+    -webkit-transform: translateY(-15px);
+    -moz-transform: translateY(-15px);
+    -ms-transform: translateY(-15px);
+    -o-transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+}
+
+@-o-keyframes up-down {
+  0% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+    -webkit-transform: translateY(-15px);
+    -moz-transform: translateY(-15px);
+    -ms-transform: translateY(-15px);
+    -o-transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -o-transform: translateY(-30px);
+  }
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: transform .3s;
+  height: 75px;
+  z-index: 100;
+  padding: 0 16px;
+  letter-spacing: normal;
+}
+
+.header--transparent {
+  background: linear-gradient(to bottom, rgb(40, 40, 40) 0%, rgba(40, 40, 40, 0) 100%);
+}
+
+.header--transparent:before {
+  transform: scaleY(0);
+}
+
+.header:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: -1;
+  transition: transform .4s;
+  border: 1px solid #ededed;
+  transform-origin: 0 0;
+  backdrop-filter: none;
+}
+
+.react-tel-input .form-control:focus {
+  border-width: 2px !important;
+  border-color: var(--primary) !important;
+}
+
+.react-tel-input .selected-flag:focus:before,
+.react-tel-input .selected-flag.open:before {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.rotateBox {
+  position: relative;
+  transition: transform 0.5s;
+}
+
+.rotateBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  transform: rotateY(0deg);
+  transition: transform 0.5s, background-color 0.5s ease-in-out;
+  pointer-events: none;
+}
+
+.contentBox:hover .rotateBox::before {
+  transform: rotateY(360deg);
+}
+
+.contentBox:hover .rotateBox {
+  transform: rotateY(-360deg);
+  background-color: #14212a;
+}
+
+.icon-banner::after {
+  content: "❯❯";
+  top: -11px;
+  color: var(--primary);
+  font-size: 17px;
+  letter-spacing: -1px;
+  height: 20px;
+  width: 26px;
+}
+
+.swiper .swiper-scrollbar {
+  display: none !important;
+}
+
+.swiper-pagination .swiper-pagination-bullet {
+  background: var(--primaryGradient);
+  width: 30px;
+  height: 6px;
+  border-radius: 0;
+  opacity: .3;
+  margin: 0 5px;
+  transform: skewX(-43deg);
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, .15);
+}
+
+.swiper-pagination .swiper-pagination-bullet-active {
+  width: 60px;
+  opacity: 1;
+}
+
+
+.swiper .swiper-button-prev,
+.swiper .swiper-button-next {
+  /* background-color: rgba(0, 0, 0, .7); */
+  font-size: 20px !important;
+  font-weight: bold !important;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
+
+.swiper-button-prev {
+  left: 10px !important;
+}
+
+.swiper-button-next {
+  right: 10px;
+}
+
+
+.mySwiper {
+  width: 95% !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+
+}
+
+.mySwiper .swiper-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.mySwiper .swiper-slide-thumb-active img {
+  border: 1px solid black;
+  border-radius: 12px;
+  padding: 2px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
+}
+
+.download-button {
+  position: absolute;
+  bottom: 40px;
+  background-color: #343a3e;
+  opacity: 0.8;
+  border: none;
+  left: 45%;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 18px;
+  padding-right: 18px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  cursor: pointer;
+}
+
+.download-img {
+  filter: invert(100%);
+}
+
+.custom-label {
+  color: #00000099 !important;
+}
+
+.notes-div {
+  width: 50% !important;
+}
+
+.label-section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.toggle-box {
+  width: 100px;
+  height: 100px;
+
+}
+
+.innerCircle {
+  text-align: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: black;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+}
+
+/* toggle triple css  */
+
+.tw-toggle {
+  display: inline-block;
+  padding: 0;
+  width: 104px;
+  height: 32px;
+  /* Adjust the height as needed */
+  border-radius: 20px;
+  position: relative;
+  border: 2px solid #dcdcdc;
+  background-color: #DCDCDC;
+}
+
+.tw-toggle label {
+  text-align: center;
+  font-family: sans-serif;
+  color: #747474 !important;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  text-align: center;
+  padding: 0px 5px;
+  font-size: 12px;
+  top: 8px;
+  /* Adjust the font size as needed */
+  float: left;
+}
+
+.tw-toggle label:nth-child(4) {
+  margin-left: 7px;
+}
+
+.tw-toggle label:nth-child(6) {
+  margin-left: 6px;
+}
+
+.tw-toggle input {
+  position: absolute;
+  z-index: 3;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.tw-toggle span {
+  height: 28px;
+  /* Adjust the height of the toggle circle */
+  width: 28px;
+  /* Adjust the width of the toggle circle */
+  line-height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  display: block;
+  position: absolute;
+  left: 22px;
+  top: 0px;
+  /* Adjust the top position of the toggle circle */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Rest of your styles remain the same */
+
+
+.tw-toggle input[value="false"]:checked~span {
+  background: rgb(41 43 48 / 50%);
+  left: 2px;
+  color: #fff;
+  z-index: 2;
+}
+
+.nav-pills .nav-link.active {
+  color: #070707;
+  background-color: #d0d0d0;
+  border-radius: 1px;
+}
+
+.nav-pills .nav-link {
+  color: #333;
+  padding: 1px 6px;
+  margin-bottom: 2px;
+}
+
+#pmodOpt .flds {
+  vertical-align: text-bottom;
+  margin-left: 5px;
+}
+
+.profile-pills {
+  border-right: solid 1px #f4f4f4;
+}
+
+.profile-pills .nav-link {
+  padding: 15px 9px;
+}
+
+.profile-pills .nav-link.active {
+  color: #070707;
+  background-color: #f4f4f4;
+  border-radius: 1px;
+}
+
+
+.tw-toggle input[value="1"]:checked~span {
+  background: #D10202;
+  left: 60px;
+  z-index: 2;
+}
+
+.tw-toggle input[value="-1"]:checked~span {
+  background: #A3A3A3;
+  left: 22px;
+  z-index: 2;
+
+}
+
+.tw-toggle input[value="0"].active~span {
+  background: #D10202;
+  left: 71px;
+  color: #fff;
+  z-index: 2;
+}
+
+.tw-toggle input[value="1"].active~span {
+  background: #38CB89;
+  left: 1px;
+  z-index: 2;
+}
+
+.tw-toggle input[value="-1"].active~span {
+  background: #A3A3A3;
+  left: 35px;
+  z-index: 2;
+}
+
+.tw-toggle label {
+  color: #747474 !important;
+}
+
+.tw-toggle input[value="false"]:checked+label,
+.tw-toggle input[value="true"]:checked+label {
+  color: transparent;
+}
+
+.tw-toggle input[value="-1"]:checked+label {
+  color: transparent;
+}
+
+.mdet {
+  background: #fafafa;
+}
+
+.mdet_container {
+  box-shadow: 0 0 2px 0px #d7d7d7;
+  padding: 20px;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.mdet .fa-false,
+.adet .fa-false {
+  color: rgb(41 43 48 / 50%);
+}
+
+.mdet .fa-1,
+.adet .fa-1 {
+  color: #f68d4b;
+}
+
+.mdet .fa-true,
+.adet .fa-true {
+  color: #38CB89;
+}
+
+.mdet .flds,
+.adet .flds {
+  vertical-align: text-bottom;
+  margin-left: 5px;
+}
+
+.table.table-vcenter th {
+  background: #fafafa;
+}
+
+.table.table-vcenter {
+  border-left: solid 1px #dee2e6;
+  border-right: solid 1px #dee2e6;
+  border: solid 1px #dee2e6;
+}
+
+.custom-checkbox .custom-control-label::before {
+  border-radius: 0.25rem;
+}
+
+hr {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, .1);
+}
+
+.tw-toggle input:nth-child(1) {
+  left: -5px;
+  width: 40px;
+  height: 100%;
+}
+
+
+.tw-toggle input:nth-child(3) {
+  left: 35%;
+  width: 40px;
+  height: 100%;
+}
+
+.tw-toggle input:nth-child(5) {
+  left: 70%;
+  width: 100%;
+  width: 40px;
+  height: 100%;
+}
+
+.toggle-table {
+  width: 33.4%;
+  height: 100%;
+  border-collapse: collapse;
+  margin-right: -1px;
+  margin-bottom: 10%;
+
+}
+
+.toggle-table th,
+.toggle-table td {
+  border: 1px solid #D9D9D9;
+  padding: 8px;
+  border-bottom: 1px solid transparent;
+  padding: 8px;
+  text-align: center;
+  color: #747474;
+  height: 40px !important;
+}
+
+.toggle-table th {
+  background-color: #25ABE1;
+  color: white;
+  border: none !important;
+  height: 50px !important;
+}
+
+.toggle-table td {
+  font-size: 13px !important;
+}
+
+.switch-table {
+  display: flex;
+  width: 100%;
+  border-radius: 13px;
+  background-color: white;
+  box-shadow: 0px 8px 18px 0px #9B9B9B1A;
+}
+
+.toggle-table tr:last-child td {
+  border-bottom: 1px solid black !important;
+
+}
+
+.toggle-table tr:nth-child(even) {
+  background-color: #EAF9FF !important;
+
+}
+
+.switch-table .toggle-table:first-child th:first-child {
+  border-top-left-radius: 13px;
+
+}
+
+.switch-table .toggle-table:last-child th:last-child {
+  border-top-right-radius: 13px;
+
+}
+
+.Cancel-btn {
+  background-color: transparent;
+  color: #00000099;
+  border: none;
+  font-weight: bold;
+  font-size: 15px;
+
+
+  cursor: pointer;
+}
+
+.switch-table {
+  overflow-x: scroll;
+}
+
+.custom-select-svg .MuiSvgIcon-root {
+  width: 20px !important;
+  height: 20px !important;
+  border: 1px solid !important;
+  border-radius: 50% !important;
+  background-color: #38cb89 !important;
+  color: white !important;
+  -webkit-border-radius: 50% !important;
+  -moz-border-radius: 50% !important;
+  -ms-border-radius: 50% !important;
+  -o-border-radius: 50% !important;
+}
+
+.your-component-container {
+  position: relative;
+
+
+}
+
+.bookingoverlay {
+  position: absolute;
+  top: 12%;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  /* Make sure the overlay appears above your content */
+}
+
+
+
+
+
+.container p {
+  line-height: 35px;
+  text-align: justify;
+  margin-top: 30px;
+}
+
+mark {
+  background-color: #ffdd4b;
+}
+
+.element-to-print1 {
+  width: 600px !important;
+  min-height: 840px !important;
+
+}
+
+.Custom_input {
+  width: 100% !important;
+}
+
+/* .logout_Box:hover>* .logout_Icon {
+  color: white;
+} */
+
+.custom-Button:hover .custom-svg {
+  fill: white !important;
+}
+
+
+
+@media all {
+  .page-break {
+    display: none;
+  }
+}
+
+@media print {
+  .scroll-container {
+    overflow: visible;
+    height: fit-content;
+  }
+}
+
+.blur-wrapper {
+  position: relative;
+  /* Make the wrapper position relative */
+}
+
+.blur-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 1);
+  /* Adjust the opacity as needed */
+  backdrop-filter: blur(10px);
+  /* Adjust the blur amount as needed */
+}
+
+kendo-pdf-document .pdf-table {
+  font-size: 5px !important;
+  line-height: 5px !important;
+  white-space: normal;
+  word-wrap: break-word !important;
+  word-break: break-all;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+kendo-pdf-document .pdf-table2 {
+  font-size: 5px !important;
+  padding: 5px !important;
+  padding-left: 5px !important;
+  text-align: left !important;
+  white-space: normal;
+  word-wrap: break-word !important;
+  word-break: break-all;
+ font-family: Arial, Helvetica, sans-serif !important;
+
+}
+kendo-pdf-document .main-table {
+ 
+ margin-top: 15% !important;
+ padding: 10px !important;
+
+}
+kendo-pdf-document .pdf-myfont{
+  font-family: Arial, Helvetica, sans-serif !important;
+ 
+}
+kendo-pdf-document .pdf-table-head2{
+  font-size: 5px !important;
+  text-align: left !important;
+  padding: 1px !important;
+  padding-left: 5px !important;
+  font-weight: bold !important;
+  white-space: normal;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 5px !important;
+  line-height: 5px !important;
+  white-space: normal;
+  word-wrap: break-word !important;
+  word-break: break-all;
+
+}
+
+kendo-pdf-document .pdf-table-head {
+  font-size: 10px !important;
+  padding: 1px !important;
+  font-weight: bold !important;
+  white-space: normal;
+  font-family: Arial, Helvetica, sans-serif !important;
+  border: 1px solid black !important;
+}
+kendo-pdf-document .pdf-table-td {
+  font-size: 10px !important;
+  padding: 5px !important;
+  white-space: normal;
+  font-family: Arial, Helvetica, sans-serif !important;
+  border: 0.5px solid black !important;
+}
+
+kendo-pdf-document .pdf-long-text {
+  padding-right: 15px !important;
+}
+kendo-pdf-document .pdf-table-long {
+  font-size: 5px !important;
+}
+
+kendo-pdf-document .pdf-table2 {
+  text-align: left !important;
+  padding: 5px !important;
+  padding-left: 5px !important;
+  margin: 0px !important;
+  font-size: 3px !important;
+  line-height: 0 !important;
+}
+
+kendo-pdf-document .pdf-font {
+  font-size: 10px !important;
+
+}
+
+
+kendo-pdf-document .pdf-hide {
+  display: none !important;
+}
+
+kendo-pdf-document .Pdf-box {
+  height: 100vh !important;
+}
+kendo-pdf-document .pdf-show {
+  display: block !important;
+}
+
+kendo-pdf-document p {
+  font-size: 10px !important;
+}
+kendo-pdf-document td {
+  padding-left:  0px !important;
+}
+
+kendo-pdf-document .table-box {
+  max-height: 100vh !important;
+}
+
+kendo-pdf-document .pdf-text-wrap {
+  word-wrap: break-word !important;
+  word-break: break-all;
+  /* width: 20px !important; */
+}
+
+
+.input-container label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 2px solid #000;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.input-prefix {
+  background-color: #03091A;
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-right: 1px solid #000;
+  width: 70px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.input-post {
+
+  font-size: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.input-group input {
+  border: none;
+  padding: 8px;
+  font-size: 14px;
+  flex: 1;
+  outline: none;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background-color: #fff;
+  height: 35px;
+}
+
+.input-group input::placeholder {
+  color: #bbb;
+}
+
+.css-w69bzh-MuiLinearProgress-root-MuiMobileStepper-progress {
+  width: 100% !important;
+}
+
+.css-1b01k47-MuiPaper-root-MuiMobileStepper-root {
+  padding: 0 !important;
+}
+
+.css-1fzybga-MuiLinearProgress-bar1 {
+  background-color: #0F2772 !important;
+}
+
+/* .css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input {
+  border: 2px solid black !important;
+  border-radius: 12px !important;
+  outline: none !important;
+} */
+
+/* .css-1n4twyu-MuiInputBase-input-MuiOutlinedInput-input {
+  border: 2px solid black !important;
+  border-radius: 12px !important;
+  outline: none !important;
+} */
+
+/* .css-vjn7pg-MuiInputBase-root-MuiOutlinedInput-root {
+  border: 2px solid black !important;
+  border-radius: 10px !important;
+  outline: none !important;
+} */
+
+.MuiOutlinedInput-root>* .Mui-focused fieldset {
+  border: none !important;
+}
+
+td {
+  border: 1px solid #EEEEEE !important;
+}
+
+a {
+  color: #0F2772;
+  text-decoration: underline;
+
+}
+
+.custom-stepper span {
+  width: 100% !important;
+}
+
+.MuiTabs-indicator {
+  display: none !important;
+}
+
+th {
+  background-color: #fcfcfc !important;
+}
+.avatar-image img{
+  object-fit: contain !important;
+}
+
+kendo-pdf-document #pd-header {
+ display: none !important;
+}
+kendo-pdf-document #pd-footer {
+ display: none !important;
+}
+kendo-pdf-document #pd-mytable {
+ padding-top: 280px !important;
+ /* height: 399px !important; */
+}
+kendo-pdf-document #pd-mytable1 {
+ padding-top: 250px !important;
+ /* height: 399px !important; */
+}
+kendo-pdf-document #pd-mytable2 {
+  padding-top: 250px !important;
+  /* height: 399px !important; */
+ }
+kendo-pdf-document .pdf-center{
+text-align: center !important;
+display: flex !important;
+justify-content: center !important;
+}
+kendo-pdf-document .pdf-col{
+  font-family: Arial, Helvetica, sans-serif !important;
+padding:0px !important;
+}
+kendo-pdf-document #table-header {
+  font-size: 10px !important;
+  padding:2px !important;
+  font-weight: bold !important;
+  white-space: normal;
+    font-family: Arial, Helvetica, sans-serif !important;
+  padding-left: 10px !important;
+
+  /* background: none !important; */
+  /* border: 1px solid black !important; */
+}
+kendo-pdf-document #table-cell-new {
+  font-size: 5px !important;
+  
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  padding: 1px !important;
+  padding-left: 10px !important;
+
+  /* background: none !important; */
+  /* border: 0.5px solid black !important; */
+}
+kendo-pdf-document #table-cell {
+  font-size: 10px !important;
+  
+  white-space: normal;
+  font-family: Arial, Helvetica, sans-serif !important;
+  padding: 1px !important;
+  padding-left: 10px !important;
+
+  /* background: none !important; */
+  /* border: 0.5px solid black !important; */
+}
+#table-cell ,  #table-cell2,#table-cell1 ,  #table-header, .table-cell{
+  /* border: 0.5px solid black !important; */
+  
+
+}
+kendo-pdf-document #table-cell2 {
+  font-size: 10px !important;
+  padding: 2px !important;
+  padding-left: 10px !important;
+  white-space: normal;
+  font-family: 'Public Sans';
+  /* background: none !important; */
+  /* border:none !important; */
+}
+kendo-pdf-document .pdf_margin{
+margin-top: 10px !important;
+}
+kendo-pdf-document #table-cell1 {
+  font-size: 10px !important;
+  padding: 8px !important;
+  white-space: normal;
+  font-family: 'Public Sans';
+  padding-left: 10px !important;
+
+  /* background: none !important; */
+  /* border: 0.5px solid black !important; */
+}
+kendo-pdf-document #pdf-padding div div{
+ 
+  padding: 0px !important;
+  margin: 0px !important;
+}
+kendo-pdf-document .pdf_font{
+  font-family: Arial, Helvetica, sans-serif !important;
+font-size: 10px !important;
+}
+kendo-pdf-document #pdf-padding div{
+ 
+  padding: 0px !important;
+  margin: 0px !important;
+}
+kendo-pdf-document #pdf_data {
+display: block !important;
+}
+
+#pdf_data {
+  display: none !important;
+}
+.table-cell-gap{
+  padding: 5px !important;
+  padding-left: 15px !important;
+
+}
+/* jhhjhajh */
+kendo-pdf-document #table-cell-new {
+  border: 1px solid #000 !important;
+  border-collapse: collapse !important;
+  padding: 5px 10px !important;
+  text-align: left !important;
+  font-size: 8px !important;
+  font-family: Arial, sans-serif !important;
+  color: #000 !important;
+}
+
+kendo-pdf-document #table-header {
+  /* background-color: #f2f2f2 !important; */
+}
+
+kendo-pdf-document #table-header #table-cell-new {
+  font-weight: bold !important;
+}
+
+kendo-pdf-document #pd-mytable {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+kendo-pdf-document .pdf-col {
+  min-width: 50px !important;
+}
+
+kendo-pdf-document .pdf-myfont {
+  font-family: Arial, sans-serif !important;
+  color: #000 !important;
+  font-size: 8px !important;
+}
+
+/* Align numeric columns to right */
+kendo-pdf-document #pd-mytable td:nth-child(3),
+kendo-pdf-document #pd-mytable td:nth-child(4),
+kendo-pdf-document #pd-mytable td:nth-child(5),
+kendo-pdf-document #pd-mytable th:nth-child(4) {
+  text-align: center !important;
+}
+
+/* Align first column (Sr No) to center */
+kendo-pdf-document #pd-mytable td:first-child {
+  text-align: center !important;
+}
+
+/* Ensure consistent borders */
+kendo-pdf-document #pd-mytable td,
+kendo-pdf-document #pd-mytable th {
+  border: 1px solid #000 !important;
+}
+
+/* Adjust the width of the first column (Sr No) */
+/* kendo-pdf-document #pd-mytable td:first-child,
+kendo-pdf-document #pd-mytable th:first-child {
+  width: 40px !important;
+} */
+
+/* Adjust the width of the second column (Candidate) */
+kendo-pdf-document #pd-mytable td:nth-child(2),
+kendo-pdf-document #pd-mytable th:nth-child(2) {
+  width: 220px !important;
+}
+kendo-pdf-document #pd-mytable2 td:nth-child(1),
+kendo-pdf-document #pd-mytable2 th:nth-child(1) {
+  width: 110px !important;
+}
+
+/* Ensure PDF margins */
+kendo-pdf-document .pdf_margin {
+  margin-top: 0px !important;
+}
+
+/* Style for the totals rows at the bottom */
+kendo-pdf-document #table-header #table-cell-new:nth-last-child(2),
+kendo-pdf-document #table-header #table-cell-new:last-child {
+  text-align: center !important;
+  font-weight: bold !important;
+}
+
+/* Ensure no gaps between cells */
+kendo-pdf-document #pd-mytable,
+kendo-pdf-document #pd-mytable tr,
+kendo-pdf-document #pd-mytable td,
+kendo-pdf-document #pd-mytable th {
+  border-collapse: collapse !important;
+  
+  border-spacing: 0 !important;
+}
+
+
+.base-Popper-root{
+  z-index: 111 !important;
+}
+
+th {
+  background-color: #bd9b4a !important;
+
+  color: white !important;
+}

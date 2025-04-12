@@ -1,0 +1,14 @@
+[
+  {
+    "id": "cash",
+    "name": "Cash"
+  },
+  {
+    "id": "bank",
+    "name": "Bank"
+  },
+  {
+    "id": "vault",
+    "name": "Wallet"
+  }
+]
