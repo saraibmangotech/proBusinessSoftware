@@ -265,7 +265,7 @@ const DataTable = ({ data, columns, enableCheckbox = false, onSelectionChange, l
                       {!loading ? (
                         <strong style={{ fontSize: "18px" }}>No Data Found</strong>
                       ) : (
-                        <CircularProgress sx={{ color: "#0b0962" }} size={50} />
+                        <CircularProgress sx={{ color: "#bd9b4a" }} size={50} />
                       )}
                     </Box>
                   </TableCell>

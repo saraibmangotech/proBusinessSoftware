@@ -482,6 +482,12 @@ function CreateCategory() {
                                         selected={category}
                                         onSelect={(value) => {
                                             setCategory(value)
+                                            console.log(value);
+                                            setAdjustmentAccount(value?.inventory_adjustment_account)
+                                            setSalesAccount(value?.sales_account)
+                                            setCogsAccount(value?.cogs_account)
+                                            setTax({id:value?.item_tax_type , name :value?.item_tax_type})
+                                            
                                         }}
                                         error={errors?.category?.message}
                                         register={register("category", {

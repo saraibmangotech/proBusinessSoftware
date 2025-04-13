@@ -3,11 +3,31 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1744546821348,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1744547729227,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -481,8 +481,10 @@\n                                         options={categories}\r\n                                         selected={category}\r\n                                         onSelect={(value) => {\r\n                                             setCategory(value)\r\n+                                            console.log(value);\r\n+                                            \r\n                                         }}\r\n                                         error={errors?.category?.message}\r\n                                         register={register(\"category\", {\r\n                                             required: 'Please select category .',\r\n"
+                },
+                {
+                    "date": 1744547788522,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -482,8 +482,9 @@\n                                         selected={category}\r\n                                         onSelect={(value) => {\r\n                                             setCategory(value)\r\n                                             console.log(value);\r\n+                                            setAdjustmentAccount(value?.inventory_adjustment_account)\r\n                                             \r\n                                         }}\r\n                                         error={errors?.category?.message}\r\n                                         register={register(\"category\", {\r\n"
+                },
+                {
+                    "date": 1744547815035,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -483,8 +483,9 @@\n                                         onSelect={(value) => {\r\n                                             setCategory(value)\r\n                                             console.log(value);\r\n                                             setAdjustmentAccount(value?.inventory_adjustment_account)\r\n+                                            setSalesAccount(value?.sales_account)\r\n                                             \r\n                                         }}\r\n                                         error={errors?.category?.message}\r\n                                         register={register(\"category\", {\r\n"
+                },
+                {
+                    "date": 1744547853907,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -484,8 +484,9 @@\n                                             setCategory(value)\r\n                                             console.log(value);\r\n                                             setAdjustmentAccount(value?.inventory_adjustment_account)\r\n                                             setSalesAccount(value?.sales_account)\r\n+                                            setCogsAccount(value?.cogs_account)\r\n                                             \r\n                                         }}\r\n                                         error={errors?.category?.message}\r\n                                         register={register(\"category\", {\r\n"
+                },
+                {
+                    "date": 1744547937192,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -485,8 +485,9 @@\n                                             console.log(value);\r\n                                             setAdjustmentAccount(value?.inventory_adjustment_account)\r\n                                             setSalesAccount(value?.sales_account)\r\n                                             setCogsAccount(value?.cogs_account)\r\n+                                            setTax({id:value?.item_tax_type , name :value?.item_tax_type})\r\n                                             \r\n                                         }}\r\n                                         error={errors?.category?.message}\r\n                                         register={register(\"category\", {\r\n"
                 }
             ],
             "date": 1744546821348,

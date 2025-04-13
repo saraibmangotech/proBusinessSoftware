@@ -314,10 +314,10 @@ function CustomerQueue() {
       cell: ({ row }) => (
 
         <Box sx={{display:'flex',gap:1}}>
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/customer-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-customer/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+          {row?.original?.name != "Walk-In Customer" && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/customer-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
+          {row?.original?.name != "Walk-In Customer" && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-customer/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
           <Box>
-            {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+            {row?.original?.name != "Walk-In Customer" && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
             {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
           </Box>
