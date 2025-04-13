@@ -378,7 +378,8 @@ function Header() {
 			order_by: 14,
 			children:[],
 			childRoute: [],
-		  },{
+		  }
+      ,{
 			id: 14,
 			name: "Service Categories",
 			icon: "customer",
@@ -390,7 +391,8 @@ function Header() {
 			order_by: 14,
 			children:[],
 			childRoute: [],
-		  },],
+		  },
+    ],
 	  },
 	  
    

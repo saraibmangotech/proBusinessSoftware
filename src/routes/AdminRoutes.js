@@ -58,7 +58,6 @@ import RejectedVisaList from "pages/Dashboard/VisaProcessing/RejectedVisaList";
 import CreditNote from "pages/Dashboard/VisaProcessing/CreditNote";
 
 
-
 const CreateCustomer = lazy(() =>
   import("pages/Dashboard/Customers/CreateCustomer")
 );
@@ -68,6 +67,10 @@ const CreateCategory = lazy(() =>
 const CategoryList = lazy(() =>
   import("pages/Dashboard/ServiceCategory/CategoryList")
 );
+
+// const ServiceList = lazy(() =>
+//   import("pages/Dashboard/ServiceCategory/ServiceList")
+// );
 const CostSetup = lazy(() =>
   import("pages/Dashboard/Settings/CostSetup")
 );
@@ -207,6 +210,7 @@ const AdminRoutes = [
     path: "/create-service-category",
     component: <CreateCategory />,
   },
+  
   {
     path: "/category-list",
     component: <CategoryList />,
@@ -572,6 +576,7 @@ const AdminRoutes = [
     path: "/notifcations",
     component: <Notification />,
   },
+ 
 ];
 
 export default AdminRoutes;

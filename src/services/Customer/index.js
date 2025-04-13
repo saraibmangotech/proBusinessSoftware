@@ -206,6 +206,26 @@ const CustomerServices = {
     const data = await get(routes.getCustomerBuyerId, params);
     return data;
   },
+  AddServiceItem: async (obj) => {
+    const data = await post(routes.AddServiceItem, obj);
+    return data;
+  },
+  getServiceItem: async (params) => {
+    const data = await get(routes.getServiceItem, params);
+    return data;
+  },
+  DetailServiceItem: async (params) => {
+    const data = await get(routes.DetailServiceItem, params);
+    return data;
+  },
+  UpdateServiceItem: async (obj) => {
+    const data = await patch(routes.UpdateServiceItem, obj);
+    return data;
+  },
+  DeleteServiceItem: async (params) => {
+    const data = await deleted(routes.DeleteServiceItem, params);
+    return data;
+  },
 }
 
 export default CustomerServices
