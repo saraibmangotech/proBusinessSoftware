@@ -407,7 +407,7 @@ function CustomerQueue() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Customer List</Typography>
         {true && <PrimaryButton
-          bgcolor={Colors.buttonBg}
+         bgcolor={'#bd9b4a'}
           title="Create Customer"
           onClick={() => { navigate('/create-customer'); localStorage.setItem("currentUrl", '/create-customer') }}
           loading={loading}

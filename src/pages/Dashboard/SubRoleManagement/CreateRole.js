@@ -66,7 +66,7 @@ function CreateRole() {
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >CREATE SUB ROLE</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
             <PrimaryButton
-              bgcolor={Colors.buttonBg}
+             bgcolor={'#bd9b4a'}
               title="Create"
               type={'submit'}
 

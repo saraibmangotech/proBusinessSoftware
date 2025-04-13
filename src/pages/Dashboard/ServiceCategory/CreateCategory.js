@@ -713,7 +713,7 @@ function CreateCategory() {
 
                                 <Grid container justifyContent={'flex-end'}>
                                     <PrimaryButton
-                                        bgcolor={Colors.buttonBg}
+                                       bgcolor={'#bd9b4a'}
                                         title="Submit"
                                         type={'submit'}
 

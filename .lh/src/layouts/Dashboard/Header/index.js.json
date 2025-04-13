@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1744507388198,
@@ -12,6 +12,18 @@
                 {
                     "date": 1744508065013,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -377,9 +377,10 @@\n \t\t\tnavigation: true,\r\n \t\t\torder_by: 14,\r\n \t\t\tchildren:[],\r\n \t\t\tchildRoute: [],\r\n-\t\t  },{\r\n+\t\t  }\r\n+      ,{\r\n \t\t\tid: 14,\r\n \t\t\tname: \"Service Categories\",\r\n \t\t\ticon: \"customer\",\r\n \t\t\tparent_id: null,\r\n"
+                },
+                {
+                    "date": 1744546645770,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -169,9 +169,22 @@\n \t\troute: \"/customer-list\",\r\n \t\tidentifier: null,\r\n \t\tnavigation: true,\r\n \t\torder_by: 33,\r\n-\t  },],\r\n+\t  },\r\n+    {\r\n+      id: 14,\r\n+      name: \"Receptions Items\",\r\n+      icon: \"customer\",\r\n+      parent_id: null,\r\n+      api: \"/api/roles\",\r\n+      route: \"/service-list\",\r\n+      identifier: null,\r\n+      navigation: true,\r\n+      order_by: 14,\r\n+      children:[],\r\n+      childRoute: [],\r\n+      }],\r\n     },\r\n     {\r\n       id: 12,\r\n       name: \"Accounts management\",\r\n"
+                },
+                {
+                    "date": 1744546655383,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -172,13 +172,13 @@\n \t\torder_by: 33,\r\n \t  },\r\n     {\r\n       id: 14,\r\n-      name: \"Receptions Items\",\r\n+      name: \"Receptions\",\r\n       icon: \"customer\",\r\n       parent_id: null,\r\n       api: \"/api/roles\",\r\n-      route: \"/service-list\",\r\n+      route: \"/reception-list\",\r\n       identifier: null,\r\n       navigation: true,\r\n       order_by: 14,\r\n       children:[],\r\n"
+                },
+                {
+                    "date": 1744546943047,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -171,8 +171,19 @@\n \t\tnavigation: true,\r\n \t\torder_by: 33,\r\n \t  },\r\n     {\r\n+      id: 33,\r\n+      name: \"Sale Receipt\",\r\n+      icon: \"customer\",\r\n+      parent_id: 12,\r\n+      api: null,\r\n+      route: \"/sales-receipt\",\r\n+      identifier: null,\r\n+      navigation: true,\r\n+      order_by: 33,\r\n+      },\r\n+    {\r\n       id: 14,\r\n       name: \"Receptions\",\r\n       icon: \"customer\",\r\n       parent_id: null,\r\n"
                 }
             ],
             "date": 1744507388198,

@@ -372,7 +372,7 @@ function AccountList() {
                 <Box sx={{ display: 'flex', gap: '5px' }} >
 
                     {permissions?.create && <PrimaryButton
-                        bgcolor={Colors.buttonBg}
+                       bgcolor={'#bd9b4a'}
                         title="Create Account"
                         onClick={() => navigate('/create-account')}
                      

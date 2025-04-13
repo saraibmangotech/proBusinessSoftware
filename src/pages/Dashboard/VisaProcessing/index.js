@@ -450,7 +450,7 @@ function VisaDetail() {
                 <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >VISA DETAIL</Typography>
                 {/* <Box sx={{ display: 'flex', gap: '10px' }}>
           <PrimaryButton
-            bgcolor={Colors.buttonBg}
+           bgcolor={'#bd9b4a'}
             title="Edit"
             onClick={() => navigate(`/update-customer/${id}`)}
 

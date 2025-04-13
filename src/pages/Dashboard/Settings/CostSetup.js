@@ -329,7 +329,7 @@ const CostSetup = () => {
                         <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >COST MANAGEMENT</Typography>
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             {permissions?.save && <PrimaryButton
-                                bgcolor={Colors.buttonBg}
+                               bgcolor={'#bd9b4a'}
                                 title="Save"
                                 type={'submit'}
 

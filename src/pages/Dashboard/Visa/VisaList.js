@@ -1330,7 +1330,7 @@ function VisaList() {
                 <Box sx={{ display: "flex", gap: "5px" }}>
                     {permissions?.create && (
                         <PrimaryButton
-                            bgcolor={Colors.buttonBg}
+                           bgcolor={'#bd9b4a'}
                             title="Create Request"
                             onClick={() => navigate("/create-request")}
                             loading={loading}
@@ -1468,7 +1468,7 @@ function VisaList() {
                             loading={loading}
                         />
                         <PrimaryButton
-                            bgcolor={Colors.buttonBg}
+                           bgcolor={'#bd9b4a'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

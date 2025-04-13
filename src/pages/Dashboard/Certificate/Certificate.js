@@ -170,7 +170,7 @@ console.log(state);
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
                     <PrimaryButton
-                        bgcolor={Colors.buttonBg}
+                       bgcolor={'#bd9b4a'}
                         title="Save"
                         onClick={() => {
                             handleExportWithComponent(contentRef);

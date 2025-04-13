@@ -393,7 +393,7 @@ function SalaryCertificate() {
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
                    {permissions?.create && <PrimaryButton
-                        bgcolor={Colors.buttonBg}
+                       bgcolor={'#bd9b4a'}
                         title="Create New"
                         onClick={() => navigate('/create-new-salary-certificate')}
 
@@ -429,7 +429,7 @@ function SalaryCertificate() {
                             loading={loading}
                         />
                         <PrimaryButton
-                            bgcolor={Colors.buttonBg}
+                           bgcolor={'#bd9b4a'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

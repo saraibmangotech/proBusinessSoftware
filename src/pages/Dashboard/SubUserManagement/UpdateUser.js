@@ -168,7 +168,7 @@ function UpdateUser() {
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update User</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
             <PrimaryButton
-              bgcolor={Colors.buttonBg}
+             bgcolor={'#bd9b4a'}
               title="Save"
               type={'submit'}
               disabled={buttondisabled}
@@ -280,7 +280,7 @@ function UpdateUser() {
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }}>Update User Password</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
             <PrimaryButton
-              bgcolor={Colors.buttonBg}
+             bgcolor={'#bd9b4a'}
               title="Change Password"
               type={'submit'}
 

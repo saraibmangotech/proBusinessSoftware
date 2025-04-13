@@ -277,7 +277,7 @@ function UserList() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Management</Typography>
         {permissions?.create && <PrimaryButton
-          bgcolor={Colors.buttonBg}
+         bgcolor={'#bd9b4a'}
           title="Create User"
           onClick={() => navigate('/create-sub-user')}
           loading={loading}
@@ -311,7 +311,7 @@ function UserList() {
               loading={loading}
             />
             <PrimaryButton
-              bgcolor={Colors.buttonBg}
+             bgcolor={'#bd9b4a'}
               title="Search"
               onClick={() => handleFilter()}
               loading={loading}

@@ -701,7 +701,7 @@ function AgentViseBillingReport() {
                             loading={loading}
                         />
                         <PrimaryButton
-                            bgcolor={Colors.buttonBg}
+                           bgcolor={'#bd9b4a'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

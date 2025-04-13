@@ -700,7 +700,7 @@ function DraftDetail() {
                 <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >DRAFT DETAIL</Typography>
                 <Box sx={{ display: 'flex', gap: '10px' }}>
                     {permissions?.publish && <PrimaryButton
-                        bgcolor={Colors.buttonBg}
+                       bgcolor={'#bd9b4a'}
                         title="Publish"
 
                         onClick={() => {

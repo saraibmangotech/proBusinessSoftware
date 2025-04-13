@@ -566,7 +566,7 @@ return (
               /></Grid>
               <Grid container justifyContent={'flex-end'}>
                 <PrimaryButton
-                  bgcolor={Colors.buttonBg}
+                 bgcolor={'#bd9b4a'}
                   title="Update"
                   type={'submit'}
 

@@ -429,7 +429,7 @@ const UpdateAgent = () => {
                     <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update</Typography>
                     <Box sx={{ display: 'flex', gap: '10px' }}>
                         <PrimaryButton
-                            bgcolor={Colors.buttonBg}
+                           bgcolor={'#bd9b4a'}
                             title="Save"
                             disabled={!emailVerify ? true : false}
                             type={'submit'}
