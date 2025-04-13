@@ -56,6 +56,9 @@ import ProfitLossVisaReport from "pages/Dashboard/Reporting/ProfitLossVisaReport
 import ProfitLossCustomerReport from "pages/Dashboard/Reporting/ProfitLossCustomerReport";
 import RejectedVisaList from "pages/Dashboard/VisaProcessing/RejectedVisaList";
 import CreditNote from "pages/Dashboard/VisaProcessing/CreditNote";
+import ServiceList from "pages/Dashboard/ServiceItem/ServiceItemList";
+import ServiceDetail from "pages/Dashboard/ServiceItem/ServiceDetail";
+
 
 
 
@@ -196,9 +199,44 @@ const JournalVoucherDetail = lazy(() =>
   import("pages/Dashboard/Accounts/JournalVoucherDetail")
 );
 
+const UpdateCategory = lazy(() =>
+  import("pages/Dashboard/ServiceCategory/UpdateCategory")
+);
 
+const CategoryDetail = lazy(() =>
+  import("pages/Dashboard/ServiceCategory/CategoryDetail")
+);
+const CreateReception = lazy(() =>
+  import("pages/Dashboard/Reception/CreateReception")
+);
+const ReceptionList = lazy(() =>
+  import("pages/Dashboard/Reception/Receptions")
+);
 
+const UpdateServiceItem = lazy(() =>
+  import("pages/Dashboard/ServiceItem/UpdateServiceItem")
+);
+const CreateServiceItem = lazy(() =>
+  import("pages/Dashboard/ServiceItem/CreateServiceItem")
+);
 const AdminRoutes = [
+  
+  {
+    path: "/create-service-item",
+    component: <CreateServiceItem />,
+  },
+  {
+    path: "/update-service/:id",
+    component: <UpdateServiceItem />,
+  },
+  {
+    path: "/service-list",
+    component: <ServiceList />,
+  },
+  {
+    path: "/service-item-detail/:id",
+    component: <ServiceDetail />,
+  },
   {
     path: "/create-customer",
     component: <CreateCustomer />,
@@ -208,8 +246,24 @@ const AdminRoutes = [
     component: <CreateCategory />,
   },
   {
+    path: "/update-service-category/:id",
+    component: <UpdateCategory />,
+  },
+  {
+  path: "/service-category-detail/:id",
+    component: <CategoryDetail />,
+  },
+  {
+    path: "/create-reception",
+    component: <CreateReception />,
+  },
+  {
     path: "/category-list",
     component: <CategoryList />,
+  },
+  {
+    path: "/reception-list",
+    component: <ReceptionList />,
   },
   {
     path: "/create-agent",

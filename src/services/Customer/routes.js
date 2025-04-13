@@ -49,7 +49,15 @@ const routes = {
   handleDeleteDraft:'visas/deleteDraft',
   handleDeleteCustomer:'/customers/delete',
   getCategoryList:'/services/categories',
-  CreateCategory:'/services/categories/add'
+  CreateCategory:'/services/categories/add',
+  getCategoryDetail:'/services/categories/details',
+  UpdateCategory:'/services/categories/update',
+  DeleteCategory:'',
+  getReceptionDetail:'/sales/reception/details',
+  getCompanies:'/customers/companies',
+  addCompany:'/customers/companies/add',
+  CreateReception:'/sales/reception/add',
+  getReceptionsList:"/sales/reception"
 };
 
 export default routes

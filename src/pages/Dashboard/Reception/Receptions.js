@@ -106,7 +106,7 @@ const useStyles = makeStyles({
   }
 })
 
-function CategoryList() {
+function ReceptionList() {
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -134,7 +134,7 @@ function CategoryList() {
 
   // *For Customer Queue
   const [customerQueue, setCustomerQueue] = useState([]);
-const [data, setData] = useState([])
+
 
 
   const [totalCount, setTotalCount] = useState(0);
@@ -157,32 +157,17 @@ const [data, setData] = useState([])
     setLoader(true)
 
     try {
-      const Page = page ? page : currentPage
-      const Limit = limit ? limit : pageLimit
-      const Filter = filter ? { ...filters, ...filter } : null;
-      setCurrentPage(Page)
-      setPageLimit(Limit)
-      setFilters(Filter)
+   
       let params = {
         page: 1,
         limit: 1000,
-      
+     
 
       }
-      params = { ...params, ...Filter }
-      const { data } = await CustomerServices.getCategoryList(params)
-      setData(data?.categories);
      
+      const { data } = await CustomerServices.getReceptionsList(params)
+      setCustomerQueue(data?.rows)
      
-      setPermissions(formatPermissionData(data?.permissions))
-      console.log(formatPermissionData(data?.permissions));
-
-      setPermissions(formatPermissionData(data?.permissions))
-      data?.permissions.forEach(e => {
-        if (e?.route && e?.identifier && e?.permitted) {
-          dispatch(addPermission(e?.route));
-        }
-      })
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -221,7 +206,7 @@ const [data, setData] = useState([])
         let params = { customer_id: selectedData?.id }
 
 
-        const { message } = await CustomerServices.DeleteCategory(params)
+        const { message } = await CustomerServices.handleDeleteCustomer(params)
 
         SuccessToaster(message);
         getCustomerQueue()
@@ -268,21 +253,24 @@ const [data, setData] = useState([])
     },
     {
       header: "Customer",
-      accessorKey: "name",
+      accessorKey: "customer_name",
 
 
     },
     {
-        header: "Arabic Name",
-        accessorKey: "name_ar",
-  
-  
-      },
-  
-    {
-      header: "Cost Center",
-      accessorKey: "cost_center",
+      header: "Mobile",
+      accessorKey: "mobile",
 
+
+    },
+    {
+      header: "Type",
+      accessorKey: "cost_center",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.is_company ? 'Company' : "Individual"}
+        </Box>
+      ),
 
     },
     {
@@ -297,19 +285,19 @@ const [data, setData] = useState([])
       ),
     },
 
-    
+   
     {
       header: "Actions",
       cell: ({ row }) => (
 
         <Box sx={{display:'flex',gap:1}}>
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/service-category-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-service-category/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-          {/* <Box>
+          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/customer-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
+          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-customer/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+          <Box>
             {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
-          
-          </Box> */}
+            {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
+          </Box>
 
         </Box>
       ),
@@ -394,11 +382,11 @@ const [data, setData] = useState([])
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Category List</Typography>
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>
         {true && <PrimaryButton
           bgcolor={Colors.buttonBg}
-          title="Create"
-          onClick={() => { navigate('/create-service-category'); localStorage.setItem("currentUrl", '/create-customer') }}
+          title="Create Customer"
+          onClick={() => { navigate('/create-customer'); localStorage.setItem("currentUrl", '/create-customer') }}
           loading={loading}
         />}
 
@@ -409,11 +397,11 @@ const [data, setData] = useState([])
       <Box >
 
 
-        {<DataTable loading={loader} data={data} columns={columns} />}
+        {<DataTable loading={loader} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>
   );
 }
 
-export default CategoryList;
+export default ReceptionList;

@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/services/Customer/routes.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1744496850301,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1744497831951,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -49,8 +49,9 @@\n   handleDeleteDraft:'visas/deleteDraft',\r\n   handleDeleteCustomer:'/customers/delete',\r\n   getCategoryList:'/services/categories',\r\n   CreateCategory:'/services/categories/add',\r\n-  getCategoryDetail:'/services/categories/details'\r\n+  getCategoryDetail:'/services/categories/details',\r\n+  UpdateCategory:'/services/categories/update'\r\n };\r\n \r\n export default routes\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1744498404303,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -50,8 +50,9 @@\n   handleDeleteCustomer:'/customers/delete',\r\n   getCategoryList:'/services/categories',\r\n   CreateCategory:'/services/categories/add',\r\n   getCategoryDetail:'/services/categories/details',\r\n-  UpdateCategory:'/services/categories/update'\r\n+  UpdateCategory:'/services/categories/update',\r\n+  DeleteCategory:''\r\n };\r\n \r\n export default routes\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1744501566340,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,5 +52,8 @@\n   CreateCategory:'/services/categories/add',\r\n   getCategoryDetail:'/services/categories/details',\r\n   UpdateCategory:'/services/categories/update',\r\n   DeleteCategory:'',\r\n-  getReceptionDetail:'/sal\n\\ No newline at end of file\n+  getReceptionDetail:'/sales/reception/details'\r\n+};\r\n+\r\n+export default routes\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1744496850301,
+            "name": "Commit-0",
+            "content": "const routes = {\r\n  UpdateCertificate:'/customers/certificates/update',\r\n  CreateCertificate:'/customers/certificates/add',\r\n  getCandidateLists:'/customers/candidates',\r\n  getCertificates:'/customers/certificates',\r\n  ServiceInvoiceDetail:'/customers/services/details',\r\n  UpdateAddOnservice:'/customers/services/update',\r\n  getInvoices:'/customers/services',\r\n  CreateAddOnService:'/customers/services/add',\r\n  requestBuyerId: 'customers/requestBuyerId',\r\n  requestBuyerIdAgain: 'customers/requestBuyerIdAgain',\r\n  getCustomerDropDown: 'customers/dropdown',\r\n  getCustomerQueue: '/customers',\r\n  getCustomerDetail: 'customers/details',\r\n  getBuyerIdDetail: 'customers/buyerId/details',\r\n  getBuyerIdByAuctionId: 'customers/request/details',\r\n  verifyFinance: 'customers/verifyFinance',\r\n  allocateBuyerId: 'customers/allocateBuyerId',\r\n  deallocateBuyerId: 'customers/deallocateBuyerId',\r\n  changeAllocationStatus: 'customers/changeAllocationStatus',\r\n  getMessages: 'customers/messages',\r\n  sendMessage: 'customers/sendMessage',\r\n  getCustomerBooking: 'customers/booking',\r\n  getCustomerBuyerId: 'customers/buyerIds',\r\n  deleteId:'customers/removeAuctionHouse',\r\n  getGalaxyCustomerList:'customers/galaxy',\r\n  CreateMemo:'customers/sendMemo',\r\n  CreateNotifcation:'customers/sendNotifications',\r\n  ChangeBranch:'customers/updateBranch',\r\n  ChangeType:'customers/updateTrustedStatus',\r\n  CreateSubCustomer:'users/addSubCustomer',\r\n  getSubCustomerList:'users/subCustomers',\r\n  SelectCustomer:'vehicleBookings/update',\r\n  getAgents:'/agents',\r\n  addCustomer:'/customers/add',\r\n  UpdateCustomer:'customers/update',\r\n  AddVisa:'/visas/addRequest',\r\n  VisaProcessing:'/visas/processing',\r\n  getWPSList:'/customers/wps',\r\n  UpdateWPStatus:'/customers/wps/update',\r\n  CreateWPS:'/customers/wps/add',\r\n  UpdateAddOnService:'/customers/services/update',\r\n  getCandidateDetail:'/customers/candidates/details',\r\n  CustomerStatus:'customers/updateStatus',\r\n  DeleteVoucher:'accounts/journalVouchers/delete',\r\n  checkWPS:'/customers/wps/check',\r\n  getRejectedVisa:'customers/candidates/rejected',\r\n  UpdateCandidate:'customers/candidates/update',\r\n  handleDeleteDraft:'visas/deleteDraft',\r\n  handleDeleteCustomer:'/customers/delete',\r\n  getCategoryList:'/services/categories',\r\n  CreateCategory:'/services/categories/add',\r\n  getCategoryDetail:'/services/categories/details'\r\n};\r\n\r\nexport default routes"
+        }
+    ]
+}

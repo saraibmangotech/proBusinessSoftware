@@ -14,6 +14,14 @@ const CustomerServices = {
     const data = await post(routes.CreateWPS, obj);
     return data;
   },
+  CreateReception: async (obj) => {
+    const data = await post(routes.CreateReception, obj);
+    return data;
+  },
+  addCompany: async (obj) => {
+    const data = await post(routes.addCompany, obj);
+    return data;
+  },
   CreateAddOnService: async (obj) => {
     const data = await post(routes.CreateAddOnService, obj);
     return data;
@@ -28,6 +36,10 @@ const CustomerServices = {
   },
   UpdateWPStatus: async (obj) => {
     const data = await patch(routes.UpdateWPStatus, obj);
+    return data;
+  },
+  UpdateCategory: async (obj) => {
+    const data = await patch(routes.UpdateCategory, obj);
     return data;
   },
   CustomerStatus: async (obj) => {
@@ -62,8 +74,20 @@ const CustomerServices = {
     const data = await get(routes.getRejectedVisa, params);
     return data;
   },
+  getReceptionsList: async (params) => {
+    const data = await get(routes.getReceptionsList, params);
+    return data;
+  },
+  getCompanies: async (params) => {
+    const data = await get(routes.getCompanies, params);
+    return data;
+  },
   getCandidateDetail: async (params) => {
     const data = await get(routes.getCandidateDetail, params);
+    return data;
+  },
+  getReceptionDetail: async (params) => {
+    const data = await get(routes.getReceptionDetail, params);
     return data;
   },
   VisaProcessing: async (params) => {
@@ -80,6 +104,10 @@ const CustomerServices = {
   },
   checkWPS: async (params) => {
     const data = await get(routes.checkWPS, params);
+    return data;
+  },
+  getCategoryDetail: async (params) => {
+    const data = await get(routes.getCategoryDetail, params);
     return data;
   },
   getCandidateLists: async (params) => {
@@ -144,6 +172,10 @@ const CustomerServices = {
   },
   handleDeleteDraft: async (params) => {
     const data = await deleted(routes.handleDeleteDraft, params);
+    return data;
+  },
+  DeleteCategory: async (params) => {
+    const data = await deleted(routes.DeleteCategory, params);
     return data;
   },
   getCustomerDropDown: async (params) => {

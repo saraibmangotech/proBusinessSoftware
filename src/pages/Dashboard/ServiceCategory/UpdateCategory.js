@@ -24,7 +24,7 @@ import CustomerServices from 'services/Customer';
 import CustomerService from '../DashboardPages/CustomerService';
 import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import moment from 'moment';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import SystemServices from 'services/System';
 import UploadFileSingle from 'components/UploadFileSingle';
 import { Images } from 'assets';
@@ -37,7 +37,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 import FinanceServices from 'services/Finance';
 
 
-function CreateCategory() {
+function UpdateCategory() {
     const theme = useTheme();
     const { user } = useAuth()
     const navigate = useNavigate()
@@ -45,7 +45,7 @@ function CreateCategory() {
     const [submit, setSubmit] = useState(false)
     const [excludeFromSales, setExcludeFromSales] = useState('no');
     const [excludeFromPurchase, setExcludeFromPurchase] = useState('no');
-
+    const { id } = useParams()
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -218,6 +218,7 @@ function CreateCategory() {
         console.log(formData);
         try {
             let obj = {
+                id:id,
                 name: formData?.name,
                 name_ar: formData?.arabic,
                 logo: imageURL,
@@ -235,7 +236,7 @@ function CreateCategory() {
 
 
             };
-            const promise = CustomerServices.CreateCategory(obj);
+            const promise = CustomerServices.UpdateCategory(obj);
 
             showPromiseToast(
                 promise,
@@ -363,6 +364,48 @@ function CreateCategory() {
         }
     };
 
+    const getData = async () => {
+        try {
+            let params = {
+                category_id: id
+            };
+
+            const { data } = await CustomerServices.getCategoryDetail(params);
+            let detail = data?.category
+            console.log(detail);
+            setImageURL(detail?.logo)
+            setValue1("image", detail?.logo, { shouldValidate: true })
+            setValue1('name', detail?.name)
+            setValue1('arabic', detail?.name_ar)
+            setExcludeFromPurchase(detail?.exclude_from_purchase)
+            setExcludeFromSales(detail?.exclude_from_sales)
+            setSalesAccount(detail?.sales_account)
+            setValue1('sales', detail?.sales_account)
+            setAssemblyAccount(detail?.item_assembly_costs_account)
+            setValue1('assembly', detail?.item_assembly_costs_account)
+            setAdjustmentAccount(detail?.inventory_adjustment_account)
+            setValue1('adjustment', detail?.inventory_adjustment_account)
+            setInventoryAccount(detail?.inventory_account)
+            setValue1('inventory', detail?.inventory_account)
+            setCogsAccount(detail?.cogs_account)
+            setValue1('cogs', detail?.cogs_account)
+            setUnit({ id: detail?.unit_of_measure, name: detail?.unit_of_measure })
+            setValue1('unit', { id: detail?.unit_of_measure, name: detail?.unit_of_measure })
+            setItemType({ id: detail?.item_type, name: detail?.item_type })
+            setValue1('type', { id: detail?.item_type, name: detail?.item_type })
+            setTax({ id: detail?.item_tax_type, name: detail?.item_tax_type })
+            setValue1('tax', { id: detail?.item_tax_type, name: detail?.item_tax_type })
+            setCenter({ id: detail?.cost_center, name: detail?.cost_center })
+            setValue1('center', { id: detail?.cost_center, name: detail?.cost_center })
+
+        } catch (error) {
+            console.error("Error fetching location:", error);
+        }
+    };
+    useEffect(() => {
+        getData()
+    }, [])
+
     useEffect(() => {
         getAccounts()
         getTax()
@@ -381,7 +424,7 @@ function CreateCategory() {
 
                     <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', p: 3, alignItems: 'flex-end' }}>
-                            <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Create Service Category</Typography>
+                            <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update Service Category</Typography>
 
                         </Box>
 
@@ -536,8 +579,8 @@ function CreateCategory() {
                                             value={excludeFromPurchase}
                                             onChange={(e) => setExcludeFromPurchase(e.target.value)}
                                         >
-                                               <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                                               <FormControlLabel value={false} control={<Radio />} label="No" />
+                                            <FormControlLabel value={true} control={<Radio />} label="Yes" />
+                                            <FormControlLabel value={false} control={<Radio />} label="No" />
                                         </RadioGroup>
                                     </FormControl>
                                 </Grid>
@@ -714,7 +757,7 @@ function CreateCategory() {
                                 <Grid container justifyContent={'flex-end'}>
                                     <PrimaryButton
                                         bgcolor={Colors.buttonBg}
-                                        title="Submit"
+                                        title="Update"
                                         type={'submit'}
 
 
@@ -729,4 +772,4 @@ function CreateCategory() {
     );
 }
 
-export default CreateCategory;
+export default UpdateCategory;

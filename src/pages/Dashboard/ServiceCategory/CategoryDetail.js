@@ -24,7 +24,7 @@ import CustomerServices from 'services/Customer';
 import CustomerService from '../DashboardPages/CustomerService';
 import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import moment from 'moment';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import SystemServices from 'services/System';
 import UploadFileSingle from 'components/UploadFileSingle';
 import { Images } from 'assets';
@@ -37,7 +37,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 import FinanceServices from 'services/Finance';
 
 
-function CreateCategory() {
+function CategoryDetail() {
     const theme = useTheme();
     const { user } = useAuth()
     const navigate = useNavigate()
@@ -45,7 +45,7 @@ function CreateCategory() {
     const [submit, setSubmit] = useState(false)
     const [excludeFromSales, setExcludeFromSales] = useState('no');
     const [excludeFromPurchase, setExcludeFromPurchase] = useState('no');
-
+    const { id } = useParams()
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -218,10 +218,11 @@ function CreateCategory() {
         console.log(formData);
         try {
             let obj = {
+                id:id,
                 name: formData?.name,
                 name_ar: formData?.arabic,
                 logo: imageURL,
-                item_tax_type: tax?.name,
+                item_tax_type: tax?.id,
                 item_type: itemType?.id,
                 unit_of_measure: unit?.id,
                 exclude_from_sales: excludeFromSales,
@@ -235,7 +236,7 @@ function CreateCategory() {
 
 
             };
-            const promise = CustomerServices.CreateCategory(obj);
+            const promise = CustomerServices.CategoryDetail(obj);
 
             showPromiseToast(
                 promise,
@@ -363,6 +364,48 @@ function CreateCategory() {
         }
     };
 
+    const getData = async () => {
+        try {
+            let params = {
+                category_id: id
+            };
+
+            const { data } = await CustomerServices.getCategoryDetail(params);
+            let detail = data?.category
+            console.log(detail);
+            setImageURL(detail?.logo)
+            setValue1("image", detail?.logo, { shouldValidate: true })
+            setValue1('name', detail?.name)
+            setValue1('arabic', detail?.name_ar)
+            setExcludeFromPurchase(detail?.exclude_from_purchase)
+            setExcludeFromSales(detail?.exclude_from_sales)
+            setSalesAccount(detail?.sales_account)
+            setValue1('sales', detail?.sales_account)
+            setAssemblyAccount(detail?.item_assembly_costs_account)
+            setValue1('assembly', detail?.item_assembly_costs_account)
+            setAdjustmentAccount(detail?.inventory_adjustment_account)
+            setValue1('adjustment', detail?.inventory_adjustment_account)
+            setInventoryAccount(detail?.inventory_account)
+            setValue1('inventory', detail?.inventory_account)
+            setCogsAccount(detail?.cogs_account)
+            setValue1('cogs', detail?.cogs_account)
+            setUnit({ id: detail?.unit_of_measure, name: detail?.unit_of_measure })
+            setValue1('unit', { id: detail?.unit_of_measure, name: detail?.unit_of_measure })
+            setItemType({ id: detail?.item_type, name: detail?.item_type })
+            setValue1('type', { id: detail?.item_type, name: detail?.item_type })
+            setTax({ id: detail?.item_tax_type, name: detail?.item_tax_type })
+            setValue1('tax', { id: detail?.item_tax_type, name: detail?.item_tax_type })
+            setCenter({ id: detail?.cost_center, name: detail?.cost_center })
+            setValue1('center', { id: detail?.cost_center, name: detail?.cost_center })
+
+        } catch (error) {
+            console.error("Error fetching location:", error);
+        }
+    };
+    useEffect(() => {
+        getData()
+    }, [])
+
     useEffect(() => {
         getAccounts()
         getTax()
@@ -381,7 +424,7 @@ function CreateCategory() {
 
                     <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', p: 3, alignItems: 'flex-end' }}>
-                            <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Create Service Category</Typography>
+                            <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Service Category Detail</Typography>
 
                         </Box>
 
@@ -430,37 +473,12 @@ function CreateCategory() {
                                                     objectFit: "cover",
                                                     textTransform: "capitalize",
                                                 }}
-                                                onClick={handleImageClick}
+                                                
                                             />
 
-                                            {hovered && <IconButton
-                                                sx={{
-                                                    position: "absolute",
-                                                    top: "0",
-                                                    left: "0",
-                                                    width: "100%",
-                                                    padding: "9px 15px",
-                                                    color: "white",
-                                                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                                                    borderRadius: "50%",
-                                                    display: "block",
-                                                    "&:hover": {
-                                                        backgroundColor: "rgba(0, 0, 0, 0.7)",
-                                                    },
-                                                }}
-                                                onClick={handleImageClick}
-                                            >
-                                                <UploadIcon />
-                                                <Box sx={{ fontSize: "12px" }}>Upload Image</Box>
-                                            </IconButton>}
+                                           
 
-                                            <input
-                                                type="file"
-                                                ref={fileInputRef}
-                                                style={{ display: "none" }}
-                                                onChange={handleFileChange}
-                                                accept="image/*"
-                                            />
+                                          
                                         </Box>
                                     )}
                                 />
@@ -476,6 +494,7 @@ function CreateCategory() {
                                     <InputField
                                         label={" Name :*"}
                                         size={'small'}
+                                        disabled={true}
                                         placeholder={" Name"}
                                         error={errors1?.name?.message}
                                         register={register1("name", {
@@ -489,6 +508,7 @@ function CreateCategory() {
                                 <Grid item xs={2.8}>
                                     <InputField
                                         label={"Arabic Name :*"}
+                                        disabled={true}
                                         size={"small"}
                                         placeholder={"Arabic Name"}
                                         error={errors1?.arabic?.message}
@@ -513,12 +533,13 @@ function CreateCategory() {
                                             Exclude from Sales
                                         </InputLabel>
                                         <RadioGroup
+                                          disabled={true}
                                             row
                                             value={excludeFromSales}
                                             onChange={(e) => setExcludeFromSales(e.target.value)}
                                         >
-                                            <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                                            <FormControlLabel value={false} control={<Radio />} label="No" />
+                                            <FormControlLabel   disabled={true} value={true} control={<Radio />} label="Yes" />
+                                            <FormControlLabel  disabled={true}  value={false} control={<Radio />} label="No" />
                                         </RadioGroup>
                                     </FormControl>
                                 </Grid>
@@ -532,12 +553,13 @@ function CreateCategory() {
                                             Exclude from Purchase
                                         </InputLabel>
                                         <RadioGroup
+                                          disabled={true}
                                             row
                                             value={excludeFromPurchase}
                                             onChange={(e) => setExcludeFromPurchase(e.target.value)}
                                         >
-                                               <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                                               <FormControlLabel value={false} control={<Radio />} label="No" />
+                                            <FormControlLabel  disabled={true}  value={true} control={<Radio />} label="Yes" />
+                                            <FormControlLabel  disabled={true}  value={false} control={<Radio />} label="No" />
                                         </RadioGroup>
                                     </FormControl>
                                 </Grid>
@@ -546,7 +568,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Tax Type *:'}
-
+                                        disabled={true}
                                         options={taxes}
                                         selected={tax}
                                         onSelect={(value) => {
@@ -567,7 +589,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Sales Account *:'}
-
+                                        disabled={true}
                                         options={accounts}
                                         selected={salesAccount}
                                         onSelect={(value) => {
@@ -585,7 +607,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Inventory Account *:'}
-
+                                        disabled={true}
                                         options={accounts}
                                         selected={inventoryAccount}
                                         onSelect={(value) => {
@@ -603,7 +625,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Cogs Account *:'}
-
+                                        disabled={true}
                                         options={accounts}
                                         selected={cogsAccount}
                                         onSelect={(value) => {
@@ -621,7 +643,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Inventory Adjustment Account *:'}
-
+                                        disabled={true}
                                         options={accounts}
                                         selected={adjustmentAccount}
                                         onSelect={(value) => {
@@ -639,7 +661,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Item Assembly Cost Account *:'}
-
+                                        disabled={true}
                                         options={accounts}
                                         selected={assemblyAccount}
                                         onSelect={(value) => {
@@ -657,7 +679,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Cost Center *:'}
-
+                                        disabled={true}
                                         options={[{ id: 'Tasheel', name: 'Tasheel' }, { id: 'DED', name: 'DED' }, { id: 'Typing', name: 'Typing' }, { id: 'General', name: 'General' }]}
                                         selected={center}
                                         onSelect={(value) => {
@@ -675,7 +697,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Item Type *:'}
-
+                                        disabled={true}
                                         options={[{ id: 'Manufactured', name: 'Manufactured' }, { id: 'Service/Consumable', name: 'Service/Consumable' }, { id: 'Purchased', name: 'Purchased' }]}
                                         selected={itemType}
                                         onSelect={(value) => {
@@ -693,7 +715,7 @@ function CreateCategory() {
                                     <SelectField
                                         size={'small'}
                                         label={'Unit *:'}
-
+                                        disabled={true}
                                         options={[{ id: 'Each', name: 'Each' }, { id: 'Hours', name: 'Hours' }]}
                                         selected={unit}
                                         onSelect={(value) => {
@@ -711,15 +733,7 @@ function CreateCategory() {
 
 
 
-                                <Grid container justifyContent={'flex-end'}>
-                                    <PrimaryButton
-                                        bgcolor={Colors.buttonBg}
-                                        title="Submit"
-                                        type={'submit'}
-
-
-                                    />
-                                </Grid>
+                             
                             </Grid>
                         </Box>
                     </Box></>}
@@ -729,4 +743,4 @@ function CreateCategory() {
     );
 }
 
-export default CreateCategory;
+export default CategoryDetail;
