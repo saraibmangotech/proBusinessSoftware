@@ -106,7 +106,7 @@ const useStyles = makeStyles({
   }
 })
 
-function ReceptionList() {
+function CategoryList() {
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -125,7 +125,7 @@ function ReceptionList() {
     reset,
   } = useForm();
 
-  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Name ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
   const [loader, setLoader] = useState(false);
@@ -134,7 +134,7 @@ function ReceptionList() {
 
   // *For Customer Queue
   const [customerQueue, setCustomerQueue] = useState([]);
-
+const [data, setData] = useState([])
 
 
   const [totalCount, setTotalCount] = useState(0);
@@ -157,17 +157,32 @@ function ReceptionList() {
     setLoader(true)
 
     try {
-   
+      const Page = page ? page : currentPage
+      const Limit = limit ? limit : pageLimit
+      const Filter = filter ? { ...filters, ...filter } : null;
+      setCurrentPage(Page)
+      setPageLimit(Limit)
+      setFilters(Filter)
       let params = {
         page: 1,
         limit: 1000,
-     
+      
 
       }
+      params = { ...params, ...Filter }
+      const { data } = await CustomerServices.getServiceItem(params)
+      setData(data?.rows);
      
-      const { data } = await CustomerServices.getReceptionsList(params)
-      setCustomerQueue(data?.rows)
      
+      setPermissions(formatPermissionData(data?.permissions))
+      console.log(formatPermissionData(data?.permissions));
+
+      setPermissions(formatPermissionData(data?.permissions))
+      data?.permissions.forEach(e => {
+        if (e?.route && e?.identifier && e?.permitted) {
+          dispatch(addPermission(e?.route));
+        }
+      })
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -203,10 +218,10 @@ function ReceptionList() {
  
 
     try {
-        let params = { reception_id: selectedData?.id }
+        let params = { service_id: selectedData?.id }
 
 
-        const { message } = await CustomerServices.deleteReception(params)
+        const { message } = await CustomerServices.DeleteServiceItem(params)
 
         SuccessToaster(message);
         getCustomerQueue()
@@ -252,25 +267,21 @@ function ReceptionList() {
 
     },
     {
-      header: "Customer",
-      accessorKey: "customer_name",
+      header: "Name",
+      accessorKey: "name",
 
 
     },
     {
-      header: "Mobile",
-      accessorKey: "mobile",
+      header: "Name Ar",
+      accessorKey: "name_ar",
 
 
     },
     {
-      header: "Type",
-      accessorKey: "cost_center",
-      cell: ({ row }) => (
-        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.is_company ? 'Company' : "Individual"}
-        </Box>
-      ),
+      header: "Item Tax Type",
+      accessorKey: "item_tax_type",
+
 
     },
     {
@@ -285,14 +296,27 @@ function ReceptionList() {
       ),
     },
 
-   
+    {
+      header: "Status",
+      cell: ({ row }) => (
+
+        <Box component={'div'} sx={{ cursor: 'pointer' }} onClick={() => {
+          if (permissions?.status_update) {
+            setStatusDialog(true)
+          }
+        }}>
+          <Chip sx={{ backgroundColor: row?.original?.is_active ? '#05c105' : '#a13605', color: 'white' }} label={row?.original?.is_active ? 'Enabled' : 'Disabled'} />
+
+        </Box>
+      ),
+    },
     {
       header: "Actions",
       cell: ({ row }) => (
 
         <Box sx={{display:'flex',gap:1}}>
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/reception-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-reception/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/service-item-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/service-item-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
+          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-service/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-service') }} src={Images.editIcon} width={'35px'}></Box>}
           <Box>
             {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
@@ -382,11 +406,11 @@ function ReceptionList() {
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Item List</Typography>
         {true && <PrimaryButton
           bgcolor={Colors.buttonBg}
-          title="Create "
-          onClick={() => { navigate('/create-reception'); localStorage.setItem("currentUrl", '/create-customer') }}
+          title="Create"
+          onClick={() => { navigate('/create-service-item'); localStorage.setItem("currentUrl", '/create-customer') }}
           loading={loading}
         />}
 
@@ -397,11 +421,11 @@ function ReceptionList() {
       <Box >
 
 
-        {<DataTable loading={loader} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} data={data} columns={columns} />}
       </Box>
 
     </Box>
   );
 }
 
-export default ReceptionList;
+export default CategoryList;

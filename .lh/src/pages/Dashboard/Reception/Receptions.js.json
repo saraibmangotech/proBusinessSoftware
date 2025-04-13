@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 12,
+            "activePatchIndex": 18,
             "patches": [
                 {
                     "date": 1744507053958,
@@ -56,6 +56,30 @@
                 {
                     "date": 1744507586810,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -284,21 +284,10 @@\n         </Box>\r\n       ),\r\n     },\r\n \r\n+   \r\n     {\r\n-      header: \"Status\",\r\n-      cell: ({ row }) => (\r\n-\r\n-        <Box component={'div'} sx={{ cursor: 'pointer' }} onClick={() => {\r\n-          \r\n-        }}>\r\n-          <Chip sx={{ backgroundColor: row?.original?.is_active ? '#05c105' : '#a13605', color: 'white' }} label={row?.original?.is_active ? 'Enabled' : 'Disabled'} />\r\n-\r\n-        </Box>\r\n-      ),\r\n-    },\r\n-    {\r\n       header: \"Actions\",\r\n       cell: ({ row }) => (\r\n \r\n         <Box sx={{display:'flex',gap:1}}>\r\n"
+                },
+                {
+                    "date": 1744508146803,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -165,9 +165,9 @@\n \r\n       }\r\n      \r\n       const { data } = await CustomerServices.getReceptionsList(params)\r\n-      setCustomerQueue(data?.rows)\r\n+      setCustomerQueue([])\r\n      \r\n     } catch (error) {\r\n       showErrorToast(error)\r\n     } finally {\r\n"
+                },
+                {
+                    "date": 1744508274003,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -165,9 +165,9 @@\n \r\n       }\r\n      \r\n       const { data } = await CustomerServices.getReceptionsList(params)\r\n-      setCustomerQueue([])\r\n+      setCustomerQueue(data?.rows)\r\n      \r\n     } catch (error) {\r\n       showErrorToast(error)\r\n     } finally {\r\n"
+                },
+                {
+                    "date": 1744508318288,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -205,9 +205,9 @@\n     try {\r\n         let params = { customer_id: selectedData?.id }\r\n \r\n \r\n-        const { message } = await CustomerServices.handleDeleteCustomer(params)\r\n+        const { message } = await CustomerServices.deleteReception(params)\r\n \r\n         SuccessToaster(message);\r\n         getCustomerQueue()\r\n     } catch (error) {\r\n"
+                },
+                {
+                    "date": 1744508326463,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -202,9 +202,9 @@\n   const handleDelete = async (item) => {\r\n  \r\n \r\n     try {\r\n-        let params = { customer_id: selectedData?.id }\r\n+        let params = { reception_id: selectedData?.id }\r\n \r\n \r\n         const { message } = await CustomerServices.deleteReception(params)\r\n \r\n"
+                },
+                {
+                    "date": 1744508382254,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -384,9 +384,9 @@\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>\r\n         {true && <PrimaryButton\r\n           bgcolor={Colors.buttonBg}\r\n-          title=\"Create Customer\"\r\n+          title=\"Create \"\r\n           onClick={() => { navigate('/create-customer'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n           loading={loading}\r\n         />}\r\n \r\n"
+                },
+                {
+                    "date": 1744508420507,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -291,9 +291,9 @@\n       cell: ({ row }) => (\r\n \r\n         <Box sx={{display:'flex',gap:1}}>\r\n           {true && <Box component={'img'} sx={{ cursor: \"pointer\" }} onClick={() => { navigate(`/customer-detail/${row?.original?.id}`); localStorage.setItem(\"currentUrl\", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}\r\n-          {true && <Box component={'img'} sx={{ cursor: \"pointer\" }} onClick={() => { navigate(`/update-customer/${row?.original?.id}`); localStorage.setItem(\"currentUrl\", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}\r\n+          {true && <Box component={'img'} sx={{ cursor: \"pointer\" }} onClick={() => { navigate(`/update-reception/${row?.original?.id}`); localStorage.setItem(\"currentUrl\", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}\r\n           <Box>\r\n             {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}\r\n \r\n             {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}\r\n@@ -385,9 +385,9 @@\n         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>\r\n         {true && <PrimaryButton\r\n           bgcolor={Colors.buttonBg}\r\n           title=\"Create \"\r\n-          onClick={() => { navigate('/create-customer'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n+          onClick={() => { navigate('/create-reception'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n           loading={loading}\r\n         />}\r\n \r\n \r\n"
                 }
             ],
             "date": 1744507053958,

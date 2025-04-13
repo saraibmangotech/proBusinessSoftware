@@ -50,6 +50,12 @@ const routes = {
   handleDeleteCustomer:'/customers/delete',
   getCategoryList:'/services/categories',
   CreateCategory:'/services/categories/add',
+  getServiceItem:"/services/",
+  AddServiceItem:"/services/add",
+  UpdateServiceItem:"/services/update",
+  DeleteServiceItem:"/services/delete",
+  DetailServiceItem:"/services/details",
+
   getCategoryDetail:'/services/categories/details',
   UpdateCategory:'/services/categories/update',
   DeleteCategory:'',
@@ -57,7 +63,9 @@ const routes = {
   getCompanies:'/customers/companies',
   addCompany:'/customers/companies/add',
   CreateReception:'/sales/reception/add',
-  getReceptionsList:"/sales/reception"
+  getReceptionsList:"/sales/reception",
+  deleteReception:'/sales/reception/delete',
+  UpdateReception:'/sales/reception/update'
 };
 
 export default routes

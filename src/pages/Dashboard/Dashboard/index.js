@@ -185,7 +185,7 @@ function Dashboard() {
   };
   useEffect(() => {
 
-    getStats()
+    // getStats()
   }, [])
 
 

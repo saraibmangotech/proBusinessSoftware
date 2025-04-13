@@ -120,9 +120,9 @@ function Home() {
 		<Fragment>
 			<Grid container justifyContent={'center'} alignItems={'center'} sx={{ backgroundColor: '#f2f6f8', height: '100vh' }} >
 				<Grid item lg={3.5} md={5} sm={10} xs={10} sx={{ border: '1px solid #B6B6B6', textAlign: 'center', p: '20px', borderRadius: '15px', backgroundColor: 'white' }}>
-					<Box component={'img'} src={Images?.logoDark} width={'130px'} >
+					{/* <Box component={'img'} src={Images?.logoDark} width={'130px'} >
 
-					</Box>
+					</Box> */}
 					<Typography sx={{ fontWeight: 'bold', fontSize: '20px', textAlign: 'left', mt: 3 }}>
 						Login
 					</Typography>

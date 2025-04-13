@@ -61,7 +61,6 @@ import ServiceDetail from "pages/Dashboard/ServiceItem/ServiceDetail";
 
 
 
-
 const CreateCustomer = lazy(() =>
   import("pages/Dashboard/Customers/CreateCustomer")
 );
@@ -71,6 +70,10 @@ const CreateCategory = lazy(() =>
 const CategoryList = lazy(() =>
   import("pages/Dashboard/ServiceCategory/CategoryList")
 );
+
+// const ServiceList = lazy(() =>
+//   import("pages/Dashboard/ServiceCategory/ServiceList")
+// );
 const CostSetup = lazy(() =>
   import("pages/Dashboard/Settings/CostSetup")
 );
@@ -219,6 +222,12 @@ const UpdateServiceItem = lazy(() =>
 const CreateServiceItem = lazy(() =>
   import("pages/Dashboard/ServiceItem/CreateServiceItem")
 );
+const UpdateReception = lazy(() =>
+  import("pages/Dashboard/Reception/UpdateReception")
+);
+const ReceptionDetail = lazy(() =>
+  import("pages/Dashboard/Reception/ReceptionDetail")
+);
 const AdminRoutes = [
   
   {
@@ -228,6 +237,10 @@ const AdminRoutes = [
   {
     path: "/update-service/:id",
     component: <UpdateServiceItem />,
+  },
+  {
+    path: "/reception-detail/:id",
+    component: <ReceptionDetail />,
   },
   {
     path: "/service-list",
@@ -245,6 +258,7 @@ const AdminRoutes = [
     path: "/create-service-category",
     component: <CreateCategory />,
   },
+  
   {
     path: "/update-service-category/:id",
     component: <UpdateCategory />,
@@ -583,6 +597,10 @@ const AdminRoutes = [
     component: <CustomerDetail />,
   },
   {
+    path: "/update-reception/:id",
+    component: <UpdateReception />,
+  },
+  {
     path: "/visa-detail/:id",
     component: <VisaDetail />,
   },
@@ -626,6 +644,7 @@ const AdminRoutes = [
     path: "/notifcations",
     component: <Notification />,
   },
+ 
 ];
 
 export default AdminRoutes;

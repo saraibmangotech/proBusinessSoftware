@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 7,
+            "activePatchIndex": 9,
             "patches": [
                 {
                     "date": 1744496828867,
@@ -36,6 +36,14 @@
                 {
                     "date": 1744507207646,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -73,8 +73,12 @@\n   getRejectedVisa: async (params) => {\r\n     const data = await get(routes.getRejectedVisa, params);\r\n     return data;\r\n   },\r\n+  getReceptionsList: async (params) => {\r\n+    const data = await get(routes.getReceptionsList, params);\r\n+    return data;\r\n+  },\r\n   getCompanies: async (params) => {\r\n     const data = await get(routes.getCompanies, params);\r\n     return data;\r\n   },\r\n"
+                },
+                {
+                    "date": 1744508342682,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -169,8 +169,12 @@\n   handleDeleteCustomer: async (params) => {\r\n     const data = await deleted(routes.handleDeleteCustomer, params);\r\n     return data;\r\n   },\r\n+  deleteReception: async (params) => {\r\n+    const data = await deleted(routes.deleteReception, params);\r\n+    return data;\r\n+  },\r\n   handleDeleteDraft: async (params) => {\r\n     const data = await deleted(routes.handleDeleteDraft, params);\r\n     return data;\r\n   },\r\n@@ -237,7 +241,27 @@\n   getCustomerBuyerId: async (params) => {\r\n     const data = await get(routes.getCustomerBuyerId, params);\r\n     return data;\r\n   },\r\n+  AddServiceItem: async (obj) => {\r\n+    const data = await post(routes.AddServiceItem, obj);\r\n+    return data;\r\n+  },\r\n+  getServiceItem: async (params) => {\r\n+    const data = await get(routes.getServiceItem, params);\r\n+    return data;\r\n+  },\r\n+  DetailServiceItem: async (params) => {\r\n+    const data = await get(routes.DetailServiceItem, params);\r\n+    return data;\r\n+  },\r\n+  UpdateServiceItem: async (obj) => {\r\n+    const data = await patch(routes.UpdateServiceItem, obj);\r\n+    return data;\r\n+  },\r\n+  DeleteServiceItem: async (params) => {\r\n+    const data = await deleted(routes.DeleteServiceItem, params);\r\n+    return data;\r\n+  },\r\n }\r\n \r\n export default CustomerServices\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1744510729962,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,8 +45,12 @@\n   CustomerStatus: async (obj) => {\r\n     const data = await patch(routes.CustomerStatus, obj);\r\n     return data;\r\n   },\r\n+  UpdateReception: async (obj) => {\r\n+    const data = await patch(routes.UpdateReception, obj);\r\n+    return data;\r\n+  },\r\n   UpdateAddOnService: async (obj) => {\r\n     const data = await patch(routes.UpdateAddOnService, obj);\r\n     return data;\r\n   },\r\n"
                 }
             ],
             "date": 1744496828867,

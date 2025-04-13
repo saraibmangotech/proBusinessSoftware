@@ -24,7 +24,7 @@ const LazyLoading = () => {
 function WebsiteLayout() {
 
   const { setStorageItem } = Storage();
-  const messaging = getMessaging(app);
+  // const messaging = getMessaging(app);
 
   // *For Get Session ID
   const generateSessionId = async () => {
@@ -38,24 +38,24 @@ function WebsiteLayout() {
     }
   }
 
-  const generateToken = async () => {
-    getToken(messaging, { vapidKey: 'BClgiPeWLUu2Q_oz822G-rRo_HDzjuh3aKanrZlMHWPDeEnjg4-1FLU65E0WD2L283FzL7R9hxjdM8XZRUrFcrE' }).then((currentToken) => {
-      if (currentToken) {
-        localStorage.setItem('fcmToken', currentToken)
-      } else {
-        // Show permission request UI
-        console.log('No registration token ava0ilable. Request permission to generate one.');
-        // ...
-      }
-    }).catch((err) => {
-      console.log('An error occurred while retrieving token. ', err);
-      // ...
-    });
-  }
+  // const generateToken = async () => {
+  //   getToken(messaging, { vapidKey: 'BClgiPeWLUu2Q_oz822G-rRo_HDzjuh3aKanrZlMHWPDeEnjg4-1FLU65E0WD2L283FzL7R9hxjdM8XZRUrFcrE' }).then((currentToken) => {
+  //     if (currentToken) {
+  //       localStorage.setItem('fcmToken', currentToken)
+  //     } else {
+  //       // Show permission request UI
+  //       console.log('No registration token ava0ilable. Request permission to generate one.');
+  //       // ...
+  //     }
+  //   }).catch((err) => {
+  //     console.log('An error occurred while retrieving token. ', err);
+  //     // ...
+  //   });
+  // }
 
   useEffect(() => {
     generateSessionId()
-    generateToken()
+    // generateToken()
   }, []);
 
   return (

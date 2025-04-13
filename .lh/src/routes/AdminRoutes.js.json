@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 16,
+            "activePatchIndex": 22,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -72,6 +72,30 @@
                 {
                     "date": 1744507667235,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -55,11 +55,14 @@\n import ProfitLossVisaReport from \"pages/Dashboard/Reporting/ProfitLossVisaReport\";\r\n import ProfitLossCustomerReport from \"pages/Dashboard/Reporting/ProfitLossCustomerReport\";\r\n import RejectedVisaList from \"pages/Dashboard/VisaProcessing/RejectedVisaList\";\r\n import CreditNote from \"pages/Dashboard/VisaProcessing/CreditNote\";\r\n+import ServiceList from \"pages/Dashboard/ServiceItem/ServiceItemList\";\r\n+import ServiceDetail from \"pages/Dashboard/ServiceItem/ServiceDetail\";\r\n \r\n \r\n \r\n+\r\n const CreateCustomer = lazy(() =>\r\n   import(\"pages/Dashboard/Customers/CreateCustomer\")\r\n );\r\n const CreateCategory = lazy(() =>\r\n@@ -208,12 +211,9 @@\n );\r\n const ReceptionList = lazy(() =>\r\n   import(\"pages/Dashboard/Reception/Receptions\")\r\n );\r\n-import ServiceList from \"pages/Dashboard/ServiceItem/ServiceItemList\";\r\n-import ServiceDetail from \"pages/Dashboard/ServiceItem/ServiceDetail\";\r\n \r\n-\r\n const UpdateServiceItem = lazy(() =>\r\n   import(\"pages/Dashboard/ServiceItem/UpdateServiceItem\")\r\n );\r\n const CreateServiceItem = lazy(() =>\r\n"
+                },
+                {
+                    "date": 1744508465984,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,9 +60,8 @@\n import ServiceDetail from \"pages/Dashboard/ServiceItem/ServiceDetail\";\r\n \r\n \r\n \r\n-\r\n const CreateCustomer = lazy(() =>\r\n   import(\"pages/Dashboard/Customers/CreateCustomer\")\r\n );\r\n const CreateCategory = lazy(() =>\r\n@@ -70,8 +69,12 @@\n );\r\n const CategoryList = lazy(() =>\r\n   import(\"pages/Dashboard/ServiceCategory/CategoryList\")\r\n );\r\n+\r\n+// const ServiceList = lazy(() =>\r\n+//   import(\"pages/Dashboard/ServiceCategory/ServiceList\")\r\n+// );\r\n const CostSetup = lazy(() =>\r\n   import(\"pages/Dashboard/Settings/CostSetup\")\r\n );\r\n const RateSetup = lazy(() =>\r\n@@ -244,8 +247,9 @@\n   {\r\n     path: \"/create-service-category\",\r\n     component: <CreateCategory />,\r\n   },\r\n+  \r\n   {\r\n     path: \"/update-service-category/:id\",\r\n     component: <UpdateCategory />,\r\n   },\r\n@@ -582,8 +586,12 @@\n     path: \"/customer-detail/:id\",\r\n     component: <CustomerDetail />,\r\n   },\r\n   {\r\n+    path: \"/update-reception/:id\",\r\n+    component: <CustomerDetail />,\r\n+  },\r\n+  {\r\n     path: \"/visa-detail/:id\",\r\n     component: <VisaDetail />,\r\n   },\r\n   {\r\n@@ -625,7 +633,8 @@\n   {\r\n     path: \"/notifcations\",\r\n     component: <Notification />,\r\n   },\r\n+ \r\n ];\r\n \r\n export default AdminRoutes;\r\n"
+                },
+                {
+                    "date": 1744508473458,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -587,9 +587,9 @@\n     component: <CustomerDetail />,\r\n   },\r\n   {\r\n     path: \"/update-reception/:id\",\r\n-    component: <CustomerDetail />,\r\n+    component: <UpdateReception />,\r\n   },\r\n   {\r\n     path: \"/visa-detail/:id\",\r\n     component: <VisaDetail />,\r\n"
+                },
+                {
+                    "date": 1744508493285,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -221,8 +221,11 @@\n );\r\n const CreateServiceItem = lazy(() =>\r\n   import(\"pages/Dashboard/ServiceItem/CreateServiceItem\")\r\n );\r\n+const UpdateReception = lazy(() =>\r\n+  import(\"pages/Dashboard/ServiceItem/UpdateReception\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n"
+                },
+                {
+                    "date": 1744508498479,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -222,9 +222,9 @@\n const CreateServiceItem = lazy(() =>\r\n   import(\"pages/Dashboard/ServiceItem/CreateServiceItem\")\r\n );\r\n const UpdateReception = lazy(() =>\r\n-  import(\"pages/Dashboard/ServiceItem/UpdateReception\")\r\n+  import(\"pages/Dashboard/Reception/UpdateReception\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744510828343,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -235,8 +235,12 @@\n     path: \"/update-service/:id\",\r\n     component: <UpdateServiceItem />,\r\n   },\r\n   {\r\n+    path: \"/reception-detail/:id\",\r\n+    component: <UpdateServiceItem />,\r\n+  },\r\n+  {\r\n     path: \"/service-list\",\r\n     component: <ServiceList />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744510843902,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -224,8 +224,11 @@\n );\r\n const UpdateReception = lazy(() =>\r\n   import(\"pages/Dashboard/Reception/UpdateReception\")\r\n );\r\n+const ReceptionDetail = lazy(() =>\r\n+  import(\"pages/Dashboard/Reception/ReceptionDetail\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -236,9 +239,9 @@\n     component: <UpdateServiceItem />,\r\n   },\r\n   {\r\n     path: \"/reception-detail/:id\",\r\n-    component: <UpdateServiceItem />,\r\n+    component: <ReceptionDetail />,\r\n   },\r\n   {\r\n     path: \"/service-list\",\r\n     component: <ServiceList />,\r\n"
                 }
             ],
             "date": 1744496886534,

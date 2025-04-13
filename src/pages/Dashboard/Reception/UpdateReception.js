@@ -12,18 +12,20 @@ import CustomerServices from "services/Customer"
 import { showErrorToast, showPromiseToast } from "components/NewToaster"
 import SimpleDialog from "components/Dialog/SimpleDialog"
 import { ErrorToaster } from "components/Toaster"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
-function ReceptionForm() {
-    const navigate=useNavigate()
+function UpdateReception() {
+    const navigate = useNavigate()
+    const { id } = useParams()
     const [customerType, setCustomerType] = useState("individual")
-    const [buttonDisabled, setButtonDisabled] = useState(true)
-    const [buttonDisabled2, setButtonDisabled2] = useState(true)
+    const [buttonDisabled, setButtonDisabled] = useState(false)
+    const [buttonDisabled2, setButtonDisabled2] = useState(false)
     const [customers, setCustomers] = useState([])
     const [selectedCompany, setSelectedCompany] = useState(null)
     const [selectedCustomer, setSelectedCustomer] = useState(null)
     const [companies, setCompanies] = useState([])
     const [companyDialog, setCompanyDialog] = useState(false)
+    const [newDetail, setNewDetail] = useState(null)
     const [subCustDisable, setSubCustDisable] = useState(false)
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
@@ -46,23 +48,23 @@ function ReceptionForm() {
         formState: { errors: errors2 },
 
     } = useForm();
- 
+
     const onSubmit = async (formData) => {
         console.log(formData);
         try {
             let obj = {
+                id:id,
                 is_company: customerType == 'individual' ? false : true,
-                customer_id:selectedCustomer?.id,
                 customer_name: formData?.customerName,
-                email:formData?.email,
-                mobile:formData?.mobile,
-                token_number:formData?.tokenNumber,
-                reference:formData?.reference,
-                company_id:selectedCompany?.id
+                customer_id: selectedCustomer?.id,
+                mobile: formData?.mobile,
+                token_number: formData?.tokenNumber,
+                reference: formData?.reference,
+                company_id: selectedCompany?.id
 
 
             };
-            const promise = CustomerServices.CreateReception(obj);
+            const promise = CustomerServices.UpdateReception(obj);
 
             showPromiseToast(
                 promise,
@@ -84,18 +86,18 @@ function ReceptionForm() {
         console.log(formData);
         try {
             let obj = {
+                id:id,
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
-                customer_id:selectedCustomer?.id,
-                email:formData?.email,
-                mobile:formData?.mobile,
-                token_number:formData?.tokenNumber,
-                reference:formData?.reference,
-                company_id:selectedCompany?.id
+                customer_id: selectedCustomer?.id,
+                mobile: formData?.mobile,
+                token_number: formData?.tokenNumber,
+                reference: formData?.reference,
+                company_id: selectedCompany?.id
 
 
             };
-            const promise = CustomerServices.CreateReception(obj);
+            const promise = CustomerServices.UpdateReception(obj);
 
             showPromiseToast(
                 promise,
@@ -245,7 +247,7 @@ function ReceptionForm() {
             let obj = {
                 code: formData?.code,
                 name: formData?.name,
-                customer_id:selectedCustomer?.id
+                customer_id: selectedCustomer?.id
 
 
             };
@@ -268,9 +270,65 @@ function ReceptionForm() {
             ErrorToaster(error);
         }
     };
+    const getData = async () => {
+        try {
+            let params = {
+                reception_id: id
+            };
+
+            const { data } = await CustomerServices.getReceptionDetail(params);
+            let detail = data?.token
+            console.log(detail);
+            setNewDetail(detail)
+            setCustomerType(!detail?.is_company ? 'individual' : 'company')
+            if (!detail?.is_company) {
+                setValue('mobile', detail?.mobile)
+                setValue('customerName', detail?.customer_name)
+                setValue('tokenNumber', detail?.token_number)
+                setValue('reference', detail?.reference)
+                setValue('email', detail?.email)
+
+
+
+            }
+
+            else {
+                setValue1('mobile', detail?.mobile)
+                setValue1('customerName', detail?.customer_name)
+                setValue1('tokenNumber', detail?.token_number)
+                setValue1('reference', detail?.reference)
+                setValue1('email', detail?.email)
+                getCompanies(detail?.customer_id)
+            }
+
+        } catch (error) {
+            console.error("Error fetching location:", error);
+        }
+    };
+    console.log(selectedCustomer, 'selectedCustomer');
+
     useEffect(() => {
+        getData()
         getCustomerQueue()
     }, [])
+
+    useEffect(() => {
+        const company = companies.find(item => item?.id == newDetail?.company_id);
+        const customer = customers.find(item => item?.id == newDetail?.customer_id);
+    
+        // Only proceed if both are found
+        if (company && customer) {
+            console.log('Company:', company);
+            console.log('Customer:', customer);
+    
+            setValue('customer', customer);
+            setSelectedCustomer(customer);
+            setValue('company', company);
+            setSelectedCompany(company);
+        }
+    }, [customers, companies, newDetail]);
+    
+
 
     return (
         <Box m={3} sx={{ backgroundColor: "white", borderRadius: "12px" }}>
@@ -283,28 +341,28 @@ function ReceptionForm() {
                     <Grid container spacing={2}>
 
                         <Grid container sx={{ justifyContent: "center" }}>
-                        <Grid item xs={12}>
-                            <InputField
-                                label={"Name *:"}
-                                size={"small"}
-                                placeholder={" Name"}
-                                error={errors2?.name?.message}
-                                register={register2("name", {
-                                    required: "Please enter  name.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <InputField
-                                label={"Code *:"}
-                                size={"small"}
-                                placeholder={" Code"}
-                                error={errors2?.code?.message}
-                                register={register2("code", {
-                                    required: "Please enter  code.",
-                                })}
-                            />
-                        </Grid>
+                            <Grid item xs={12}>
+                                <InputField
+                                    label={"Name *:"}
+                                    size={"small"}
+                                    placeholder={" Name"}
+                                    error={errors2?.name?.message}
+                                    register={register2("name", {
+                                        required: "Please enter  name.",
+                                    })}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <InputField
+                                    label={"Code *:"}
+                                    size={"small"}
+                                    placeholder={" Code"}
+                                    error={errors2?.code?.message}
+                                    register={register2("code", {
+                                        required: "Please enter  code.",
+                                    })}
+                                />
+                            </Grid>
                             <Grid
                                 item
                                 xs={6}
@@ -332,17 +390,17 @@ function ReceptionForm() {
                 </Box>
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
-                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Create Reception</Typography>
+                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}> Reception Detail</Typography>
             </Box>
             <RadioGroup row value={customerType} onChange={(e) => setCustomerType(e.target.value)} sx={{ mb: 3, p: 3 }}>
                 <FormControlLabel
                     value="individual"
-                    control={<Radio checked={customerType === "individual"} />}
+                    control={<Radio disabled checked={customerType === "individual"} />}
                     label="Individual"
                 />
                 <FormControlLabel
                     value="company"
-                    control={<Radio checked={customerType === "company"} />}
+                    control={<Radio disabled checked={customerType === "company"} />}
                     label="Company"
                 />
             </RadioGroup>
@@ -444,7 +502,7 @@ function ReceptionForm() {
                             <PrimaryButton
                                 disabled={buttonDisabled}
                                 bgcolor={Colors.buttonBg}
-                                title="Create"
+                                title="Update"
                                 type={'submit'}
 
 
@@ -614,7 +672,7 @@ function ReceptionForm() {
                                 <PrimaryButton
                                     disabled={buttonDisabled2}
                                     bgcolor={Colors.buttonBg}
-                                    title="Create"
+                                    title="Update"
                                     type={'submit'}
 
 
@@ -627,4 +685,4 @@ function ReceptionForm() {
     )
 }
 
-export default ReceptionForm
+export default UpdateReception
