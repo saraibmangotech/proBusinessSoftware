@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1744507388198,
@@ -24,6 +24,10 @@
                 {
                     "date": 1744546943047,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -171,8 +171,19 @@\n \t\tnavigation: true,\r\n \t\torder_by: 33,\r\n \t  },\r\n     {\r\n+      id: 33,\r\n+      name: \"Sale Receipt\",\r\n+      icon: \"customer\",\r\n+      parent_id: 12,\r\n+      api: null,\r\n+      route: \"/sales-receipt\",\r\n+      identifier: null,\r\n+      navigation: true,\r\n+      order_by: 33,\r\n+      },\r\n+    {\r\n       id: 14,\r\n       name: \"Receptions\",\r\n       icon: \"customer\",\r\n       parent_id: null,\r\n"
+                },
+                {
+                    "date": 1744614682002,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -427,9 +427,22 @@\n         navigation: true,\r\n         order_by: 14,\r\n         children:[],\r\n         childRoute: [],\r\n-        }],\r\n+        },\r\n+        {\r\n+          id: 14,\r\n+          name: \"Banks\",\r\n+          icon: \"customer\",\r\n+          parent_id: null,\r\n+          api: \"/api/roles\",\r\n+          route: \"/service-list\",\r\n+          identifier: null,\r\n+          navigation: true,\r\n+          order_by: 14,\r\n+          children:[],\r\n+          childRoute: [],\r\n+          }],\r\n \t  },\r\n \t  \r\n    \r\n   ]\r\n"
                 }
             ],
             "date": 1744507388198,

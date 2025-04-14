@@ -228,6 +228,7 @@ function CreateCategory() {
                 center_fee:Number(formData?.center_fee),
                 govt_bank_account_id:governmentAccount?.id,
                 bank_service_charge:Number(formData?.bank_service_charges),
+                government_fee :Number(formData?.govtFee),
                 other_charge:Number(formData?.other_charge),
                 local_commission: Number(formData?.local_commission),
                 item_tax_type:tax?.name,
@@ -471,67 +472,6 @@ function CreateCategory() {
                                         })}
                                     />
                                 </Grid>
-                               
-
-                                <Grid item xs={2.8} >
-                                    <SelectField
-                                        size={'small'}
-                                        label={'Category *:'}
-
-                                        options={categories}
-                                        selected={category}
-                                        onSelect={(value) => {
-                                            setCategory(value)
-                                            console.log(value);
-                                            setAdjustmentAccount(value?.inventory_adjustment_account)
-                                            setSalesAccount(value?.sales_account)
-                                            setCogsAccount(value?.cogs_account)
-                                            setTax({id:value?.item_tax_type , name :value?.item_tax_type})
-                                            
-                                        }}
-                                        error={errors?.category?.message}
-                                        register={register("category", {
-                                            required: 'Please select category .',
-                                        })}
-                                    />
-                                </Grid>
-                                <Grid item xs={2.8} >
-                                    <SelectField
-                                        size={'small'}
-                                        label={'Tax Type *:'}
-
-                                        options={taxes}
-                                        selected={tax}
-                                        onSelect={(value) => {
-                                            setTax(value)
-
-
-                                        }}
-                                        error={errors?.tax?.message}
-                                        register={register("tax", {
-                                            required: 'Please select tax .',
-                                        })}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={2.8} >
-                                    <SelectField
-                                        size={'small'}
-                                        label={'Govt Bank Account *:'}
-
-                                        options={accounts}
-                                        selected={governmentAccount}
-                                        onSelect={(value) => {
-                                            setGovernmnentAccount(value)
-
-                                        }}
-                                        error={errors?.governmentAccount?.message}
-                                        register={register("governmentAccount", {
-                                            required: 'Please select Government Account .',
-                                        })}
-                                    />
-                                </Grid>
-
                                 <Grid item xs={2.8}>
                                     <InputField
                                         label={"Bank Services Charges :*"}
@@ -540,6 +480,25 @@ function CreateCategory() {
                                         error={errors1?.bank_service_charges?.message}
                                         register={register1("bank_service_charges", {
                                             required: "Please Enter Bank Service Charges .",
+                                            onChange: (e) => {
+                                                console.log('asdas');
+
+
+
+                                            },
+
+
+                                        })}
+                                    />
+                                </Grid>
+                                <Grid item xs={2.8}>
+                                    <InputField
+                                        label={"Govt Fees :*"}
+                                        size={"small"}
+                                        placeholder={"Govt Fees "}
+                                        error={errors1?.govtFee?.message}
+                                        register={register1("govtFee", {
+                                            required: "Please Enter govt fee .",
                                             onChange: (e) => {
                                                 console.log('asdas');
 
@@ -627,6 +586,67 @@ function CreateCategory() {
                                         })}
                                     />
                                 </Grid>
+
+                                <Grid item xs={2.8} >
+                                    <SelectField
+                                        size={'small'}
+                                        label={'Category *:'}
+
+                                        options={categories}
+                                        selected={category}
+                                        onSelect={(value) => {
+                                            setCategory(value)
+                                            console.log(value);
+                                            setAdjustmentAccount(value?.inventory_adjustment_account)
+                                            setSalesAccount(value?.sales_account)
+                                            setCogsAccount(value?.cogs_account)
+                                            setTax({id:value?.item_tax_type , name :value?.item_tax_type})
+                                            
+                                        }}
+                                        error={errors?.category?.message}
+                                        register={register("category", {
+                                            required: 'Please select category .',
+                                        })}
+                                    />
+                                </Grid>
+                                <Grid item xs={2.8} >
+                                    <SelectField
+                                        size={'small'}
+                                        label={'Tax Type *:'}
+
+                                        options={taxes}
+                                        selected={tax}
+                                        onSelect={(value) => {
+                                            setTax(value)
+
+
+                                        }}
+                                        error={errors?.tax?.message}
+                                        register={register("tax", {
+                                            required: 'Please select tax .',
+                                        })}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={2.8} >
+                                    <SelectField
+                                        size={'small'}
+                                        label={'Govt Bank Account *:'}
+
+                                        options={accounts}
+                                        selected={governmentAccount}
+                                        onSelect={(value) => {
+                                            setGovernmnentAccount(value)
+
+                                        }}
+                                        error={errors?.governmentAccount?.message}
+                                        register={register("governmentAccount", {
+                                            required: 'Please select Government Account .',
+                                        })}
+                                    />
+                                </Grid>
+
+                               
 
                                 <Grid item xs={2.8} >
                                     <SelectField

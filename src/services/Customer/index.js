@@ -6,8 +6,16 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+  CreateBank: async (obj) => {
+    const data = await post(routes.CreateBank, obj);
+    return data;
+  },
   DeleteVoucher: async (obj) => {
     const data = await deleted(routes.DeleteVoucher, obj);
+    return data;
+  },
+  DeleteBank: async (obj) => {
+    const data = await deleted(routes.DeleteBank, obj);
     return data;
   },
   CreateWPS: async (obj) => {
@@ -46,6 +54,10 @@ const CustomerServices = {
     const data = await patch(routes.CustomerStatus, obj);
     return data;
   },
+  UpdateBank: async (obj) => {
+    const data = await patch(routes.UpdateBank, obj);
+    return data;
+  },
   UpdateReception: async (obj) => {
     const data = await patch(routes.UpdateReception, obj);
     return data;
@@ -74,6 +86,10 @@ const CustomerServices = {
     const data = await get(routes.getAgents, params);
     return data;
   },
+  getBankDetail: async (params) => {
+    const data = await get(routes.getBankDetail, params);
+    return data;
+  },
   getRejectedVisa: async (params) => {
     const data = await get(routes.getRejectedVisa, params);
     return data;
@@ -92,6 +108,10 @@ const CustomerServices = {
   },
   getReceptionDetail: async (params) => {
     const data = await get(routes.getReceptionDetail, params);
+    return data;
+  },
+  getBanks: async (params) => {
+    const data = await get(routes.getBanks, params);
     return data;
   },
   VisaProcessing: async (params) => {

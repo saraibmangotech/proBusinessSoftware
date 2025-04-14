@@ -15,8 +15,8 @@ import { ErrorToaster } from "components/Toaster"
 import { useNavigate } from "react-router-dom"
 
 function ReceptionForm() {
-    const navigate=useNavigate()
-    const [customerType, setCustomerType] = useState("individual")
+    const navigate = useNavigate()
+    const [customerType, setCustomerType] = useState("company")
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [buttonDisabled2, setButtonDisabled2] = useState(true)
     const [customers, setCustomers] = useState([])
@@ -25,6 +25,8 @@ function ReceptionForm() {
     const [companies, setCompanies] = useState([])
     const [companyDialog, setCompanyDialog] = useState(false)
     const [subCustDisable, setSubCustDisable] = useState(false)
+    const [categories, setCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -46,19 +48,21 @@ function ReceptionForm() {
         formState: { errors: errors2 },
 
     } = useForm();
- 
+
     const onSubmit = async (formData) => {
         console.log(formData);
         try {
             let obj = {
-                is_company: customerType == 'individual' ? false : true,
-                customer_id:selectedCustomer?.id,
+
+                customer_id: selectedCustomer?.id,
+                service_category_id:selectedCategory?.id,
+                service_category:selectedCategory?.name,
                 customer_name: formData?.customerName,
-                email:formData?.email,
-                mobile:formData?.mobile,
-                token_number:formData?.tokenNumber,
-                reference:formData?.reference,
-                company_id:selectedCompany?.id
+                email: formData?.email,
+                mobile: formData?.mobile,
+                token_number: formData?.tokenNumber,
+                reference: formData?.reference,
+                company_id: selectedCompany?.id
 
 
             };
@@ -86,12 +90,14 @@ function ReceptionForm() {
             let obj = {
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
-                customer_id:selectedCustomer?.id,
-                email:formData?.email,
-                mobile:formData?.mobile,
-                token_number:formData?.tokenNumber,
-                reference:formData?.reference,
-                company_id:selectedCompany?.id
+                service_category_id:selectedCategory?.id,
+                service_category:selectedCategory?.name,
+                customer_id: selectedCustomer?.id,
+                email: formData?.email,
+                mobile: formData?.mobile,
+                token_number: formData?.tokenNumber,
+                reference: formData?.reference,
+                company_id: selectedCompany?.id
 
 
             };
@@ -128,11 +134,34 @@ function ReceptionForm() {
 
             const { data } = await CustomerServices.getCustomerQueue(params)
             setCustomers(data?.rows)
-
+            let filter = await data?.rows.find(item => item?.name == 'Walk-In Customer')
+            setSelectedCustomer(filter)
         } catch (error) {
             showErrorToast(error)
         }
     }
+
+     const getCategories = async (page, limit, filter) => {
+     
+    
+        try {
+        
+          let params = {
+            page: 1,
+            limit: 1000,
+          
+    
+          }
+        
+          const { data } = await CustomerServices.getCategoryList(params)
+          setCategories(data?.categories)
+         
+         
+        
+        } catch (error) {
+          showErrorToast(error)
+        } 
+      }
 
     const getCustomerDetail = async (phone) => {
         try {
@@ -245,7 +274,7 @@ function ReceptionForm() {
             let obj = {
                 code: formData?.code,
                 name: formData?.name,
-                customer_id:selectedCustomer?.id
+                customer_id: selectedCustomer?.id
 
 
             };
@@ -269,6 +298,7 @@ function ReceptionForm() {
         }
     };
     useEffect(() => {
+        getCategories()
         getCustomerQueue()
     }, [])
 
@@ -283,28 +313,28 @@ function ReceptionForm() {
                     <Grid container spacing={2}>
 
                         <Grid container sx={{ justifyContent: "center" }}>
-                        <Grid item xs={12}>
-                            <InputField
-                                label={"Name *:"}
-                                size={"small"}
-                                placeholder={" Name"}
-                                error={errors2?.name?.message}
-                                register={register2("name", {
-                                    required: "Please enter  name.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <InputField
-                                label={"Code *:"}
-                                size={"small"}
-                                placeholder={" Code"}
-                                error={errors2?.code?.message}
-                                register={register2("code", {
-                                    required: "Please enter  code.",
-                                })}
-                            />
-                        </Grid>
+                            <Grid item xs={12}>
+                                <InputField
+                                    label={"Name *:"}
+                                    size={"small"}
+                                    placeholder={" Name"}
+                                    error={errors2?.name?.message}
+                                    register={register2("name", {
+                                        required: "Please enter  name.",
+                                    })}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <InputField
+                                    label={"Code *:"}
+                                    size={"small"}
+                                    placeholder={" Code"}
+                                    error={errors2?.code?.message}
+                                    register={register2("code", {
+                                        required: "Please enter  code.",
+                                    })}
+                                />
+                            </Grid>
                             <Grid
                                 item
                                 xs={6}
@@ -334,18 +364,7 @@ function ReceptionForm() {
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Create Reception</Typography>
             </Box>
-            <RadioGroup row value={customerType} onChange={(e) => setCustomerType(e.target.value)} sx={{ mb: 3, p: 3 }}>
-                <FormControlLabel
-                    value="individual"
-                    control={<Radio checked={customerType === "individual"} />}
-                    label="Individual"
-                />
-                <FormControlLabel
-                    value="company"
-                    control={<Radio checked={customerType === "company"} />}
-                    label="Company"
-                />
-            </RadioGroup>
+
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
 
 
@@ -413,11 +432,13 @@ function ReceptionForm() {
 
                         <Grid item xs={2.8}>
                             <InputField
-                                label={"Reference *:"}
+                                label={"Reference :"}
                                 size={"small"}
                                 placeholder={"Reference"}
                                 error={errors?.reference?.message}
-                                register={register("reference")}
+                                register={register("reference",{
+                                    required:false
+                                })}
                             />
                         </Grid>
 
@@ -443,7 +464,7 @@ function ReceptionForm() {
                         <Grid container justifyContent={'flex-end'}>
                             <PrimaryButton
                                 disabled={buttonDisabled}
-                               bgcolor={'#bd9b4a'}
+                                bgcolor={'#bd9b4a'}
                                 title="Create"
                                 type={'submit'}
 
@@ -583,6 +604,24 @@ function ReceptionForm() {
                             <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}
+                                    label={'Service Category *:'}
+
+                                    options={categories}
+                                    selected={selectedCategory}
+                                    onSelect={(value) => {
+                                        setSelectedCategory(value)
+                                       
+
+                                    }}
+                                    error={errors1?.service?.message}
+                                    register={register1("service", {
+                                        required: 'Please select service.',
+                                    })}
+                                />
+                            </Grid>
+                            {/* <Grid item xs={2.8} >
+                                <SelectField
+                                    size={'small'}
                                     label={'Company *:'}
                                     disabled={subCustDisable}
                                     options={companies}
@@ -609,11 +648,11 @@ function ReceptionForm() {
 
 
                                 />
-                            </Grid>
+                            </Grid> */}
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
                                     disabled={buttonDisabled2}
-                                   bgcolor={'#bd9b4a'}
+                                    bgcolor={'#bd9b4a'}
                                     title="Create"
                                     type={'submit'}
 

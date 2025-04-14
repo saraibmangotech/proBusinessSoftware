@@ -3,18 +3,14 @@ import { Autocomplete, InputLabel, TextField, Typography, createFilterOptions } 
 import { Debounce } from "utils";
 
 function SelectField(props) {
-
   const { label, size, disabled, onSearch, addNew, multiple, selected, onSelect, register, error, options } = props
 
   const filter = createFilterOptions();
 
-
   // *For Handle Filter Option
   const handleFilterOptions = (options, params) => {
-
     const filtered = filter(options, params);
    
-
     const { inputValue } = params;
     // *Suggest the creation of a new value
     const isExisting = options.some((option) => inputValue === option.name);
@@ -30,7 +26,6 @@ function SelectField(props) {
 
   // *For Handle Option Label
   const handleOptionLabel = (option) => {
-
     // *Value selected with enter, right from the input
     if (typeof option === 'string') {
       return option;
@@ -41,7 +36,6 @@ function SelectField(props) {
     }
     // *Regular option
     return option.name;
-
   }
 
   // *For Handle Change
@@ -78,18 +72,24 @@ function SelectField(props) {
         getOptionLabel={(option) => handleOptionLabel(option)}
         onChange={(event, newValue) => handleChange(newValue)}
         onInputChange={(event, newInputValue) => handleSearch(newInputValue)}
-        sx={{  mb: !error && 2 }}
+        sx={{ mb: !error && 2 }}
+        PopperProps={{
+          style: { zIndex: 1400 }, // Higher z-index to appear above modal
+        }}
         renderOption={(props, option) => <li {...props}>{option.name}</li>}
         renderInput={(params) => (
           <TextField
             {...params}
-            sx={{'& .MuiOutlinedInput-root': {
-                  '& fieldset' : {
-                    border:'2px solid black !important',
-                    borderRadius:'12px',
-                    
-                  }
-                }}}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset' : {
+                  border:'2px solid black !important',
+                  borderRadius:'12px',
+                }
+              },
+              position: 'relative', // Ensure proper stacking context
+              zIndex: 1 // Base z-index for the field itself
+            }}
             placeholder={label}
             error={error}
             {...register}
@@ -111,4 +111,4 @@ function SelectField(props) {
   );
 }
 
-export default SelectField
+export default SelectField;

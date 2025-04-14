@@ -228,11 +228,39 @@ const UpdateReception = lazy(() =>
 const ReceptionDetail = lazy(() =>
   import("pages/Dashboard/Reception/ReceptionDetail")
 );
+const CreateBank = lazy(() =>
+  import("pages/Dashboard/Banks/CreateBank")
+);
+const BankList = lazy(() =>
+  import("pages/Dashboard/Banks/BankList")
+);
+const UpdateBank = lazy(() =>
+  import("pages/Dashboard/Banks/UpdateBank")
+);
+const BankDetail = lazy(() =>
+  import("pages/Dashboard/Banks/BankDetail")
+);
 const AdminRoutes = [
   
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
+  },
+  {
+    path: "/update-bank/:id",
+    component: <UpdateBank />,
+  },
+  {
+    path: "/bank-detail/:id",
+    component: <BankDetail />,
+  },
+  {
+    path: "/create-bank",
+    component: <CreateBank />,
+  },
+  {
+    path: "/bank-list",
+    component: <BankList />,
   },
   {
     path: "/update-service/:id",

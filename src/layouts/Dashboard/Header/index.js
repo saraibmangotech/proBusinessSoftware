@@ -428,7 +428,20 @@ function Header() {
         order_by: 14,
         children:[],
         childRoute: [],
-        }],
+        },
+        {
+          id: 14,
+          name: "Banks",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/bank-list",
+          identifier: null,
+          navigation: true,
+          order_by: 14,
+          children:[],
+          childRoute: [],
+          }],
 	  },
 	  
    

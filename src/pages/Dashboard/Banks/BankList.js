@@ -106,7 +106,7 @@ const useStyles = makeStyles({
   }
 })
 
-function CategoryList() {
+function BankList() {
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -125,7 +125,7 @@ function CategoryList() {
     reset,
   } = useForm();
 
-  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Name ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
   const [loader, setLoader] = useState(false);
@@ -157,32 +157,19 @@ const [data, setData] = useState([])
     setLoader(true)
 
     try {
-      const Page = page ? page : currentPage
-      const Limit = limit ? limit : pageLimit
-      const Filter = filter ? { ...filters, ...filter } : null;
-      setCurrentPage(Page)
-      setPageLimit(Limit)
-      setFilters(Filter)
+  
       let params = {
         page: 1,
         limit: 1000,
       
 
       }
-      params = { ...params, ...Filter }
-      const { data } = await CustomerServices.getServiceItem(params)
-      setData(data?.rows);
+    
+      const { data } = await CustomerServices.getBanks(params)
+      setData(data?.banks);
      
      
-      setPermissions(formatPermissionData(data?.permissions))
-      console.log(formatPermissionData(data?.permissions));
-
-      setPermissions(formatPermissionData(data?.permissions))
-      data?.permissions.forEach(e => {
-        if (e?.route && e?.identifier && e?.permitted) {
-          dispatch(addPermission(e?.route));
-        }
-      })
+      
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -218,10 +205,10 @@ const [data, setData] = useState([])
  
 
     try {
-        let params = { service_id: selectedData?.id }
+        let params = { customer_id: selectedData?.id }
 
 
-        const { message } = await CustomerServices.DeleteServiceItem(params)
+        const { message } = await CustomerServices.DeleteBank(params)
 
         SuccessToaster(message);
         getCustomerQueue()
@@ -234,11 +221,11 @@ const [data, setData] = useState([])
   const UpdateStatus = async () => {
     try {
       let obj = {
-        customer_id: selectedData?.id,
+        id: selectedData?.id,
         is_active: status?.id,
       };
 
-      const promise = CustomerServices.CustomerStatus(obj);
+      const promise = CustomerServices.UpdateBank(obj);
       console.log(promise);
 
       showPromiseToast(
@@ -261,7 +248,7 @@ const [data, setData] = useState([])
   };
   const columns = [
     {
-      header: "Item Code",
+      header: "SR No.",
       accessorKey: "id",
 
 
@@ -272,56 +259,50 @@ const [data, setData] = useState([])
 
 
     },
+    
+  
     {
-      header: "Name Ar",
-      accessorKey: "name_ar",
+      header: "Account Number",
+      accessorKey: "account_number",
 
 
     },
+   
     {
-      header: "Category",
-      accessorKey: "name_ar",
-       accessorFn: (row) => row?.category?.name,
-
-
-    },
-    {
-      header: "Center Fee",
-      accessorKey: "center_fee",
-
-
-    },
-    {
-      header: "Govt Fee",
-      accessorKey: "government_fee",
-
-
-    },
-    {
-      header: "Bank Service Charges",
-      accessorKey: "bank_service_charge",
-
-
-    },
-    {
-      header: "Item Tax Type",
-      accessorKey: "item_tax_type",
-
-
-    },
+        header: "IBN Number",
+        accessorKey: "account_ibn",
+  
+  
+      },
+      {
+            header: "Status",
+            cell: ({ row }) => (
+      
+              <Box component={'div'} sx={{ cursor: 'pointer' }} onClick={() => {
+                setSelectedData(row?.original)
+                  setStatusDialog(true)
+                
+              }}>
+                <Chip sx={{ backgroundColor: row?.original?.is_active ? '#05c105' : '#a13605', color: 'white' }} label={row?.original?.is_active ? 'Active' : 'Inactive'} />
+      
+              </Box>
+            ),
+          },
     
     {
       header: "Actions",
       cell: ({ row }) => (
 
         <Box sx={{display:'flex',gap:1}}>
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/service-item-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/service-item-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-service/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-service') }} src={Images.editIcon} width={'35px'}></Box>}
-          <Box>
+          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/bank-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
+          {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-bank/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+         
+         
+          {/* <Box>
             {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
-            {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
-          </Box>
+          
+          </Box> */}
 
         </Box>
       ),
@@ -370,6 +351,7 @@ const [data, setData] = useState([])
                 onSelect={(value) => {
                   setStatus(value);
                 }}
+                
                 error={errors?.status?.message}
                 register={register("status", {
                   required: "Please select status.",
@@ -406,11 +388,11 @@ const [data, setData] = useState([])
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Item List</Typography>
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Bank List</Typography>
         {true && <PrimaryButton
          bgcolor={'#bd9b4a'}
           title="Create"
-          onClick={() => { navigate('/create-service-item'); localStorage.setItem("currentUrl", '/create-customer') }}
+          onClick={() => { navigate('/create-bank'); localStorage.setItem("currentUrl", '/create-customer') }}
           loading={loading}
         />}
 
@@ -428,4 +410,4 @@ const [data, setData] = useState([])
   );
 }
 
-export default CategoryList;
+export default BankList;

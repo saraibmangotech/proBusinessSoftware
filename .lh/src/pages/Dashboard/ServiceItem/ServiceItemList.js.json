@@ -3,11 +3,59 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1744546821348,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1744612824439,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -260,9 +260,9 @@\n     }\r\n   };\r\n   const columns = [\r\n     {\r\n-      header: \"SR No.\",\r\n+      header: \"Item Code\",\r\n       accessorKey: \"id\",\r\n \r\n \r\n     },\r\n"
+                },
+                {
+                    "date": 1744612830908,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -278,8 +278,26 @@\n \r\n \r\n     },\r\n     {\r\n+      header: \"Name Ar\",\r\n+      accessorKey: \"name_ar\",\r\n+\r\n+\r\n+    },\r\n+    {\r\n+      header: \"Name Ar\",\r\n+      accessorKey: \"name_ar\",\r\n+\r\n+\r\n+    },\r\n+    {\r\n+      header: \"Name Ar\",\r\n+      accessorKey: \"name_ar\",\r\n+\r\n+\r\n+    },\r\n+    {\r\n       header: \"Item Tax Type\",\r\n       accessorKey: \"item_tax_type\",\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1744612848375,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -301,35 +301,10 @@\n       accessorKey: \"item_tax_type\",\r\n \r\n \r\n     },\r\n+    \r\n     {\r\n-      id: \"created_at\",\r\n-      header: \"Registration Date\",\r\n-      // Remove accessorKey and fix accessorFn to use row directly\r\n-      accessorFn: (row) => moment(row.created_at).format(\"MM-DD-YYYY\"),\r\n-      cell: ({ row }) => (\r\n-        <Box variant=\"contained\" color=\"primary\" sx={{ cursor: \"pointer\", display: \"flex\", gap: 2 }}>\r\n-          {moment(row.original.created_at).format(\"MM-DD-YYYY\")}\r\n-        </Box>\r\n-      ),\r\n-    },\r\n-\r\n-    {\r\n-      header: \"Status\",\r\n-      cell: ({ row }) => (\r\n-\r\n-        <Box component={'div'} sx={{ cursor: 'pointer' }} onClick={() => {\r\n-          if (permissions?.status_update) {\r\n-            setStatusDialog(true)\r\n-          }\r\n-        }}>\r\n-          <Chip sx={{ backgroundColor: row?.original?.is_active ? '#05c105' : '#a13605', color: 'white' }} label={row?.original?.is_active ? 'Enabled' : 'Disabled'} />\r\n-\r\n-        </Box>\r\n-      ),\r\n-    },\r\n-    {\r\n       header: \"Actions\",\r\n       cell: ({ row }) => (\r\n \r\n         <Box sx={{display:'flex',gap:1}}>\r\n"
+                },
+                {
+                    "date": 1744612974332,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -284,9 +284,9 @@\n \r\n \r\n     },\r\n     {\r\n-      header: \"Name Ar\",\r\n+      header: \"Center Fee\",\r\n       accessorKey: \"name_ar\",\r\n \r\n \r\n     },\r\n"
+                },
+                {
+                    "date": 1744612981313,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -290,9 +290,9 @@\n \r\n \r\n     },\r\n     {\r\n-      header: \"Name Ar\",\r\n+      header: \"Govt Fee\",\r\n       accessorKey: \"name_ar\",\r\n \r\n \r\n     },\r\n"
+                },
+                {
+                    "date": 1744612997992,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -296,8 +296,14 @@\n \r\n \r\n     },\r\n     {\r\n+      header: \"Bank Service Charges\",\r\n+      accessorKey: \"name_ar\",\r\n+\r\n+\r\n+    },\r\n+    {\r\n       header: \"Item Tax Type\",\r\n       accessorKey: \"item_tax_type\",\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1744613009520,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -285,9 +285,9 @@\n \r\n     },\r\n     {\r\n       header: \"Center Fee\",\r\n-      accessorKey: \"name_ar\",\r\n+      accessorKey: \"center_fee\",\r\n \r\n \r\n     },\r\n     {\r\n"
+                },
+                {
+                    "date": 1744613015989,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -291,9 +291,9 @@\n \r\n     },\r\n     {\r\n       header: \"Govt Fee\",\r\n-      accessorKey: \"name_ar\",\r\n+      accessorKey: \"government_fee\",\r\n \r\n \r\n     },\r\n     {\r\n"
+                },
+                {
+                    "date": 1744613031554,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -297,9 +297,9 @@\n \r\n     },\r\n     {\r\n       header: \"Bank Service Charges\",\r\n-      accessorKey: \"name_ar\",\r\n+      accessorKey: \"bank_service_charge\",\r\n \r\n \r\n     },\r\n     {\r\n"
+                },
+                {
+                    "date": 1744613086289,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -277,15 +277,10 @@\n       accessorKey: \"name_ar\",\r\n \r\n \r\n     },\r\n+   \r\n     {\r\n-      header: \"Name Ar\",\r\n-      accessorKey: \"name_ar\",\r\n-\r\n-\r\n-    },\r\n-    {\r\n       header: \"Center Fee\",\r\n       accessorKey: \"center_fee\",\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1744613605310,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -277,10 +277,15 @@\n       accessorKey: \"name_ar\",\r\n \r\n \r\n     },\r\n-   \r\n     {\r\n+      header: \"Category\",\r\n+      accessorKey: \"name_ar\",\r\n+\r\n+\r\n+    },\r\n+    {\r\n       header: \"Center Fee\",\r\n       accessorKey: \"center_fee\",\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1744613670228,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -280,8 +280,9 @@\n     },\r\n     {\r\n       header: \"Category\",\r\n       accessorKey: \"name_ar\",\r\n+       accessorFn: (row) => row?.category?.name,\r\n \r\n \r\n     },\r\n     {\r\n"
                 }
             ],
             "date": 1744546821348,

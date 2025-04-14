@@ -97,26 +97,15 @@ console.log(watch());
   const [slipDetail, setSlipDetail] = useState([]);
 
 
-  const [selectedDue, setSelectedDue] = useState({ id: 'Instant', name: 'Instant' })
-  const [passport, setPassport] = useState()
-  const [allocation, setAllocation] = useState(false)
-  const [depositError, setDepositError] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [emailVerify, setEmailVerify] = useState(false)
-  const [isUploading, setIsUploading] = useState(false);
-  const [loader, setLoader] = useState(false)
-  const [fieldsDisabled, setFieldsDisabled] = useState({
-    monthlyVisaServiceCharges: false,
-    vipMedical: false,
-    extraTyping: true,
-  });
+  
 
   const [center, setCenter] = useState(null)
   const [status, setStatus] = useState(null)
 
   // *For Stepper Forms Data
   const [stepFormData, setStepFormData] = useState()
-  const [step1FormData, setStep1FormData] = useState();
+
   const [selectedType, setSelectedType] = useState(null)
   const [date, setDate] = useState(null)
   const [balanceType, setBalanceType] = useState(null)
@@ -135,58 +124,7 @@ console.log(watch());
 
 
 
-  const handleUpload = async (file, docs) => {
-    setProgress(0);
-    try {
-      const formData = new FormData();
-      formData.append("document", file);
-      console.log(file.size);
-      console.log(getFileSize(file.size))
-      const { data } = await instance.post(routes.uploadDocuments, formData, {
-        onUploadProgress: (progressEvent) => {
-          const uploadedBytes = progressEvent.loaded;
-          const percentCompleted = Math.round(
-            (uploadedBytes * 100) / progressEvent.total
-          );
-
-          setProgress(percentCompleted);
-          console.log(getFileSize(uploadedBytes));
-          setUploadedSize(getFileSize(uploadedBytes));
-        },
-      });
-      if (data) {
-        docs[0].isUpload = true;
-        docs[0].file = data?.data?.nations;
-        setSlipDetail(docs);
-        console.log(data, 'asddasasd');
-        return data?.data?.path
-
-      }
-    } catch (error) {
-      ErrorToaster(error);
-    }
-  };
-  const submitForm = async (formData) => {
-    console.log(formData);
-    try {
-      let obj = {
-        name: formData?.companyName,
-
-        phone: formData?.mobile,
-        email: formData?.email,
-        address: formData?.businessAddress,
-        website: formData?.businessWebsite,
-        cp_name: formData?.personName,
-        cp_mobile: formData?.phone,
-
-      };
-
-      setStepFormData(obj);
-      handleNext()
-    } catch (error) {
-      ErrorToaster(error);
-    }
-  };
+ 
 
 
 
@@ -238,36 +176,7 @@ console.log(watch());
 
   
 
-  const verifyEmail = async (value) => {
-    let Myemail = getValues1('email')
-    if (Myemail) {
-
-      try {
-        let obj = {
-          email: Myemail.toLowerCase(),
-          validate: true
-
-
-        };
-
-        console.log(obj);
-
-        const { status } = await CustomerServices.addCustomer(obj);
-
-        console.log(status);
-        if (status) {
-          setEmailVerify(true)
-        }
-
-
-      } catch (error) {
-        console.log(error);
-        setEmailVerify(false)
-        showErrorToast(error)
-      }
-    }
-  };
- 
+  
 
 
 

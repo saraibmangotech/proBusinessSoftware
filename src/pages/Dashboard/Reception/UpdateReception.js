@@ -17,7 +17,7 @@ import { useNavigate, useParams } from "react-router-dom"
 function UpdateReception() {
     const navigate = useNavigate()
     const { id } = useParams()
-    const [customerType, setCustomerType] = useState("individual")
+    const [customerType, setCustomerType] = useState("company")
     const [buttonDisabled, setButtonDisabled] = useState(false)
     const [buttonDisabled2, setButtonDisabled2] = useState(false)
     const [customers, setCustomers] = useState([])
@@ -27,6 +27,8 @@ function UpdateReception() {
     const [companyDialog, setCompanyDialog] = useState(false)
     const [newDetail, setNewDetail] = useState(null)
     const [subCustDisable, setSubCustDisable] = useState(false)
+    const [categories, setCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -53,9 +55,10 @@ function UpdateReception() {
         console.log(formData);
         try {
             let obj = {
-                id:id,
+                id: id,
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
+                service_category_id: selectedCategory?.id,
                 customer_id: selectedCustomer?.id,
                 mobile: formData?.mobile,
                 token_number: formData?.tokenNumber,
@@ -86,7 +89,7 @@ function UpdateReception() {
         console.log(formData);
         try {
             let obj = {
-                id:id,
+                id: id,
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
                 customer_id: selectedCustomer?.id,
@@ -145,7 +148,7 @@ function UpdateReception() {
             const { data } = await CustomerServices.getCustomerDetail(params);
             let detail = data?.customer
             console.log(detail);
-
+            setSelectedCustomer(detail)
             setValue('customerName', detail?.name)
             setValue('email', detail?.email)
             setValue('mobile', detail?.mobile)
@@ -280,34 +283,59 @@ function UpdateReception() {
             let detail = data?.token
             console.log(detail);
             setNewDetail(detail)
-            setCustomerType(!detail?.is_company ? 'individual' : 'company')
-            if (!detail?.is_company) {
-                setValue('mobile', detail?.mobile)
-                setValue('customerName', detail?.customer_name)
-                setValue('tokenNumber', detail?.token_number)
-                setValue('reference', detail?.reference)
-                setValue('email', detail?.email)
+            let updatedObj = {...detail,name:detail?.customer_name}
+            setSelectedCustomer(updatedObj)
+
+            setValue1('customer', updatedObj);
+            setValue('mobile', detail?.mobile)
+            setValue('customerName', detail?.customer_name)
+            setValue('tokenNumber', detail?.token_number)
+            setValue('reference', detail?.reference)
+            setValue('email', detail?.email)
 
 
 
-            }
+            setSelectedCategory(detail?.service_category)
 
-            else {
-                setValue1('mobile', detail?.mobile)
-                setValue1('customerName', detail?.customer_name)
-                setValue1('tokenNumber', detail?.token_number)
-                setValue1('reference', detail?.reference)
-                setValue1('email', detail?.email)
-                getCompanies(detail?.customer_id)
-            }
+            setValue1('service', detail?.service_category)
+
+            setValue1('mobile', detail?.mobile)
+            setValue1('customerName', detail?.customer_name)
+            setValue1('tokenNumber', detail?.token_number)
+            setValue1('reference', detail?.reference)
+            setValue1('email', detail?.email)
+            getCompanies(detail?.customer_id)
+
 
         } catch (error) {
             console.error("Error fetching location:", error);
         }
     };
     console.log(selectedCustomer, 'selectedCustomer');
+    const getCategories = async (page, limit, filter) => {
+
+
+        try {
+
+            let params = {
+                page: 1,
+                limit: 1000,
+
+
+            }
+
+            const { data } = await CustomerServices.getCategoryList(params)
+            setCategories(data?.categories)
+
+
+
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
 
     useEffect(() => {
+        getCategories()
         getData()
         getCustomerQueue()
     }, [])
@@ -315,19 +343,20 @@ function UpdateReception() {
     useEffect(() => {
         const company = companies.find(item => item?.id == newDetail?.company_id);
         const customer = customers.find(item => item?.id == newDetail?.customer_id);
-    
+        console.log(customer);
+
         // Only proceed if both are found
         if (company && customer) {
             console.log('Company:', company);
             console.log('Customer:', customer);
-    
-            setValue('customer', customer);
+
+            setValue1('customer', customer);
             setSelectedCustomer(customer);
             setValue('company', company);
             setSelectedCompany(company);
         }
     }, [customers, companies, newDetail]);
-    
+
 
 
     return (
@@ -390,20 +419,9 @@ function UpdateReception() {
                 </Box>
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
-                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}> Reception Detail</Typography>
+                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}> Update Reception </Typography>
             </Box>
-            <RadioGroup row value={customerType} onChange={(e) => setCustomerType(e.target.value)} sx={{ mb: 3, p: 3 }}>
-                <FormControlLabel
-                    value="individual"
-                    control={<Radio disabled checked={customerType === "individual"} />}
-                    label="Individual"
-                />
-                <FormControlLabel
-                    value="company"
-                    control={<Radio disabled checked={customerType === "company"} />}
-                    label="Company"
-                />
-            </RadioGroup>
+
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
 
 
@@ -471,11 +489,13 @@ function UpdateReception() {
 
                         <Grid item xs={2.8}>
                             <InputField
-                                label={"Reference *:"}
+                                label={"Reference :"}
                                 size={"small"}
                                 placeholder={"Reference"}
                                 error={errors?.reference?.message}
-                                register={register("reference")}
+                                register={register("reference", {
+                                    required: false
+                                })}
                             />
                         </Grid>
 
@@ -501,7 +521,7 @@ function UpdateReception() {
                         <Grid container justifyContent={'flex-end'}>
                             <PrimaryButton
                                 disabled={buttonDisabled}
-                               bgcolor={'#bd9b4a'}
+                                bgcolor={'#bd9b4a'}
                                 title="Update"
                                 type={'submit'}
 
@@ -601,6 +621,7 @@ function UpdateReception() {
                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                             message: "Please enter a valid email address.",
                                         },
+                                        required:'please enter email'
                                     })}
                                 />
                             </Grid>
@@ -641,6 +662,24 @@ function UpdateReception() {
                             <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}
+                                    label={'Service Category *:'}
+
+                                    options={categories}
+                                    selected={selectedCategory}
+                                    onSelect={(value) => {
+                                        setSelectedCategory(value)
+
+
+                                    }}
+                                    error={errors1?.service?.message}
+                                    register={register1("service", {
+                                        required: 'Please select service.',
+                                    })}
+                                />
+                            </Grid>
+                            {/* <Grid item xs={2.8} >
+                                <SelectField
+                                    size={'small'}
                                     label={'Company *:'}
                                     disabled={subCustDisable}
                                     options={companies}
@@ -667,11 +706,11 @@ function UpdateReception() {
 
 
                                 />
-                            </Grid>
+                            </Grid> */}
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
                                     disabled={buttonDisabled2}
-                                   bgcolor={'#bd9b4a'}
+                                    bgcolor={'#bd9b4a'}
                                     title="Update"
                                     type={'submit'}
 

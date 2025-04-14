@@ -189,13 +189,14 @@ function CreateCategory() {
     console.log(formData);
     try {
       let obj = {
-        id:id,
+        id: id,
         name: formData?.name,
         name_ar: formData?.arabic,
         category_id: category?.id,
         center_fee: Number(formData?.center_fee),
         govt_bank_account_id: governmentAccount?.id,
         bank_service_charge: Number(formData?.bank_service_charges),
+        government_fee : Number(formData?.govtFee),
         other_charge: Number(formData?.other_charge),
         local_commission: Number(formData?.local_commission),
         item_tax_type: tax?.name,
@@ -349,6 +350,7 @@ function CreateCategory() {
       setValue1("name", detail?.name);
       setValue1("arabic", detail?.name_ar);
       setValue1("center_fee", detail?.center_fee);
+      setValue1("govtFee", detail?.government_fee );
       setValue1("category", detail?.category);
       setCategory(detail?.category?.name);
       setTax(detail?.item_tax_type);
@@ -433,54 +435,6 @@ function CreateCategory() {
                       })}
                     />
                   </Grid>
-
-                  <Grid item xs={2.8}>
-                    <SelectField
-                      size={"small"}
-                      label={"Category *:"}
-                      options={categories}
-                      selected={category}
-                      onSelect={(value) => {
-                        setCategory(value);
-                      }}
-                      error={errors?.category?.message}
-                      register={register("category", {
-                        required: "Please select category .",
-                      })}
-                    />
-                  </Grid>
-                  <Grid item xs={2.8}>
-                    <SelectField
-                      size={"small"}
-                      label={"Tax Type *:"}
-                      options={taxes}
-                      selected={tax}
-                      onSelect={(value) => {
-                        setTax(value);
-                      }}
-                      error={errors?.tax?.message}
-                      register={register("tax", {
-                        required: "Please select tax .",
-                      })}
-                    />
-                  </Grid>
-
-                  <Grid item xs={2.8}>
-                    <SelectField
-                      size={"small"}
-                      label={"Govt Bank Account *:"}
-                      options={accounts}
-                      selected={governmentAccount}
-                      onSelect={(value) => {
-                        setGovernmnentAccount(value);
-                      }}
-                      error={errors?.governmentAccount?.message}
-                      register={register("governmentAccount", {
-                        required: "Please select Government Account .",
-                      })}
-                    />
-                  </Grid>
-
                   <Grid item xs={2.8}>
                     <InputField
                       label={"Bank Services Charges :*"}
@@ -492,6 +446,25 @@ function CreateCategory() {
                         onChange: (e) => {
                           console.log("asdas");
                         },
+                      })}
+                    />
+                  </Grid>
+                  <Grid item xs={2.8}>
+                    <InputField
+                      label={"Govt Fees :*"}
+                      size={"small"}
+                      placeholder={"Govt Fees "}
+                      error={errors1?.govtFee?.message}
+                      register={register1("govtFee", {
+                        required: "Please Enter govt fee .",
+                        onChange: (e) => {
+                          console.log('asdas');
+
+
+
+                        },
+
+
                       })}
                     />
                   </Grid>
@@ -551,6 +524,54 @@ function CreateCategory() {
                       })}
                     />
                   </Grid>
+                  <Grid item xs={2.8}>
+                    <SelectField
+                      size={"small"}
+                      label={"Category *:"}
+                      options={categories}
+                      selected={category}
+                      onSelect={(value) => {
+                        setCategory(value);
+                      }}
+                      error={errors?.category?.message}
+                      register={register("category", {
+                        required: "Please select category .",
+                      })}
+                    />
+                  </Grid>
+                  <Grid item xs={2.8}>
+                    <SelectField
+                      size={"small"}
+                      label={"Tax Type *:"}
+                      options={taxes}
+                      selected={tax}
+                      onSelect={(value) => {
+                        setTax(value);
+                      }}
+                      error={errors?.tax?.message}
+                      register={register("tax", {
+                        required: "Please select tax .",
+                      })}
+                    />
+                  </Grid>
+
+                  <Grid item xs={2.8}>
+                    <SelectField
+                      size={"small"}
+                      label={"Govt Bank Account *:"}
+                      options={accounts}
+                      selected={governmentAccount}
+                      onSelect={(value) => {
+                        setGovernmnentAccount(value);
+                      }}
+                      error={errors?.governmentAccount?.message}
+                      register={register("governmentAccount", {
+                        required: "Please select Government Account .",
+                      })}
+                    />
+                  </Grid>
+
+
 
                   <Grid item xs={2.8}>
                     <SelectField
@@ -624,7 +645,7 @@ function CreateCategory() {
 
                   <Grid container justifyContent={"flex-end"}>
                     <PrimaryButton
-                     bgcolor={'#bd9b4a'}
+                      bgcolor={'#bd9b4a'}
                       title="Submit"
                       type={"submit"}
                     />

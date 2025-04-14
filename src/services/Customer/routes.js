@@ -65,7 +65,12 @@ const routes = {
   CreateReception:'/sales/reception/add',
   getReceptionsList:"/sales/reception",
   deleteReception:'/sales/reception/delete',
-  UpdateReception:'/sales/reception/update'
+  UpdateReception:'/sales/reception/update',
+  CreateBank:'/system/banks/add',
+  getBanks:'/system/banks',
+  DeleteBank:'/system/banks/delete',
+  UpdateBank:'/system/banks/update',
+  getBankDetail:'/system/banks/details'
 };
 
 export default routes
