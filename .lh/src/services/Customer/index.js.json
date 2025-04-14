@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 15,
+            "activePatchIndex": 16,
             "patches": [
                 {
                     "date": 1744496828867,
@@ -68,6 +68,10 @@
                 {
                     "date": 1744618793880,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -282,5 +282,10 @@\n     const data = await patch(routes.UpdateServiceItem, obj);\r\n     return data;\r\n   },\r\n   DeleteServiceItem: async (params) => {\r\n-    co\n\\ No newline at end of file\n+    const data = await deleted(routes.DeleteServiceItem, params);\r\n+    return data;\r\n+  },\r\n+}\r\n+\r\n+export default CustomerServices\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1744666800348,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,8 +109,12 @@\n   getRejectedVisa: async (params) => {\r\n     const data = await get(routes.getRejectedVisa, params);\r\n     return data;\r\n   },\r\n+  getReceiptDetail: async (params) => {\r\n+    const data = await get(routes.getReceiptDetail, params);\r\n+    return data;\r\n+  },\r\n   getReceptionsList: async (params) => {\r\n     const data = await get(routes.getReceptionsList, params);\r\n     return data;\r\n   },\r\n"
                 }
             ],
             "date": 1744496828867,

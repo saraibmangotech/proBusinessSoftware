@@ -76,7 +76,8 @@ const routes = {
   getPreSaleDetail:'/sales/receipts/details',
   DeletePreSale:'/sales/receipts/delete',
   UpdateSaleReceipt:'/sales/reception/update',
-  CreateAlDed:'/sales/receipts/place'
+  CreateAlDed:'/sales/receipts/place',
+  getReceiptDetail:'/sales/receipts/details'
 };
 
 export default routes

@@ -110,6 +110,10 @@ const CustomerServices = {
     const data = await get(routes.getRejectedVisa, params);
     return data;
   },
+  getReceiptDetail: async (params) => {
+    const data = await get(routes.getReceiptDetail, params);
+    return data;
+  },
   getReceptionsList: async (params) => {
     const data = await get(routes.getReceptionsList, params);
     return data;

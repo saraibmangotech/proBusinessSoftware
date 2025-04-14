@@ -229,6 +229,7 @@ function CreateAldeed() {
         console.log(formData);
         try {
             let obj = {
+                id:detail?.id,
                 token_number: formData?.token,
                 token_date: date,
                 invoice_prefix: "AAD",
@@ -274,19 +275,20 @@ function CreateAldeed() {
                     invoice_number: getValues1("invoicenumber"),
                 };
             }
-            const { data } = await CustomerServices.getReceptionDetail(params);
+            const { data } = await CustomerServices.getReceiptDetail(params);
             console.log(data, "dataaa");
-            setDetail(data?.token)
-            setValue1("customer", data?.token?.customer_name);
+            setDetail(data?.receipt)
+            setValue1("customer", data?.receipt?.customer_name);
             setValue1("invoice_date", moment().toDate());
-            setValue1("mobile", data?.token?.mobile);
-            setValue1("ref", data?.token?.reference);
-            setValue1("display_customer", data?.token?.customer_name);
-            setValue1("email", data?.token?.email);
-            setValue1("address", data?.token?.address);
-            setValue1("trn", data?.token?.trn);
-            setValue1("cost_center", data?.token?.cost_center);
-
+            setValue1("mobile", data?.receipt?.customer_mobile);
+            setValue1("ref", data?.receipt?.ref);
+            setValue1("display_customer", data?.receipt?.customer_name);
+            setValue1("email", data?.receipt?.customer_email);
+            setValue1("address", data?.receipt?.address);
+            setValue1("trn", data?.receipt?.trn);
+            setValue1("cost_center", data?.receipt?.cost_center);
+            setValue1("caseno", data?.receipt?.case_no);
+            setRows(data?.receipt?.sale_receipt_items)
             setAccounts(data?.accounts?.rows);
         } catch (error) {
             ErrorToaster(error);
@@ -678,7 +680,7 @@ function CreateAldeed() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        <TableRow>
+                                        {/* <TableRow>
                                             <TableCell>
                                                 <InputField
                                                     size="small"
@@ -787,12 +789,12 @@ function CreateAldeed() {
                                                     Add Item
                                                 </Button>
                                             </TableCell>
-                                        </TableRow>
+                                        </TableRow> */}
 
                                         {rows.map((item, index) => (
                                             <TableRow key={index}>
                                                 <TableCell>{item?.item_code}</TableCell>
-                                                <TableCell>{item?.service}</TableCell>
+                                                <TableCell>{item?.service?.name}</TableCell>
                                                 <TableCell>{item?.qty}</TableCell>
                                                 <TableCell>{item?.govt_fee}</TableCell>
                                                 <TableCell>{item?.center_fee}</TableCell>
