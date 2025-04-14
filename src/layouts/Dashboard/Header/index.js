@@ -865,6 +865,9 @@ function Header() {
                           placement="bottom-start"
                           transition
                           disablePortal
+                          style={{
+                            zIndex: 111,
+                          }}
                         >
                           {({ TransitionProps, placement }) => (
                             <Grow
@@ -880,7 +883,6 @@ function Header() {
                                   width: 220,
                                   borderRadius: "8px",
                                   overflow: "hidden",
-                                  zIndex: 111,
                                 }}
                               >
                                 <ClickAwayListener onClickAway={handleDropdownClose}>
