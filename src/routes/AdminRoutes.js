@@ -243,6 +243,21 @@ const BankDetail = lazy(() =>
 const SalesReciept = lazy(() =>
   import("pages/Dashboard/SalesReciept/index")
 );
+const PreSalesList = lazy(() =>
+  import("pages/Dashboard/SalesReciept/PreSales")
+);
+const UpdatePreSale = lazy(() =>
+  import("pages/Dashboard/SalesReciept/UpdatePreSale")
+);
+const CreateAldeed = lazy(() =>
+  import("pages/Dashboard/AlDeed/CreateAldeed")
+);
+const AldeedList = lazy(() =>
+  import("pages/Dashboard/AlDeed/Aldeeds")
+);
+const UpdateAldeed = lazy(() =>
+  import("pages/Dashboard/AlDeed/UpdateAldeed")
+);
 const AdminRoutes = [
   
   {
@@ -250,8 +265,28 @@ const AdminRoutes = [
     component: <CreateServiceItem />,
   },
   {
+    path: "/create-aldeed",
+    component: <CreateAldeed />,
+  },
+  {
+    path: "/aldeed-list",
+    component: <AldeedList />,
+  },
+  {
+    path: "/pre-sales",
+    component: <PreSalesList />,
+  },
+  {
     path: "/sales-receipt",
     component: <SalesReciept />,
+  },
+  {
+    path: "/update-presale/:id",
+    component: <UpdatePreSale />,
+  },
+  {
+    path: "/update-alded/:id",
+    component: <UpdateAldeed />,
   },
   {
     path: "/update-bank/:id",

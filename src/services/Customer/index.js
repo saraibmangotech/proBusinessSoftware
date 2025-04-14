@@ -10,8 +10,20 @@ const CustomerServices = {
     const data = await post(routes.CreateBank, obj);
     return data;
   },
+  CreateAlDed: async (obj) => {
+    const data = await post(routes.CreateAlDed, obj);
+    return data;
+  },
+  CreateSaleReceipt: async (obj) => {
+    const data = await post(routes.CreateSaleReceipt, obj);
+    return data;
+  },
   DeleteVoucher: async (obj) => {
     const data = await deleted(routes.DeleteVoucher, obj);
+    return data;
+  },
+  DeletePreSale: async (obj) => {
+    const data = await deleted(routes.DeletePreSale, obj);
     return data;
   },
   DeleteBank: async (obj) => {
@@ -62,6 +74,10 @@ const CustomerServices = {
     const data = await patch(routes.UpdateReception, obj);
     return data;
   },
+  UpdateSaleReceipt: async (obj) => {
+    const data = await patch(routes.UpdateSaleReceipt, obj);
+    return data;
+  },
   UpdateAddOnService: async (obj) => {
     const data = await patch(routes.UpdateAddOnService, obj);
     return data;
@@ -106,6 +122,10 @@ const CustomerServices = {
     const data = await get(routes.getCandidateDetail, params);
     return data;
   },
+  getPreSaleDetail: async (params) => {
+    const data = await get(routes.getPreSaleDetail, params);
+    return data;
+  },
   getReceptionDetail: async (params) => {
     const data = await get(routes.getReceptionDetail, params);
     return data;
@@ -116,6 +136,10 @@ const CustomerServices = {
   },
   VisaProcessing: async (params) => {
     const data = await get(routes.VisaProcessing, params);
+    return data;
+  },
+  getPreSales: async (params) => {
+    const data = await get(routes.getPreSales, params);
     return data;
   },
   getWPSList: async (params) => {

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1744496850301,
@@ -20,6 +20,10 @@
                 {
                     "date": 1744501566340,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,5 +52,8 @@\n   CreateCategory:'/services/categories/add',\r\n   getCategoryDetail:'/services/categories/details',\r\n   UpdateCategory:'/services/categories/update',\r\n   DeleteCategory:'',\r\n-  getReceptionDetail:'/sal\n\\ No newline at end of file\n+  getReceptionDetail:'/sales/reception/details'\r\n+};\r\n+\r\n+export default routes\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1744623707778,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -69,8 +69,9 @@\n   CreateBank:'/system/banks/add',\r\n   getBanks:'/system/banks',\r\n   DeleteBank:'/system/banks/delete',\r\n   UpdateBank:'/system/banks/update',\r\n-  getBankDetail:'/system/banks/details'\r\n+  getBankDetail:'/system/banks/details',\r\n+  CreateSaleReceipt:'/sales/receipts/pre/add'\r\n };\r\n \r\n export default routes\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1744496850301,

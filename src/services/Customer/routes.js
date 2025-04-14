@@ -70,7 +70,13 @@ const routes = {
   getBanks:'/system/banks',
   DeleteBank:'/system/banks/delete',
   UpdateBank:'/system/banks/update',
-  getBankDetail:'/system/banks/details'
+  getBankDetail:'/system/banks/details',
+  CreateSaleReceipt:'/sales/receipts/pre/add',
+  getPreSales:'/sales/receipts',
+  getPreSaleDetail:'/sales/receipts/details',
+  DeletePreSale:'/sales/receipts/delete',
+  UpdateSaleReceipt:'/sales/reception/update',
+  CreateAlDed:'/sales/receipts/place'
 };
 
 export default routes

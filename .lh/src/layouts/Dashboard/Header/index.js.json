@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1744507388198,
@@ -28,6 +28,14 @@
                 {
                     "date": 1744614682002,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -427,9 +427,22 @@\n         navigation: true,\r\n         order_by: 14,\r\n         children:[],\r\n         childRoute: [],\r\n-        }],\r\n+        },\r\n+        {\r\n+          id: 14,\r\n+          name: \"Banks\",\r\n+          icon: \"customer\",\r\n+          parent_id: null,\r\n+          api: \"/api/roles\",\r\n+          route: \"/service-list\",\r\n+          identifier: null,\r\n+          navigation: true,\r\n+          order_by: 14,\r\n+          children:[],\r\n+          childRoute: [],\r\n+          }],\r\n \t  },\r\n \t  \r\n    \r\n   ]\r\n"
+                },
+                {
+                    "date": 1744635291424,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -193,9 +193,21 @@\n       navigation: true,\r\n       order_by: 14,\r\n       children:[],\r\n       childRoute: [],\r\n-      }],\r\n+      }, {\r\n+        id: 14,\r\n+        name: \"Al DED\",\r\n+        icon: \"customer\",\r\n+        parent_id: null,\r\n+        api: \"/api/roles\",\r\n+        route: \"/bank-list\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 14,\r\n+        children:[],\r\n+        childRoute: [],\r\n+        }],\r\n     },\r\n     {\r\n       id: 12,\r\n       name: \"Accounts management\",\r\n@@ -434,9 +446,9 @@\n           name: \"Banks\",\r\n           icon: \"customer\",\r\n           parent_id: null,\r\n           api: \"/api/roles\",\r\n-          route: \"/service-list\",\r\n+          route: \"/bank-list\",\r\n           identifier: null,\r\n           navigation: true,\r\n           order_by: 14,\r\n           children:[],\r\n@@ -864,8 +876,11 @@\n                           role={undefined}\r\n                           placement=\"bottom-start\"\r\n                           transition\r\n                           disablePortal\r\n+                          style={{\r\n+                            zIndex: 111,\r\n+                          }}\r\n                         >\r\n                           {({ TransitionProps, placement }) => (\r\n                             <Grow\r\n                               {...TransitionProps}\r\n@@ -879,9 +894,8 @@\n                                   mt: 1,\r\n                                   width: 220,\r\n                                   borderRadius: \"8px\",\r\n                                   overflow: \"hidden\",\r\n-                                  zIndex: 111,\r\n                                 }}\r\n                               >\r\n                                 <ClickAwayListener onClickAway={handleDropdownClose}>\r\n                                   <MenuList autoFocusItem={openDropdownId === item.id}>\r\n"
+                },
+                {
+                    "date": 1744635297817,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -199,9 +199,9 @@\n         name: \"Al DED\",\r\n         icon: \"customer\",\r\n         parent_id: null,\r\n         api: \"/api/roles\",\r\n-        route: \"/bank-list\",\r\n+        route: \"/aldeed-list\",\r\n         identifier: null,\r\n         navigation: true,\r\n         order_by: 14,\r\n         children:[],\r\n"
                 }
             ],
             "date": 1744507388198,

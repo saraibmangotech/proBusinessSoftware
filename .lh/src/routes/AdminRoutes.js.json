@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 32,
+            "activePatchIndex": 48,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -136,6 +136,70 @@
                 {
                     "date": 1744619724418,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -239,15 +239,22 @@\n );\r\n const BankDetail = lazy(() =>\r\n   import(\"pages/Dashboard/Banks/BankDetail\")\r\n );\r\n+const SalesReciept = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/index\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n+    path: \"/sales-receipt\",\r\n+    component: <SalesReciept />,\r\n+  },\r\n+  {\r\n     path: \"/update-bank/:id\",\r\n     component: <UpdateBank />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744624143538,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -250,8 +250,12 @@\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n     path: \"/sales-receipt\",\r\n+    component: <PreSalesList />,\r\n+  },\r\n+  {\r\n+    path: \"/sales-receipt\",\r\n     component: <SalesReciept />,\r\n   },\r\n   {\r\n     path: \"/update-bank/:id\",\r\n"
+                },
+                {
+                    "date": 1744624285381,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -242,8 +242,11 @@\n );\r\n const SalesReciept = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/index\")\r\n );\r\n+const PreSalesList = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/PreSalesList\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n"
+                },
+                {
+                    "date": 1744624326516,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -252,9 +252,9 @@\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n-    path: \"/sales-receipt\",\r\n+    path: \"/pre-sales\",\r\n     component: <PreSalesList />,\r\n   },\r\n   {\r\n     path: \"/sales-receipt\",\r\n"
+                },
+                {
+                    "date": 1744624341282,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -243,9 +243,9 @@\n const SalesReciept = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/index\")\r\n );\r\n const PreSalesList = lazy(() =>\r\n-  import(\"pages/Dashboard/SalesReciept/PreSalesList\")\r\n+  import(\"pages/Dashboard/SalesReciept/PreSales\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744625550939,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -260,8 +260,12 @@\n     path: \"/sales-receipt\",\r\n     component: <SalesReciept />,\r\n   },\r\n   {\r\n+    path: \"/update-presale/:id\",\r\n+    component: <SalesReciept />,\r\n+  },\r\n+  {\r\n     path: \"/update-bank/:id\",\r\n     component: <UpdateBank />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744625565701,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -245,8 +245,11 @@\n );\r\n const PreSalesList = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/PreSales\")\r\n );\r\n+const UpdatePreSale = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/PreSales\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -261,9 +264,9 @@\n     component: <SalesReciept />,\r\n   },\r\n   {\r\n     path: \"/update-presale/:id\",\r\n-    component: <SalesReciept />,\r\n+    component: <UpdatePreSale />,\r\n   },\r\n   {\r\n     path: \"/update-bank/:id\",\r\n     component: <UpdateBank />,\r\n"
+                },
+                {
+                    "date": 1744633598571,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -246,17 +246,21 @@\n const PreSalesList = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/PreSales\")\r\n );\r\n const UpdatePreSale = lazy(() =>\r\n-  import(\"pages/Dashboard/SalesReciept/PreSales\")\r\n+  import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n+    path: \"/create-aldeed\",\r\n+    component: <CreateServiceItem />,\r\n+  },\r\n+  {\r\n     path: \"/pre-sales\",\r\n     component: <PreSalesList />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744633607116,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -248,17 +248,24 @@\n );\r\n const UpdatePreSale = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n );\r\n+const const UpdatePreSale = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n+); = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/const UpdatePreSale = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n+);\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n     path: \"/create-aldeed\",\r\n-    component: <CreateServiceItem />,\r\n+    component: <CreateAldeed />,\r\n   },\r\n   {\r\n     path: \"/pre-sales\",\r\n     component: <PreSalesList />,\r\n"
+                },
+                {
+                    "date": 1744633618278,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -248,14 +248,10 @@\n );\r\n const UpdatePreSale = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n );\r\n-const const UpdatePreSale = lazy(() =>\r\n-  import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n-); = lazy(() =>\r\n-  import(\"pages/Dashboard/SalesReciept/const UpdatePreSale = lazy(() =>\r\n-  import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n-);\")\r\n+const CreateAldeed = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/CreateAldeed\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744633624813,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -249,9 +249,9 @@\n const UpdatePreSale = lazy(() =>\r\n   import(\"pages/Dashboard/SalesReciept/UpdatePreSale\")\r\n );\r\n const CreateAldeed = lazy(() =>\r\n-  import(\"pages/Dashboard/SalesReciept/CreateAldeed\")\r\n+  import(\"pages/Dashboard/AlDeed/CreateAldeed\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744635096801,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -262,8 +262,12 @@\n     path: \"/create-aldeed\",\r\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n+    path: \"/aldeed-list\",\r\n+    component: <CreateAldeed />,\r\n+  },\r\n+  {\r\n     path: \"/pre-sales\",\r\n     component: <PreSalesList />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744635110455,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -251,8 +251,11 @@\n );\r\n const CreateAldeed = lazy(() =>\r\n   import(\"pages/Dashboard/AlDeed/CreateAldeed\")\r\n );\r\n+const AldeedList = lazy(() =>\r\n+  import(\"pages/Dashboard/AlDeed/AldeedList\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -263,9 +266,9 @@\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n     path: \"/aldeed-list\",\r\n-    component: <CreateAldeed />,\r\n+    component: <AldeedList />,\r\n   },\r\n   {\r\n     path: \"/pre-sales\",\r\n     component: <PreSalesList />,\r\n"
+                },
+                {
+                    "date": 1744635137294,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -252,9 +252,9 @@\n const CreateAldeed = lazy(() =>\r\n   import(\"pages/Dashboard/AlDeed/CreateAldeed\")\r\n );\r\n const AldeedList = lazy(() =>\r\n-  import(\"pages/Dashboard/AlDeed/AldeedList\")\r\n+  import(\"pages/Dashboard/AlDeed/Aldeeds\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744635599416,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -281,8 +281,12 @@\n     path: \"/update-presale/:id\",\r\n     component: <UpdatePreSale />,\r\n   },\r\n   {\r\n+    path: \"/update-alded/:id\",\r\n+    component: <UpdatePreSale />,\r\n+  },\r\n+  {\r\n     path: \"/update-bank/:id\",\r\n     component: <UpdateBank />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744635604628,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -282,9 +282,9 @@\n     component: <UpdatePreSale />,\r\n   },\r\n   {\r\n     path: \"/update-alded/:id\",\r\n-    component: <UpdatePreSale />,\r\n+    component: <UpdateAldeed />,\r\n   },\r\n   {\r\n     path: \"/update-bank/:id\",\r\n     component: <UpdateBank />,\r\n"
+                },
+                {
+                    "date": 1744635617147,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -254,8 +254,11 @@\n );\r\n const AldeedList = lazy(() =>\r\n   import(\"pages/Dashboard/AlDeed/Aldeeds\")\r\n );\r\n+const UpdateAldeed = lazy(() =>\r\n+  import(\"pages/Dashboard/AlDeed/UpdateAldeed\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n"
                 }
             ],
             "date": 1744496886534,

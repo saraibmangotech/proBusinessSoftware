@@ -74,11 +74,11 @@ function SalesReciept() {
   const [excludeFromSales, setExcludeFromSales] = useState("no");
   const [excludeFromPurchase, setExcludeFromPurchase] = useState("no");
   const [total, setTotal] = useState(0);
-  const [subTotal, setSubTotal] = useState(0); 
+  const [subTotal, setSubTotal] = useState(0);
   const [rows, setRows] = useState([]);
 
 
-console.log(rows , "data")
+  console.log(rows, "data")
   const [items, setItems] = useState([
     {
       itemCode: "",
@@ -117,12 +117,12 @@ console.log(rows , "data")
     setValue: setValue1,
     getValues: getValues1,
     control,
-    watch :watch1,
+    watch: watch1,
     formState: { errors: errors1 },
   } = useForm();
 
   // Watch all form data
-  
+
   // Watch for changes in the fee-related fields
   const govtFee = watch('govt_fee', 0);
   const centerFee = watch('center_fee', 0);
@@ -130,21 +130,21 @@ console.log(rows , "data")
   const qty = watch('qty', 1);
   useEffect(() => {
     const feesTotal = (parseFloat(govtFee) || 0) + (parseFloat(centerFee) || 0) + (parseFloat(bankCharges) || 0);
-    const finalTotal = feesTotal * (parseFloat(qty) || 1); 
-    setValue("total",finalTotal);
+    const finalTotal = feesTotal * (parseFloat(qty) || 1);
+    setValue("total", finalTotal);
   }, [govtFee, centerFee, bankCharges, qty]);
 
-const addItem = (data) => {
-  const total = data.total;  
-  setRows((prevRows) => {
-    const updatedRows = [...prevRows, data];
-    const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0); 
-    setSubTotal(newSubTotal); 
-    return updatedRows;
-  });
-  reset();
-  setServiceItem("")
-};
+  const addItem = (data) => {
+    const total = data.total;
+    setRows((prevRows) => {
+      const updatedRows = [...prevRows, data];
+      const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
+      setSubTotal(newSubTotal);
+      return updatedRows;
+    });
+    reset();
+    setServiceItem("")
+  };
   const isFormDataEmpty = (data) => {
     // Check if all form fields are empty
     return Object.values(data).every((value) => {
@@ -155,7 +155,7 @@ const addItem = (data) => {
       // Otherwise, check if the value is an empty string
       return value === "";
     });
-  };  
+  };
 
   const allowFilesType = [
     "image/png",
@@ -221,6 +221,8 @@ const addItem = (data) => {
   const [ownGovBank, setOwnGovBank] = useState(null);
   const [services, setServices] = useState(null);
   const [serviceItem, setServiceItem] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [detail, setDetail] = useState(null)
   //documents array
 
   const handleNext = () => {
@@ -231,35 +233,32 @@ const addItem = (data) => {
     console.log(formData);
     try {
       let obj = {
-        name: formData?.name,
-        name_ar: formData?.arabic,
-        category_id: category?.id,
-        center_fee: Number(formData?.center_fee),
-        govt_bank_account_id: governmentAccount?.id,
-        bank_service_charge: Number(formData?.bank_service_charges),
-        other_charge: Number(formData?.other_charge),
-        local_commission: Number(formData?.local_commission),
-        item_tax_type: tax?.name,
-        editable_description: description?.id,
-        sales_account_id: salesAccount?.id,
-        use_own_govt_bank: ownGovBank?.id,
-        cogs_account_id: cogsAccount?.id,
-        vat_bank_charge: Number(formData?.vat_bank_charge),
-        non_local_commission: Number(formData?.non_local_commission),
+        token_number: formData?.token,
+        token_date: date,
+        invoice_prefix: "AAD",
+        cost_center:formData?.cost_center,
+        customer_name: formData?.display_customer,
+        reception_id: detail?.id,
+        customer_mobile: formData?.mobile,
+        customer_email: formData?.email,
+        ref: formData?.ref,
+        total_amount: subTotal,
+
+        items: rows
       };
       console.log(formData, "formData");
-      //   const promise = CustomerServices.AddServiceItem(obj);
+      const promise = CustomerServices.CreateSaleReceipt(obj);
 
-      //   showPromiseToast(
-      //     promise,
-      //     "Saving...",
-      //     "Added Successfully",
-      //     "Something Went Wrong"
-      //   );
-      //   const response = await promise;
-      //   if (response?.responseCode === 200) {
-      //     navigate("/service-list");
-      //   }
+      showPromiseToast(
+        promise,
+        "Saving...",
+        "Added Successfully",
+        "Something Went Wrong"
+      );
+      const response = await promise;
+      if (response?.responseCode === 200) {
+        navigate("/pre-sales");
+      }
     } catch (error) {
       ErrorToaster(error);
     }
@@ -273,6 +272,7 @@ const addItem = (data) => {
       };
       const { data } = await CustomerServices.getReceptionDetail(params);
       console.log(data, "dataaa");
+      setDetail(data?.token)
       setValue1("customer", data?.token?.customer_name);
       setValue1("invoice_date", moment().toDate());
       setValue1("mobile", data?.token?.mobile);
@@ -322,7 +322,8 @@ const addItem = (data) => {
       setValue("govt_fee", data?.service?.bank_service_charge);
       setValue("center_fee", data?.service?.center_fee);
       setValue("bank_charges", data?.service?.bank_service_charge);
-      setValue("qty",1);
+
+      setValue("qty", 1);
     } catch (error) {
       ErrorToaster(error);
     } finally {
@@ -389,6 +390,8 @@ const addItem = (data) => {
     getTax();
     getCategories();
     getServiceItem();
+    setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" })
+    setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
   }, []);
 
   return (
@@ -454,37 +457,50 @@ const addItem = (data) => {
                           register={register1("invoice_no")}
                         />
                       </Grid>
-
-                      <Grid item md={5.7} sm={12} xs={12}>
+                      <Grid item xs={5.7}>
                         <DatePicker
-                          label="Invoice Date"
-                          value={watch1("invoice_date")}
-                          onChange={(value) => setValue("invoice_date", value)}
-                          maxDate={moment().toDate()}
-                        />
-                      </Grid>
+                          label={"Invoice Date :*"}
+                          value={date}
+                          size={'small'}
 
-                      <Grid item md={5.7} sm={12} xs={12}>
+                          error={errors1?.date?.message}
+                          register={register1("date", {
+                            required:
+                              date ? false :
+                                "please enter  date."
+
+                          })}
+                          onChange={(date) => {
+
+                            setValue1('date', date)
+                            setDate(new Date(date));
+
+                          }
+
+                          }
+                        /></Grid>
+
+                      <Grid item xs={5.7} >
                         <SelectField
-                          label="Customer"
-                          size="small"
+                          size={'small'}
+                          label={'Customer *:'}
+                          disabled={true}
                           options={[{ id: "walkin", name: "Walk-in Customer" }]}
-                          selected={watch1("customer")}
-                          onSelect={(value) => setValue("customer", value)}
-                          register={register1("customer")}
+                          selected={selectedCustomer}
+                          onSelect={(value) => {
+                            setSelectedCustomer(value)
+
+
+                          }}
+                          error={errors1?.customer?.message}
+                          register={register1("customer", {
+                            required: false,
+                          })}
                         />
                       </Grid>
 
-                      <Grid item md={5.7} sm={12} xs={12}>
-                        <SelectField
-                          label="Company"
-                          size="small"
-                          options={[{ id: 1, name: "ABC Ltd" }]} // Replace with real data
-                          selected={watch1("company")}
-                          onSelect={(value) => setValue("company", value)}
-                          register={register1("company")}
-                        />
-                      </Grid>
+
+
                     </Grid>
                   </Grid>
                   <Grid
@@ -505,7 +521,10 @@ const addItem = (data) => {
                           label="Display Customer"
                           size="small"
                           placeholder="Walk-in Customer"
-                          register={register1("display_customer")}
+                          register={register1("display_customer", {
+                            required: 'please enter display name.'
+                          })}
+                          error={errors1?.display_customer?.message}
                         />
                       </Grid>
 
@@ -514,7 +533,11 @@ const addItem = (data) => {
                           label="Mobile"
                           size="small"
                           placeholder="Mobile No"
-                          register={register1("mobile")}
+
+                          register={register1("mobile", {
+                            required: 'please enter mobile .'
+                          })}
+                          error={errors1?.display_customer?.message}
                         />
                       </Grid>
 
@@ -523,18 +546,27 @@ const addItem = (data) => {
                           label="Email"
                           size="small"
                           placeholder="Email"
-                          register={register1("email")}
+
+                          register={register1("email", {
+                            required: 'please enter email .'
+                          })}
+                          error={errors1?.email?.message}
                         />
                       </Grid>
-
+{/* 
                       <Grid item md={5.7} sm={12} xs={12}>
                         <InputField
                           label="TRN"
                           size="small"
                           placeholder="TRN"
-                          register={register1("trn")}
+
+
+                          register={register1("trn", {
+                            required: 'please enter trn .'
+                          })}
+                          error={errors1?.trn?.message}
                         />
-                      </Grid>
+                      </Grid> */}
 
                       <Grid item md={5.7} sm={12} xs={12}>
                         <InputField
@@ -544,17 +576,21 @@ const addItem = (data) => {
                           register={register1("ref")}
                         />
                       </Grid>
-
-                      <Grid item md={5.7} sm={12} xs={12}>
+                     
+                      {/* <Grid item md={5.7} sm={12} xs={12}>
                         <SelectField
                           label="Cost Center"
                           size="small"
-                          options={[{ id: "tasheel", name: "TASHEEL" }]}
+                          options={[{ id: 'Tasheel', name: 'Tasheel' }, { id: 'DED', name: 'DED' }, { id: 'Typing', name: 'Typing' }, { id: 'General', name: 'General' }]}
                           selected={watch1("cost_center")}
-                          onSelect={(value) => setValue("cost_center", value)}
-                          register={register1("cost_center")}
+                          onSelect={(value) => setValue1("cost_center", value)}
+
+                          register={register1("cost_center", {
+                            required: 'please enter cost center .'
+                          })}
+                          error={errors1?.cost_center?.message}
                         />
-                      </Grid>
+                      </Grid> */}
                       <Grid item md={5.7} sm={12} xs={12}>
                         <InputField
                           label="Address"
@@ -562,200 +598,181 @@ const addItem = (data) => {
                           placeholder="Address"
                           multiline
                           rows={2}
-                          register={register1("address")}
+
+                          register={register1("address", {
+                            required: 'please enter address .'
+                          })}
+                          error={errors1?.address?.message}
                         />
                       </Grid>
                     </Grid>
                   </Grid>
 
                   {/* </Grid> */}
-                  <Grid item xs={2.8}>
+                  <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>
                     <Button
                       type="submit"
+                      disabled={rows?.length == 0}
                       variant="contained"
                       sx={{
+                        textTransform: 'capitalize',
                         backgroundColor: "#bd9b4a",
                         ":hover": {
                           backgroundColor: "rgb(189 155 74)",
                         },
                       }}
                     >
-                      Add Company
+                      Create
                     </Button>
                   </Grid>
                 </Grid>
               </Box>
             </Box>
 
-            
-    <form onSubmit={handleSubmit(addItem)}>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Item Code</TableCell>
-              <TableCell sx={{ width: "200px" }}>Item Description</TableCell>
-              <TableCell>Qty</TableCell>
-              <TableCell>Govt fee</TableCell>
-              <TableCell>Center fee</TableCell>
-              <TableCell>Bank Charge</TableCell>
-              <TableCell>Transaction ID</TableCell>
-              <TableCell>Application ID</TableCell>
-              <TableCell>Narration</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Item code"
-                  {...register("item_code", { required: "Item code is required" })}
-                />
-                {errors.item_code && <span>{errors.item_code.message}</span>}
-              </TableCell>
-              <TableCell>
-              <SelectField
-                         size="small"
-                         options={services}
-                         selected={serviceItem}
-                         onSelect={handleServiceSelect}
-                        //  error={errors?.service?.message}
-                         register={register("service", {
-                           required: "Please select a service.",
-                         })}
-                       />
-                {errors.service && <span style={{color:"red"}}>{errors.service.message}</span>}
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Quantity"
-                  type="number"
-                  register={register("qty", { required: "Quantity is required" })}
-                />
-                {errors.qty && <span style={{color:"red"}}>{errors.qty.message}</span>}
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Govt fee"
-                  type="number"
-                  register={register("govt_fee", { required: "Govt fee is required" })}
-                />
-                {errors.govt_fee && <span style={{color:"red"}}>{errors.govt_fee.message}</span>}
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Center Fee"
-                  type="number"
-                  register={register("center_fee", { required: "Center fee is required" })}
-                />
-                {errors.center_fee && <span style={{color:"red"}}>{errors.center_fee.message}</span>}
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Bank Charges"
-                  type="number"
-                  register={register("bank_charges", { required: "Bank charges are required" })}
-                  disabled
-                />
-                {errors.bank_charges && <span style={{color:"red"}}>{errors.bank_charges.message}</span>}
 
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Transaction Id"
-                  register={register("transaction_id", { required: "Transaction Id is required" })}
-                />
-                {errors.transaction_id && <span style={{color:"red"}}>{errors.transaction_id.message}</span>}
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Application Id"
-                  register={register("application_id", { required: "Application Id is required" })}
-                />
-                {errors.application_id && <span style={{color:"red"}}>{errors.application_id.message}</span>}
-              </TableCell>
-              <TableCell>
-                <InputField
-                  size="small"
-                  placeholder="Narration"
-                  register={register("narration", { required: "Narration is required" })}
-                />
-                {errors.narration && <span style={{color:"red"}}>{errors.narration.message}</span>}
-              </TableCell>
-              <TableCell>
-               <InputField
-                   disabled={true}
-                   style={{border:"none"}}
-                  size="small"
-                  placeholder="Narration"
-                  register={register("total")}
-                />
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{
-                    backgroundColor: "rgb(189 155 74)",
-                    fontSize: "12px",
-                    ":hover": {
-                      backgroundColor: "rgb(189 155 74)",
-                    },
-                  }}
-                >
-                  Add Item
-                </Button>
-              </TableCell>
-            </TableRow>
+            <form onSubmit={handleSubmit(addItem)}>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
+                      <TableCell sx={{ width: "400px" }}>Service</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Qty</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
 
-            {rows.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{item?.item_code}</TableCell>
-                <TableCell>{item?.service}</TableCell>
-                <TableCell>{item?.qty}</TableCell>
-                <TableCell>{item?.govt_fee}</TableCell>
-                <TableCell>{item?.center_fee}</TableCell>
-                <TableCell>{item?.bank_charges}</TableCell>
-                <TableCell>{item?.transaction_id}</TableCell>
-                <TableCell>{item?.application_id}</TableCell>
-                <TableCell>{item?.narration}</TableCell>
-                <TableCell>{item?.total}</TableCell>
-               
-              </TableRow>
-            ))}
+                      <TableCell sx={{ width: "150px" }}>Total</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          disabled={true}
+                          placeholder="Item code"
+                          register={register("item_code", { required: "Item code is required" })}
+                        />
+                        {errors.item_code && <span>{errors.item_code.message}</span>}
+                      </TableCell>
+                      <TableCell>
+                        <SelectField
+                          size="small"
+                          options={services}
+                          selected={serviceItem}
+                          onSelect={handleServiceSelect}
+                          //  error={errors?.service?.message}
+                          register={register("service", {
+                            required: "Please select a service.",
+                          })}
+                        />
+                        {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                      </TableCell>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder="Quantity"
+                          type="number"
+                          register={register("qty", { required: "Quantity is required" })}
+                        />
+                        {errors.qty && <span style={{ color: "red" }}>{errors.qty.message}</span>}
+                      </TableCell>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder="Govt fee"
+                          type="number"
+                          register={register("govt_fee", { required: "Govt fee is required" })}
+                        />
+                        {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
+                      </TableCell>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder="Center Fee"
+                          type="number"
+                          register={register("center_fee", { required: "Center fee is required" })}
+                        />
+                        {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
+                      </TableCell>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder="Bank Charges"
+                          type="number"
+                          register={register("bank_charges", { required: "Bank charges are required" })}
+                          disabled
+                        />
+                        {errors.bank_charges && <span style={{ color: "red" }}>{errors.bank_charges.message}</span>}
 
-<TableRow>
-              <TableCell colSpan={9} align="right">
-                <Typography variant="h6"  sx={{fontSize:"15px"}}>Sub-total:</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="h6"  sx={{fontSize:"15px"}}>{subTotal}</Typography> {/* Display the Sub-total */}
-              </TableCell>
-            </TableRow>
+                      </TableCell>
 
-            {/* Amount Total Row (optional, if needed for the final sum) */}
-            <TableRow>
-              <TableCell colSpan={9} align="right">
-                <Typography variant="h6"  sx={{fontSize:"15px"}}>Amount Total:</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="h6" sx={{fontSize:"15px"}}>{subTotal}</Typography> {/* This can be the same as Sub-total */}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </form>
+                      <TableCell>
+                        <InputField
+                          disabled={true}
+                          style={{ border: "none" }}
+                          size="small"
+                          placeholder="Narration"
+                          register={register("total")}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                          sx={{
+                            textTransform: 'capitalize',
+                            backgroundColor: "rgb(189 155 74)",
+                            fontSize: "12px",
+                            ":hover": {
+                              backgroundColor: "rgb(189 155 74)",
+                            },
+                          }}
+                        >
+                          Add Item
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+
+                    {rows.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{item?.item_code}</TableCell>
+                        <TableCell>{item?.service}</TableCell>
+                        <TableCell>{item?.qty}</TableCell>
+                        <TableCell>{item?.govt_fee}</TableCell>
+                        <TableCell>{item?.center_fee}</TableCell>
+                        <TableCell>{item?.bank_charges}</TableCell>
+
+                        <TableCell>{item?.total}</TableCell>
+
+                      </TableRow>
+                    ))}
+
+                    <TableRow>
+                      <TableCell colSpan={7} align="right">
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Amount Total Row (optional, if needed for the final sum) */}
+                    <TableRow>
+                      <TableCell colSpan={7} align="right">
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* This can be the same as Sub-total */}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </form>
           </>
         }
       </Box>
