@@ -299,7 +299,7 @@ function UpdateAldeed() {
                     invoice_number: getValues1("invoicenumber"),
                 };
             }
-            const { data } = await CustomerServices.getReceptionDetail(params);
+            const { data } = await CustomerServices.getReceiptDetail(params);
             console.log(data, "dataaa");
             setDetail(data?.token)
             setValue1("customer", data?.token?.customer_name);
@@ -432,7 +432,7 @@ function UpdateAldeed() {
             console.log(data?.receipt?.sale_receipt_items);
             setValue1('token', data?.receipt?.token_number)
             setRows(data?.receipt?.sale_receipt_items)
-            setSubTotal(data?.receipt?.total)
+            setSubTotal(data?.receipt?.total_amount)
             setDate(new Date(data?.receipt?.invoice_date))
             setValue1('display_customer', data?.receipt?.customer_name)
             setValue1('mobile', data?.receipt?.customer_mobile)
@@ -710,7 +710,7 @@ function UpdateAldeed() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        <TableRow>
+                                        {/* <TableRow>
                                             <TableCell>
                                                 <InputField
                                                     size="small"
@@ -858,7 +858,7 @@ function UpdateAldeed() {
                                                         Cancel
                                                     </Button></>}
                                             </TableCell>
-                                        </TableRow>
+                                        </TableRow> */}
 
                                         {rows?.length > 0 && rows?.map((item, index) => (
                                             <TableRow key={index}>
@@ -870,29 +870,7 @@ function UpdateAldeed() {
                                                 <TableCell>{item?.bank_charge}</TableCell>
 
                                                 <TableCell>{item?.total}</TableCell>
-                                                <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
-
-                                                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
-                                                        setSelectedRow(item); setEditState(true)
-                                                        setValue("id", item?.service?.id);
-                                                        setValue("govt_fee", item?.service?.bank_service_charge);
-                                                        setValue("center_fee", item?.service?.center_fee);
-                                                        setValue("bank_charge", item?.service?.bank_service_charge);
-                                                        setServiceItem(item?.service);
-                                                        setValue("quantity", item?.quantity);
-
-                                                    }} src={Images.editIcon} width={'35px'}></Box>}
-                                                    <Box>
-                                                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
-
-                                                            let selectedID = item?.id
-                                                            setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                        }} width={'35px'}></Box>}
-
-
-                                                    </Box>
-
-                                                </Box></TableCell>
+                                              
                                             </TableRow>
                                         ))}
 

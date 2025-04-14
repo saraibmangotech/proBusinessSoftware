@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 74,
+            "activePatchIndex": 75,
             "patches": [
                 {
                     "date": 1744633571052,
@@ -304,6 +304,10 @@
                 {
                     "date": 1744667501167,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -228,9 +228,9 @@\n     const submitForm1 = async (formData) => {\r\n         console.log(formData);\r\n         try {\r\n             let obj = {\r\n-                id:323,\r\n+                id:detail?.id,\r\n                 token_number: formData?.token,\r\n                 token_date: date,\r\n                 invoice_prefix: \"AAD\",\r\n                 cost_center: formData?.cost_center?.id,\r\n"
+                },
+                {
+                    "date": 1744667808075,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -287,8 +287,9 @@\n             setValue1(\"address\", data?.receipt?.address);\r\n             setValue1(\"trn\", data?.receipt?.trn);\r\n             setValue1(\"cost_center\", data?.receipt?.cost_center);\r\n             setValue1(\"caseno\", data?.receipt?.case_no);\r\n+            setSubTotal(data?.receipt?.total_amount)\r\n             setRows(data?.receipt?.sale_receipt_items)\r\n             setAccounts(data?.accounts?.rows);\r\n         } catch (error) {\r\n             ErrorToaster(error);\r\n"
                 }
             ],
             "date": 1744633571052,

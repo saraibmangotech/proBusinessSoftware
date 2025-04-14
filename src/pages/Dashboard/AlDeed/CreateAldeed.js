@@ -288,6 +288,7 @@ function CreateAldeed() {
             setValue1("trn", data?.receipt?.trn);
             setValue1("cost_center", data?.receipt?.cost_center);
             setValue1("caseno", data?.receipt?.case_no);
+            setSubTotal(data?.receipt?.total_amount)
             setRows(data?.receipt?.sale_receipt_items)
             setAccounts(data?.accounts?.rows);
         } catch (error) {
