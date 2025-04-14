@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 31,
+            "activePatchIndex": 32,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -132,6 +132,10 @@
                 {
                     "date": 1744619468599,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -236,8 +236,11 @@\n );\r\n const UpdateBank = lazy(() =>\r\n   import(\"pages/Dashboard/Banks/UpdateBank\")\r\n );\r\n+const BankDetail = lazy(() =>\r\n+  import(\"pages/Dashboard/Banks/BankDetail\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -248,9 +251,9 @@\n     component: <UpdateBank />,\r\n   },\r\n   {\r\n     path: \"/bank-detail/:id\",\r\n-    component: <UpdateBank />,\r\n+    component: <BankDetail />,\r\n   },\r\n   {\r\n     path: \"/create-bank\",\r\n     component: <CreateBank />,\r\n"
+                },
+                {
+                    "date": 1744619724418,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -239,15 +239,22 @@\n );\r\n const BankDetail = lazy(() =>\r\n   import(\"pages/Dashboard/Banks/BankDetail\")\r\n );\r\n+const SalesReciept = lazy(() =>\r\n+  import(\"pages/Dashboard/SalesReciept/index\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n+    path: \"/sales-receipt\",\r\n+    component: <SalesReciept />,\r\n+  },\r\n+  {\r\n     path: \"/update-bank/:id\",\r\n     component: <UpdateBank />,\r\n   },\r\n   {\r\n"
                 }
             ],
             "date": 1744496886534,

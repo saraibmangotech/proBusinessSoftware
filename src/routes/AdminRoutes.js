@@ -240,11 +240,18 @@ const UpdateBank = lazy(() =>
 const BankDetail = lazy(() =>
   import("pages/Dashboard/Banks/BankDetail")
 );
+const SalesReciept = lazy(() =>
+  import("pages/Dashboard/SalesReciept/index")
+);
 const AdminRoutes = [
   
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
+  },
+  {
+    path: "/sales-receipt",
+    component: <SalesReciept />,
   },
   {
     path: "/update-bank/:id",
