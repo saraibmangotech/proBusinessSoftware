@@ -77,7 +77,7 @@ function CreatePaidReceipt() {
   const [subTotal, setSubTotal] = useState(0);
   const [payButton, setPayButton] = useState(false);
   const [rows, setRows] = useState([]);
-
+  const [buttonDisabled, setButtonDisabled] = useState(false)
   console.log(rows, "data");
   const [items, setItems] = useState([
     {
@@ -232,6 +232,7 @@ function CreatePaidReceipt() {
   console.log("object", getValues1("bank")?.id);
 
   const submitForm1 = async (formData) => {
+    setButtonDisabled(true)
     try {
       let obj = {
         id: getValues1("invoicenumber"),
@@ -270,6 +271,9 @@ function CreatePaidReceipt() {
       }
     } catch (error) {
       ErrorToaster(error);
+    }
+    finally{
+      setButtonDisabled(false)
     }
   };
   // *For Get Customer Queue
@@ -401,7 +405,7 @@ function CreatePaidReceipt() {
     setRows(updatedRows);
   };
   console.log(rows);
-  
+
   const getTax = async () => {
     // setLoader(true)
     try {
@@ -632,10 +636,10 @@ function CreatePaidReceipt() {
                           size="small"
                           placeholder="TRN"
                           disabled={true}
-                          register={register1("trn",{
-                            required:false
+                          register={register1("trn", {
+                            required: false
                           })}
-                          
+
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -644,10 +648,10 @@ function CreatePaidReceipt() {
                           size="small"
                           placeholder="Case No"
                           disabled={true}
-                          register={register1("caseno",{
-                            required:false
+                          register={register1("caseno", {
+                            required: false
                           })}
-                          
+
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -670,10 +674,10 @@ function CreatePaidReceipt() {
                           onSelect={(value) => setValue1("cost_center", value)}
                           register={register1("cost_center",
                             {
-                              required:false
+                              required: false
                             }
                           )}
-                       
+
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -923,7 +927,7 @@ function CreatePaidReceipt() {
                   <Grid container justifyContent={"flex-end"}>
                     <Button
                       type="submit"
-                      disabled={rows?.length == 0}
+                      disabled={rows?.length == 0 || buttonDisabled}
                       variant="contained"
                       sx={{
                         textTransform: "capitalize",

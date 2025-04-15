@@ -127,7 +127,7 @@ function UserList() {
 
 
   // *For Customer Queue
-  const [UserList, setUserList] = useState([{ id: 1, name: 'asdasd' }, { id: 1, name: 'asdasd' }]);
+  const [UserList, setUserList] = useState([]);
 
 
 
@@ -274,7 +274,7 @@ function UserList() {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Management</Typography>
-        {permissions?.create && <PrimaryButton
+        {true && <PrimaryButton
          bgcolor={'#bd9b4a'}
           title="Create User"
           onClick={() => navigate('/create-user')}

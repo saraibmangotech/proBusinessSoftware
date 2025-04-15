@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 162,
+            "activePatchIndex": 167,
             "patches": [
                 {
                     "date": 1744620323235,
@@ -656,6 +656,26 @@
                 {
                     "date": 1744738463704,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -265,9 +265,10 @@\n         token_number: formData?.token,\r\n         token_date: date,\r\n         invoice_prefix: \"AAD\",\r\n         trn: formData?.trn,\r\n-        case_no: formData?.case_no,\r\n+        case_no: formData?.caseno,\r\n+        cost_center: formData?.caseno,\r\n         customer_name: formData?.display_customer,\r\n         reception_id: detail?.id,\r\n         customer_mobile: formData?.mobile,\r\n         customer_email: formData?.email,\r\n"
+                },
+                {
+                    "date": 1744743664380,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -238,8 +238,9 @@\n   };\r\n \r\n \r\n   const submitForm1 = async (formData) => {\r\n+    \r\n     console.log(formData);\r\n     try {\r\n \r\n       let invoice = {\r\n@@ -266,9 +267,9 @@\n         token_date: date,\r\n         invoice_prefix: \"AAD\",\r\n         trn: formData?.trn,\r\n         case_no: formData?.caseno,\r\n-        cost_center: formData?.caseno,\r\n+        cost_center: formData?.cost_center,\r\n         customer_name: formData?.display_customer,\r\n         reception_id: detail?.id,\r\n         customer_mobile: formData?.mobile,\r\n         customer_email: formData?.email,\r\n"
+                },
+                {
+                    "date": 1744743688780,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,8 +80,9 @@\n   const [total, setTotal] = useState(0);\r\n   const [subTotal, setSubTotal] = useState(0);\r\n   const [rows, setRows] = useState([]);\r\n   const [invoiceData, setInvoiceData] = useState(null)\r\n+  const [buttonDisabled, setButtonDisabled] = useState(false)\r\n \r\n   console.log(rows, \"data\");\r\n   const [items, setItems] = useState([\r\n     {\r\n"
+                },
+                {
+                    "date": 1744743699918,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -239,9 +239,9 @@\n   };\r\n \r\n \r\n   const submitForm1 = async (formData) => {\r\n-    \r\n+    setButtonDisabled(true)\r\n     console.log(formData);\r\n     try {\r\n \r\n       let invoice = {\r\n"
+                },
+                {
+                    "date": 1744743708703,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -292,8 +292,9 @@\n       const response = await promise;\r\n       if (response?.responseCode === 200) {\r\n         generatePDF()\r\n         navigate(\"/pre-sales\");\r\n+        setButtonDisabled(false)\r\n       }\r\n     } catch (error) {\r\n       ErrorToaster(error);\r\n     }\r\n"
+                },
+                {
+                    "date": 1744743717104,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -297,8 +297,11 @@\n       }\r\n     } catch (error) {\r\n       ErrorToaster(error);\r\n     }\r\n+    finally{\r\n+      setButtonDisabled\r\n+    }\r\n   };\r\n \r\n   // *For Get Account\r\n   const getReceptionDetail = async (value) => {\r\n"
                 }
             ],
             "date": 1744620323235,

@@ -19,6 +19,7 @@ function ReceptionForm() {
     const [customerType, setCustomerType] = useState("company")
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [buttonDisabled2, setButtonDisabled2] = useState(true)
+    const [buttonDisabled3, setButtonDisabled3] = useState(false)
     const [customers, setCustomers] = useState([])
     const [selectedCompany, setSelectedCompany] = useState(null)
     const [selectedCustomer, setSelectedCustomer] = useState(null)
@@ -27,6 +28,7 @@ function ReceptionForm() {
     const [subCustDisable, setSubCustDisable] = useState(false)
     const [categories, setCategories] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
+   
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -50,6 +52,7 @@ function ReceptionForm() {
     } = useForm();
 
     const onSubmit = async (formData) => {
+        setButtonDisabled3(true)
         console.log(formData);
         try {
             let obj = {
@@ -83,8 +86,12 @@ function ReceptionForm() {
         } catch (error) {
             ErrorToaster(error);
         }
+        finally{
+            setButtonDisabled3(false)
+        }
     };
     const onSubmit1 = async (formData) => {
+        setButtonDisabled3(true)
         console.log(formData);
         try {
             let obj = {
@@ -117,6 +124,9 @@ function ReceptionForm() {
 
         } catch (error) {
             ErrorToaster(error);
+        }
+        finally{
+            setButtonDisabled3(false)
         }
     };
     // *For Get Customer Queue
@@ -464,7 +474,7 @@ function ReceptionForm() {
 
                         <Grid container justifyContent={'flex-end'}>
                             <PrimaryButton
-                                disabled={buttonDisabled}
+                                disabled={buttonDisabled || buttonDisabled3}
                                 bgcolor={'#bd9b4a'}
                                 title="Create"
                                 type={'submit'}

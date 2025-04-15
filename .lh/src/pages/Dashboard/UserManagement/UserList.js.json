@@ -3,11 +3,27 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1744546821337,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1744744254005,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -272,9 +272,9 @@\n \r\n \r\n \r\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Management</Typography>\r\n+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Managementsss</Typography>\r\n         {permissions?.create && <PrimaryButton\r\n          bgcolor={'#bd9b4a'}\r\n           title=\"Create User\"\r\n           onClick={() => navigate('/create-user')}\r\n"
+                },
+                {
+                    "date": 1744744283190,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -272,9 +272,9 @@\n \r\n \r\n \r\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Managementsss</Typography>\r\n+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Management</Typography>\r\n         {permissions?.create && <PrimaryButton\r\n          bgcolor={'#bd9b4a'}\r\n           title=\"Create User\"\r\n           onClick={() => navigate('/create-user')}\r\n"
+                },
+                {
+                    "date": 1744744293205,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -126,9 +126,9 @@\n   const [sort, setSort] = useState('asc')\r\n \r\n \r\n   // *For Customer Queue\r\n-  const [UserList, setUserList] = useState([{ id: 1, name: 'asdasd' }, { id: 1, name: 'asdasd' }]);\r\n+  const [UserList, setUserList] = useState([]);\r\n \r\n \r\n \r\n   // *For setPermissions\r\n"
+                },
+                {
+                    "date": 1744745018826,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -273,9 +273,9 @@\n \r\n \r\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Management</Typography>\r\n-        {permissions?.create && <PrimaryButton\r\n+        {true && <PrimaryButton\r\n          bgcolor={'#bd9b4a'}\r\n           title=\"Create User\"\r\n           onClick={() => navigate('/create-user')}\r\n           loading={loading}\r\n"
                 }
             ],
             "date": 1744546821337,

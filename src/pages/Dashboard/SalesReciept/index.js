@@ -81,6 +81,7 @@ function SalesReciept() {
   const [subTotal, setSubTotal] = useState(0);
   const [rows, setRows] = useState([]);
   const [invoiceData, setInvoiceData] = useState(null)
+  const [buttonDisabled, setButtonDisabled] = useState(false)
 
   console.log(rows, "data");
   const [items, setItems] = useState([
@@ -239,6 +240,7 @@ function SalesReciept() {
 
 
   const submitForm1 = async (formData) => {
+    setButtonDisabled(true)
     console.log(formData);
     try {
 
@@ -291,9 +293,13 @@ function SalesReciept() {
       if (response?.responseCode === 200) {
         generatePDF()
         navigate("/pre-sales");
+        setButtonDisabled(false)
       }
     } catch (error) {
       ErrorToaster(error);
+    }
+    finally{
+      setButtonDisabled(false)
     }
   };
 
