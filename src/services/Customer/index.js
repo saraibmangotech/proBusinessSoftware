@@ -326,6 +326,14 @@ const CustomerServices = {
     const data = await deleted(routes.DeleteServiceItem, params);
     return data;
   },
+  getInvoiceNumber: async (params) => {
+    const data = await get(routes.getInvoiceNumber, params);
+    return data;
+  },
+  PayReceipt: async (obj) => {
+    const data = await post(routes.PayReceipt, obj);
+    return data;
+  },
 }
 
 export default CustomerServices

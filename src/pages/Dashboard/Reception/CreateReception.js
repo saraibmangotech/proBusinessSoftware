@@ -387,9 +387,9 @@ function ReceptionForm() {
                                 },
                                 onChange: (e) => {
                                     console.log('asdas');
-                                    if (getValues('mobile').length == 10) {
-                                        Debounce2(() => getCustomerDetail(getValues('mobile')));
-                                    }
+                                    // if (getValues('mobile').length == 10) {
+                                    //     Debounce2(() => getCustomerDetail(getValues('mobile')));
+                                    // }
 
                                     // Delay the execution of verifyEmail by 2 seconds
 
@@ -405,15 +405,7 @@ function ReceptionForm() {
                                 placeholder={"Token Number"}
                                 error={errors?.tokenNumber?.message}
                                 register={register("tokenNumber", {
-                                    onChange: (e) => {
-                                        console.log('asdas');
-                                        if (getValues('tokenNumber')) {
-                                            Debounce2(() => getTokenValidation(getValues('tokenNumber')));
-                                        }
-
-                                        // Delay the execution of verifyEmail by 2 seconds
-
-                                    },
+                                   required:"Enter Token Number"
                                 })}
                             />
                         </Grid>
@@ -436,9 +428,7 @@ function ReceptionForm() {
                                 size={"small"}
                                 placeholder={"Reference"}
                                 error={errors?.reference?.message}
-                                register={register("reference",{
-                                    required:false
-                                })}
+                                register={register("reference")}
                             />
                         </Grid>
 
@@ -482,7 +472,8 @@ function ReceptionForm() {
 
 
                         <Grid container sx={{ gap: "5px 25px" }}>
-                            <Grid item xs={2.8}><InputField
+                            <Grid item xs={2.8}>
+                                <InputField
                                 label={"Mobile *:"}
                                 size={'small'}
                                 type={'number'}
@@ -497,9 +488,9 @@ function ReceptionForm() {
                                     },
                                     onChange: (e) => {
                                         console.log('asdas');
-                                        if (getValues1('mobile').length == 10) {
-                                            Debounce2(() => getCustomerDetail2(getValues1('mobile')));
-                                        }
+                                        // if (getValues1('mobile').length == 10) {
+                                        //     Debounce2(() => getCustomerDetail2(getValues1('mobile')));
+                                        // }
 
                                         // Delay the execution of verifyEmail by 2 seconds
 
@@ -515,15 +506,9 @@ function ReceptionForm() {
                                     placeholder={"Token Number"}
                                     error={errors1?.tokenNumber?.message}
                                     register={register1("tokenNumber", {
-                                        onChange: (e) => {
-                                            console.log('asdas');
-                                            if (getValues1('tokenNumber')) {
-                                                Debounce2(() => getTokenValidation2(getValues1('tokenNumber')));
-                                            }
-
-                                            // Delay the execution of verifyEmail by 2 seconds
-
-                                        },
+                                        
+                                            required:"Enter Token Number"
+                                         
                                     })}
                                 />
                             </Grid>
@@ -542,7 +527,7 @@ function ReceptionForm() {
 
                             <Grid item xs={2.8}>
                                 <InputField
-                                    label={"Reference *:"}
+                                    label={"Reference:"}
                                     size={"small"}
                                     placeholder={"Reference"}
                                     error={errors1?.reference?.message}
@@ -554,7 +539,7 @@ function ReceptionForm() {
 
                             <Grid item xs={2.8}>
                                 <InputField
-                                    label={"Email *:"}
+                                    label={"Email :"}
                                     size={"small"}
                                     type={"email"}
                                     placeholder={"Email"}
@@ -572,7 +557,7 @@ function ReceptionForm() {
                                 <SelectField
                                     size={'small'}
                                     label={'Customer *:'}
-
+disabled={true}
                                     options={customers}
                                     selected={selectedCustomer}
                                     onSelect={(value) => {
@@ -591,14 +576,12 @@ function ReceptionForm() {
                                             setValue1('mobile', value?.mobile)
 
                                             setSubCustDisable(false)
-                                            Debounce2(() => getCompanies(value?.id));
+                                            // Debounce2(() => getCompanies(value?.id));
                                         }
 
                                     }}
                                     error={errors1?.customer?.message}
-                                    register={register1("customer", {
-                                        required: 'Please select customer account.',
-                                    })}
+                                    register={register1("customer")}
                                 />
                             </Grid>
                             <Grid item xs={2.8} >
@@ -651,7 +634,7 @@ function ReceptionForm() {
                             </Grid> */}
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
-                                    disabled={buttonDisabled2}
+                                    // disabled={buttonDisabled2}
                                     bgcolor={'#bd9b4a'}
                                     title="Create"
                                     type={'submit'}

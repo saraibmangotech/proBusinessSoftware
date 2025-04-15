@@ -464,7 +464,7 @@ function UpdateAldeed() {
                                 }}
                             >
                                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                    Update Al-Ded
+                                    Update Al-ADHEED
                                 </Typography>
                             </Box>
 
@@ -644,7 +644,7 @@ function UpdateAldeed() {
                                                 <SelectField
                                                     label="Cost Center"
                                                     size="small"
-                                                    options={[ { id: 'Al-DED', name: 'Al-DED' }]}
+                                                    options={[ { id: 'Al-ADHEED', name: 'Al-ADHEED' }]}
                                                     selected={watch1("cost_center")}
                                                     onSelect={(value) => setValue1("cost_center", value)}
 

@@ -160,7 +160,7 @@ function AldeedList() {
 
             let params = {
 
-                is_presale: true
+                is_presale: false
 
 
             }
@@ -263,12 +263,12 @@ function AldeedList() {
 
 
         },
-        {
-            header: "Token Number",
-            accessorKey: "token_number",
+        // {
+        //     header: "Token Number",
+        //     accessorKey: "token_number",
 
 
-        },
+        // },
         {
             header: "Total Amount",
             accessorKey: "total_amount",
@@ -396,7 +396,7 @@ function AldeedList() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-Ded List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>AL-ADHEED List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"

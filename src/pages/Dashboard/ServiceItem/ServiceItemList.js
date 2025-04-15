@@ -280,7 +280,7 @@ const [data, setData] = useState([])
     },
     {
       header: "Category",
-      accessorKey: "name_ar",
+      accessorKey: "category",
        accessorFn: (row) => row?.category?.name,
 
 

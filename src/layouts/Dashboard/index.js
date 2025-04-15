@@ -40,19 +40,35 @@ function DashboardLayout() {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: '#FCFCFC', height: '100vh', overflow: 'auto' }}>
-      {/* ========== Full-Width Header ========== */}
-      <Header status={true} />
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+  {/* ========== Full-Width Header ========== */}
+  <Header status={true} />
 
-      {/* ========== Main Content ========== */}
-      <Box sx={{ px: 2, py: 2 }}>
-        <Suspense fallback={<CircleLoading />}>
-          <ProtectedRoute>
-            <Outlet />
-          </ProtectedRoute>
-        </Suspense>
+  {/* ========== Main Content ========== */}
+  <Box sx={{ px: 2, py: 2, flexGrow: 1 ,overflow:'auto' }}>
+    <Suspense fallback={<CircleLoading />}>
+      <ProtectedRoute>
+        <Outlet />
+      </ProtectedRoute>
+    </Suspense>
+  </Box>
+
+  {/* ========== Footer ========== */}
+  <Box sx={{ bgcolor: '#121f35', padding: '5px 18px', textAlign: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box>
+        <p style={{ fontSize: '14px', color: '#ffffff' }}>
+        Alpha PRO ERP
+        </p>
+      </Box>
+      <Box>
+        <p style={{ fontSize: '14px', color: '#ffffff' }}>
+        Powered by <a href='https://MangoTechDevs.ae' target='blank' style={{cursor:"pointer" , color:"#ffffff"}}> MangoTechDevs.ae </a>        </p>
       </Box>
     </Box>
+  </Box>
+</Box>
+
   );
 }
 

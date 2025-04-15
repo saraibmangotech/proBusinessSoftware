@@ -59,7 +59,7 @@ function UpdateReception() {
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
                 service_category_id: selectedCategory?.id,
-                customer_id: selectedCustomer?.id,
+                customer_id: newDetail?.token?.customer_id,
                 mobile: formData?.mobile,
                 token_number: formData?.tokenNumber,
                 reference: formData?.reference,
@@ -92,7 +92,7 @@ function UpdateReception() {
                 id: id,
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
-                customer_id: selectedCustomer?.id,
+                customer_id: newDetail?.token?.customer_id,
                 mobile: formData?.mobile,
                 token_number: formData?.tokenNumber,
                 reference: formData?.reference,
@@ -284,7 +284,7 @@ function UpdateReception() {
             console.log(detail);
             setNewDetail(detail)
             let updatedObj = {...detail,name:detail?.customer_name}
-            setSelectedCustomer(updatedObj)
+            // setSelectedCustomer(updatedObj)
 
             setValue1('customer', updatedObj);
             setValue('mobile', detail?.mobile)
@@ -351,7 +351,7 @@ function UpdateReception() {
             console.log('Customer:', customer);
 
             setValue1('customer', customer);
-            setSelectedCustomer(customer);
+            // setSelectedCustomer(customer);
             setValue('company', company);
             setSelectedCompany(company);
         }
@@ -445,7 +445,7 @@ function UpdateReception() {
                                 onChange: (e) => {
                                     console.log('asdas');
                                     if (getValues('mobile').length == 10) {
-                                        Debounce2(() => getCustomerDetail(getValues('mobile')));
+                                        // Debounce2(() => getCustomerDetail(getValues('mobile')));
                                     }
 
                                     // Delay the execution of verifyEmail by 2 seconds
@@ -465,7 +465,7 @@ function UpdateReception() {
                                     onChange: (e) => {
                                         console.log('asdas');
                                         if (getValues('tokenNumber')) {
-                                            Debounce2(() => getTokenValidation(getValues('tokenNumber')));
+                                            // Debounce2(() => getTokenValidation(getValues('tokenNumber')));
                                         }
 
                                         // Delay the execution of verifyEmail by 2 seconds
@@ -555,7 +555,7 @@ function UpdateReception() {
                                     onChange: (e) => {
                                         console.log('asdas');
                                         if (getValues1('mobile').length == 10) {
-                                            Debounce2(() => getCustomerDetail2(getValues1('mobile')));
+                                            // Debounce2(() => getCustomerDetail2(getValues1('mobile')));
                                         }
 
                                         // Delay the execution of verifyEmail by 2 seconds
@@ -575,7 +575,7 @@ function UpdateReception() {
                                         onChange: (e) => {
                                             console.log('asdas');
                                             if (getValues1('tokenNumber')) {
-                                                Debounce2(() => getTokenValidation2(getValues1('tokenNumber')));
+                                                // Debounce2(() => getTokenValidation2(getValues1('tokenNumber')));
                                             }
 
                                             // Delay the execution of verifyEmail by 2 seconds
@@ -621,7 +621,7 @@ function UpdateReception() {
                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                             message: "Please enter a valid email address.",
                                         },
-                                        required:'please enter email'
+                                        // required:'please enter email'
                                     })}
                                 />
                             </Grid>
@@ -630,9 +630,9 @@ function UpdateReception() {
                                 <SelectField
                                     size={'small'}
                                     label={'Customer *:'}
-
+disabled={true}
                                     options={customers}
-                                    selected={selectedCustomer}
+                                    selected={"Walk-In Customer"}
                                     onSelect={(value) => {
                                         setSelectedCustomer(value)
                                         if (value?.name == 'Walk-In Customer') {

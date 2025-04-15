@@ -396,7 +396,7 @@ function PayReceipts() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-Ded List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-ADHEED List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"

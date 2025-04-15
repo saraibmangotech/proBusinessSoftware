@@ -125,7 +125,7 @@ function ReceptionList() {
     reset,
   } = useForm();
 
-  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'SR No.', key: '' },{ name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
   const [loader, setLoader] = useState(false);
@@ -252,6 +252,12 @@ function ReceptionList() {
 
     },
     {
+      header: "Token Number.",
+      accessorKey: "token_number",
+
+
+    },
+    {
       header: "Customer",
       accessorKey: "customer_name",
 
@@ -263,16 +269,16 @@ function ReceptionList() {
 
 
     },
-    {
-      header: "Type",
-      accessorKey: "cost_center",
-      cell: ({ row }) => (
-        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.is_company ? 'Company' : "Individual"}
-        </Box>
-      ),
+    // {
+    //   header: "Type",
+    //   accessorKey: "cost_center",
+    //   cell: ({ row }) => (
+    //     <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+    //       {row?.original?.is_company ? 'Company' : "Individual"}
+    //     </Box>
+    //   ),
 
-    },
+    // },
     {
       id: "created_at",
       header: "Registration Date",

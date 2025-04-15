@@ -47,6 +47,7 @@ import {
 } from "utils";
 import instance from "config/axios";
 import routes from "services/System/routes";
+import AddIcon from '@mui/icons-material/Add';
 import CustomerServices from "services/Customer";
 import CustomerService from "../DashboardPages/CustomerService";
 import { showErrorToast, showPromiseToast } from "components/NewToaster";
@@ -63,7 +64,7 @@ import axios from "axios";
 import UploadIcon from "@mui/icons-material/Upload";
 import FinanceServices from "services/Finance";
 import SearchIcon from "@mui/icons-material/Search";
-import { updateItem } from "@progress/kendo-react-common";
+
 // import { TableBody, TableHead } from "mui-datatables";
 
 function UpdatePreSale() {
@@ -153,18 +154,23 @@ function UpdatePreSale() {
         setServiceItem("");
     };
 
+  
     const updateItem = (data) => {
         const newRow = { ...data, service: serviceItem };
-
-        // Update the existing item based on matching id
-        setRows(prevItems =>
-            prevItems.map(item =>
-                item.id === newRow.id ? newRow : item
-            )
-        );
-        reset()
-        setServiceItem(null)
+    
+        // Update rows state immutably
+        setRows(prevItems => {
+            return prevItems.map(item =>
+                item.id === newRow.id ? { ...newRow } : item
+            );
+        });
+    
+        // Reset form and other state
+        reset();
+        setServiceItem(null);
+        setEditState(false);
     };
+    
 
 
     const isFormDataEmpty = (data) => {
@@ -305,6 +311,7 @@ function UpdatePreSale() {
             setValue1("address", data?.token?.address);
             setValue1("trn", data?.token?.trn);
             setValue1("cost_center", data?.token?.cost_center);
+            setValue1("mobileValue", data?.token?.mobile);
 
             setAccounts(data?.accounts?.rows);
         } catch (error) {
@@ -345,6 +352,7 @@ function UpdatePreSale() {
             setValue("govt_fee", data?.service?.bank_service_charge);
             setValue("center_fee", data?.service?.center_fee);
             setValue("bank_charge", data?.service?.bank_service_charge);
+            // setValue("transaction_id", data?.transaction_id);
             setServiceItem(data?.service);
             setValue("quantity", 1);
         } catch (error) {
@@ -425,14 +433,16 @@ function UpdatePreSale() {
             const { data } = await CustomerServices.getPreSaleDetail(params);
             console.log(data?.receipt?.sale_receipt_items);
             setValue1('token', data?.receipt?.token_number)
+            setValue1("mobileValue", data?.receipt?.customer_mobile);
             setRows(data?.receipt?.sale_receipt_items)
-            setSubTotal(data?.receipt?.total)
+            setSubTotal(data?.receipt?.total_amount)
             setDate(new Date(data?.receipt?.invoice_date))
             setValue1('display_customer', data?.receipt?.customer_name)
             setValue1('mobile', data?.receipt?.customer_mobile)
             setValue1('email', data?.receipt?.customer_email)
             setValue1('ref', data?.receipt?.ref)
             setValue1('address', data?.receipt?.address)
+        
         } catch (error) {
             console.error("Error fetching location:", error);
         }
@@ -458,14 +468,14 @@ function UpdatePreSale() {
                                 }}
                             >
                                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                   Update Sales Receipt
+                                   Update Pre Sales Receipt
                                 </Typography>
                             </Box>
 
                             <Box sx={{ p: 3 }}>
                                 <Grid container sx={{ gap: "5px 25px" }}>
-                                    <Grid item xs={12}>
-                                        <Grid container>
+                                    <Grid item xs={12}  >
+                                        <Grid container   gap={2}>
                                             <Grid item md={3} sm={12} xs={12}>
                                                 <InputField
                                                     label="Token"
@@ -473,15 +483,19 @@ function UpdatePreSale() {
                                                     disabled={true}
                                                     placeholder="Enter Token"
                                                     register={register1("token")}
-                                                    InputProps={{
-                                                        endAdornment: (
-                                                            <IconButton onClick={getReceptionDetail}>
-                                                                <SearchIcon sx={{ color: "#bd9b4a" }} />
-                                                            </IconButton>
-                                                        ),
-                                                    }}
+                                                  
                                                 />
                                             </Grid>
+                                            <Grid item md={3} sm={12} xs={12}>
+                        <InputField
+                                label={"Mobile *:"}
+                                size={'small'}
+                                type={'number'}
+                                disabled={fieldsDisabled}
+                                placeholder={"Mobile"}
+                                register={register1("mobileValue")}
+                            />
+                        </Grid>
                                         </Grid>
                                     </Grid>
 
@@ -690,7 +704,9 @@ function UpdatePreSale() {
                                             <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
                                             <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
                                             <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
-
+                                            <TableCell sx={{ width: "150px" }}>Trsn Id</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>App/Case ID</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
                                             <TableCell sx={{ width: "150px" }}>Total</TableCell>
                                             <TableCell sx={{ width: "150px" }}>Action</TableCell>
                                         </TableRow>
@@ -757,13 +773,54 @@ function UpdatePreSale() {
                                                 {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
 
                                             </TableCell>
+                                            <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder="Transaction Id"
+                          type="number"
+                          register={register("transaction_id", { required: "Transaction Id is required" })}
+                          
+                        />
+                        {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
+
+                      </TableCell>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder="Application Id"
+                          type="number"
+                          register={register("application_id", {
+                            required: "Application Id is required",
+                          })}
+                        />
+                        {errors.application_id && (
+                          <span style={{ color: "red" }}>
+                            {errors.application_id.message}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <InputField
+                          size="small"
+                          placeholder=" Ref No"
+                          type="number"
+                          register={register("ref_no", {
+                            required: "Ref No is required",
+                          })}
+                        />
+                        {errors.ref_no && (
+                          <span style={{ color: "red" }}>
+                            {errors.ref_no.message}
+                          </span>
+                        )}
+                      </TableCell>
 
                                             <TableCell>
                                                 <InputField
                                                     disabled={true}
                                                     style={{ border: "none" }}
                                                     size="small"
-                                                    placeholder="Narration"
+                                                    placeholder=""
                                                     register={register("total")}
                                                 />
                                             </TableCell>
@@ -781,7 +838,7 @@ function UpdatePreSale() {
                                                         },
                                                     }}
                                                 >
-                                                    Add Item
+                                                   <AddIcon /> 
                                                 </Button> : <> <Button
                                                     variant="contained"
                                                     color="primary"
@@ -808,6 +865,9 @@ function UpdatePreSale() {
                                                             setValue("govt_fee", '');
                                                             setValue("center_fee", '');
                                                             setValue("bank_charge", '');
+                                                            setValue("transaction_id", '');
+                                                            setValue("application_id", '');
+                                                            setValue("ref_no", '');
                                                             setServiceItem(null);
                                                             setValue("quantity", '');
                                                         }}
@@ -834,6 +894,9 @@ function UpdatePreSale() {
                                                 <TableCell>{item?.govt_fee}</TableCell>
                                                 <TableCell>{item?.center_fee}</TableCell>
                                                 <TableCell>{item?.bank_charge}</TableCell>
+                                                <TableCell>{item?.transaction_id}</TableCell>
+                                                <TableCell>{item?.application_id}</TableCell>
+                                                <TableCell>{item?.ref_no}</TableCell>
 
                                                 <TableCell>{item?.total}</TableCell>
                                                 <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
@@ -844,8 +907,13 @@ function UpdatePreSale() {
                                                         setValue("govt_fee", item?.service?.bank_service_charge);
                                                         setValue("center_fee", item?.service?.center_fee);
                                                         setValue("bank_charge", item?.service?.bank_service_charge);
+                                                        setValue("transaction_id", item?.transaction_id);
+                                                        setValue("application_id", item?.application_id);
+                                                        setValue("ref_no", item?.ref_no);
+                                                        setValue("service", item?.service);
                                                         setServiceItem(item?.service);
                                                         setValue("quantity", item?.quantity);
+                                                        console.log(item?.service)
 
                                                     }} src={Images.editIcon} width={'35px'}></Box>}
                                                     <Box>

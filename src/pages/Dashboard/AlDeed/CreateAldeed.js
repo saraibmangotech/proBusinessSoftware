@@ -234,7 +234,7 @@ function CreateAldeed() {
     const [stepFormData, setStepFormData] = useState();
     const [step1FormData, setStep1FormData] = useState();
     const [selectedType, setSelectedType] = useState(null);
-    const [date, setDate] = useState(null);
+    const [date, setDate] = useState(new Date());
     const [balanceType, setBalanceType] = useState(null);
     const [imageURL, setImageURL] = useState(null);
     const fileInputRef = useRef(null);
@@ -291,12 +291,12 @@ function CreateAldeed() {
         try {
             let obj = {
                 id:detail?.id,
-                token_number: formData?.token,
+                // token_number: formData?.token,
                 token_date: date,
                 invoice_prefix: "AAD",
                 cost_center: formData?.cost_center?.id,
                 trn: formData?.trn,
-                case_number: formData?.caseno,
+                case_no: formData?.caseno,
                 customer_name: formData?.display_customer,
                 reception_id: detail?.id,
                 customer_mobile: formData?.mobile,
@@ -317,8 +317,9 @@ function CreateAldeed() {
             );
             const response = await promise;
             if (response?.responseCode === 200) {
-                // navigate("/alded-list");
                 generatePDF()
+                navigate("/aldeed-list");
+
             }
         } catch (error) {
             ErrorToaster(error);
@@ -339,20 +340,29 @@ function CreateAldeed() {
             }
             const { data } = await CustomerServices.getReceiptDetail(params);
             console.log(data, "dataaa");
-            setDetail(data?.receipt)
-            setValue1("customer", data?.receipt?.customer_name);
-            setValue1("invoice_date", moment().toDate());
-            setValue1("mobile", data?.receipt?.customer_mobile);
-            setValue1("ref", data?.receipt?.ref);
-            setValue1("display_customer", data?.receipt?.customer_name);
-            setValue1("email", data?.receipt?.customer_email);
-            setValue1("address", data?.receipt?.address);
-            setValue1("trn", data?.receipt?.trn);
-            setValue1("cost_center", data?.receipt?.cost_center);
-            setValue1("caseno", data?.receipt?.case_no);
-            setSubTotal(data?.receipt?.total_amount)
-            setRows(data?.receipt?.sale_receipt_items)
-            setAccounts(data?.accounts?.rows);
+            if(  data?.receipt?.is_presale == true){
+
+                setDetail(data?.receipt)
+                setValue1("customer", data?.receipt?.customer_name);
+                setValue1("invoice_date", moment().toDate());
+                setValue1("mobile", data?.receipt?.customer_mobile);
+                setValue1("ref", data?.receipt?.ref);
+                setValue1("display_customer", data?.receipt?.customer_name);
+                setValue1("email", data?.receipt?.customer_email);
+                setValue1("address", data?.receipt?.address);
+                setValue1("trn", data?.receipt?.trn);
+                setValue1("cost_center", data?.receipt?.cost_center);
+                setValue1("caseno", data?.receipt?.case_no);
+                setSubTotal(data?.receipt?.total_amount)
+                setRows(data?.receipt?.sale_receipt_items)
+                setAccounts(data?.accounts?.rows);
+            }else if(data?.receipt == null){
+
+                ErrorToaster("Invoice Not  Found")
+            }
+            else{
+                ErrorToaster("Invoice Already Created")
+            }
         } catch (error) {
             ErrorToaster(error);
         } finally {
@@ -482,7 +492,7 @@ function CreateAldeed() {
                                 }}
                             >
                                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                    Create Al-DED
+                                    Create Al-ADHEED
                                 </Typography>
                             </Box>
 
@@ -522,7 +532,7 @@ function CreateAldeed() {
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item md={3} sm={12} xs={12} mt={2}>
+                                            <Grid item md={1} sm={12} xs={12} mt={2}>
                                                 <PrimaryButton
                                                     bgcolor={'#bd9b4a'}
                                                     title="Clear"
@@ -543,10 +553,33 @@ function CreateAldeed() {
                                                     loading={loading}
                                                 />
                                             </Grid>
+                                            <Grid item md={3} sm={12} xs={12}>
+                                                <DatePicker
+                                                    label={"Invoice Date :*"}
+                                                    value={date}
+                                                    size={'small'}
+
+                                                    error={errors1?.date?.message}
+                                                    register={register1("date", {
+                                                        required:
+                                                            date ? false :
+                                                                "please enter  date."
+
+                                                    })}
+                                                    maxDate={new Date()}
+                                                    onChange={(date) => {
+
+                                                        setValue1('date', date)
+                                                        setDate(new Date(date));
+
+                                                    }
+
+                                                    }
+                                                /></Grid>
                                         </Grid>
                                     </Grid>
 
-                                    <Grid
+                                    {/* <Grid
                                         item
                                         md={5.5}
                                         sm={12}
@@ -604,10 +637,10 @@ function CreateAldeed() {
 
 
                                         </Grid>
-                                    </Grid>
+                                    </Grid> */}
                                     <Grid
                                         item
-                                        md={5.5}
+                                        md={12}
                                         sm={12}
                                         xs={12}
                                         sx={{
@@ -618,7 +651,7 @@ function CreateAldeed() {
                                         }}
                                     >
                                         <Grid container sx={{ gap: "5px 25px" }}>
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Display Customer"
                                                     size="small"
@@ -630,7 +663,7 @@ function CreateAldeed() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Mobile"
                                                     size="small"
@@ -643,7 +676,7 @@ function CreateAldeed() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Email"
                                                     size="small"
@@ -656,7 +689,7 @@ function CreateAldeed() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="TRN"
                                                     size="small"
@@ -669,7 +702,7 @@ function CreateAldeed() {
                                                     error={errors1?.trn?.message}
                                                 />
                                             </Grid>
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Case No"
                                                     size="small"
@@ -682,7 +715,7 @@ function CreateAldeed() {
                                                     error={errors1?.caseno?.message}
                                                 />
                                             </Grid>
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Ref"
                                                     size="small"
@@ -691,11 +724,11 @@ function CreateAldeed() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <SelectField
                                                     label="Cost Center"
                                                     size="small"
-                                                    options={[{ id: 'Al-DED', name: 'Al-DED' }]}
+                                                    options={[{ id: 'Al-ADHEED', name: 'Al-ADHEED' }]}
                                                     selected={watch1("cost_center")}
                                                     onSelect={(value) => setValue1("cost_center", value)}
 
@@ -705,7 +738,25 @@ function CreateAldeed() {
                                                     error={errors1?.cost_center?.message}
                                                 />
                                             </Grid>
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            <Grid item md={3.8} sm={5.5} xs={12} >
+                                                <SelectField
+                                                    size={'small'}
+                                                    label={'Customer *:'}
+                                                    disabled={true}
+                                                    options={[{ id: "walkin", name: "Walk-in Customer" }]}
+                                                    selected={selectedCustomer}
+                                                    onSelect={(value) => {
+                                                        setSelectedCustomer(value)
+
+
+                                                    }}
+                                                    error={errors1?.customer?.message}
+                                                    register={register1("customer", {
+                                                        required: false,
+                                                    })}
+                                                />
+                                            </Grid>
+                                            <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Address"
                                                     size="small"

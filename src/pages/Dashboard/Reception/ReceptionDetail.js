@@ -389,9 +389,9 @@ function ReceptionDetail() {
                 </Box>
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
-                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Update Reception</Typography>
+                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}> Reception Detail</Typography>
             </Box>
-            <RadioGroup row value={customerType} onChange={(e) => setCustomerType(e.target.value)} sx={{ mb: 3, p: 3 }}>
+            {/* <RadioGroup row value={customerType} onChange={(e) => setCustomerType(e.target.value)} sx={{ mb: 3, p: 3 }}>
                 <FormControlLabel
                     value="individual"
                     control={<Radio disabled checked={customerType === "individual"} />}
@@ -402,7 +402,7 @@ function ReceptionDetail() {
                     control={<Radio disabled checked={customerType === "company"} />}
                     label="Company"
                 />
-            </RadioGroup>
+            </RadioGroup> */}
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
 
 

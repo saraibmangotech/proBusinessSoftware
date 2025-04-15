@@ -152,6 +152,28 @@ function Header() {
   const navigationData = [
     {
       id: 2,
+      name: "Receptions",
+      icon: "customer",
+      parent_id: null,
+      api: "/api/roles",
+      route: "/reception-list",
+      identifier: null,
+      navigation: true,
+       
+    },
+    {
+      id: 2,
+      name: "Cashier",
+      icon: "customer",
+      parent_id: null,
+      api: "/api/roles",
+      route: "/create-paid-receipt",
+      identifier: null,
+      navigation: true,
+       
+    },
+    {
+      id: 2,
       name: "Sales",
       icon: "customer",
       parent_id: null,
@@ -160,20 +182,22 @@ function Header() {
       identifier: null,
       navigation: true,
       order_by: 2,
-      children: [  {
-		id: 33,
-		name: "Customer Management",
-		icon: "customer",
-		parent_id: 12,
-		api: null,
-		route: "/customer-list",
-		identifier: null,
-		navigation: true,
-		order_by: 33,
-	  },
+      children: [
+        
     {
       id: 33,
-      name: "Sale Receipt",
+      name: "Create Pre Sale Receipt",
+      icon: "customer",
+      parent_id: 12,
+      api: null,
+      route: "/sales-receipt",
+      identifier: null,
+      navigation: true,
+      order_by: 33,
+      },
+    {
+      id: 33,
+      name: "Pre Sale Receipt List",
       icon: "customer",
       parent_id: 12,
       api: null,
@@ -182,31 +206,48 @@ function Header() {
       navigation: true,
       order_by: 33,
       },
-    {
-      id: 14,
-      name: "Receptions",
-      icon: "customer",
-      parent_id: null,
-      api: "/api/roles",
-      route: "/reception-list",
-      identifier: null,
-      navigation: true,
-      order_by: 14,
-      children:[],
-      childRoute: [],
-      }, {
-        id: 14,
-        name: "Al DED",
-        icon: "customer",
-        parent_id: null,
-        api: "/api/roles",
-        route: "/aldeed-list",
-        identifier: null,
-        navigation: true,
-        order_by: 14,
-        children:[],
-        childRoute: [],
-        }],
+    // {
+    //   id: 14,
+    //   name: "Receptions",
+    //   icon: "customer",
+    //   parent_id: null,
+    //   api: "/api/roles",
+    //   route: "/reception-list",
+    //   identifier: null,
+    //   navigation: true,
+    //   order_by: 14,
+    //   children:[],
+    //   childRoute: [],
+    //   }
+      , 
+     
+        {
+          id: 14,
+          name: "Create Al-ADHEED",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/create-aldeed",
+          identifier: null,
+          navigation: true,
+          order_by: 14,
+          children:[],
+          childRoute: [],
+          },
+        {
+          id: 14,
+          name: "Al-ADHEED List",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/aldeed-list",
+          identifier: null,
+          navigation: true,
+          order_by: 14,
+          children:[],
+          childRoute: [],
+          },
+          ],
     },
     {
       id: 15,
@@ -258,6 +299,17 @@ function Header() {
       navigation: true,
       order_by: 12,
       children: [
+        {
+          id: 33,
+          name: "Create Account",
+          icon: "customer",
+          parent_id: 12,
+          api: null,
+          route: "/create-account",
+          identifier: null,
+          navigation: true,
+          order_by: 33,
+        },
         {
           id: 33,
           name: "Create journal voucher",
@@ -394,7 +446,7 @@ function Header() {
         "/profit-loss-visa-report",
       ],
     },
-	{
+  	{
 		id: 13,
 		name: "Settings",
 		icon: "settings",
@@ -404,7 +456,20 @@ function Header() {
 		identifier: null,
 		navigation: true,
 		order_by: 13,
-		childRoute: [ {
+		childRoute: [ 
+      {
+        id: 33,
+        name: "Customer Management",
+        icon: "customer",
+        parent_id: 12,
+        api: null,
+        route: "/customer-list",
+        identifier: null,
+        navigation: true,
+        order_by: 33,
+        },
+      
+      {
 			id: 13,
 			name: "User management",
 			icon: "customer",
@@ -429,32 +494,20 @@ function Header() {
 			children:[],
 			childRoute: [],
 		  },],
-		children: [ {
-			id: 13,
-			name: "User management",
-			icon: "customer",
-			parent_id: null,
-			api: "/api/users",
-			route: "/user-list",
-			identifier: null,
-			navigation: true,
-			order_by: 13,
-			childRoute: [],
-		  },
-		  {
-			id: 14,
-			name: "Role management",
-			icon: "customer",
-			parent_id: null,
-			api: "/api/roles",
-			route: "/role-list",
-			identifier: null,
-			navigation: true,
-			order_by: 14,
-			children:[],
-			childRoute: [],
-		  }
-      ,{
+		children: [
+      {
+        id: 33,
+        name: "Customer Management",
+        icon: "customer",
+        parent_id: 12,
+        api: null,
+        route: "/customer-list",
+        identifier: null,
+        navigation: true,
+        order_by: 33,
+        },
+      
+      {
 			id: 14,
 			name: "Service Categories",
 			icon: "customer",
@@ -505,7 +558,32 @@ function Header() {
             order_by: 14,
             children:[],
             childRoute: [],
-            }],
+            },
+            {
+              id: 13,
+              name: "User management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/user-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+              },
+              {
+              id: 14,
+              name: "Role management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/role-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children:[],
+              childRoute: [],
+              }],
 	  },
 	  
    
@@ -580,7 +658,7 @@ function Header() {
         // Then check child routes
         if (item.children) {
           for (const child of item.children) {
-            if (child.route && location.pathname === child.route) {
+            if (child?.route && location?.pathname === child?.route) {
               return child.name
             }
           }

@@ -396,7 +396,7 @@ function PreSalesList() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Pre Sales List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Sales List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"

@@ -80,7 +80,10 @@ const routes = {
   getReceiptDetail:'/sales/receipts/details',
   CreateCard:'/system/cards/add',
   getCards:'/system/cards/',
-  UpdateCard:'/system/cards/update'
+  UpdateCard:'/system/cards/update',
+  getInvoiceNumber:'/sales/receipts/invoiceNumber',
+  PayReceipt:'/sales/receipts/pay',
+
 };
 
 export default routes
