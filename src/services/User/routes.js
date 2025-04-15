@@ -1,5 +1,5 @@
 const routes = {
-  createUser: '/auth/add',
+  CreateUser: '/Users/add',
   getUsers: '/users',
   updateUser: 'users/update',
   getProfile:'users/profile',

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/services/User/routes.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1744752848570,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1744753177496,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n const routes = {\r\n-  createUser: '/Users/add/add',\r\n+  CreateUser: '/Users/add',\r\n   getUsers: '/users',\r\n   updateUser: 'users/update',\r\n   getProfile:'users/profile',\r\n   updateUserStatus: 'users/disable',\r\n"
+                }
+            ],
+            "date": 1744752848570,
+            "name": "Commit-0",
+            "content": "const routes = {\r\n  createUser: '/Users/add/add',\r\n  getUsers: '/users',\r\n  updateUser: 'users/update',\r\n  getProfile:'users/profile',\r\n  updateUserStatus: 'users/disable',\r\n  getUserPermissions: 'users/permissions',\r\n  UpdatePassword:'/auth/changePassword',\r\n  getSubUsers:'/customers/users',\r\n  CreateSubUser:'/customers/users/add'\r\n  \r\n};\r\n\r\nexport default routes"
+        }
+    ]
+}

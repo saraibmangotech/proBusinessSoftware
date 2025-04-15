@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, IconButton, InputAdornment, Typography } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Box, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, InputAdornment, ListItemText, MenuItem, OutlinedInput, Paper, Select, Typography } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
 import { Images, SvgIcon, SvgIcon as SvgIconss } from 'assets';
 import { useNavigate } from "react-router-dom";
 import { PrimaryButton } from "components/Buttons";
 import Colors from "assets/Style/Colors";
+import { useTheme } from '@mui/material/styles';
 import { FontFamily } from "assets";
 import { ErrorToaster, SuccessToaster } from "components/Toaster";
 import InputField from "components/Input";
@@ -15,8 +16,20 @@ import SelectField from "components/Select";
 import UserServices from "services/User";
 import SystemServices from "services/System";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
+import CustomerServices from "services/Customer";
+import { InputLabel } from "@mui/material";
+import { Checkbox } from "@mui/material";
 
-
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 // function PasswordIcon(props) {
 // 	return (
 // 		<SvgIcon className='saraib' {...props}>
@@ -30,10 +43,11 @@ import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 
 function CreateUser() {
   const [handleBlockedNavigation] =
-  useCallbackPrompt(false)
+    useCallbackPrompt(false)
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors }, control, getValues, watch } = useForm();
+  const { register, handleSubmit, formState: { errors }, control, getValues, watch, setError,
+    clearErrors, } = useForm();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -41,9 +55,35 @@ function CreateUser() {
   const [roles, setRoles] = useState([])
   const [selectedRole, setSelectedRole] = useState(null)
   const [buttondisabled, setButtondisabled] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState([])
+  const [categories, setCategories] = useState([])
+  const theme = useTheme();
+  function getStyles(name, personName, theme) {
+    return {
+      fontWeight: personName.includes(name)
+        ? theme.typography.fontWeightMedium
+        : theme.typography.fontWeightRegular,
+    };
+  }
   // Watch both password and confirm password fields for changes
   const password = watch('password', '');
   const confirmPassword = watch('confirmpassword', '');
+  console.log(watch());
+
+  const [personName, setPersonName] = React.useState([]);
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+
+    const selected = typeof value === 'string' ? value.split(',') : value;
+
+    const selectedObjects = categories.filter((item) => selected.includes(item.label));
+
+    setPersonName(selectedObjects); // Now you're storing the whole objects
+  };
+
 
   const getRoles = async (search) => {
     try {
@@ -62,16 +102,18 @@ function CreateUser() {
 
   // *For Create Role
   const CreateUser = async (formData) => {
+    console.log(selectedCategoryObjects);
+    
     setLoading(true)
     setButtondisabled(true)
     console.log(formData);
     try {
       let obj = {
         name: getValues('name'),
-
         email: getValues('email'),
         phone: getValues('phone'),
         password: getValues('password'),
+        permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
         role_id: selectedRole?.id
       }
 
@@ -98,9 +140,50 @@ function CreateUser() {
       setLoading(false)
     }
   }
+  // *For Get Customer Queue
+  const getCategoryList = async (page, limit, filter) => {
+
+
+    try {
+
+      let params = {
+        page: 1,
+        limit: 1000,
+
+
+      }
+
+      const { data } = await CustomerServices.getCategoryList(params)
+      setCategories(data?.categories);
+
+
+
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
   useEffect(() => {
+    getCategoryList()
     getRoles()
   }, [])
+
+  const selectedCategoryObjects = categories.filter((category) => selectedCategory.includes(category.id))
+
+  // Handle checkbox change
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory((prev) => {
+      if (prev.includes(categoryId)) {
+        // Remove if already selected
+        return prev.filter((id) => id !== categoryId)
+      } else {
+        // Add if not selected
+        return [...prev, categoryId]
+      }
+    })
+  }
+
+
+
 
   return (
     <Box sx={{ p: 3, borderRadius: 3, }}>
@@ -110,7 +193,7 @@ function CreateUser() {
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >CREATE USER</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
             <PrimaryButton
-             bgcolor={'#bd9b4a'}
+              bgcolor={'#bd9b4a'}
               title="Save"
               type={'submit'}
               disabled={buttondisabled}
@@ -189,6 +272,10 @@ function CreateUser() {
               })}
             />
           </Grid>
+     
+
+
+
 
           <Grid item xs={12} sm={5}>
             <InputField
@@ -234,7 +321,38 @@ function CreateUser() {
             />
 
           </Grid>
+          {selectedRole?.name === 'Typist' && (
+            <Grid item xs={12} sm={12}>
+            
+                <Typography variant="h5" gutterBottom>
+                  Select Categories
+                </Typography>
 
+                {selectedRole?.name === "Typist" && (
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={5}>
+                      <FormGroup>
+                        {categories?.map((category) => (
+                          <FormControlLabel
+                            key={category.id}
+                            control={
+                              <Checkbox
+                                checked={selectedCategory?.includes(category.id)}
+                                onChange={() => handleCategoryChange(category.id)}
+                              />
+                            }
+                            label={category.name}
+                          />
+                        ))}
+                      </FormGroup>
+                    </Grid>
+
+                   
+                  </Grid>
+                )}
+           
+            </Grid>
+          )}
         </Grid>
       </Box>
 
