@@ -6,6 +6,10 @@ const UserServices = {
     const data = await post(routes.CreateSubUser, obj);
     return data;
   },
+  CreateUser: async (obj) => {
+    const data = await post(routes.CreateUser, obj);
+    return data;
+  },
   getUsers: async (params) => {
     const data = await get(routes.getUsers, params);
     return data;
