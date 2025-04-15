@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 7,
+            "activePatchIndex": 13,
             "patches": [
                 {
                     "date": 1744507388198,
@@ -36,6 +36,30 @@
                 {
                     "date": 1744635297817,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -199,9 +199,9 @@\n         name: \"Al DED\",\r\n         icon: \"customer\",\r\n         parent_id: null,\r\n         api: \"/api/roles\",\r\n-        route: \"/bank-list\",\r\n+        route: \"/aldeed-list\",\r\n         identifier: null,\r\n         navigation: true,\r\n         order_by: 14,\r\n         children:[],\r\n"
+                },
+                {
+                    "date": 1744668086380,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -209,9 +209,9 @@\n         }],\r\n     },\r\n     {\r\n       id: 12,\r\n-      name: \"Accounts management\",\r\n+      name: \"Accounts\",\r\n       icon: \"customer\",\r\n       parent_id: null,\r\n       api: null,\r\n       route: null,\r\n"
+                },
+                {
+                    "date": 1744669333191,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -181,8 +181,19 @@\n       identifier: null,\r\n       navigation: true,\r\n       order_by: 33,\r\n       },\r\n+      {\r\n+        id: 33,\r\n+        name: \"Purchase Receipt\",\r\n+        icon: \"customer\",\r\n+        parent_id: 12,\r\n+        api: null,\r\n+        route: \"/sales-receipt\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 33,\r\n+        },\r\n     {\r\n       id: 14,\r\n       name: \"Receptions\",\r\n       icon: \"customer\",\r\n"
+                },
+                {
+                    "date": 1744669338703,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -187,9 +187,9 @@\n         name: \"Purchase Receipt\",\r\n         icon: \"customer\",\r\n         parent_id: 12,\r\n         api: null,\r\n-        route: \"/sales-receipt\",\r\n+        route: \"/create-purchase-receipt\",\r\n         identifier: null,\r\n         navigation: true,\r\n         order_by: 33,\r\n         },\r\n"
+                },
+                {
+                    "date": 1744669612418,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -219,8 +219,108 @@\n         childRoute: [],\r\n         }],\r\n     },\r\n     {\r\n+      id: 13,\r\n+      name: \"Purchase\",\r\n+      icon: \"settings\",\r\n+      parent_id: null,\r\n+      api: \"/api/users\",\r\n+      route: \"/user-list\",\r\n+      identifier: null,\r\n+      navigation: true,\r\n+      order_by: 13,\r\n+      childRoute: [ {\r\n+        id: 13,\r\n+        name: \"User management\",\r\n+        icon: \"customer\",\r\n+        parent_id: null,\r\n+        api: \"/api/users\",\r\n+        route: \"/user-list\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 13,\r\n+        childRoute: [],\r\n+        },\r\n+        {\r\n+        id: 14,\r\n+        name: \"Role management\",\r\n+        icon: \"customer\",\r\n+        parent_id: null,\r\n+        api: \"/api/roles\",\r\n+        route: \"/role-list\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 14,\r\n+        children:[],\r\n+        childRoute: [],\r\n+        },],\r\n+      children: [ {\r\n+        id: 13,\r\n+        name: \"User management\",\r\n+        icon: \"customer\",\r\n+        parent_id: null,\r\n+        api: \"/api/users\",\r\n+        route: \"/user-list\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 13,\r\n+        childRoute: [],\r\n+        },\r\n+        {\r\n+        id: 14,\r\n+        name: \"Role management\",\r\n+        icon: \"customer\",\r\n+        parent_id: null,\r\n+        api: \"/api/roles\",\r\n+        route: \"/role-list\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 14,\r\n+        children:[],\r\n+        childRoute: [],\r\n+        }\r\n+        ,{\r\n+        id: 14,\r\n+        name: \"Service Categories\",\r\n+        icon: \"customer\",\r\n+        parent_id: null,\r\n+        api: \"/api/roles\",\r\n+        route: \"/category-list\",\r\n+        identifier: null,\r\n+        navigation: true,\r\n+        order_by: 14,\r\n+        children:[],\r\n+        childRoute: [],\r\n+        },\r\n+        {\r\n+          id: 14,\r\n+          name: \"Service Items\",\r\n+          icon: \"customer\",\r\n+          parent_id: null,\r\n+          api: \"/api/roles\",\r\n+          route: \"/service-list\",\r\n+          identifier: null,\r\n+          navigation: true,\r\n+          order_by: 14,\r\n+          children:[],\r\n+          childRoute: [],\r\n+          },\r\n+          {\r\n+            id: 14,\r\n+            name: \"Banks\",\r\n+            icon: \"customer\",\r\n+            parent_id: null,\r\n+            api: \"/api/roles\",\r\n+            route: \"/bank-list\",\r\n+            identifier: null,\r\n+            navigation: true,\r\n+            order_by: 14,\r\n+            children:[],\r\n+            childRoute: [],\r\n+            }],\r\n+      },\r\n+    {\r\n       id: 12,\r\n       name: \"Accounts\",\r\n       icon: \"customer\",\r\n       parent_id: null,\r\n"
+                },
+                {
+                    "date": 1744669657337,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -228,33 +228,9 @@\n       route: \"/user-list\",\r\n       identifier: null,\r\n       navigation: true,\r\n       order_by: 13,\r\n-      childRoute: [ {\r\n-        id: 13,\r\n-        name: \"vendors\",\r\n-        icon: \"customer\",\r\n-        parent_id: null,\r\n-        api: \"/api/users\",\r\n-        route: \"/user-list\",\r\n-        identifier: null,\r\n-        navigation: true,\r\n-        order_by: 13,\r\n-        childRoute: [],\r\n-        },\r\n-        {\r\n-        id: 14,\r\n-        name: \"Role management\",\r\n-        icon: \"customer\",\r\n-        parent_id: null,\r\n-        api: \"/api/roles\",\r\n-        route: \"/role-list\",\r\n-        identifier: null,\r\n-        navigation: true,\r\n-        order_by: 14,\r\n-        children:[],\r\n-        childRoute: [],\r\n-        },],\r\n+      childRoute: [ ],\r\n       children: [ {\r\n         id: 13,\r\n         name: \"User management\",\r\n         icon: \"customer\",\r\n"
+                },
+                {
+                    "date": 1744669862163,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -209,9 +209,9 @@\n         }],\r\n     },\r\n     {\r\n       id: 2,\r\n-      name: \"Sales\",\r\n+      name: \"Purchase\",\r\n       icon: \"customer\",\r\n       parent_id: null,\r\n       api: \"/api/customers\",\r\n       route: \"\",\r\n"
                 }
             ],
             "date": 1744507388198,
