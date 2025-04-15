@@ -77,7 +77,10 @@ const routes = {
   DeletePreSale:'/sales/receipts/delete',
   UpdateSaleReceipt:'/sales/reception/update',
   CreateAlDed:'/sales/receipts/place',
-  getReceiptDetail:'/sales/receipts/details'
+  getReceiptDetail:'/sales/receipts/details',
+  CreateCard:'/system/cards/add',
+  getCards:'/system/cards/',
+  UpdateCard:'/system/cards/update'
 };
 
 export default routes

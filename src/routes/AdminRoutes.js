@@ -258,6 +258,21 @@ const AldeedList = lazy(() =>
 const UpdateAldeed = lazy(() =>
   import("pages/Dashboard/AlDeed/UpdateAldeed")
 );
+const CreatePurchaseReceipt = lazy(() =>
+  import("pages/Dashboard/PurchaseReceipt/CreatePurchaseReceipt")
+);
+const PayReceipts = lazy(() =>
+  import("pages/Dashboard/Payments/PayReciepts")
+);
+const CreatePaidReceipt = lazy(() =>
+  import("pages/Dashboard/Payments/CreatePaidReceipt")
+);
+const CardList = lazy(() =>
+  import("pages/Dashboard/Cards/Cards")
+);
+const UpdateCard = lazy(() =>
+  import("pages/Dashboard/Cards/UpdateCard")
+);
 const AdminRoutes = [
   
   {
@@ -265,8 +280,28 @@ const AdminRoutes = [
     component: <CreateServiceItem />,
   },
   {
+    path: "/create-paid-receipt",
+    component: <CreatePaidReceipt />,
+  },
+  {
     path: "/create-aldeed",
     component: <CreateAldeed />,
+  },
+  {
+    path: "/paid-receipts",
+    component: <PayReceipts />,
+  },
+  {
+    path: "/card-list",
+    component: <CardList />,
+  },
+  {
+    path: "/update-card",
+    component: <UpdateCard />,
+  },
+  {
+    path: "/create-purchase-receipt",
+    component: <CreatePurchaseReceipt />,
   },
   {
     path: "/aldeed-list",

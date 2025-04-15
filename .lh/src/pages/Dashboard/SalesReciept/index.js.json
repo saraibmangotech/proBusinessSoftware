@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 93,
+            "activePatchIndex": 103,
             "patches": [
                 {
                     "date": 1744620323235,
@@ -380,6 +380,46 @@
                 {
                     "date": 1744666930072,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -269,9 +269,9 @@\n     try {\r\n       let params = {\r\n         token_number: getValues1(\"token\"),\r\n       };\r\n-      const { data } = await CustomerServices.getReceiptDetail(params);\r\n+      const { data } = await CustomerServices.getReceptionDetail(params);\r\n       console.log(data, \"dataaa\");\r\n       setDetail(data?.token)\r\n       setValue1(\"customer\", data?.token?.customer_name);\r\n       setValue1(\"invoice_date\", moment().toDate());\r\n"
+                },
+                {
+                    "date": 1744674284922,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -348,8 +348,28 @@\n     } finally {\r\n       // setLoader(false)\r\n     }\r\n   };\r\n+     // *For Get Account\r\n+      const getReceptionDetail = async (state) => {\r\n+          setFieldsDisabled(true)\r\n+          try {\r\n+              let params = {\r\n+                  token_number: getValues1(\"token\"),\r\n+              };\r\n+              if (state) {\r\n+                  params = {\r\n+                      invoice_number: getValues1(\"invoicenumber\"),\r\n+                  };\r\n+              }\r\n+              const { data } = await CustomerServices.getReceiptDetail(params);\r\n+              \r\n+          } catch (error) {\r\n+              ErrorToaster(error);\r\n+          } finally {\r\n+              // setLoader(false)\r\n+          }\r\n+      };\r\n   const getTax = async () => {\r\n     // setLoader(true)\r\n     try {\r\n       let params = {\r\n@@ -576,9 +596,9 @@\n                           register={register1(\"ref\")}\r\n                         />\r\n                       </Grid>\r\n                      \r\n-                      <Grid item md={5.7} sm={12} xs={12}>\r\n+                      {/* <Grid item md={5.7} sm={12} xs={12}>\r\n                         <SelectField\r\n                           label=\"Cost Center\"\r\n                           size=\"small\"\r\n                           options={[{ id: 'Tasheel', name: 'Tasheel' }, { id: 'DED', name: 'DED' }, { id: 'Typing', name: 'Typing' }, { id: 'General', name: 'General' }]}\r\n@@ -589,9 +609,9 @@\n                             required: 'please enter cost center .'\r\n                           })}\r\n                           error={errors1?.cost_center?.message}\r\n                         />\r\n-                      </Grid>\r\n+                      </Grid> */}\r\n                       <Grid item md={5.7} sm={12} xs={12}>\r\n                         <InputField\r\n                           label=\"Address\"\r\n                           size=\"small\"\r\n"
+                },
+                {
+                    "date": 1744674330165,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -349,9 +349,9 @@\n       // setLoader(false)\r\n     }\r\n   };\r\n      // *For Get Account\r\n-      const getReceptionDetail = async (state) => {\r\n+      const getReceiptDetail = async (state) => {\r\n           setFieldsDisabled(true)\r\n           try {\r\n               let params = {\r\n                   token_number: getValues1(\"token\"),\r\n@@ -446,9 +446,9 @@\n                           placeholder=\"Enter Token\"\r\n                           register={register1(\"token\")}\r\n                           InputProps={{\r\n                             endAdornment: (\r\n-                              <IconButton onClick={getReceptionDetail}>\r\n+                              <IconButton onClick={getReceptionDetail() ; getReceiptDetail()}>\r\n                                 <SearchIcon sx={{ color: \"#bd9b4a\" }} />\r\n                               </IconButton>\r\n                             ),\r\n                           }}\r\n"
+                },
+                {
+                    "date": 1744674346757,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -446,9 +446,9 @@\n                           placeholder=\"Enter Token\"\r\n                           register={register1(\"token\")}\r\n                           InputProps={{\r\n                             endAdornment: (\r\n-                              <IconButton onClick={getReceptionDetail() ; getReceiptDetail()}>\r\n+                              <IconButton onClick={()=> {getReceptionDetail(); getReceiptDetail()}}>\r\n                                 <SearchIcon sx={{ color: \"#bd9b4a\" }} />\r\n                               </IconButton>\r\n                             ),\r\n                           }}\r\n"
+                },
+                {
+                    "date": 1744674361512,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -355,13 +355,9 @@\n           try {\r\n               let params = {\r\n                   token_number: getValues1(\"token\"),\r\n               };\r\n-              if (state) {\r\n-                  params = {\r\n-                      invoice_number: getValues1(\"invoicenumber\"),\r\n-                  };\r\n-              }\r\n+             \r\n               const { data } = await CustomerServices.getReceiptDetail(params);\r\n               \r\n           } catch (error) {\r\n               ErrorToaster(error);\r\n"
+                },
+                {
+                    "date": 1744674378821,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -222,8 +222,9 @@\n   const [services, setServices] = useState(null);\r\n   const [serviceItem, setServiceItem] = useState(null);\r\n   const [selectedCustomer, setSelectedCustomer] = useState(null)\r\n   const [detail, setDetail] = useState(null)\r\n+  const [holdState, setHoldState] = useState(false)\r\n   //documents array\r\n \r\n   const handleNext = () => {\r\n     setActiveStep((prevActiveStep) => prevActiveStep + 1);\r\n"
+                },
+                {
+                    "date": 1744674407698,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -358,8 +358,9 @@\n                   token_number: getValues1(\"token\"),\r\n               };\r\n              \r\n               const { data } = await CustomerServices.getReceiptDetail(params);\r\n+              console.log(data);\r\n               \r\n           } catch (error) {\r\n               ErrorToaster(error);\r\n           } finally {\r\n"
+                },
+                {
+                    "date": 1744674436214,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -222,9 +222,9 @@\n   const [services, setServices] = useState(null);\r\n   const [serviceItem, setServiceItem] = useState(null);\r\n   const [selectedCustomer, setSelectedCustomer] = useState(null)\r\n   const [detail, setDetail] = useState(null)\r\n-  const [holdState, setHoldState] = useState(false)\r\n+  const [holdState, setHoldState] = useState(true)\r\n   //documents array\r\n \r\n   const handleNext = () => {\r\n     setActiveStep((prevActiveStep) => prevActiveStep + 1);\r\n@@ -359,8 +359,11 @@\n               };\r\n              \r\n               const { data } = await CustomerServices.getReceiptDetail(params);\r\n               console.log(data);\r\n+              if(data?.receipt){\r\n+                setHoldState(true)\r\n+              }\r\n               \r\n           } catch (error) {\r\n               ErrorToaster(error);\r\n           } finally {\r\n"
+                },
+                {
+                    "date": 1744674456843,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -361,8 +361,9 @@\n               const { data } = await CustomerServices.getReceiptDetail(params);\r\n               console.log(data);\r\n               if(data?.receipt){\r\n                 setHoldState(true)\r\n+                showErrorToast('Invoice already exist with this token number')\r\n               }\r\n               \r\n           } catch (error) {\r\n               ErrorToaster(error);\r\n"
+                },
+                {
+                    "date": 1744674468427,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -363,8 +363,11 @@\n               if(data?.receipt){\r\n                 setHoldState(true)\r\n                 showErrorToast('Invoice already exist with this token number')\r\n               }\r\n+              else{\r\n+                setHoldState(false)\r\n+              }\r\n               \r\n           } catch (error) {\r\n               ErrorToaster(error);\r\n           } finally {\r\n"
+                },
+                {
+                    "date": 1744674500850,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -636,9 +636,9 @@\n                   {/* </Grid> */}\r\n                   <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>\r\n                     <Button\r\n                       type=\"submit\"\r\n-                      disabled={rows?.length == 0}\r\n+                      disabled={rows?.length == 0 || holdState}\r\n                       variant=\"contained\"\r\n                       sx={{\r\n                         textTransform: 'capitalize',\r\n                         backgroundColor: \"#bd9b4a\",\r\n"
                 }
             ],
             "date": 1744620323235,

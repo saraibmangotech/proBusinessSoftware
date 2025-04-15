@@ -18,6 +18,10 @@ const CustomerServices = {
     const data = await post(routes.CreateSaleReceipt, obj);
     return data;
   },
+  CreateCard: async (obj) => {
+    const data = await post(routes.CreateCard, obj);
+    return data;
+  },
   DeleteVoucher: async (obj) => {
     const data = await deleted(routes.DeleteVoucher, obj);
     return data;
@@ -56,6 +60,10 @@ const CustomerServices = {
   },
   UpdateWPStatus: async (obj) => {
     const data = await patch(routes.UpdateWPStatus, obj);
+    return data;
+  },
+  UpdateCard: async (obj) => {
+    const data = await patch(routes.UpdateCard, obj);
     return data;
   },
   UpdateCategory: async (obj) => {
@@ -108,6 +116,10 @@ const CustomerServices = {
   },
   getRejectedVisa: async (params) => {
     const data = await get(routes.getRejectedVisa, params);
+    return data;
+  },
+  getCards: async (params) => {
+    const data = await get(routes.getCards, params);
     return data;
   },
   getReceiptDetail: async (params) => {

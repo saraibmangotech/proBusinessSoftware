@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 48,
+            "activePatchIndex": 64,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -200,6 +200,70 @@
                 {
                     "date": 1744635617147,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -254,8 +254,11 @@\n );\r\n const AldeedList = lazy(() =>\r\n   import(\"pages/Dashboard/AlDeed/Aldeeds\")\r\n );\r\n+const UpdateAldeed = lazy(() =>\r\n+  import(\"pages/Dashboard/AlDeed/UpdateAldeed\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n"
+                },
+                {
+                    "date": 1744669259972,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -268,8 +268,12 @@\n     path: \"/create-aldeed\",\r\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n+    path: \"/create-purchase-receipt\",\r\n+    component: <CreatePurchaseReceipt />,\r\n+  },\r\n+  {\r\n     path: \"/aldeed-list\",\r\n     component: <AldeedList />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744669270705,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -257,8 +257,11 @@\n );\r\n const UpdateAldeed = lazy(() =>\r\n   import(\"pages/Dashboard/AlDeed/UpdateAldeed\")\r\n );\r\n+const CreatePurchaseReceipt = lazy(() =>\r\n+  import(\"pages/Dashboard/AlDeed/CreatePurchaseReceipt\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n"
+                },
+                {
+                    "date": 1744669281152,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -258,9 +258,9 @@\n const UpdateAldeed = lazy(() =>\r\n   import(\"pages/Dashboard/AlDeed/UpdateAldeed\")\r\n );\r\n const CreatePurchaseReceipt = lazy(() =>\r\n-  import(\"pages/Dashboard/AlDeed/CreatePurchaseReceipt\")\r\n+  import(\"pages/Dashboard/PurchaseReceipt/CreatePurchaseReceipt\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744671387086,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -271,8 +271,12 @@\n     path: \"/create-aldeed\",\r\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n+    path: \"/paid-receipts\",\r\n+    component: <CreatePurchaseReceipt />,\r\n+  },\r\n+  {\r\n     path: \"/create-purchase-receipt\",\r\n     component: <CreatePurchaseReceipt />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744671404500,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -260,8 +260,11 @@\n );\r\n const CreatePurchaseReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/PurchaseReceipt/CreatePurchaseReceipt\")\r\n );\r\n+const PayReceipts = lazy(() =>\r\n+  import(\"pages/Dashboard/PurchaseReceipt/PayReceipts\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -272,9 +275,9 @@\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n     path: \"/paid-receipts\",\r\n-    component: <CreatePurchaseReceipt />,\r\n+    component: <PayReceipts />,\r\n   },\r\n   {\r\n     path: \"/create-purchase-receipt\",\r\n     component: <CreatePurchaseReceipt />,\r\n"
+                },
+                {
+                    "date": 1744671413258,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -261,9 +261,9 @@\n const CreatePurchaseReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/PurchaseReceipt/CreatePurchaseReceipt\")\r\n );\r\n const PayReceipts = lazy(() =>\r\n-  import(\"pages/Dashboard/PurchaseReceipt/PayReceipts\")\r\n+  import(\"pages/Dashboard/Payments/PayReceipts\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744671554764,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -261,9 +261,9 @@\n const CreatePurchaseReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/PurchaseReceipt/CreatePurchaseReceipt\")\r\n );\r\n const PayReceipts = lazy(() =>\r\n-  import(\"pages/Dashboard/Payments/PayReceipts\")\r\n+  import(\"pages/Dashboard/Payments/PayReciepts\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744673207731,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -270,8 +270,12 @@\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n+    path: \"/create-paid-receipt\",\r\n+    component: <CreatePaidReceipt />,\r\n+  },\r\n+  {\r\n     path: \"/create-aldeed\",\r\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744673221322,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -263,8 +263,11 @@\n );\r\n const PayReceipts = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/PayReciepts\")\r\n );\r\n+const CreatePaidReceipt = lazy(() =>\r\n+  import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n"
+                },
+                {
+                    "date": 1744677925701,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -285,8 +285,12 @@\n     path: \"/paid-receipts\",\r\n     component: <PayReceipts />,\r\n   },\r\n   {\r\n+    path: \"/card-list\",\r\n+    component: <PayReceipts />,\r\n+  },\r\n+  {\r\n     path: \"/create-purchase-receipt\",\r\n     component: <CreatePurchaseReceipt />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744677940813,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -266,8 +266,11 @@\n );\r\n const CreatePaidReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n );\r\n+const CardList = lazy(() =>\r\n+  import(\"pages/Dashboard/Payments/CardList\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -286,9 +289,9 @@\n     component: <PayReceipts />,\r\n   },\r\n   {\r\n     path: \"/card-list\",\r\n-    component: <PayReceipts />,\r\n+    component: <CardList />,\r\n   },\r\n   {\r\n     path: \"/create-purchase-receipt\",\r\n     component: <CreatePurchaseReceipt />,\r\n"
+                },
+                {
+                    "date": 1744677948373,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -267,9 +267,9 @@\n const CreatePaidReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n );\r\n const CardList = lazy(() =>\r\n-  import(\"pages/Dashboard/Payments/CardList\")\r\n+  import(\"pages/Dashboard/Cards/CardList\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744677967728,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -267,9 +267,9 @@\n const CreatePaidReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n );\r\n const CardList = lazy(() =>\r\n-  import(\"pages/Dashboard/Cards/CardList\")\r\n+  import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744678337277,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -292,8 +292,12 @@\n     path: \"/card-list\",\r\n     component: <CardList />,\r\n   },\r\n   {\r\n+    path: \"/update-card\",\r\n+    component: <CardList />,\r\n+  },\r\n+  {\r\n     path: \"/create-purchase-receipt\",\r\n     component: <CreatePurchaseReceipt />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744678345124,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -269,8 +269,11 @@\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n+const CardList = lazy(() =>\r\n+  import(\"pages/Dashboard/Cards/Cards\")\r\n+);\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n@@ -293,9 +296,9 @@\n     component: <CardList />,\r\n   },\r\n   {\r\n     path: \"/update-card\",\r\n-    component: <CardList />,\r\n+    component: <UpdateCard />,\r\n   },\r\n   {\r\n     path: \"/create-purchase-receipt\",\r\n     component: <CreatePurchaseReceipt />,\r\n"
+                },
+                {
+                    "date": 1744678352188,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -269,10 +269,10 @@\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n-const CardList = lazy(() =>\r\n-  import(\"pages/Dashboard/Cards/Cards\")\r\n+const UpdateCard = lazy(() =>\r\n+  import(\"pages/Dashboard/Cards/UpdateCard\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
                 }
             ],
             "date": 1744496886534,

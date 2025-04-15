@@ -223,6 +223,7 @@ function SalesReciept() {
   const [serviceItem, setServiceItem] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [detail, setDetail] = useState(null)
+  const [holdState, setHoldState] = useState(true)
   //documents array
 
   const handleNext = () => {
@@ -349,6 +350,30 @@ function SalesReciept() {
       // setLoader(false)
     }
   };
+     // *For Get Account
+      const getReceiptDetail = async (state) => {
+          setFieldsDisabled(true)
+          try {
+              let params = {
+                  token_number: getValues1("token"),
+              };
+             
+              const { data } = await CustomerServices.getReceiptDetail(params);
+              console.log(data);
+              if(data?.receipt){
+                setHoldState(true)
+                showErrorToast('Invoice already exist with this token number')
+              }
+              else{
+                setHoldState(false)
+              }
+              
+          } catch (error) {
+              ErrorToaster(error);
+          } finally {
+              // setLoader(false)
+          }
+      };
   const getTax = async () => {
     // setLoader(true)
     try {
@@ -427,7 +452,7 @@ function SalesReciept() {
                           register={register1("token")}
                           InputProps={{
                             endAdornment: (
-                              <IconButton onClick={getReceptionDetail}>
+                              <IconButton onClick={()=> {getReceptionDetail(); getReceiptDetail()}}>
                                 <SearchIcon sx={{ color: "#bd9b4a" }} />
                               </IconButton>
                             ),
@@ -612,7 +637,7 @@ function SalesReciept() {
                   <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>
                     <Button
                       type="submit"
-                      disabled={rows?.length == 0}
+                      disabled={rows?.length == 0 || holdState}
                       variant="contained"
                       sx={{
                         textTransform: 'capitalize',
