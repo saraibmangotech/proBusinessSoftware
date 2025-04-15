@@ -126,8 +126,8 @@ function SalesReciept() {
   // Watch for changes in the fee-related fields
   const govtFee = watch('govt_fee', 0);
   const centerFee = watch('center_fee', 0);
-  const bankCharges = watch('bank_charges', 0);
-  const qty = watch('qty', 1);
+  const bankCharges = watch('bank_charge', 0);
+  const qty = watch('quantity', 1);
   useEffect(() => {
     const feesTotal = (parseFloat(govtFee) || 0) + (parseFloat(centerFee) || 0) + (parseFloat(bankCharges) || 0);
     const finalTotal = feesTotal * (parseFloat(qty) || 1);
@@ -318,12 +318,12 @@ function SalesReciept() {
       };
 
       const { data } = await CustomerServices.DetailServiceItem(params);
-      setValue("item_code", data?.service?.id);
+      setValue("service_id", data?.service?.id);
       setValue("govt_fee", data?.service?.bank_service_charge);
       setValue("center_fee", data?.service?.center_fee);
-      setValue("bank_charges", data?.service?.bank_service_charge);
+      setValue("bank_charge", data?.service?.bank_service_charge);
 
-      setValue("qty", 1);
+      setValue("quantity", 1);
     } catch (error) {
       ErrorToaster(error);
     } finally {
@@ -653,9 +653,9 @@ function SalesReciept() {
                           size="small"
                           disabled={true}
                           placeholder="Item code"
-                          register={register("item_code", { required: "Item code is required" })}
+                          register={register("service_id", { required: "Item code is required" })}
                         />
-                        {errors.item_code && <span>{errors.item_code.message}</span>}
+                        {errors.service_id && <span>{errors.service_id.message}</span>}
                       </TableCell>
                       <TableCell>
                         <SelectField
@@ -664,20 +664,20 @@ function SalesReciept() {
                           selected={serviceItem}
                           onSelect={handleServiceSelect}
                           //  error={errors?.service?.message}
-                          register={register("service", {
+                          register={register("service_description", {
                             required: "Please select a service.",
                           })}
                         />
-                        {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                        {errors.service_description && <span style={{ color: "red" }}>{errors.service_description.message}</span>}
                       </TableCell>
                       <TableCell>
                         <InputField
                           size="small"
                           placeholder="Quantity"
                           type="number"
-                          register={register("qty", { required: "Quantity is required" })}
+                          register={register("quantity", { required: "Quantity is required" })}
                         />
-                        {errors.qty && <span style={{ color: "red" }}>{errors.qty.message}</span>}
+                        {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
                       </TableCell>
                       <TableCell>
                         <InputField
@@ -702,10 +702,10 @@ function SalesReciept() {
                           size="small"
                           placeholder="Bank Charges"
                           type="number"
-                          register={register("bank_charges", { required: "Bank charges are required" })}
+                          register={register("bank_charge", { required: "Bank charges are required" })}
                           disabled
                         />
-                        {errors.bank_charges && <span style={{ color: "red" }}>{errors.bank_charges.message}</span>}
+                        {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
 
                       </TableCell>
 
@@ -739,12 +739,12 @@ function SalesReciept() {
 
                     {rows.map((item, index) => (
                       <TableRow key={index}>
-                        <TableCell>{item?.item_code}</TableCell>
-                        <TableCell>{item?.service}</TableCell>
-                        <TableCell>{item?.qty}</TableCell>
+                        <TableCell>{item?.service_id}</TableCell>
+                        <TableCell>{item?.service_description}</TableCell>
+                        <TableCell>{item?.quantity}</TableCell>
                         <TableCell>{item?.govt_fee}</TableCell>
                         <TableCell>{item?.center_fee}</TableCell>
-                        <TableCell>{item?.bank_charges}</TableCell>
+                        <TableCell>{item?.bank_charge}</TableCell>
 
                         <TableCell>{item?.total}</TableCell>
 

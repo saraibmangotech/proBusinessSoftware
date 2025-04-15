@@ -1394,3 +1394,7 @@ th {
 
   color: white !important;
 }
+
+.showPdf{
+  display: none;
+}

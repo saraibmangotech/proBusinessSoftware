@@ -91,7 +91,9 @@ export const Images = {
 	service8: require("./Images/service-8.jpg"),
 	invoiceIcon1:require("./Images/invoiceicon1.png"),
 	fileIcon:require("./Images/fileIcon.png"),
-	pdfImg:require("./Images/pdfImg.png")
+	pdfImg:require("./Images/pdfImg.png"),
+	header:require("./Images/header.png"),
+	footer:require("./Images/footer.png"),
 };
 
 export const Icons = {
