@@ -274,6 +274,7 @@ function SalesReciept() {
         reception_id: detail?.id,
         customer_mobile: formData?.mobile,
         customer_email: formData?.email,
+        customer_id: detail?.customer_id,
         ref: formData?.ref,
         total_amount: subTotal,
 
@@ -622,6 +623,7 @@ function SalesReciept() {
                       <InputField
                         label="Invoice No"
                         size="small"
+                        disabled={true}
                         placeholder="TSL/83540"
                         register={register1("invoice_no")}
                       />

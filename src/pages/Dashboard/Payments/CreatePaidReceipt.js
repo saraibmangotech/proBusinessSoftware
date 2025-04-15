@@ -148,27 +148,9 @@ function CreatePaidReceipt() {
     reset();
     setServiceItem("");
   };
-  const isFormDataEmpty = (data) => {
-    // Check if all form fields are empty
-    return Object.values(data).every((value) => {
-      // If the value is an object (like companyLogo), check if it's empty
-      if (typeof value === "object" && value !== null) {
-        return Object.keys(value).length === 0;
-      }
-      // Otherwise, check if the value is an empty string
-      return value === "";
-    });
-  };
+ 
 
-  const allowFilesType = [
-    "image/png",
-    "image/jpg",
-    "image/jpeg",
-    "application/pdf",
-    "application/vnd.ms-excel",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
+
   const allowFilesType2 = ["image/png", "image/jpg", "image/jpeg"];
   const [guarantors, setGuarantors] = useState([]);
   const [activeStep, setActiveStep] = React.useState(1);
@@ -188,7 +170,9 @@ function CreatePaidReceipt() {
   const [loading, setLoading] = useState(false);
   const [emailVerify, setEmailVerify] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedBank, setSelectedBank] = useState(null);
   const [loader, setLoader] = useState(false);
+  console.log(selectedBank ,"objobj")
 
   const [center, setCenter] = useState(null);
   const [status, setStatus] = useState(null);
@@ -229,9 +213,10 @@ function CreatePaidReceipt() {
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
-  console.log("object", getValues1("bank")?.id);
+  console.log("objobj", watch1("bank"));
 
   const submitForm1 = async (formData) => {
+    console.log(formData ,"objobjj")
     setButtonDisabled(true)
     try {
       let obj = {
@@ -245,26 +230,46 @@ function CreatePaidReceipt() {
           selectedMode?.id == "Cash"
             ? 700117
             : selectedMode?.id == "Bank"
-              ? getValues1("bank")?.id
-              : null, // By default 700117 for Cash
+              ? selectedBank?.id
+              :  selectedMode?.id == "Network receivable"
+              ? 700171  :null, 
         ref_id:
           selectedMode?.id == "Bank" || selectedMode?.id == "Bank" ? "2" : null, //bank or card id null for cash
         remarks: formData?.remarks,
         narration: formData?.narration,
+
+        charges :      detail?.sale_receipt_items?.reduce(
+          (acc, item) => acc + Number(item?.center_fee || 0),
+          0
+        ),
+        govt_charges  :detail?.sale_receipt_items?.reduce(
+          (acc, item) => acc + Number(item?.govt_fee || 0),
+          0
+        ),
+        bank_charges   :detail?.sale_receipt_items?.reduce(
+          (acc, item) => acc + Number(item?.bank_charge || 0),
+          0
+        ),
+
+        bank_name : selectedMode?.id == "Bank" ? selectedBank?.name : '',
+        bank_id    : selectedMode?.id == "Bank" ? selectedBank?.id : '',
+        customer_id     :detail?.customer_id,
+        invoice_prefix :detail?.invoice_prefix,
       };
 
-
+      console.log(obj ,"objobj")
       if (detail?.is_paid == true) {
         ErrorToaster("Already paid");
       } else {
+        
+        const promise = CustomerServices.PayReceipt(obj);
+        const response = await promise;
         showPromiseToast(
           promise,
           "Saving...",
           "Added Successfully",
           "Something Went Wrong"
         );
-        const promise = CustomerServices.PayReceipt(obj);
-        const response = await promise;
         if (response?.responseCode === 200) {
           window.location.reload();
         }
@@ -879,6 +884,7 @@ function CreatePaidReceipt() {
                         { id: "Cash", name: "Cash" },
                         { id: "Bank", name: "Bank" },
                         { id: "Card", name: "Card" },
+                        { id: "Network receivable", name: "Network receivable" },
                       ]}
                       selected={watch1("payment")}
                       onSelect={(value) => {
@@ -897,8 +903,10 @@ function CreatePaidReceipt() {
                         label="Banks"
                         size="small"
                         options={banks}
-                        selected={watch1("bank")}
-                        onSelect={(value) => setValue1("bank", value)}
+                        selected={selectedBank}
+                        onSelect={(value) => {
+                          setSelectedBank(value);
+                        }}
                         register={register1("bank", {
                           required: "please enter bank .",
                         })}

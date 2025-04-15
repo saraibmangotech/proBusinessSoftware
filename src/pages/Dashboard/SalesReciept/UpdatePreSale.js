@@ -170,8 +170,19 @@ function UpdatePreSale() {
         setServiceItem(null);
         setEditState(false);
     };
-
-
+    const getInvoiceNumber = async () => {
+        // setLoader(true)
+        try {
+          const { data } = await CustomerServices.getInvoiceNumber();
+    
+          console.log(data);
+          setValue1("invoice_no", `AAD/${data?.next_invoice_number}`);
+        } catch (error) {
+          ErrorToaster(error);
+        } finally {
+          // setLoader(false)
+        }
+      };
 
     const isFormDataEmpty = (data) => {
         // Check if all form fields are empty
@@ -268,6 +279,7 @@ function UpdatePreSale() {
                 case_no: formData?.caseno,
                 cost_center: formData?.cost_center,
                 customer_name: formData?.display_customer,
+                customer_id: detail?.customer_id,
                 reception_id: detail?.id,
                 customer_mobile: formData?.mobile,
                 customer_email: formData?.email,
@@ -432,6 +444,7 @@ function UpdatePreSale() {
             };
 
             const { data } = await CustomerServices.getPreSaleDetail(params);
+            setDetail(data?.receipt)
             console.log(data?.receipt?.sale_receipt_items);
             setValue1('token', data?.receipt?.token_number)
             setValue1("mobileValue", data?.receipt?.customer_mobile);
@@ -450,6 +463,7 @@ function UpdatePreSale() {
     };
     useEffect(() => {
         getData()
+        getInvoiceNumber()
     }, [])
 
     return (
@@ -469,7 +483,7 @@ function UpdatePreSale() {
                                 }}
                             >
                                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                    Update Pre Sales Receipt
+                                    Update Sales Receipt
                                 </Typography>
                             </Box>
 
@@ -641,7 +655,7 @@ function UpdatePreSale() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            <Grid item  md={5.7} sm={12} xs={12}>
                                                 <SelectField
                                                     label="Cost Center"
                                                     size="small"
@@ -657,7 +671,7 @@ function UpdatePreSale() {
 
                                                 />
                                             </Grid>
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            <Grid item  md={5.7} sm={12} xs={12}>
                                                 <InputField
                                                     label="TRN"
                                                     size="small"
@@ -669,7 +683,7 @@ function UpdatePreSale() {
 
                                                 />
                                             </Grid>
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            <Grid item  md={5.7} sm={12} xs={12}>
                                                 <InputField
                                                     label="Case No"
                                                     size="small"
