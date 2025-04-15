@@ -160,7 +160,7 @@ function PayReceipts() {
 
             let params = {
 
-                is_presale: true
+                is_paid: true
 
 
             }
@@ -306,7 +306,7 @@ function PayReceipts() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
          
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-alded/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-paid-receipt/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     <Box>
                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
@@ -396,11 +396,11 @@ function PayReceipts() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-ADHEED List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid Receipt List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"
-                    onClick={() => { navigate('/create-aldeed'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    onClick={() => { navigate('/create-paid-receipt'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
                 />}
 

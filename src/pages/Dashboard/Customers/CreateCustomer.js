@@ -367,8 +367,8 @@ console.log(watch());
 
 
                     }}
-                    error={errors?.type?.message}
-                    register={register("type", {
+                    error={errors?.credittype?.message}
+                    register={register("credittype", {
                       required: 'Please select type account.',
                     })}
                   />

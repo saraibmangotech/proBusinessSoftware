@@ -55,8 +55,8 @@ function ReceptionForm() {
             let obj = {
 
                 customer_id: selectedCustomer?.id,
-                service_category_id:selectedCategory?.id,
-                service_category:selectedCategory?.name,
+                service_category_id: selectedCategory?.id,
+                service_category: selectedCategory?.name,
                 customer_name: formData?.customerName,
                 email: formData?.email,
                 mobile: formData?.mobile,
@@ -90,8 +90,8 @@ function ReceptionForm() {
             let obj = {
                 is_company: customerType == 'individual' ? false : true,
                 customer_name: formData?.customerName,
-                service_category_id:selectedCategory?.id,
-                service_category:selectedCategory?.name,
+                service_category_id: selectedCategory?.id,
+                service_category: selectedCategory?.name,
                 customer_id: selectedCustomer?.id,
                 email: formData?.email,
                 mobile: formData?.mobile,
@@ -141,27 +141,27 @@ function ReceptionForm() {
         }
     }
 
-     const getCategories = async (page, limit, filter) => {
-     
-    
+    const getCategories = async (page, limit, filter) => {
+
+
         try {
-        
-          let params = {
-            page: 1,
-            limit: 1000,
-          
-    
-          }
-        
-          const { data } = await CustomerServices.getCategoryList(params)
-          setCategories(data?.categories)
-         
-         
-        
+
+            let params = {
+                page: 1,
+                limit: 1000,
+
+
+            }
+
+            const { data } = await CustomerServices.getCategoryList(params)
+            setCategories(data?.categories)
+
+
+
         } catch (error) {
-          showErrorToast(error)
-        } 
-      }
+            showErrorToast(error)
+        }
+    }
 
     const getCustomerDetail = async (phone) => {
         try {
@@ -192,11 +192,23 @@ function ReceptionForm() {
             const { data } = await CustomerServices.getCustomerDetail(params);
             let detail = data?.customer
             console.log(detail);
-            setSelectedCustomer(detail)
-            setValue1('customer', detail)
-            setValue1('customerName', detail?.name)
-            setValue1('email', detail?.email)
-            setValue1('mobile', detail?.mobile)
+            if (data?.customer) {
+                setSelectedCustomer(detail)
+                setValue1('customer', detail)
+                setValue1('customerName', detail?.name)
+                setValue1('email', detail?.email)
+                setValue1('mobile', detail?.mobile)
+            }
+            else {
+                let filter = await customers.find(item => item?.name == 'Walk-In Customer')
+                console.log(filter);
+                
+                setSelectedCustomer(filter)
+                setValue1('customer', filter?.name)
+                setValue1('customerName', '')
+                setValue1('email', '')
+               
+            }
 
 
 
@@ -386,12 +398,11 @@ function ReceptionForm() {
                                     message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
                                 },
                                 onChange: (e) => {
-                                    console.log('asdas');
-                                    // if (getValues('mobile').length == 10) {
-                                    //     Debounce2(() => getCustomerDetail(getValues('mobile')));
-                                    // }
+                                    console.log(e.target.value);
+                                    if (e.target.value.length == 10) {
+                                        Debounce2(() => getCustomerDetail(e.target.value));
+                                    }
 
-                                    // Delay the execution of verifyEmail by 2 seconds
 
                                 },
 
@@ -405,7 +416,7 @@ function ReceptionForm() {
                                 placeholder={"Token Number"}
                                 error={errors?.tokenNumber?.message}
                                 register={register("tokenNumber", {
-                                   required:"Enter Token Number"
+                                    required: "Enter Token Number"
                                 })}
                             />
                         </Grid>
@@ -474,30 +485,30 @@ function ReceptionForm() {
                         <Grid container sx={{ gap: "5px 25px" }}>
                             <Grid item xs={2.8}>
                                 <InputField
-                                label={"Mobile *:"}
-                                size={'small'}
-                                type={'number'}
-                                placeholder={"Mobile"}
-                                error={errors1?.mobile?.message}
-                                register={register1("mobile", {
-                                    required:
-                                        "Please enter your mobile.",
-                                    pattern: {
-                                        value: /^05[0-9]{8}$/,
-                                        message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                    },
-                                    onChange: (e) => {
-                                        console.log('asdas');
-                                        // if (getValues1('mobile').length == 10) {
-                                        //     Debounce2(() => getCustomerDetail2(getValues1('mobile')));
-                                        // }
+                                    label={"Mobile *:"}
+                                    size={'small'}
+                                    type={'number'}
+                                    placeholder={"Mobile"}
+                                    error={errors1?.mobile?.message}
+                                    register={register1("mobile", {
+                                        required:
+                                            "Please enter your mobile.",
+                                        pattern: {
+                                            value: /^05[0-9]{8}$/,
+                                            message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
+                                        },
+                                        onChange: (e) => {
+                                            console.log(e.target.value);
+                                            if (e.target.value.length == 10) {
+                                                Debounce2(() => getCustomerDetail2(e.target.value));
+                                            }
 
-                                        // Delay the execution of verifyEmail by 2 seconds
+                                            // Delay the execution of verifyEmail by 2 seconds
 
-                                    },
+                                        },
 
-                                })}
-                            /></Grid>
+                                    })}
+                                /></Grid>
 
                             <Grid item xs={2.8}>
                                 <InputField
@@ -506,9 +517,9 @@ function ReceptionForm() {
                                     placeholder={"Token Number"}
                                     error={errors1?.tokenNumber?.message}
                                     register={register1("tokenNumber", {
-                                        
-                                            required:"Enter Token Number"
-                                         
+
+                                        required: "Enter Token Number"
+
                                     })}
                                 />
                             </Grid>
@@ -557,7 +568,7 @@ function ReceptionForm() {
                                 <SelectField
                                     size={'small'}
                                     label={'Customer *:'}
-disabled={true}
+                                 
                                     options={customers}
                                     selected={selectedCustomer}
                                     onSelect={(value) => {
@@ -584,7 +595,7 @@ disabled={true}
                                     register={register1("customer")}
                                 />
                             </Grid>
-                            <Grid item xs={2.8} >
+                            {/* <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}
                                     label={'Service Category *:'}
@@ -601,7 +612,7 @@ disabled={true}
                                         required: 'Please select service.',
                                     })}
                                 />
-                            </Grid>
+                            </Grid> */}
                             {/* <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 64,
+            "activePatchIndex": 67,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -264,6 +264,18 @@
                 {
                     "date": 1744678352188,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -269,10 +269,10 @@\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n-const CardList = lazy(() =>\r\n-  import(\"pages/Dashboard/Cards/Cards\")\r\n+const UpdateCard = lazy(() =>\r\n+  import(\"pages/Dashboard/Cards/UpdateCard\")\r\n );\r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1744737281235,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -283,8 +283,12 @@\n     path: \"/create-paid-receipt\",\r\n     component: <CreatePaidReceipt />,\r\n   },\r\n   {\r\n+    path: \"/update-paid-receipt/:id\",\r\n+    component: <UpdatePaidReceipt />,\r\n+  },\r\n+  {\r\n     path: \"/create-aldeed\",\r\n     component: <CreateAldeed />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744737291663,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -266,8 +266,11 @@\n );\r\n const CreatePaidReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n );\r\n+const UpdatePaidReceipt = lazy(() =>\r\n+  import(\"pages/Dashboard/Payments/UpdatePaidReceipt\")\r\n+);\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n const UpdateCard = lazy(() =>\r\n"
+                },
+                {
+                    "date": 1744737357887,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -267,9 +267,9 @@\n const CreatePaidReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n );\r\n const UpdatePaidReceipt = lazy(() =>\r\n-  import(\"pages/Dashboard/Payments/UpdatePaidReceipt\")\r\n+  import(\"pages/Dashboard/Payments/UpdateReceipt\")\r\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n"
                 }
             ],
             "date": 1744496886534,

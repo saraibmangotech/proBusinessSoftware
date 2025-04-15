@@ -83,6 +83,7 @@ const routes = {
   UpdateCard:'/system/cards/update',
   getInvoiceNumber:'/sales/receipts/invoiceNumber',
   PayReceipt:'/sales/receipts/pay',
+  UpdateReceipt:'/sales/reception/update'
 
 };
 

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1744546821281,
@@ -16,6 +16,10 @@
                 {
                     "date": 1744613982790,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -123,65 +123,14 @@\n \r\n \r\n \r\n \r\n-  const handleUpload = async (file, docs) => {\r\n-    setProgress(0);\r\n-    try {\r\n-      const formData = new FormData();\r\n-      formData.append(\"document\", file);\r\n-      console.log(file.size);\r\n-      console.log(getFileSize(file.size))\r\n-      const { data } = await instance.post(routes.uploadDocuments, formData, {\r\n-        onUploadProgress: (progressEvent) => {\r\n-          const uploadedBytes = progressEvent.loaded;\r\n-          const percentCompleted = Math.round(\r\n-            (uploadedBytes * 100) / progressEvent.total\r\n-          );\r\n+ \r\n \r\n-          setProgress(percentCompleted);\r\n-          console.log(getFileSize(uploadedBytes));\r\n-          setUploadedSize(getFileSize(uploadedBytes));\r\n-        },\r\n-      });\r\n-      if (data) {\r\n-        docs[0].isUpload = true;\r\n-        docs[0].file = data?.data?.nations;\r\n-        setSlipDetail(docs);\r\n-        console.log(data, 'asddasasd');\r\n-        return data?.data?.path\r\n \r\n-      }\r\n-    } catch (error) {\r\n-      ErrorToaster(error);\r\n-    }\r\n-  };\r\n-  const submitForm = async (formData) => {\r\n-    console.log(formData);\r\n-    try {\r\n-      let obj = {\r\n-        name: formData?.companyName,\r\n \r\n-        phone: formData?.mobile,\r\n-        email: formData?.email,\r\n-        address: formData?.businessAddress,\r\n-        website: formData?.businessWebsite,\r\n-        cp_name: formData?.personName,\r\n-        cp_mobile: formData?.phone,\r\n \r\n-      };\r\n \r\n-      setStepFormData(obj);\r\n-      handleNext()\r\n-    } catch (error) {\r\n-      ErrorToaster(error);\r\n-    }\r\n-  };\r\n-\r\n-\r\n-\r\n-\r\n-\r\n   const submitForm1 = async (formData) => {\r\n     console.log(formData);\r\n     try {\r\n       let obj = {\r\n@@ -226,41 +175,12 @@\n \r\n \r\n   \r\n \r\n-  const verifyEmail = async (value) => {\r\n-    let Myemail = getValues1('email')\r\n-    if (Myemail) {\r\n+  \r\n \r\n-      try {\r\n-        let obj = {\r\n-          email: Myemail.toLowerCase(),\r\n-          validate: true\r\n \r\n \r\n-        };\r\n-\r\n-        console.log(obj);\r\n-\r\n-        const { status } = await CustomerServices.addCustomer(obj);\r\n-\r\n-        console.log(status);\r\n-        if (status) {\r\n-          setEmailVerify(true)\r\n-        }\r\n-\r\n-\r\n-      } catch (error) {\r\n-        console.log(error);\r\n-        setEmailVerify(false)\r\n-        showErrorToast(error)\r\n-      }\r\n-    }\r\n-  };\r\n- \r\n-\r\n-\r\n-\r\n   return (\r\n     <>\r\n       <Box sx={{ width: \"100%\" }}>\r\n \r\n"
+                },
+                {
+                    "date": 1744734162299,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -367,9 +367,9 @@\n \r\n \r\n                     }}\r\n                     error={errors?.type?.message}\r\n-                    register={register(\"type\", {\r\n+                    register={register(\"credittype\", {\r\n                       required: 'Please select type account.',\r\n                     })}\r\n                   />\r\n                 </Grid>\r\n"
                 }
             ],
             "date": 1744546821281,

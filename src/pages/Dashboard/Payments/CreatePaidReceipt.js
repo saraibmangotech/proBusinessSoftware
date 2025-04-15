@@ -244,15 +244,15 @@ function CreatePaidReceipt() {
           selectedMode?.id == "Cash"
             ? 700117
             : selectedMode?.id == "Bank"
-            ? getValues1("bank")?.id
-            : null, // By default 700117 for Cash
+              ? getValues1("bank")?.id
+              : null, // By default 700117 for Cash
         ref_id:
           selectedMode?.id == "Bank" || selectedMode?.id == "Bank" ? "2" : null, //bank or card id null for cash
         remarks: formData?.remarks,
         narration: formData?.narration,
       };
 
-     
+
       if (detail?.is_paid == true) {
         ErrorToaster("Already paid");
       } else {
@@ -391,6 +391,17 @@ function CreatePaidReceipt() {
       // setLoader(false)
     }
   };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index] = {
+      ...updatedRows[index],
+      [field]: value,
+    };
+    setRows(updatedRows);
+  };
+  console.log(rows);
+  
   const getTax = async () => {
     // setLoader(true)
     try {
@@ -621,8 +632,10 @@ function CreatePaidReceipt() {
                           size="small"
                           placeholder="TRN"
                           disabled={true}
-                          register={register1("trn")}
-                          error={errors1?.trn?.message}
+                          register={register1("trn",{
+                            required:false
+                          })}
+                          
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -631,8 +644,10 @@ function CreatePaidReceipt() {
                           size="small"
                           placeholder="Case No"
                           disabled={true}
-                          register={register1("caseno")}
-                          error={errors1?.caseno?.message}
+                          register={register1("caseno",{
+                            required:false
+                          })}
+                          
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -653,8 +668,12 @@ function CreatePaidReceipt() {
                           options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
                           selected={watch1("cost_center")}
                           onSelect={(value) => setValue1("cost_center", value)}
-                          register={register1("cost_center")}
-                          error={errors1?.cost_center?.message}
+                          register={register1("cost_center",
+                            {
+                              required:false
+                            }
+                          )}
+                       
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -684,13 +703,16 @@ function CreatePaidReceipt() {
                       <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
                       <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
                       <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
-
                       <TableCell sx={{ width: "150px" }}>Total</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Trans Id</TableCell>
+                      <TableCell sx={{ width: "150px" }}>App Id</TableCell>
+                      <TableCell sx={{ width: "150px" }}>Ref Id</TableCell>
+
                       <TableCell sx={{ width: "150px" }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((item, index) => (
+                    {rows?.map((item, index) => (
                       <TableRow key={index}>
                         <TableCell>{item?.id}</TableCell>
                         <TableCell>{item?.service?.name}</TableCell>
@@ -698,13 +720,43 @@ function CreatePaidReceipt() {
                         <TableCell>{item?.govt_fee}</TableCell>
                         <TableCell>{item?.center_fee}</TableCell>
                         <TableCell>{item?.bank_charge}</TableCell>
-
                         <TableCell>{item?.total}</TableCell>
+
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            placeholder="Transaction Id"
+                            type="number"
+                            value={item.transaction_id || ""}
+                            onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
+                          />
+                        </TableCell>
+
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            placeholder="Application Id"
+                            type="number"
+                            value={item.application_id || ""}
+                            onChange={(e) => handleInputChange(index, "application_id", e.target.value)}
+                          />
+                        </TableCell>
+
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            placeholder="Ref No"
+                            type="number"
+                            value={item.ref_no || ""}
+                            onChange={(e) => handleInputChange(index, "ref_no", e.target.value)}
+                          />
+                        </TableCell>
                       </TableRow>
                     ))}
 
+
                     <TableRow>
-                      <TableCell colSpan={7} align="right">
+                      <TableCell colSpan={10} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
                           Sub-total:
                         </Typography>
@@ -719,7 +771,7 @@ function CreatePaidReceipt() {
 
                     {/* Amount Total Row (optional, if needed for the final sum) */}
                     <TableRow>
-                      <TableCell colSpan={7} align="right">
+                      <TableCell colSpan={10} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
                           Amount Total:
                         </Typography>
@@ -733,7 +785,7 @@ function CreatePaidReceipt() {
                     </TableRow>
                     {/* </Grid> */}
                     <TableRow>
-                      <TableCell colSpan={8} align="center">
+                      <TableCell colSpan={10} align="center">
                         {" "}
                         {/* adjust colSpan to match total columns */}
                         <Box

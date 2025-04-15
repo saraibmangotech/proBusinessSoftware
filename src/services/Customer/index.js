@@ -66,6 +66,10 @@ const CustomerServices = {
     const data = await patch(routes.UpdateCard, obj);
     return data;
   },
+  UpdateReceipt: async (obj) => {
+    const data = await patch(routes.UpdateReceipt, obj);
+    return data;
+  },
   UpdateCategory: async (obj) => {
     const data = await patch(routes.UpdateCategory, obj);
     return data;

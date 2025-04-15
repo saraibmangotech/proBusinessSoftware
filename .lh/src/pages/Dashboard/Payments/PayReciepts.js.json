@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1744671359469,
@@ -12,6 +12,30 @@
                 {
                     "date": 1744671371409,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -105,9 +105,9 @@\n         }\r\n     }\r\n })\r\n \r\n-function AldeedList() {\r\n+function PayReceipts() {\r\n \r\n     const navigate = useNavigate();\r\n     const classes = useStyles();\r\n     const dispatch = useDispatch();\r\n@@ -417,5 +417,5 @@\n         </Box>\r\n     );\r\n }\r\n \r\n-export default AldeedList;\n\\ No newline at end of file\n+export default PayReceipts;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1744736745621,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -159,9 +159,9 @@\n         try {\r\n \r\n             let params = {\r\n \r\n-                is_presale: true\r\n+                is_paid: true\r\n \r\n \r\n             }\r\n \r\n@@ -395,9 +395,9 @@\n             </SimpleDialog>\r\n \r\n \r\n             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-Ded List</Typography>\r\n+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-ADHEED List</Typography>\r\n                 {true && <PrimaryButton\r\n                     bgcolor={'#bd9b4a'}\r\n                     title=\"Create\"\r\n                     onClick={() => { navigate('/create-aldeed'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n"
+                },
+                {
+                    "date": 1744736795420,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -395,9 +395,9 @@\n             </SimpleDialog>\r\n \r\n \r\n             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Al-ADHEED List</Typography>\r\n+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid List</Typography>\r\n                 {true && <PrimaryButton\r\n                     bgcolor={'#bd9b4a'}\r\n                     title=\"Create\"\r\n                     onClick={() => { navigate('/create-aldeed'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n"
+                },
+                {
+                    "date": 1744736802058,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -395,9 +395,9 @@\n             </SimpleDialog>\r\n \r\n \r\n             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid List</Typography>\r\n+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid Receipt List</Typography>\r\n                 {true && <PrimaryButton\r\n                     bgcolor={'#bd9b4a'}\r\n                     title=\"Create\"\r\n                     onClick={() => { navigate('/create-aldeed'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n"
+                },
+                {
+                    "date": 1744736873637,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -399,9 +399,9 @@\n                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid Receipt List</Typography>\r\n                 {true && <PrimaryButton\r\n                     bgcolor={'#bd9b4a'}\r\n                     title=\"Create\"\r\n-                    onClick={() => { navigate('/create-aldeed'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n+                    onClick={() => { navigate('/create-paid-receipt'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n                     loading={loading}\r\n                 />}\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1744736983788,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -305,9 +305,9 @@\n             cell: ({ row }) => (\r\n \r\n                 <Box sx={{ display: 'flex', gap: 1 }}>\r\n          \r\n-                    {true && <Box component={'img'} sx={{ cursor: \"pointer\" }} onClick={() => { navigate(`/update-alded/${row?.original?.id}`); localStorage.setItem(\"currentUrl\", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}\r\n+              \r\n                     <Box>\r\n                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1744737318624,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -305,9 +305,9 @@\n             cell: ({ row }) => (\r\n \r\n                 <Box sx={{ display: 'flex', gap: 1 }}>\r\n          \r\n-              \r\n+                    {true && <Box component={'img'} sx={{ cursor: \"pointer\" }} onClick={() => { navigate(`/update-paid-receipt/${row?.original?.id}`); localStorage.setItem(\"currentUrl\", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}\r\n                     <Box>\r\n                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}\r\n \r\n \r\n"
                 }
             ],
             "date": 1744671359469,
