@@ -320,7 +320,7 @@ function CreatePaidReceipt() {
           name: card.account_name,
         }))
       );
-      
+
     } catch (error) {
       showErrorToast(error);
     } finally {
@@ -358,8 +358,19 @@ function CreatePaidReceipt() {
         setValue1("cost_center", data?.receipt?.cost_center);
         setValue1("caseno", data?.receipt?.case_no);
         setSubTotal(data?.receipt?.total_amount);
-        setValue1("total", data?.receipt?.total_amount);
-        setValue1("balance", data?.receipt?.total_amount);
+
+        setValue1("total", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
+          ?.reduce(
+            (total, item) =>
+              total + parseFloat(item?.center_fee ?? 0),
+            0
+          ) * 0.05)).toFixed(2));
+        setValue1("balance", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
+          ?.reduce(
+            (total, item) =>
+              total + parseFloat(item?.center_fee ?? 0),
+            0
+          ) * 0.05)).toFixed(2));
         setValue1("cost_center", data?.receipt?.cost_center)
         setAccounts(data?.accounts?.rows);
       }
@@ -506,8 +517,18 @@ function CreatePaidReceipt() {
         setValue1("cost_center", data?.receipt?.cost_center);
         setValue1("caseno", data?.receipt?.case_no);
         setSubTotal(data?.receipt?.total_amount);
-        setValue1("total", data?.receipt?.total_amount);
-        setValue1("balance", data?.receipt?.total_amount);
+        setValue1("total", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
+          ?.reduce(
+            (total, item) =>
+              total + parseFloat(item?.center_fee ?? 0),
+            0
+          ) * 0.05)).toFixed(2));
+        setValue1("balance", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
+          ?.reduce(
+            (total, item) =>
+              total + parseFloat(item?.center_fee ?? 0),
+            0
+          ) * 0.05)).toFixed(2));
         setValue1("cost_center", data?.receipt?.cost_center)
         setAccounts(data?.accounts?.rows);
       } else {
@@ -628,6 +649,9 @@ function CreatePaidReceipt() {
                             setValue1("address", "");
                             setValue1("trn", "");
                             setValue1("cost_center", "");
+                            setRows([])
+                            setPayButton(false)
+                            setSubTotal(0)
                           }}
                           loading={loading}
                         />
@@ -880,45 +904,49 @@ function CreatePaidReceipt() {
                     {/* Amount Total Row (optional, if needed for the final sum) */}
 
                     <TableRow>
-                      <TableCell colSpan={10} align="right">
+                      <TableCell colSpan={9} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Net Taxable Amount:</Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows
-                          ?.reduce(
-                            (total, item) =>
-                              total + parseFloat(item?.center_fee ?? 0),
-                            0
-                          ).toFixed(2)
-                        }</Typography> {/* Display the Sub-total */}
+                          ?.reduce((total, item) => {
+                            const fee = parseFloat(item?.center_fee ?? 0);
+                            const qty = parseInt(item?.quantity ?? 1);
+                            return total + fee * qty;
+                          }, 0)
+                          .toFixed(2)}</Typography> {/* Display the Sub-total */}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={10} align="right">
+                      <TableCell colSpan={9} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(rows
-                          ?.reduce(
-                            (total, item) =>
-                              total + parseFloat(item?.center_fee ?? 0),
-                            0
-                          ) * 0.05).toFixed(2)
-                        }</Typography> {/* Display the Sub-total */}
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{(
+                          rows?.reduce((total, item) => {
+                            const fee = parseFloat(item?.center_fee ?? 0);
+                            const qty = parseFloat(item?.quantity ?? 1);
+                            return total + fee * qty;
+                          }, 0) * 0.05
+                        ).toFixed(2)}
+                        </Typography> {/* Display the Sub-total */}
                       </TableCell>
                     </TableRow>
                     {/* Amount Total Row (optional, if needed for the final sum) */}
                     <TableRow>
-                      <TableCell colSpan={10} align="right">
+                      <TableCell colSpan={9} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(parseFloat(subTotal) + parseFloat(rows
-                          ?.reduce(
-                            (total, item) =>
-                              total + parseFloat(item?.center_fee ?? 0),
-                            0
-                          ) * 0.05)).toFixed(2)}</Typography> {/* This can be the same as Sub-total */}
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{(
+                          parseFloat(subTotal) +
+                          rows?.reduce((total, item) => {
+                            const fee = parseFloat(item?.center_fee ?? 0);
+                            const qty = parseFloat(item?.quantity ?? 1);
+                            return total + fee * qty;
+                          }, 0) * 0.05
+                        ).toFixed(2)}
+                        </Typography> {/* This can be the same as Sub-total */}
                       </TableCell>
                     </TableRow>
                     <TableRow>

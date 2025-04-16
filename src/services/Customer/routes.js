@@ -50,7 +50,7 @@ const routes = {
   handleDeleteCustomer:'/customers/delete',
   getCategoryList:'/services/categories',
   CreateCategory:'/services/categories/add',
-  getServiceItem:"/services/",
+  getServiceItem:"/services",
   AddServiceItem:"/services/add",
   UpdateServiceItem:"/services/update",
   DeleteServiceItem:"/services/delete",

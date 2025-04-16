@@ -165,7 +165,13 @@ function PayReceipts() {
         pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
         // Save the generated PDF
-        pdf.save("invoice.pdf");
+        const blob = pdf.output("blob");
+
+        // Create a blob URL
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(blobUrl);
 
         // Restore the content visibility after generating the PDF
         invoiceElement.style.display = "none"; // Show the content again
@@ -198,7 +204,13 @@ function PayReceipts() {
         pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
         // Save the generated PDF
-        pdf.save("receipt.pdf");
+        const blob = pdf.output("blob");
+
+        // Create a blob URL
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(blobUrl);
 
         // Restore the content visibility after generating the PDF
         invoiceElement.style.display = "none"; // Show the content again
@@ -232,7 +244,13 @@ function PayReceipts() {
         pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
         // Save the generated PDF
-        pdf.save("invoice.pdf");
+        const blob = pdf.output("blob");
+
+        // Create a blob URL
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(blobUrl);
 
         // Restore the content visibility after generating the PDF
         invoiceElement.style.display = "none"; // Show the content again
@@ -533,8 +551,8 @@ function PayReceipts() {
                     )} */}
 
                     {/* View Invoice (getData2) */}
-                    {/* {row?.original?.is_paid && (
-                        <Tooltip title="View Invoice">
+                    {row?.original?.is_paid && (
+                        <Tooltip title=" Invoice">
                             <IconButton
                                 onClick={() => {
                                     getData2(row?.original?.id);
@@ -551,7 +569,7 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
-        
+
                     {/* View Receipt (getData) */}
                     {/* <Tooltip title="View Receipt">
                         <IconButton
@@ -1069,228 +1087,178 @@ function PayReceipts() {
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <tbody>
                             <tr>
-                                <td
-                                    colSpan={5}
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        Total Govt.fee & Bank Charge
-                                    </p>
-                                </td>
-                                <td
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "center",
-                                        width: "10%",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    parseFloat(total) +
-                                                    parseFloat(item?.govt_fee ?? 0) +
-                                                    parseFloat(item?.bank_charge ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>Net Taxable Amount</p>
-                                </td>
-                                <td
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "center",
-                                        width: "10%",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    total + parseFloat(item?.center_fee ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    <p
-                                        style={{
-                                            fontSize: "12px",
-                                            fontFamily: "'Amiri', Arial, sans-serif",
-                                        }}
-                                        className="arabic-text"
-                                    >
-                                        Total VAT إجمالي القيمة المضافة
-                                    </p>
-                                </td>
-                                <td
-                                    align="center"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "center",
-                                        width: "10%",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    total + parseFloat(item?.bank_charge ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    align="right"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    <p
-                                        style={{
-                                            fontSize: "12px",
-                                            fontFamily: "'Amiri', Arial, sans-serif",
-                                        }}
-                                        className="arabic-text"
-                                    >
-                                        Gross Total إجمالي القيمة
-                                    </p>
-                                </td>
-                                <td
-                                    align="center"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "center",
-                                        width: "10%",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total2, item) =>
-                                                    parseFloat(total2) + parseFloat(item?.total ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    align="right"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    <p
-                                        style={{
-                                            fontSize: "12px",
-                                            fontFamily: "'Amiri', Arial, sans-serif",
-                                        }}
-                                        className="arabic-text"
-                                    >
-                                        Customer Card Payment الإجمالي
-                                    </p>
-                                </td>
-                                <td
-                                    align="right"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "center",
-                                        width: "10%",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    total + parseFloat(item?.bank_charge ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    align="right"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    <p
-                                        style={{
-                                            fontSize: "12px",
-                                            fontFamily: "'Amiri', Arial, sans-serif",
-                                        }}
-                                        className="arabic-text"
-                                    >
-                                        Total Payable الإجمالي
-                                    </p>
-                                </td>
-                                <td
-                                    align="right"
-                                    style={{
-                                        border: "1px solid #000",
-                                        padding: "0.5rem",
-                                        textAlign: "center",
-                                        width: "10%",
-                                    }}
-                                >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total2, item) =>
-                                                    parseFloat(total2) + parseFloat(item?.total ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
-                                    </p>
-                                </td>
-                            </tr>
+                <td
+                  colSpan={6}
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    Total Govt.fee & Bank Charge إجمالي الرسوم الحكومية ورسوم البنك
+                  </p>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "center",
+                    width: "8%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total, item) =>
+                          parseFloat(total) +
+                          parseFloat(item?.govt_fee ?? 0) +
+                          parseFloat(item?.bank_charge ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount صافي المبلغ الخاضع للضريبة</p>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0)
+                      .toFixed(2)}
+
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}> Total VAT إجمالي القيمة المضافة</p>
+
+                </td>
+                <td
+                  align="center"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {(
+                      invoiceData?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={6}
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Gross Total إجمالي القيمة</p>
+
+                </td>
+                <td
+                  align="center"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {(
+                      invoiceData?.items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                      }, 0) +
+                      invoiceData?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
+                  </p>
+                </td>
+              </tr>
+
+              <tr>
+                <td
+                  colSpan={6}
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Total Payable الإجمالي</p>
+
+                </td>
+                <td
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.5rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px" }}>
+                    {(
+                      invoiceData?.items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                      }, 0) +
+                      invoiceData?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
+                  </p>
+                </td>
+              </tr>
                         </tbody>
                     </table>
                 </Box>
@@ -1366,12 +1334,18 @@ function PayReceipts() {
                 </Box>
             </Box>
             <Box className="showPdf" ref={invoiceRef3} sx={{ padding: "20px 60px" }}>
-                <div className="w-full h-[115px] flex justify-center items-center mb-4">
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', border: '1px solid black', marginBottom: 4, padding: '10px' }}>
                     <img
-                        src={Images.header}
+                        src={Images.headerRightImage}
                         alt="Header"
-                        style={{ width: "100%" }}
-                        className="max-w-full h-auto"
+                        style={{ width: '180px' }}
+
+                    />
+                    <img
+                        src={Images.headerLeftImage}
+                        alt="Header"
+                        style={{ width: '150px' }}
+
                     />
                 </div>
                 <p
@@ -1382,13 +1356,12 @@ function PayReceipts() {
                         margin: 0,
                         textAlign: 'center',
                         textDecoration: 'underline',
-                        marginTop: '20px',
-                        marginBottom: '20px',
+                        marginTop: '40px',
+                        marginBottom: '40px',
                     }}
                 >
-                    TAX INVOICE    فاتورة ضريبية
+                    TAX INVOICE / طلب الخدمة
                 </p>
-
                 <Box
                     sx={{
                         display: "flex",
@@ -1406,23 +1379,23 @@ function PayReceipts() {
                             flexDirection: "column",
                         }}
                     >
-                        <Box sx={{ mb: 1 }}>
-                            <Barcode
-                                value={invoiceData2?.id}
-                                width={1.4}
-                                height={40}
-                                displayValue={false}
-                            />
-                            <Typography
-                                variant="body2"
-                                align="left"
-                                sx={{ fontSize: "15px", ml: 3 }}
-                            >
-                                {invoiceData2?.id}
-                            </Typography>
-                        </Box>
+
 
                         <Grid container spacing={1}>
+
+                            <Grid item xs={6}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: "bold", fontSize: "12px" }}
+                                >
+                                    Invoice Type - Invoice No نوع الفاتورة - رقم الفاتورة
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                                    {invoiceData2?.invoiceType}
+                                </Typography>
+                            </Grid>
                             <Grid item xs={6}>
                                 <p
                                     variant="body2"
@@ -1440,45 +1413,45 @@ function PayReceipts() {
                                     {invoiceData2?.date}
                                 </Typography>
                             </Grid>
+                            {/* <Grid item xs={6}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: "bold", fontSize: "15px" }}
+                          >
+                            Name Of Employee (Typist)
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                            Typist
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: "bold", fontSize: "15px" }}
+                          >
+                            Name Of Employee (Cashier)
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                            Cashier
+                          </Typography>
+                        </Grid> */}
+
+
 
                             <Grid item xs={6}>
                                 <Typography
                                     variant="body2"
-                                    sx={{ fontWeight: "bold", fontSize: "15px" }}
+                                    sx={{ fontWeight: "bold", fontSize: "12px" }}
                                 >
-                                    Invoice Type - Invoice No
+                                    Token Number رقم الرمز المميز
                                 </Typography>
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                                    {invoiceData2?.invoiceType}
-                                </Typography>
-                            </Grid>
-
-                            <Grid item xs={6}>
-                                <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: "bold", fontSize: "15px" }}
-                                >
-                                    TRN:
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                                    {invoiceData2?.trn}
-                                </Typography>
-                            </Grid>
-
-                            <Grid item xs={6}>
-                                <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: "bold", fontSize: "15px" }}
-                                >
-                                    Token Number
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                                <Typography variant="body2" sx={{ fontSize: "12px" }}>
                                     {invoiceData2?.tokenNumber}
                                 </Typography>
                             </Grid>
@@ -1486,17 +1459,21 @@ function PayReceipts() {
                     </Box>
 
                     <Box sx={{ width: "50%", p: 2 }}>
-                        <p
-                            variant="body2"
-                            style={{
-                                fontSize: "14px",
-                                textAlign: "center",
+                        <Grid item xs={6}>
+                            <p
+                                variant="body2"
+                                style={{
+                                    fontSize: "12px",
+                                    fontWeight: "bold",
+                                    margin: 0,
+                                    // textAlign:"center",
+                                    // marginBottom:2
+                                }}
+                            >
+                                Customer Information معلومات المتعاملين
+                            </p>
+                        </Grid>
 
-                                marginBottom: 2,
-                            }}
-                        >
-                            Customer Information معلومات المتعاملين
-                        </p>
 
                         <Grid container spacing={1}>
                             <Grid item xs={6}>
@@ -1510,7 +1487,7 @@ function PayReceipts() {
                                         // marginBottom:2
                                     }}
                                 >
-                                    Customer/المتعامل
+                                    Name / الاسم
                                 </p>
                             </Grid>
                             <Grid item xs={6}>
@@ -1528,11 +1505,11 @@ function PayReceipts() {
                                         margin: 0,
                                     }}
                                 >
-                                    Mobile No./رقم الهاتف المتحرك
+                                    Phone/ الهاتف رق
                                 </p>
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                                <Typography variant="body2" sx={{ fontSize: "12px" }}>
                                     {invoiceData2?.mobileNo}
                                 </Typography>
                             </Grid>
@@ -1540,28 +1517,43 @@ function PayReceipts() {
                             <Grid item xs={6}>
                                 <Typography
                                     variant="body2"
-                                    sx={{ fontWeight: "bold", fontSize: "15px" }}
+                                    sx={{ fontWeight: "bold", fontSize: "12px" }}
                                 >
-                                    Customer Reference
+                                    Email / الالكتروني البريد
                                 </Typography>
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                                    {invoiceData2?.customerReference}
+                                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                                    {invoiceData2?.email}
                                 </Typography>
                             </Grid>
+
 
                             <Grid item xs={6}>
                                 <Typography
                                     variant="body2"
-                                    sx={{ fontWeight: "bold", fontSize: "15px" }}
+                                    sx={{ fontWeight: "bold", fontSize: "12px" }}
                                 >
-                                    Customer Address
+                                    Customer Address عنوان العميل
+
                                 </Typography>
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                                <Typography variant="body2" sx={{ fontSize: "12px" }}>
                                     {invoiceData2?.customerAddress}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: "bold", fontSize: "12px" }}
+                                >
+                                    TRN:
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                                    {invoiceData2?.trn}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -1578,85 +1570,85 @@ function PayReceipts() {
                         Particulars تفاصيل
                     </p>
 
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <table className="mytable" style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr style={{ backgroundColor: "#f5f5f5" }}>
+                            <tr style={{ backgroundColor: "transparent" }}>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "5%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>Sl.No الرقم</p>
+                                    <p style={{ fontSize: "12px", color: 'black', }}>Sl.No الرقم</p>
                                 </th>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "30%",
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>Service - الخدمات</p>
+                                    <p style={{ fontSize: "12px", color: 'black' }}>Service - الخدمات</p>
                                 </th>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "8%",
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>Qty - الكمية</p>
+                                    <p style={{ fontSize: "12px", color: 'black', }}>Qty - الكمية</p>
                                 </th>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "18%",
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>
+                                    <p style={{ fontSize: "12px", color: 'black' }}>
                                         Govt Fee and Bank Charge - الرسوم الحكومية
                                     </p>
                                 </th>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "15%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>
+                                    <p style={{ fontSize: "12px", color: 'black' }}>
                                         Service Charge Taxable - تكلفة الخدمة
                                     </p>
                                 </th>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "15%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>Tax Amt - قيمة المضافة</p>
+                                    <p style={{ fontSize: "12px", color: 'black' }}>Tax Amt - قيمة المضافة</p>
                                 </th>
                                 <th
                                     style={{
-                                        border: "1px solid black",
+                                        border: "1px solid black !important",
                                         padding: "8px",
                                         textAlign: "center",
                                         width: "15%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>Total - الإجمالي بالدرهم</p>
+                                    <p style={{ fontSize: "12px", color: 'black' }}>Total - الإجمالي بالدرهم</p>
                                 </th>
                             </tr>
                         </thead>
@@ -1665,7 +1657,7 @@ function PayReceipts() {
                                 <tr key={item.id}>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                         }}
@@ -1674,7 +1666,7 @@ function PayReceipts() {
                                     </td>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                         }}
@@ -1687,18 +1679,26 @@ function PayReceipts() {
                                         >
                                             <span style={{ fontSize: "12px", fontWeight: "bold" }}>
                                                 {item?.service?.name}
+
                                             </span>
                                             <span style={{ fontSize: "12px" }}>
                                                 {item.service?.name_ar}
                                             </span>
+
                                         </div>
+                                        <span style={{ fontSize: "12px" }}>
+                                            {item?.application_id}
+                                            {item?.transaction_id && ` || ${item.transaction_id}`}
+                                            {item?.ref_id && ` || ${item.ref_id}`}
+                                        </span>
+
                                         {/* <p style={{ fontSize: "9px", textAlign: "left" }}>
-                          {item?.details}
-                        </p> */}
+                                    {item?.details}
+                                  </p> */}
                                     </td>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                             fontSize: "12px",
@@ -1708,7 +1708,7 @@ function PayReceipts() {
                                     </td>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                             fontSize: "12px",
@@ -1721,7 +1721,7 @@ function PayReceipts() {
                                     </td>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                             fontSize: "12px",
@@ -1731,17 +1731,17 @@ function PayReceipts() {
                                     </td>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                             fontSize: "12px",
                                         }}
                                     >
-                                        {parseFloat(item?.bank_charge).toFixed(2)}
+                                        {parseFloat(parseFloat(item?.center_fee) * 0.05).toFixed(2)}
                                     </td>
                                     <td
                                         style={{
-                                            border: "1px solid black",
+                                            border: "1px solid black !important",
                                             padding: "8px",
                                             textAlign: "center",
                                             fontSize: "12px",
@@ -1750,23 +1750,52 @@ function PayReceipts() {
                                         {parseFloat(item?.total).toFixed(2)}
                                     </td>
                                 </tr>
+
                             ))}
-                        </tbody>
-                    </table>
-
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                        <tbody>
-
                             <tr>
                                 <td
-                                    colSpan={5}
+                                    colSpan={6}
                                     style={{
                                         border: "1px solid #000",
                                         padding: "0.5rem",
                                         textAlign: "right",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}> Total Amount</p>
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        Total Govt.fee & Bank Charge إجمالي الرسوم الحكومية ورسوم البنك
+                                    </p>
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "8%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {invoiceData2?.items
+                                            ?.reduce(
+                                                (total, item) =>
+                                                    parseFloat(total) +
+                                                    parseFloat(item?.govt_fee ?? 0) +
+                                                    parseFloat(item?.bank_charge ?? 0),
+                                                0
+                                            )
+                                            ?.toFixed(2)}
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount صافي المبلغ الخاضع للضريبة</p>
                                 </td>
                                 <td
                                     style={{
@@ -1776,29 +1805,29 @@ function PayReceipts() {
                                         width: "10%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData2?.total_amount}
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {invoiceData2?.items
+                                            ?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0)
+                                            .toFixed(2)}
+
                                     </p>
                                 </td>
                             </tr>
                             <tr>
                                 <td
-                                    colSpan={5}
+                                    colSpan={6}
                                     style={{
                                         border: "1px solid #000",
                                         padding: "0.5rem",
                                         textAlign: "right",
                                     }}
                                 >
-                                    <p
-                                        style={{
-                                            fontSize: "12px",
-                                            fontFamily: "'Amiri', Arial, sans-serif",
-                                        }}
-                                        className="arabic-text"
-                                    >
-                                        Total VAT إجمالي القيمة المضافة
-                                    </p>
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}> Total VAT إجمالي القيمة المضافة</p>
+
                                 </td>
                                 <td
                                     align="center"
@@ -1809,20 +1838,21 @@ function PayReceipts() {
                                         width: "10%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData2?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    parseFloat(total) + parseFloat(item?.center_fee ?? 0),
-                                                0
-                                            ) * 0.05
-                                        }
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {(
+                                            invoiceData2?.items?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0) * 0.05
+                                        ).toFixed(2)}
+
                                     </p>
                                 </td>
                             </tr>
                             <tr>
                                 <td
-                                    colSpan={5}
+                                    colSpan={6}
                                     align="right"
                                     style={{
                                         border: "1px solid #000",
@@ -1830,15 +1860,8 @@ function PayReceipts() {
                                         textAlign: "right",
                                     }}
                                 >
-                                    <p
-                                        style={{
-                                            fontSize: "12px",
-                                            fontFamily: "'Amiri', Arial, sans-serif",
-                                        }}
-                                        className="arabic-text"
-                                    >
-                                        Net Total إجمالي القيمة
-                                    </p>
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Gross Total إجمالي القيمة</p>
+
                                 </td>
                                 <td
                                     align="center"
@@ -1849,151 +1872,193 @@ function PayReceipts() {
                                         width: "10%",
                                     }}
                                 >
-                                    <p style={{ fontSize: "12px" }}>
-                                        {invoiceData2?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    parseFloat(total) + parseFloat(item?.center_fee ?? 0),
-                                                0
-                                            ) * 0.05 + parseFloat(invoiceData2?.total_amount)}
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {(
+                                            invoiceData2?.items?.reduce((total2, item) => {
+                                                return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                                            }, 0) +
+                                            invoiceData2?.items?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0) * 0.05
+                                        ).toFixed(2)}
+
                                     </p>
                                 </td>
+                            </tr>
+
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    align="right"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Total Payable الإجمالي</p>
+
+                                </td>
+                                <td
+                                    align="right"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "10%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>
+                                        {(
+                                            invoiceData2?.items?.reduce((total2, item) => {
+                                                return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                                            }, 0) +
+                                            invoiceData2?.items?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0) * 0.05
+                                        ).toFixed(2)}
+
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table className="mytable" style={{ width: "100%", borderCollapse: "collapse", marginTop: '100px' }}>
+                        <thead>
+                            <tr style={{ backgroundColor: "transparent" }}>
+                                <th
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        width: "5%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>Receipt No.</p>
+                                </th>
+                                <th
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        width: "30%",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>Date </p>
+                                </th>
+                                <th
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        width: "8%",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>Amount</p>
+                                </th>
+                                <th
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        width: "18%",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>
+                                        Collected  By
+                                    </p>
+                                </th>
+                                <th
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        width: "15%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>
+                                        Payment Mode
+                                    </p>
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr >
+                                <td
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    {invoiceData2?.id}
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        {invoiceData2?.date}
+                                    </div>
+                                    {/* <p style={{ fontSize: "9px", textAlign: "left" }}>
+                                          {item?.details}
+                                        </p> */}
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    {invoiceData2?.total_amount}
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    Cashier
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid black",
+                                        padding: "8px",
+                                        textAlign: "center",
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    {invoiceData2?.payment_mode}
+                                </td>
+
                             </tr>
 
                         </tbody>
                     </table>
                 </Box>
-                <table style={{ width: "100%", borderCollapse: "collapse", marginTop: '200px' }}>
-                    <thead>
-                        <tr style={{ backgroundColor: "transparent" }}>
-                            <th
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    width: "5%",
-
-                                }}
-                            >
-                                <p style={{ fontSize: "12px" }}>Receipt No.</p>
-                            </th>
-                            <th
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    width: "30%",
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                <p style={{ fontSize: "12px" }}>Date </p>
-                            </th>
-                            <th
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    width: "8%",
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                <p style={{ fontSize: "12px" }}>Amount</p>
-                            </th>
-                            <th
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    width: "18%",
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                <p style={{ fontSize: "12px" }}>
-                                    Collected  By
-                                </p>
-                            </th>
-                            <th
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    width: "15%",
-                                }}
-                            >
-                                <p style={{ fontSize: "12px" }}>
-                                    Payment Mode
-                                </p>
-                            </th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <tr >
-                            <td
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                {invoiceData2?.id}
-                            </td>
-                            <td
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    {invoiceData2?.date}
-                                </div>
-                                {/* <p style={{ fontSize: "9px", textAlign: "left" }}>
-                          {item?.details}
-                        </p> */}
-                            </td>
-                            <td
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    fontSize: "12px",
-                                }}
-                            >
-                                {invoiceData2?.total_amount}
-                            </td>
-                            <td
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    fontSize: "12px",
-                                }}
-                            >
-                                Cashier
-                            </td>
-                            <td
-                                style={{
-                                    border: "1px solid black",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    fontSize: "12px",
-                                }}
-                            >
-                                {invoiceData2?.payment_mode}
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-                </table>
-                <Box class="footer">
+                <Box class="footer" style={{ marginTop: '0px' }}>
                     <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "100px" }}>
                         <Box
                             display="flex"
@@ -2001,13 +2066,7 @@ function PayReceipts() {
                             alignItems="flex-start"
                         >
                             <Box textAlign="center">
-                                <Typography
-                                    variant="h6"
-                                    fontWeight="bold"
-                                    sx={{ fontSize: "12px" }}
-                                >
-                                    SabelahHaq Naqaz
-                                </Typography>
+
                                 <p
                                     variant="body2"
                                     style={{
@@ -2016,12 +2075,7 @@ function PayReceipts() {
                                 >
                                     Authorized Signatory - المخول بالتوقيع
                                 </p>
-                                <Typography
-                                    variant="body2"
-                                    sx={{ fontSize: "12px", textAlign: "center" }}
-                                >
-                                    (REPRINT)
-                                </Typography>
+
                             </Box>
 
                             <Box textAlign="right" sx={{ fontSize: "12px" }}>
@@ -2048,13 +2102,10 @@ function PayReceipts() {
                             </Box>
                         </Box>
 
-                        <Typography variant="body1" fontWeight="bold" color="error" mt={2}>
-                            "save 10 aed on all DED transactions every Saturday in Premium
-                            Businessmen Services"
-                        </Typography>
+
                     </Box>
 
-                    <div className="w-full h-[115px] flex justify-center items-center mb-4">
+                    <div className="w-full h-[115px] flex justify-center items-center mb-4 mt-4" >
                         <img
                             src={Images.footer}
                             alt="Header"
@@ -2062,6 +2113,13 @@ function PayReceipts() {
                             className="max-w-full h-auto"
                         />
                     </div>
+                    < hr style={{ color: 'black !important' }} />
+                    <Typography
+                        variant="body2"
+                        sx={{ fontWeight: "bold", fontSize: "15px", textAlign: 'right' }}
+                    >
+                        Powered By : MangoTechDevs.ae
+                    </Typography>
                 </Box>
             </Box>
             <Box className="showPdf2" ref={invoiceRef2} sx={{ padding: "20px 60px" }}>
@@ -2115,7 +2173,7 @@ function PayReceipts() {
                     >
                         <Grid container spacing={1}>
                             <Grid item xs={6}>
-                            <p
+                                <p
                                     variant="body2"
                                     style={{
                                         fontWeight: "bold",
@@ -2253,7 +2311,7 @@ function PayReceipts() {
                                 </Typography>
                             </Grid>
 
-                            
+
                         </Grid>
                     </Box>
                 </Box>
@@ -2495,71 +2553,71 @@ function PayReceipts() {
                             </tr>
                         </tbody>
                     </table>
-                    
+
                 </Box>
-               <Box class="footer" style={{ marginTop: '300px' }}>
-                         <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "200px" }}>
-                           <Box
-                             display="flex"
-                             justifyContent="space-between"
-                             alignItems="flex-start"
-                           >
-                             <Box textAlign="center">
-               
-                               <p
-                                 variant="body2"
-                                 style={{
-                                   fontSize: "12px",
-                                 }}
-                               >
-                                 Authorized Signatory - المخول بالتوقيع
-                               </p>
-               
-                             </Box>
-               
-                             <Box textAlign="right" sx={{ fontSize: "12px" }}>
-                               <p
-                                 variant="body2"
-                                 style={{
-                                   fontSize: "12px",
-                                 }}
-                               >
-                                 Note - ملاحظات
-                               </p>
-                               <p
-                                 variant="body2"
-                                 style={{
-                                   fontSize: "12px",
-                                 }}
-                               >
-                                 الرجاء التأكد من الفاتورة والمستندات قبل مغادرة الكاونتر
-                               </p>
-                               <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px" }}>
-                                 Kindly check the invoice and documents before leaving the
-                                 counter
-                               </Typography>
-                             </Box>
-                           </Box>
-               
-               
-                         </Box>
-               
-                         <div className="w-full h-[115px] flex justify-center items-center mb-4 mt-4" >
-                           <img
-                             src={Images.footer}
-                             alt="Header"
-                             style={{ width: "100%" }}
-                             className="max-w-full h-auto"
-                           />
-                         </div>
-                         < hr style={{ color: 'black !important' }} />
-                         <Typography
-                           variant="body2"
-                           sx={{ fontWeight: "bold", fontSize: "15px", textAlign: 'right' }}
-                         >
-                           Powered By : MangoTechDevs.ae
-                         </Typography>
-                       </Box>
+                <Box class="footer" style={{ marginTop: '300px' }}>
+                    <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "200px" }}>
+                        <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="flex-start"
+                        >
+                            <Box textAlign="center">
+
+                                <p
+                                    variant="body2"
+                                    style={{
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    Authorized Signatory - المخول بالتوقيع
+                                </p>
+
+                            </Box>
+
+                            <Box textAlign="right" sx={{ fontSize: "12px" }}>
+                                <p
+                                    variant="body2"
+                                    style={{
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    Note - ملاحظات
+                                </p>
+                                <p
+                                    variant="body2"
+                                    style={{
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    الرجاء التأكد من الفاتورة والمستندات قبل مغادرة الكاونتر
+                                </p>
+                                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px" }}>
+                                    Kindly check the invoice and documents before leaving the
+                                    counter
+                                </Typography>
+                            </Box>
+                        </Box>
+
+
+                    </Box>
+
+                    <div className="w-full h-[115px] flex justify-center items-center mb-4 mt-4" >
+                        <img
+                            src={Images.footer}
+                            alt="Header"
+                            style={{ width: "100%" }}
+                            className="max-w-full h-auto"
+                        />
+                    </div>
+                    < hr style={{ color: 'black !important' }} />
+                    <Typography
+                        variant="body2"
+                        sx={{ fontWeight: "bold", fontSize: "15px", textAlign: 'right' }}
+                    >
+                        Powered By : MangoTechDevs.ae
+                    </Typography>
+                </Box>
             </Box>
         </Box>
     );

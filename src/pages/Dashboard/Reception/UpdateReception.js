@@ -16,19 +16,21 @@ import { useNavigate, useParams } from "react-router-dom"
 
 function UpdateReception() {
     const navigate = useNavigate()
-    const { id } = useParams()
     const [customerType, setCustomerType] = useState("company")
-    const [buttonDisabled, setButtonDisabled] = useState(false)
-    const [buttonDisabled2, setButtonDisabled2] = useState(false)
+    const [newDetail, setNewDetail] = useState(null)
+    const [buttonDisabled, setButtonDisabled] = useState(true)
+    const [buttonDisabled2, setButtonDisabled2] = useState(true)
+    const [buttonDisabled3, setButtonDisabled3] = useState(false)
     const [customers, setCustomers] = useState([])
     const [selectedCompany, setSelectedCompany] = useState(null)
     const [selectedCustomer, setSelectedCustomer] = useState(null)
     const [companies, setCompanies] = useState([])
     const [companyDialog, setCompanyDialog] = useState(false)
-    const [newDetail, setNewDetail] = useState(null)
     const [subCustDisable, setSubCustDisable] = useState(false)
     const [categories, setCategories] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
+    const {id}=useParams()
+
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -52,18 +54,61 @@ function UpdateReception() {
     } = useForm();
 
     const onSubmit = async (formData) => {
+        setButtonDisabled3(true)
         console.log(formData);
         try {
             let obj = {
-                id: id,
-                is_company: customerType == 'individual' ? false : true,
-                customer_name: formData?.customerName,
+
+                customer_id: selectedCustomer?.id,
                 service_category_id: selectedCategory?.id,
-                customer_id: newDetail?.token?.customer_id,
+                service_category: selectedCategory?.name,
+                customer_name: formData?.customerName,
+                email: formData?.email,
                 mobile: formData?.mobile,
                 token_number: formData?.tokenNumber,
                 reference: formData?.reference,
                 company_id: selectedCompany?.id
+
+
+            };
+            const promise = CustomerServices.CreateReception(obj);
+
+            showPromiseToast(
+                promise,
+                'Saving...',
+                'Added Successfully',
+                'Something Went Wrong'
+            );
+            const response = await promise;
+            if (response?.responseCode === 200) {
+                navigate('/reception-list')
+            }
+
+
+        } catch (error) {
+            ErrorToaster(error);
+        }
+        finally {
+            setButtonDisabled3(false)
+        }
+    };
+    const onSubmit1 = async (formData) => {
+        setButtonDisabled3(true)
+        console.log(formData);
+        try {
+            let obj = {
+                id: id,
+       
+                customer_name: formData?.customerName,
+                service_category_id: selectedCategory?.id,
+                customer_id: selectedCustomer?.id,
+                mobile: formData?.mobile,
+                token_number: formData?.tokenNumber,
+                email:formData?.email,
+                reference: formData?.reference,
+          
+
+
 
 
             };
@@ -84,38 +129,8 @@ function UpdateReception() {
         } catch (error) {
             ErrorToaster(error);
         }
-    };
-    const onSubmit1 = async (formData) => {
-        console.log(formData);
-        try {
-            let obj = {
-                id: id,
-                is_company: customerType == 'individual' ? false : true,
-                customer_name: formData?.customerName,
-                customer_id: newDetail?.token?.customer_id,
-                mobile: formData?.mobile,
-                token_number: formData?.tokenNumber,
-                reference: formData?.reference,
-                company_id: selectedCompany?.id
-
-
-            };
-            const promise = CustomerServices.UpdateReception(obj);
-
-            showPromiseToast(
-                promise,
-                'Saving...',
-                'Added Successfully',
-                'Something Went Wrong'
-            );
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                navigate('/reception-list')
-            }
-
-
-        } catch (error) {
-            ErrorToaster(error);
+        finally {
+            setButtonDisabled3(false)
         }
     };
     // *For Get Customer Queue
@@ -133,11 +148,14 @@ function UpdateReception() {
 
             const { data } = await CustomerServices.getCustomerQueue(params)
             setCustomers(data?.rows)
-
+            // let filter = await data?.rows.find(item => item?.name == 'Walk-In Customer')
+            // setSelectedCustomer(filter)
         } catch (error) {
             showErrorToast(error)
         }
     }
+
+  
 
     const getCustomerDetail = async (phone) => {
         try {
@@ -148,7 +166,7 @@ function UpdateReception() {
             const { data } = await CustomerServices.getCustomerDetail(params);
             let detail = data?.customer
             console.log(detail);
-            setSelectedCustomer(detail)
+
             setValue('customerName', detail?.name)
             setValue('email', detail?.email)
             setValue('mobile', detail?.mobile)
@@ -168,11 +186,22 @@ function UpdateReception() {
             const { data } = await CustomerServices.getCustomerDetail(params);
             let detail = data?.customer
             console.log(detail);
-            setSelectedCustomer(detail)
-            setValue1('customer', detail)
-            setValue1('customerName', detail?.name)
-            setValue1('email', detail?.email)
-            setValue1('mobile', detail?.mobile)
+            if (data?.customer) {
+                setSelectedCustomer(detail)
+                setValue1('customer', detail)
+                setValue1('customerName', detail?.name)
+                setValue1('email', detail?.email)
+                setValue1('mobile', detail?.mobile)
+            }
+            else {
+                let filter = await customers.find(item => item?.name == 'Walk-In Customer')
+                console.log(filter);
+
+                setSelectedCustomer(filter)
+                setValue1('customer', filter?.name)
+
+
+            }
 
 
 
@@ -285,8 +314,11 @@ function UpdateReception() {
             setNewDetail(detail)
             let updatedObj = {...detail,name:detail?.customer_name}
             // setSelectedCustomer(updatedObj)
-
-            setValue1('customer', updatedObj);
+            let filter = await customers.find(item => item?.id == detail?.customer_id)
+            console.log(filter,'filterfilter');
+            
+            setSelectedCustomer(filter)
+            setValue1('customer', filter);
             setValue('mobile', detail?.mobile)
             setValue('customerName', detail?.customer_name)
             setValue('tokenNumber', detail?.token_number)
@@ -343,21 +375,19 @@ function UpdateReception() {
     useEffect(() => {
         const company = companies.find(item => item?.id == newDetail?.company_id);
         const customer = customers.find(item => item?.id == newDetail?.customer_id);
-        console.log(customer);
+        console.log(customer,'filterfilter');
 
         // Only proceed if both are found
         if (company && customer) {
             console.log('Company:', company);
             console.log('Customer:', customer);
-
+            setSelectedCustomer(customer);        setSelectedCustomer(customer);
             setValue1('customer', customer);
-            // setSelectedCustomer(customer);
+            setSelectedCustomer(customer);
             setValue('company', company);
             setSelectedCompany(company);
         }
     }, [customers, companies, newDetail]);
-
-
 
     return (
         <Box m={3} sx={{ backgroundColor: "white", borderRadius: "12px" }}>
@@ -419,7 +449,7 @@ function UpdateReception() {
                 </Box>
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
-                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}> Update Reception </Typography>
+                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Update Reception</Typography>
             </Box>
 
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
@@ -443,12 +473,11 @@ function UpdateReception() {
                                     message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
                                 },
                                 onChange: (e) => {
-                                    console.log('asdas');
-                                    if (getValues('mobile').length == 10) {
-                                        // Debounce2(() => getCustomerDetail(getValues('mobile')));
+                                    console.log(e.target.value);
+                                    if (e.target.value.length == 10) {
+                                        Debounce2(() => getCustomerDetail(e.target.value));
                                     }
 
-                                    // Delay the execution of verifyEmail by 2 seconds
 
                                 },
 
@@ -462,15 +491,7 @@ function UpdateReception() {
                                 placeholder={"Token Number"}
                                 error={errors?.tokenNumber?.message}
                                 register={register("tokenNumber", {
-                                    onChange: (e) => {
-                                        console.log('asdas');
-                                        if (getValues('tokenNumber')) {
-                                            // Debounce2(() => getTokenValidation(getValues('tokenNumber')));
-                                        }
-
-                                        // Delay the execution of verifyEmail by 2 seconds
-
-                                    },
+                                    required: "Enter Token Number"
                                 })}
                             />
                         </Grid>
@@ -493,9 +514,7 @@ function UpdateReception() {
                                 size={"small"}
                                 placeholder={"Reference"}
                                 error={errors?.reference?.message}
-                                register={register("reference", {
-                                    required: false
-                                })}
+                                register={register("reference")}
                             />
                         </Grid>
 
@@ -520,7 +539,7 @@ function UpdateReception() {
 
                         <Grid container justifyContent={'flex-end'}>
                             <PrimaryButton
-                                disabled={buttonDisabled}
+                                disabled={buttonDisabled || buttonDisabled3}
                                 bgcolor={'#bd9b4a'}
                                 title="Update"
                                 type={'submit'}
@@ -539,31 +558,32 @@ function UpdateReception() {
 
 
                         <Grid container sx={{ gap: "5px 25px" }}>
-                            <Grid item xs={2.8}><InputField
-                                label={"Mobile *:"}
-                                size={'small'}
-                                type={'number'}
-                                placeholder={"Mobile"}
-                                error={errors1?.mobile?.message}
-                                register={register1("mobile", {
-                                    required:
-                                        "Please enter your mobile.",
-                                    pattern: {
-                                        value: /^05[0-9]{8}$/,
-                                        message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                    },
-                                    onChange: (e) => {
-                                        console.log('asdas');
-                                        if (getValues1('mobile').length == 10) {
-                                            // Debounce2(() => getCustomerDetail2(getValues1('mobile')));
-                                        }
+                            <Grid item xs={2.8}>
+                                <InputField
+                                    label={"Mobile *:"}
+                                    size={'small'}
+                                    type={'number'}
+                                    placeholder={"Mobile"}
+                                    error={errors1?.mobile?.message}
+                                    register={register1("mobile", {
+                                        required:
+                                            "Please enter your mobile.",
+                                        pattern: {
+                                            value: /^05[0-9]{8}$/,
+                                            message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
+                                        },
+                                        onChange: (e) => {
+                                            console.log(e.target.value);
+                                            if (e.target.value.length == 10) {
+                                                Debounce2(() => getCustomerDetail2(e.target.value));
+                                            }
 
-                                        // Delay the execution of verifyEmail by 2 seconds
+                                            // Delay the execution of verifyEmail by 2 seconds
 
-                                    },
+                                        },
 
-                                })}
-                            /></Grid>
+                                    })}
+                                /></Grid>
 
                             <Grid item xs={2.8}>
                                 <InputField
@@ -572,15 +592,9 @@ function UpdateReception() {
                                     placeholder={"Token Number"}
                                     error={errors1?.tokenNumber?.message}
                                     register={register1("tokenNumber", {
-                                        onChange: (e) => {
-                                            console.log('asdas');
-                                            if (getValues1('tokenNumber')) {
-                                                // Debounce2(() => getTokenValidation2(getValues1('tokenNumber')));
-                                            }
 
-                                            // Delay the execution of verifyEmail by 2 seconds
+                                        required: "Enter Token Number"
 
-                                        },
                                     })}
                                 />
                             </Grid>
@@ -599,7 +613,7 @@ function UpdateReception() {
 
                             <Grid item xs={2.8}>
                                 <InputField
-                                    label={"Reference *:"}
+                                    label={"Reference:"}
                                     size={"small"}
                                     placeholder={"Reference"}
                                     error={errors1?.reference?.message}
@@ -611,7 +625,7 @@ function UpdateReception() {
 
                             <Grid item xs={2.8}>
                                 <InputField
-                                    label={"Email *:"}
+                                    label={"Email :"}
                                     size={"small"}
                                     type={"email"}
                                     placeholder={"Email"}
@@ -621,7 +635,6 @@ function UpdateReception() {
                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                             message: "Please enter a valid email address.",
                                         },
-                                        // required:'please enter email'
                                     })}
                                 />
                             </Grid>
@@ -630,9 +643,9 @@ function UpdateReception() {
                                 <SelectField
                                     size={'small'}
                                     label={'Customer *:'}
-disabled={true}
+
                                     options={customers}
-                                    selected={"Walk-In Customer"}
+                                    selected={selectedCustomer}
                                     onSelect={(value) => {
                                         setSelectedCustomer(value)
                                         if (value?.name == 'Walk-In Customer') {
@@ -649,17 +662,15 @@ disabled={true}
                                             setValue1('mobile', value?.mobile)
 
                                             setSubCustDisable(false)
-                                            Debounce2(() => getCompanies(value?.id));
+                                            // Debounce2(() => getCompanies(value?.id));
                                         }
 
                                     }}
                                     error={errors1?.customer?.message}
-                                    register={register1("customer", {
-                                        required: 'Please select customer account.',
-                                    })}
+                                    register={register1("customer")}
                                 />
                             </Grid>
-                            <Grid item xs={2.8} >
+                            {/* <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}
                                     label={'Service Category *:'}
@@ -668,7 +679,7 @@ disabled={true}
                                     selected={selectedCategory}
                                     onSelect={(value) => {
                                         setSelectedCategory(value)
-
+                                       
 
                                     }}
                                     error={errors1?.service?.message}
@@ -676,7 +687,7 @@ disabled={true}
                                         required: 'Please select service.',
                                     })}
                                 />
-                            </Grid>
+                            </Grid> */}
                             {/* <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}
@@ -709,7 +720,7 @@ disabled={true}
                             </Grid> */}
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
-                                    disabled={buttonDisabled2}
+                                    // disabled={buttonDisabled2}
                                     bgcolor={'#bd9b4a'}
                                     title="Update"
                                     type={'submit'}

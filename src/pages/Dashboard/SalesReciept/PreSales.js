@@ -220,8 +220,15 @@ function PreSalesList() {
     // Add image to the PDF
     pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
-    // Save the generated PDF
-    pdf.save("service_request.pdf");
+    // // Save the generated PDF
+    // pdf.save("service_request.pdf");
+    const blob = pdf.output("blob");
+
+    // Create a blob URL
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open the PDF in a new tab
+    window.open(blobUrl);
 
     // Restore the content visibility after generating the PDF
     invoiceElement.style.display = "none"; // Show the content again
@@ -253,8 +260,13 @@ function PreSalesList() {
     // Add image to the PDF
     pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
-    // Save the generated PDF
-    pdf.save("invoice.pdf");
+    const blob = pdf.output("blob");
+
+    // Create a blob URL
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open the PDF in a new tab
+    window.open(blobUrl);
 
     // Restore the content visibility after generating the PDF
     invoiceElement.style.display = "none"; // Show the content again
@@ -288,7 +300,13 @@ function PreSalesList() {
     pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
     // Save the generated PDF
-    pdf.save("tax_invoice.pdf");
+    const blob = pdf.output("blob");
+
+    // Create a blob URL
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open the PDF in a new tab
+    window.open(blobUrl);
 
     // Restore the content visibility after generating the PDF
     invoiceElement.style.display = "none"; // Show the content again
@@ -308,7 +326,7 @@ function PreSalesList() {
         id: data?.receipt?.id,
         trn: data?.receipt?.trn,
         tokenNumber: data?.receipt?.token_number,
-        email:data?.receipt?.customer_email,
+        email: data?.receipt?.customer_email,
         customerName: data?.receipt?.customer_name,
         mobileNo: data?.receipt?.customer_mobile,
         customerReference: data?.receipt?.ref,
@@ -510,7 +528,7 @@ function PreSalesList() {
       header: "Actions",
       cell: ({ row }) => (
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          { <Box
+          {<Box
             component={"img"}
             sx={{ cursor: "pointer" }}
             onClick={() => {
@@ -1166,12 +1184,13 @@ function PreSalesList() {
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
                     {invoiceData?.items
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ).toFixed(2)
-                    }
+                      ?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0)
+                      .toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -1197,12 +1216,14 @@ function PreSalesList() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {parseFloat(invoiceData?.items
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ) * 0.05).toFixed(2)}
+                    {(
+                      invoiceData?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -1229,18 +1250,17 @@ function PreSalesList() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {parseFloat(invoiceData?.items
-                      ?.reduce(
-                        (total2, item) =>
-                          parseFloat(total2) + parseFloat(item?.total ?? 0),
-                        0
-                      )
-                      + parseFloat(invoiceData?.items
-                        ?.reduce(
-                          (total, item) =>
-                            total + parseFloat(item?.center_fee ?? 0),
-                          0
-                        ) * 0.05)).toFixed(2)}
+                    {(
+                      invoiceData?.items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                      }, 0) +
+                      invoiceData?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -1268,18 +1288,17 @@ function PreSalesList() {
                   }}
                 >
                   <p style={{ fontSize: "12px" }}>
-                    {parseFloat(invoiceData?.items
-                      ?.reduce(
-                        (total2, item) =>
-                          parseFloat(total2) + parseFloat(item?.total ?? 0),
-                        0
-                      )
-                      + parseFloat(invoiceData?.items
-                        ?.reduce(
-                          (total, item) =>
-                            total + parseFloat(item?.center_fee ?? 0),
-                          0
-                        ) * 0.05)).toFixed(2)}
+                    {(
+                      invoiceData?.items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                      }, 0) +
+                      invoiceData?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -1354,14 +1373,21 @@ function PreSalesList() {
       </Box>
 
       <Box className="showPdf2" ref={invoiceRef2} sx={{ padding: "20px 60px" }}>
-        <div className="w-full h-[115px] flex justify-center items-center mb-4">
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', border: '1px solid black', marginBottom: 4, padding: '10px' }}>
           <img
-            src={Images.header}
+            src={Images.headerRightImage}
             alt="Header"
-            style={{ width: "100%" }}
-            className="max-w-full h-auto"
+            style={{ width: '180px' }}
+
+          />
+          <img
+            src={Images.headerLeftImage}
+            alt="Header"
+            style={{ width: '150px' }}
+
           />
         </div>
+
         <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
           <p
             variant="h6"
@@ -1369,6 +1395,10 @@ function PreSalesList() {
               fontSize: "25px",
               fontWeight: "bold",
               fontFamily: "Atlassian Sans",
+              textDecoration: 'underline',
+
+              marginTop: '40px',
+              marginBottom: '40px',
             }}
           >
             RECEIPT - الإيصال
@@ -1393,15 +1423,17 @@ function PreSalesList() {
           >
             <Grid container spacing={1}>
               <Grid item xs={6}>
-                <Typography
+                <p
                   variant="body2"
                   style={{
-                    fontSize: "15px",
                     fontWeight: "bold",
+                    fontSize: "16px",
+                    fontFamily: "Atlassian Sans",
+                    margin: "2px",
                   }}
                 >
-                  Receipt No
-                </Typography>
+                  Receipt No/رقم الإيصال
+                </p>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" sx={{ fontSize: "15px" }}>
@@ -1480,7 +1512,7 @@ function PreSalesList() {
                     margin: "2px",
                   }}
                 >
-                  Payment Date
+                  Payment Date / تاريخ الدفع
                 </p>
               </Grid>
               <Grid item xs={6}>
@@ -1501,7 +1533,7 @@ function PreSalesList() {
                     margin: "2px",
                   }}
                 >
-                  Printed at
+                  Printed at/طبع في
                 </p>
               </Grid>
               <Grid item xs={6}>
@@ -1529,24 +1561,7 @@ function PreSalesList() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={6}>
-                <p
-                  variant="body2"
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: "16px",
-                    fontFamily: "Atlassian Sans",
-                    margin: "2px",
-                  }}
-                >
-                  Remarks/ملاحظات
-                </p>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                  {/* {invoiceData.customerAddress} */}
-                </Typography>
-              </Grid>
+
             </Grid>
           </Box>
         </Box>
@@ -1676,23 +1691,12 @@ function PreSalesList() {
                 </td>
               </tr>
               {/* ))} */}
-            </tbody>
-          </table>
-
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginTop: "20px",
-            }}
-          >
-            <tbody>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
@@ -1701,7 +1705,7 @@ function PreSalesList() {
                 <td
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                   }}
                 >
@@ -1712,10 +1716,10 @@ function PreSalesList() {
               </tr>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                     fontWeight: "bold",
                   }}
@@ -1725,7 +1729,7 @@ function PreSalesList() {
                 <td
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                     fontWeight: "bold",
                   }}
@@ -1737,10 +1741,10 @@ function PreSalesList() {
               </tr>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
@@ -1749,7 +1753,7 @@ function PreSalesList() {
                 <td
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                   }}
                 >
@@ -1760,10 +1764,10 @@ function PreSalesList() {
               </tr>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
@@ -1772,7 +1776,7 @@ function PreSalesList() {
                 <td
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                   }}
                 >
@@ -1786,10 +1790,10 @@ function PreSalesList() {
 
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                   }}
                 >
@@ -1799,65 +1803,56 @@ function PreSalesList() {
               </tr>
             </tbody>
           </table>
+
         </Box>
-        <Box class="footer" style={{ paddingTop: "100px" }}>
-          <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "100px" }}>
+        <Box class="footer" style={{ marginTop: '300px' }}>
+          <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "200px" }}>
             <Box
               display="flex"
               justifyContent="space-between"
               alignItems="flex-start"
             >
               <Box textAlign="center">
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{ fontSize: "15px" }}
-                >
-                  Muhammad Ahsan{" "}
-                </Typography>
+
                 <p
                   variant="body2"
                   style={{
-                    fontSize: "15px",
-                    margin: "2px",
+                    fontSize: "12px",
                   }}
                 >
-                  Authorized Signatory
+                  Authorized Signatory - المخول بالتوقيع
                 </p>
-                <p
-                  variant="body2"
-                  style={{
-                    fontSize: "15px",
-                    margin: "2px",
-                  }}
-                >
-                  المخول بالتوقيع
-                </p>
+
               </Box>
 
               <Box textAlign="right" sx={{ fontSize: "12px" }}>
                 <p
                   variant="body2"
                   style={{
-                    fontSize: "15px",
-                    margin: "2px",
+                    fontSize: "12px",
+                  }}
+                >
+                  Note - ملاحظات
+                </p>
+                <p
+                  variant="body2"
+                  style={{
+                    fontSize: "12px",
                   }}
                 >
                   الرجاء التأكد من الفاتورة والمستندات قبل مغادرة الكاونتر
                 </p>
-                <p
-                  variant="body2"
-                  dir="ltr"
-                  style={{ fontSize: "15px", margin: "2px" }}
-                >
+                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px" }}>
                   Kindly check the invoice and documents before leaving the
                   counter
-                </p>
+                </Typography>
               </Box>
             </Box>
+
+
           </Box>
 
-          <div className="w-full h-[115px] flex justify-center items-center mb-4">
+          <div className="w-full h-[115px] flex justify-center items-center mb-4 mt-4" >
             <img
               src={Images.footer}
               alt="Header"
@@ -2293,7 +2288,7 @@ function PreSalesList() {
                 </tr>
 
               ))}
-              <tr>
+               <tr>
                 <td
                   colSpan={6}
                   style={{
@@ -2348,12 +2343,13 @@ function PreSalesList() {
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
                     {invoiceData2?.items
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ).toFixed(2)
-                    }
+                      ?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0)
+                      .toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -2379,12 +2375,14 @@ function PreSalesList() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {parseFloat(invoiceData2?.items
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ) * 0.05).toFixed(2)}
+                    {(
+                      invoiceData2?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -2411,18 +2409,17 @@ function PreSalesList() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {parseFloat(invoiceData2?.items
-                      ?.reduce(
-                        (total2, item) =>
-                          parseFloat(total2) + parseFloat(item?.total ?? 0),
-                        0
-                      )
-                      + parseFloat(invoiceData2?.items
-                        ?.reduce(
-                          (total, item) =>
-                            total + parseFloat(item?.center_fee ?? 0),
-                          0
-                        ) * 0.05)).toFixed(2)}
+                    {(
+                      invoiceData2?.items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                      }, 0) +
+                      invoiceData2?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
                   </p>
                 </td>
               </tr>
@@ -2450,18 +2447,17 @@ function PreSalesList() {
                   }}
                 >
                   <p style={{ fontSize: "12px" }}>
-                    {parseFloat(invoiceData2?.items
-                      ?.reduce(
-                        (total2, item) =>
-                          parseFloat(total2) + parseFloat(item?.total ?? 0),
-                        0
-                      )
-                      + parseFloat(invoiceData2?.items
-                        ?.reduce(
-                          (total, item) =>
-                            total + parseFloat(item?.center_fee ?? 0),
-                          0
-                        ) * 0.05)).toFixed(2)}
+                    {(
+                      invoiceData2?.items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                      }, 0) +
+                      invoiceData2?.items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+
                   </p>
                 </td>
               </tr>
