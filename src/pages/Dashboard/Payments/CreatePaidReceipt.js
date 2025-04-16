@@ -230,11 +230,10 @@ function CreatePaidReceipt() {
           selectedMode?.id == "Cash"
             ? 700117
             : selectedMode?.id == "Bank"
-              ? selectedBank?.id
+              ? selectedBank?.account_id
               :  selectedMode?.id == "Network receivable"
               ? 700171  :null, 
-        ref_id:
-          selectedMode?.id == "Bank" || selectedMode?.id == "Bank" ? "2" : null, //bank or card id null for cash
+        ref_id: selectedMode?.id == "Bank" ? selectedBank?.id : null, 
         remarks: formData?.remarks,
         narration: formData?.narration,
 
@@ -255,6 +254,7 @@ function CreatePaidReceipt() {
         bank_id    : selectedMode?.id == "Bank" ? selectedBank?.id : '',
         customer_id     :detail?.customer_id,
         invoice_prefix :detail?.invoice_prefix,
+        category_id:detail?.sale_receipt_items[0]?.service?.category_id
       };
 
       console.log(obj ,"objobj")
