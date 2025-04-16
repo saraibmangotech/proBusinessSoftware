@@ -75,7 +75,7 @@ const routes = {
   getPreSales:'/sales/receipts',
   getPreSaleDetail:'/sales/receipts/details',
   DeletePreSale:'/sales/receipts/delete',
-  UpdateSaleReceipt:'/sales/reception/update',
+  UpdateSaleReceipt:'/sales/receipts/update',
   CreateAlDed:'/sales/receipts/place',
   getReceiptDetail:'/sales/receipts/details',
   CreateCard:'/system/cards/add',
