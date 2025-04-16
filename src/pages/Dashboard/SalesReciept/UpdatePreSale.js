@@ -156,22 +156,53 @@ function UpdatePreSale() {
 
 
     const updateItem = (data) => {
-        const newRow = { ...data, service: serviceItem };
+        console.log("Raw data passed to updateItem:", data);
+        console.log("Current serviceItem:", serviceItem);
 
-        // Update rows state immutably
+        if (!data?.id) {
+            console.warn("No valid ID found in data. Skipping update.");
+            return;
+        }
+
+        const updatedItem = { ...data, service: serviceItem };
+        console.log("Updated item to be saved:", updatedItem);
+
         setRows(prevItems => {
-            return prevItems.map(item =>
-                item.id === newRow.id ? { ...newRow } : item
-            );
+            console.log("Previous rows:", prevItems);
+
+            const updatedRows = prevItems.map(item => {
+                if (item.id === data.id) {
+                    console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
+                    return updatedItem;
+                } else {
+                    return item;
+                }
+            });
+
+            console.log("Rows after update:", updatedRows);
+            return updatedRows;
         });
 
-        // Reset form and other state
+        console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
         setEditState(false);
     };
 
 
+    const getInvoiceNumber = async () => {
+        // setLoader(true)
+        try {
+            const { data } = await CustomerServices.getInvoiceNumber();
+
+            console.log(data);
+            setValue1("invoice_no", `AAD/${data?.next_invoice_number}`);
+        } catch (error) {
+            ErrorToaster(error);
+        } finally {
+            // setLoader(false)
+        }
+    };
 
     const isFormDataEmpty = (data) => {
         // Check if all form fields are empty
@@ -247,6 +278,7 @@ function UpdatePreSale() {
     const [governmentAccount, setGovernmnentAccount] = useState(null);
     const [description, setDescription] = useState(null);
     const [ownGovBank, setOwnGovBank] = useState(null);
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     const [services, setServices] = useState(null);
     const [serviceItem, setServiceItem] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null)
@@ -261,14 +293,17 @@ function UpdatePreSale() {
         console.log(formData);
         try {
             let obj = {
+                id: detail?.id,
                 token_number: formData?.token,
                 token_date: date,
                 invoice_prefix: "AAD",
                 trn: formData?.trn,
                 case_no: formData?.caseno,
+                customer_address: formData?.address,
                 cost_center: formData?.cost_center,
                 customer_name: formData?.display_customer,
-                reception_id: detail?.id,
+                customer_id: detail?.customer_id,
+                reception_id: detail?.reception_id,
                 customer_mobile: formData?.mobile,
                 customer_email: formData?.email,
                 ref: formData?.ref,
@@ -342,25 +377,39 @@ function UpdatePreSale() {
     const handleServiceSelect = async (value) => {
         console.log(value, "idididid");
         setServiceItem(value);
-        // setLoader(true)
-        try {
-            let params = {
-                service_id: value?.id,
-            };
+        if (value) {
+            // setLoader(true)
+            try {
+                let params = {
+                    service_id: value?.id,
+                };
 
-            const { data } = await CustomerServices.DetailServiceItem(params);
-            setValue("id", data?.service?.id);
-            setValue("govt_fee", data?.service?.bank_service_charge);
-            setValue("center_fee", data?.service?.center_fee);
-            setValue("bank_charge", data?.service?.bank_service_charge);
-            // setValue("transaction_id", data?.transaction_id);
-            setServiceItem(data?.service);
-            setValue("quantity", 1);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
+                const { data } = await CustomerServices.DetailServiceItem(params);
+                setValue("id", data?.service?.id);
+                setValue("govt_fee", data?.service?.bank_service_charge);
+                setValue("center_fee", data?.service?.center_fee);
+                setValue("bank_charge", data?.service?.bank_service_charge);
+                // setValue("transaction_id", data?.transaction_id);
+                setServiceItem(data?.service);
+                setValue("quantity", 1);
+            } catch (error) {
+                ErrorToaster(error);
+            } finally {
+                // setLoader(false)
+            }
         }
+        else {
+            setValue("id", '');
+            setValue("govt_fee", '');
+            setValue("center_fee", '');
+            setValue("bank_charge", '');
+            setValue("transaction_id", '');
+            setValue("application_id", '');
+            setValue("ref_no", '');
+            setServiceItem(null);
+            setValue("quantity", '');
+        }
+
     };
 
     const getAccounts = async (page, limit, filter) => {
@@ -424,6 +473,7 @@ function UpdatePreSale() {
         getServiceItem();
         setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" })
         setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
+        setValue1("cost_center", { id: "Al-ADHEED", name: "Al-ADHEED" })
     }, []);
     const getData = async () => {
         try {
@@ -432,6 +482,7 @@ function UpdatePreSale() {
             };
 
             const { data } = await CustomerServices.getPreSaleDetail(params);
+            setDetail(data?.receipt)
             console.log(data?.receipt?.sale_receipt_items);
             setValue1('token', data?.receipt?.token_number)
             setValue1("mobileValue", data?.receipt?.customer_mobile);
@@ -439,10 +490,14 @@ function UpdatePreSale() {
             setSubTotal(data?.receipt?.total_amount)
             setDate(new Date(data?.receipt?.invoice_date))
             setValue1('display_customer', data?.receipt?.customer_name)
+            setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
+            setValue1('cost_center', { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
             setValue1('mobile', data?.receipt?.customer_mobile)
+            setValue1('trn', data?.receipt?.trn)
             setValue1('email', data?.receipt?.customer_email)
+            setValue1('caseno', data?.receipt?.case_no)
             setValue1('ref', data?.receipt?.ref)
-            setValue1('address', data?.receipt?.address)
+            setValue1('address', data?.receipt?.customer_address)
 
         } catch (error) {
             console.error("Error fetching location:", error);
@@ -450,6 +505,7 @@ function UpdatePreSale() {
     };
     useEffect(() => {
         getData()
+        getInvoiceNumber()
     }, [])
 
     return (
@@ -469,7 +525,7 @@ function UpdatePreSale() {
                                 }}
                             >
                                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                    Update Pre Sales Receipt
+                                    Update Sales Receipt
                                 </Typography>
                             </Box>
 
@@ -641,14 +697,14 @@ function UpdatePreSale() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            <Grid item md={5.7} sm={12} xs={12}>
                                                 <SelectField
                                                     label="Cost Center"
                                                     size="small"
-                                                    disabled={true}
+
                                                     options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
-                                                    selected={watch1("cost_center")}
-                                                    onSelect={(value) => setValue1("cost_center", value)}
+                                                    selected={selectedCostCenter}
+                                                    onSelect={(value) => setSelectedCostCenter(value)}
                                                     register={register1("cost_center",
                                                         {
                                                             required: false
@@ -657,224 +713,57 @@ function UpdatePreSale() {
 
                                                 />
                                             </Grid>
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            <Grid item md={5.7} sm={12} xs={12}>
                                                 <InputField
                                                     label="TRN"
                                                     size="small"
                                                     placeholder="TRN"
-                                                    disabled={true}
+
                                                     register={register1("trn", {
                                                         required: false
                                                     })}
 
                                                 />
                                             </Grid>
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            {/* <Grid item md={5.7} sm={12} xs={12}>
                                                 <InputField
                                                     label="Case No"
                                                     size="small"
                                                     placeholder="Case No"
-                                                    disabled={true}
+
                                                     register={register1("caseno", {
                                                         required: false
                                                     })}
 
                                                 />
-                                            </Grid>
-                                        
-                                        <Grid item md={5.7} sm={12} xs={12}>
-                                            <InputField
-                                                label="Address"
-                                                size="small"
-                                                placeholder="Address"
-                                                multiline
-                                                rows={2}
+                                            </Grid> */}
 
-                                                register={register1("address", {
-                                                    required: 'please enter address .'
-                                                })}
-                                                error={errors1?.address?.message}
-                                            />
+                                            <Grid item md={5.7} sm={12} xs={12}>
+                                                <InputField
+                                                    label="Address"
+                                                    size="small"
+                                                    placeholder="Address"
+                                                    multiline
+                                                    rows={2}
+
+                                                    register={register1("address", {
+                                                        required: 'please enter address .'
+                                                    })}
+                                                    error={errors1?.address?.message}
+                                                />
+                                            </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
 
-                                {/* </Grid> */}
-                                <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>
-                                    <Button
-                                        type="submit"
-                                        disabled={rows?.length == 0}
-                                        variant="contained"
-                                        sx={{
-                                            textTransform: 'capitalize',
-                                            backgroundColor: "#bd9b4a",
-                                            ":hover": {
-                                                backgroundColor: "rgb(189 155 74)",
-                                            },
-                                        }}
-                                    >
-                                        Update
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    </Box>
-
-
-                <form onSubmit={handleSubmit(!editState ? addItem : updateItem)}>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
-                                    <TableCell sx={{ width: "400px" }}>Service</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Qty</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Trsn Id</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>App/Case ID</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Total</TableCell>
-                                    <TableCell sx={{ width: "150px" }}>Action</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            disabled={true}
-                                            placeholder="Item code"
-                                            register={register("id", { required: "Item code is required" })}
-                                        />
-                                        {errors.id && <span>{errors.id.message}</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <SelectField
-                                            size="small"
-                                            options={services}
-                                            selected={serviceItem}
-                                            onSelect={handleServiceSelect}
-                                            //  error={errors?.service?.message}
-                                            register={register("service", {
-                                                required: "Please select a service.",
-                                            })}
-                                        />
-                                        {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder="Quantity"
-                                            type="number"
-                                            register={register("quantity", { required: "Quantity is required" })}
-                                        />
-                                        {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder="Govt fee"
-                                            type="number"
-                                            register={register("govt_fee", { required: "Govt fee is required" })}
-                                        />
-                                        {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder="Center Fee"
-                                            type="number"
-                                            register={register("center_fee", { required: "Center fee is required" })}
-                                        />
-                                        {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder="Bank Charges"
-                                            type="number"
-                                            register={register("bank_charge", { required: "Bank charges are required" })}
-                                            disabled
-                                        />
-                                        {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
-
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder="Transaction Id"
-                                            type="number"
-                                            register={register("transaction_id", { required: "Transaction Id is required" })}
-
-                                        />
-                                        {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
-
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder="Application Id"
-                                            type="number"
-                                            register={register("application_id", {
-                                                required: "Application Id is required",
-                                            })}
-                                        />
-                                        {errors.application_id && (
-                                            <span style={{ color: "red" }}>
-                                                {errors.application_id.message}
-                                            </span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField
-                                            size="small"
-                                            placeholder=" Ref No"
-                                            type="number"
-                                            register={register("ref_no", {
-                                                required: "Ref No is required",
-                                            })}
-                                        />
-                                        {errors.ref_no && (
-                                            <span style={{ color: "red" }}>
-                                                {errors.ref_no.message}
-                                            </span>
-                                        )}
-                                    </TableCell>
-
-                                    <TableCell>
-                                        <InputField
-                                            disabled={true}
-                                            style={{ border: "none" }}
-                                            size="small"
-                                            placeholder=""
-                                            register={register("total")}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        {!editState ? <Button
-                                            variant="contained"
-                                            color="primary"
+                                    {/* </Grid> */}
+                                    <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>
+                                        <Button
                                             type="submit"
+                                            disabled={rows?.length == 0}
+                                            variant="contained"
                                             sx={{
                                                 textTransform: 'capitalize',
-                                                backgroundColor: "rgb(189 155 74)",
-                                                fontSize: "12px",
-                                                ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
-                                                },
-                                            }}
-                                        >
-                                            <AddIcon />
-                                        </Button> : <> <Button
-                                            variant="contained"
-                                            color="primary"
-                                            type="submit"
-                                            sx={{
-                                                textTransform: 'capitalize',
-                                                backgroundColor: "rgb(189 155 74)",
-                                                fontSize: "12px",
+                                                backgroundColor: "#bd9b4a",
                                                 ":hover": {
                                                     backgroundColor: "rgb(189 155 74)",
                                                 },
@@ -882,107 +771,280 @@ function UpdatePreSale() {
                                         >
                                             Update
                                         </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Box>
 
-                                                onClick={() => {
-                                                    setEditState(false)
 
-                                                    setValue("id", '');
-                                                    setValue("govt_fee", '');
-                                                    setValue("center_fee", '');
-                                                    setValue("bank_charge", '');
-                                                    setValue("transaction_id", '');
-                                                    setValue("application_id", '');
-                                                    setValue("ref_no", '');
-                                                    setServiceItem(null);
-                                                    setValue("quantity", '');
-                                                }}
-                                                sx={{
-                                                    mt: 2,
-                                                    textTransform: 'capitalize',
-                                                    backgroundColor: "rgb(189 155 74)",
-                                                    fontSize: "12px",
-                                                    ":hover": {
+                        <form onSubmit={handleSubmit(!editState ? addItem : updateItem)}>
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
+                                            <TableCell sx={{ width: "400px" }}>Service</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Qty</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Trsn Id</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>App/Case ID</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Total</TableCell>
+                                            <TableCell sx={{ width: "150px" }}>Action</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {<TableRow>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    disabled={true}
+                                                    placeholder="Item code"
+                                                    register={register("id", { required: "Item code is required" })}
+                                                />
+                                                {errors.id && <span>{errors.id.message}</span>}
+                                            </TableCell>
+                                            <TableCell>
+                                                <SelectField
+                                                    size="small"
+                                                    options={services}
+                                                    disabled={detail?.is_paid}
+                                                    selected={serviceItem}
+                                                    onSelect={handleServiceSelect}
+                                                    //  error={errors?.service?.message}
+                                                    register={register("service", {
+                                                        required: "Please select a service.",
+                                                    })}
+                                                />
+                                                {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    disabled={detail?.is_paid}
+                                                    placeholder="Quantity"
+                                                    type="number"
+                                                    register={register("quantity", { required: "Quantity is required" })}
+                                                />
+                                                {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    disabled={detail?.is_paid}
+                                                    placeholder="Govt fee"
+                                                    type="number"
+                                                    register={register("govt_fee", { required: "Govt fee is required" })}
+                                                />
+                                                {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    disabled={detail?.is_paid}
+                                                    placeholder="Center Fee"
+                                                    type="number"
+                                                    register={register("center_fee", { required: "Center fee is required" })}
+                                                />
+                                                {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    disabled={detail?.is_paid}
+                                                    placeholder="Bank Charges"
+                                                    type="number"
+                                                    register={register("bank_charge", { required: "Bank charges are required" })}
+
+                                                />
+                                                {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
+
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    placeholder="Transaction Id"
+                                                    type="number"
+                                                    register={register("transaction_id", { required: false })}
+
+                                                />
+                                                {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
+
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    placeholder="Application Id"
+                                                    type="number"
+                                                    register={register("application_id", {
+                                                        required: false,
+                                                    })}
+                                                />
+                                                {errors.application_id && (
+                                                    <span style={{ color: "red" }}>
+                                                        {errors.application_id.message}
+                                                    </span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <InputField
+                                                    size="small"
+                                                    placeholder=" Ref No"
+                                                    type="number"
+                                                    register={register("ref_no", {
+                                                        required: false,
+                                                    })}
+                                                />
+                                                {errors.ref_no && (
+                                                    <span style={{ color: "red" }}>
+                                                        {errors.ref_no.message}
+                                                    </span>
+                                                )}
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <InputField
+                                                    disabled={true}
+                                                    style={{ border: "none" }}
+                                                    size="small"
+                                                    placeholder=""
+                                                    register={register("total")}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                {(!editState && !detail?.is_paid) && <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    type="submit"
+                                                    sx={{
+                                                        textTransform: 'capitalize',
                                                         backgroundColor: "rgb(189 155 74)",
-                                                    },
-                                                }}
-                                            >
-                                                Cancel
-                                            </Button></>}
-                                    </TableCell>
-                                </TableRow>
+                                                        fontSize: "12px",
+                                                        ":hover": {
+                                                            backgroundColor: "rgb(189 155 74)",
+                                                        },
+                                                    }}
+                                                >
+                                                    <AddIcon />
+                                                </Button>}
+                                                {editState && <> <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    type="submit"
+                                                    sx={{
+                                                        textTransform: 'capitalize',
+                                                        backgroundColor: "rgb(189 155 74)",
+                                                        fontSize: "12px",
+                                                        ":hover": {
+                                                            backgroundColor: "rgb(189 155 74)",
+                                                        },
+                                                    }}
+                                                >
+                                                    Update
+                                                </Button>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
 
-                                {rows?.length > 0 && rows?.map((item, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{item?.id}</TableCell>
-                                        <TableCell>{item?.service?.name}</TableCell>
-                                        <TableCell>{item?.quantity}</TableCell>
-                                        <TableCell>{item?.govt_fee}</TableCell>
-                                        <TableCell>{item?.center_fee}</TableCell>
-                                        <TableCell>{item?.bank_charge}</TableCell>
-                                        <TableCell>{item?.transaction_id}</TableCell>
-                                        <TableCell>{item?.application_id}</TableCell>
-                                        <TableCell>{item?.ref_no}</TableCell>
+                                                        onClick={() => {
+                                                            setEditState(false)
 
-                                        <TableCell>{item?.total}</TableCell>
-                                        <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
+                                                            setValue("id", '');
+                                                            setValue("govt_fee", '');
+                                                            setValue("center_fee", '');
+                                                            setValue("bank_charge", '');
+                                                            setValue("transaction_id", '');
+                                                            setValue("application_id", '');
+                                                            setValue("ref_no", '');
+                                                            setServiceItem(null);
+                                                            setValue("quantity", '');
+                                                        }}
+                                                        sx={{
+                                                            mt: 2,
+                                                            textTransform: 'capitalize',
+                                                            backgroundColor: "rgb(189 155 74)",
+                                                            fontSize: "12px",
+                                                            ":hover": {
+                                                                backgroundColor: "rgb(189 155 74)",
+                                                            },
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </Button></>}
+                                            </TableCell>
+                                        </TableRow>}
 
-                                            {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
-                                                setSelectedRow(item); setEditState(true)
-                                                setValue("id", item?.service?.id);
-                                                setValue("govt_fee", item?.service?.bank_service_charge);
-                                                setValue("center_fee", item?.service?.center_fee);
-                                                setValue("bank_charge", item?.service?.bank_service_charge);
-                                                setValue("transaction_id", item?.transaction_id);
-                                                setValue("application_id", item?.application_id);
-                                                setValue("ref_no", item?.ref_no);
-                                                setValue("service", item?.service);
-                                                setServiceItem(item?.service);
-                                                setValue("quantity", item?.quantity);
-                                                console.log(item?.service)
+                                        {rows?.length > 0 && rows?.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{item?.id}</TableCell>
+                                                <TableCell>{item?.service?.name}</TableCell>
+                                                <TableCell>{item?.quantity}</TableCell>
+                                                <TableCell>{item?.govt_fee}</TableCell>
+                                                <TableCell>{item?.center_fee}</TableCell>
+                                                <TableCell>{item?.bank_charge}</TableCell>
+                                                <TableCell>{item?.transaction_id}</TableCell>
+                                                <TableCell>{item?.application_id}</TableCell>
+                                                <TableCell>{item?.ref_no}</TableCell>
 
-                                            }} src={Images.editIcon} width={'35px'}></Box>}
-                                            <Box>
-                                                {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+                                                <TableCell>{item?.total}</TableCell>
+                                                <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
-                                                    let selectedID = item?.id
-                                                    setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                }} width={'35px'}></Box>}
+                                                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
+                                                        setSelectedRow(item); setEditState(true)
+                                                        setValue("id", item?.id);
+                                                        setValue("govt_fee", item?.service?.bank_service_charge);
+                                                        setValue("center_fee", item?.service?.center_fee);
+                                                        setValue("bank_charge", item?.service?.bank_service_charge);
+                                                        setValue("transaction_id", item?.transaction_id);
+                                                        setValue("application_id", item?.application_id);
+                                                        setValue("ref_no", item?.ref_no);
+                                                        setValue("service", item?.service);
+                                                        setServiceItem(item?.service);
+                                                        setValue("quantity", item?.quantity);
+                                                        console.log(item?.service)
+
+                                                    }} src={Images.editIcon} width={'35px'}></Box>}
+                                                    <Box>
+                                                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+
+                                                            let selectedID = item?.id
+                                                            setRows(rows?.filter(item2 => item2?.id != item?.id))
+                                                        }} width={'35px'}></Box>}
 
 
-                                            </Box>
+                                                    </Box>
 
-                                        </Box></TableCell>
-                                    </TableRow>
-                                ))}
+                                                </Box></TableCell>
+                                            </TableRow>
+                                        ))}
 
-                                <TableRow>
-                                    <TableCell colSpan={9} align="right">
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
-                                    </TableCell>
-                                </TableRow>
+                                        <TableRow>
+                                            <TableCell colSpan={9} align="right">
+                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                                            </TableCell>
+                                        </TableRow>
 
-                                {/* Amount Total Row (optional, if needed for the final sum) */}
-                                <TableRow>
-                                    <TableCell colSpan={9} align="right">
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* This can be the same as Sub-total */}
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </form>
-            </>
+                                        {/* Amount Total Row (optional, if needed for the final sum) */}
+                                        <TableRow>
+                                            <TableCell colSpan={9} align="right">
+                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* This can be the same as Sub-total */}
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </form>
+                    </>
                 }
-        </Box >
+            </Box >
         </>
     );
 }

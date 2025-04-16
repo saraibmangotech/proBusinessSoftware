@@ -382,7 +382,7 @@ function CardList() {
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"
-                    onClick={() => { navigate('/create-bank'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    onClick={() => { navigate('/create-card'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
                 />}
 

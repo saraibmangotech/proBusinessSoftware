@@ -148,27 +148,9 @@ function CreatePaidReceipt() {
     reset();
     setServiceItem("");
   };
-  const isFormDataEmpty = (data) => {
-    // Check if all form fields are empty
-    return Object.values(data).every((value) => {
-      // If the value is an object (like companyLogo), check if it's empty
-      if (typeof value === "object" && value !== null) {
-        return Object.keys(value).length === 0;
-      }
-      // Otherwise, check if the value is an empty string
-      return value === "";
-    });
-  };
 
-  const allowFilesType = [
-    "image/png",
-    "image/jpg",
-    "image/jpeg",
-    "application/pdf",
-    "application/vnd.ms-excel",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
+
+
   const allowFilesType2 = ["image/png", "image/jpg", "image/jpeg"];
   const [guarantors, setGuarantors] = useState([]);
   const [activeStep, setActiveStep] = React.useState(1);
@@ -188,7 +170,9 @@ function CreatePaidReceipt() {
   const [loading, setLoading] = useState(false);
   const [emailVerify, setEmailVerify] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedBank, setSelectedBank] = useState(null);
   const [loader, setLoader] = useState(false);
+  console.log(selectedBank, "objobj")
 
   const [center, setCenter] = useState(null);
   const [status, setStatus] = useState(null);
@@ -223,15 +207,17 @@ function CreatePaidReceipt() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [detail, setDetail] = useState(null);
   const [banks, setBanks] = useState([]);
+  const [holdState, setHoldState] = useState(true);
   const [selectedMode, setSelectedMode] = useState(null);
   //documents array
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
-  console.log("object", getValues1("bank")?.id);
+  console.log("objobj", watch1("bank"));
 
   const submitForm1 = async (formData) => {
+    console.log(formData, "objobjj")
     setButtonDisabled(true)
     try {
       let obj = {
@@ -245,26 +231,46 @@ function CreatePaidReceipt() {
           selectedMode?.id == "Cash"
             ? 700117
             : selectedMode?.id == "Bank"
-              ? getValues1("bank")?.id
-              : null, // By default 700117 for Cash
-        ref_id:
-          selectedMode?.id == "Bank" || selectedMode?.id == "Bank" ? "2" : null, //bank or card id null for cash
+              ? selectedBank?.account_id
+              : selectedMode?.id == "Payment Link"
+                ? 700171 : null,
+        ref_id: selectedMode?.id == "Bank" ? selectedBank?.id : null,
         remarks: formData?.remarks,
         narration: formData?.narration,
+
+        charges: detail?.sale_receipt_items?.reduce(
+          (acc, item) => acc + Number(item?.center_fee || 0),
+          0
+        ),
+        govt_charges: detail?.sale_receipt_items?.reduce(
+          (acc, item) => acc + Number(item?.govt_fee || 0),
+          0
+        ),
+        bank_charges: detail?.sale_receipt_items?.reduce(
+          (acc, item) => acc + Number(item?.bank_charge || 0),
+          0
+        ),
+
+        bank_name: selectedMode?.id == "Bank" ? selectedBank?.name : '',
+        bank_id: selectedMode?.id == "Bank" ? selectedBank?.id : '',
+        customer_id: detail?.customer_id,
+        invoice_prefix: detail?.invoice_prefix,
+        category_id: detail?.sale_receipt_items[0]?.service?.category_id
       };
 
-
+      console.log(obj, "objobj")
       if (detail?.is_paid == true) {
         ErrorToaster("Already paid");
       } else {
+
+        const promise = CustomerServices.PayReceipt(obj);
+        const response = await promise;
         showPromiseToast(
           promise,
           "Saving...",
           "Added Successfully",
           "Something Went Wrong"
         );
-        const promise = CustomerServices.PayReceipt(obj);
-        const response = await promise;
         if (response?.responseCode === 200) {
           window.location.reload();
         }
@@ -272,7 +278,7 @@ function CreatePaidReceipt() {
     } catch (error) {
       ErrorToaster(error);
     }
-    finally{
+    finally {
       setButtonDisabled(false)
     }
   };
@@ -328,6 +334,7 @@ function CreatePaidReceipt() {
         setSubTotal(data?.receipt?.total_amount);
         setValue1("total", data?.receipt?.total_amount);
         setValue1("balance", data?.receipt?.total_amount);
+        setValue1("cost_center", data?.receipt?.cost_center)
         setAccounts(data?.accounts?.rows);
       }
     } catch (error) {
@@ -442,12 +449,57 @@ function CreatePaidReceipt() {
     }
   };
 
+  // *For Get Account
+  const getReceiptDetail = async (state) => {
+    setFieldsDisabled(true);
+    try {
+      let params = {
+        token_number: getValues1("token"),
+        invoice_date: date,
+      };
+
+      const { data } = await CustomerServices.getReceiptDetail(params);
+      console.log(data);
+      if (data?.receipt) {
+        setHoldState(true);
+
+        setRows(data?.receipt?.sale_receipt_items);
+        setDetail(data?.receipt);
+
+        setValue1("paid", 0);
+        setValue1("customer", data?.receipt?.customer_name);
+        setValue1("invoice_date", moment().toDate());
+        setDate(new Date(data?.receipt?.invoice_date));
+        setValue1("mobile", data?.receipt?.customer_mobile);
+        setValue1("ref", data?.receipt?.ref);
+        setValue1("display_customer", data?.receipt?.customer_name);
+        setValue1("email", data?.receipt?.customer_email);
+        setValue1("address", data?.receipt?.address);
+        setValue1("trn", data?.receipt?.trn);
+        setValue1("cost_center", data?.receipt?.cost_center);
+        setValue1("caseno", data?.receipt?.case_no);
+        setSubTotal(data?.receipt?.total_amount);
+        setValue1("total", data?.receipt?.total_amount);
+        setValue1("balance", data?.receipt?.total_amount);
+        setValue1("cost_center", data?.receipt?.cost_center)
+        setAccounts(data?.accounts?.rows);
+      } else {
+       showErrorToast('Data Not Found')
+      
+      }
+    } catch (error) {
+      ErrorToaster(error);
+    } finally {
+      // setLoader(false)
+    }
+  };
   useEffect(() => {
     getBanks();
     getAccounts();
     getTax();
     getCategories();
     getServiceItem();
+    setDate(new Date())
     setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
     setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
   }, []);
@@ -482,7 +534,7 @@ function CreatePaidReceipt() {
                           label={"Invoice Date :*"}
                           value={date}
                           size={"small"}
-                          disabled={true}
+                          disabled={fieldsDisabled}
                           error={errors1?.date?.message}
                           register={register1("date")}
                           onChange={(date) => {
@@ -509,8 +561,29 @@ function CreatePaidReceipt() {
                           }}
                         />
                       </Grid>
+                      <Grid item md={3} sm={12} xs={12}>
+                        <InputField
+                          label="Token"
+                          size="small"
+                          disabled={fieldsDisabled}
+                          placeholder="Enter Token"
+                          register={register1("token")}
+                          InputProps={{
+                            endAdornment: (
+                              <IconButton
+                                onClick={() => {
+                                  getReceiptDetail();
 
-                      <Grid item md={3} sm={12} xs={12} mt={2.5}>
+
+                                }}
+                              >
+                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                              </IconButton>
+                            ),
+                          }}
+                        />
+                      </Grid>
+                      <Grid item md={2} sm={12} xs={12} mt={2.5}>
                         <PrimaryButton
                           bgcolor={"#bd9b4a"}
                           title="Clear"
@@ -642,7 +715,7 @@ function CreatePaidReceipt() {
 
                         />
                       </Grid>
-                      <Grid item md={3.8} sm={5.5} xs={12}>
+                      {/* <Grid item md={3.8} sm={5.5} xs={12}>
                         <InputField
                           label="Case No"
                           size="small"
@@ -653,7 +726,7 @@ function CreatePaidReceipt() {
                           })}
 
                         />
-                      </Grid>
+                      </Grid> */}
                       <Grid item md={3.8} sm={5.5} xs={12}>
                         <InputField
                           label="Ref"
@@ -730,6 +803,7 @@ function CreatePaidReceipt() {
                           <TextField
                             size="small"
                             placeholder="Transaction Id"
+                        
                             type="number"
                             value={item.transaction_id || ""}
                             onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
@@ -741,6 +815,7 @@ function CreatePaidReceipt() {
                             size="small"
                             placeholder="Application Id"
                             type="number"
+                            disabled={true}
                             value={item.application_id || ""}
                             onChange={(e) => handleInputChange(index, "application_id", e.target.value)}
                           />
@@ -751,6 +826,7 @@ function CreatePaidReceipt() {
                             size="small"
                             placeholder="Ref No"
                             type="number"
+                            disabled={true}
                             value={item.ref_no || ""}
                             onChange={(e) => handleInputChange(index, "ref_no", e.target.value)}
                           />
@@ -879,6 +955,7 @@ function CreatePaidReceipt() {
                         { id: "Cash", name: "Cash" },
                         { id: "Bank", name: "Bank" },
                         { id: "Card", name: "Card" },
+                        { id: "Payment Link", name: "Payment Link" },
                       ]}
                       selected={watch1("payment")}
                       onSelect={(value) => {
@@ -897,8 +974,10 @@ function CreatePaidReceipt() {
                         label="Banks"
                         size="small"
                         options={banks}
-                        selected={watch1("bank")}
-                        onSelect={(value) => setValue1("bank", value)}
+                        selected={selectedBank}
+                        onSelect={(value) => {
+                          setSelectedBank(value);
+                        }}
                         register={register1("bank", {
                           required: "please enter bank .",
                         })}
@@ -908,9 +987,9 @@ function CreatePaidReceipt() {
                   )}
                   <Grid item md={3} sm={12} xs={12}>
                     <InputField
-                      label="Remarks"
+                      label="Authorization Code"
                       size="small"
-                      placeholder="Remarks"
+                      placeholder="Authorization Code"
                       register={register1("remarks")}
                       error={errors1?.remarks?.message}
                     />

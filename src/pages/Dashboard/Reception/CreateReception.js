@@ -215,8 +215,7 @@ function ReceptionForm() {
                 
                 setSelectedCustomer(filter)
                 setValue1('customer', filter?.name)
-                setValue1('customerName', '')
-                setValue1('email', '')
+               
                
             }
 

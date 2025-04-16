@@ -666,7 +666,7 @@ function UpdatePaidReceipt() {
                                                     error={errors1?.trn?.message}
                                                 />
                                             </Grid>
-                                            <Grid item md={3.8} sm={5.5} xs={12}>
+                                            {/* <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Case No"
                                                     size="small"
@@ -675,7 +675,7 @@ function UpdatePaidReceipt() {
                                                     register={register1("caseno")}
                                                     error={errors1?.caseno?.message}
                                                 />
-                                            </Grid>
+                                            </Grid> */}
                                             <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
                                                     label="Ref"

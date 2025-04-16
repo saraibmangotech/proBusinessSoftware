@@ -1398,3 +1398,20 @@ th {
 .showPdf{
   display: none;
 }
+  .showPdf2{
+    display: none;
+  }
+  .mytable p{
+    color: black !important;
+  }
+  .mytable {
+    border: 1px solid black !important;
+  }
+  .mytable td{
+    border: 1px solid black !important;
+  }
+
+  .mytable th{
+    background-color: transparent !important;
+    border: 1px solid black !important;
+  }

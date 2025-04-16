@@ -281,7 +281,7 @@ function Header() {
 
             {
               id: 33,
-              name: "Create Pre Sale Receipt",
+              name: "Create  Sale Request",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -292,7 +292,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Pre Sale Receipt List",
+              name: "Sale Request List",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -434,7 +434,7 @@ function Header() {
           children: [
             {
               id: 31,
-              name: "Pre Sale Receipt List",
+              name: " Sale Request List ",
               icon: "customer",
               parent_id: 3,
               api: null,
@@ -463,20 +463,6 @@ function Header() {
         },
         {
           id: 2,
-          name: "Cashier",
-          icon: "customer",
-          parent_id: null,
-          api: "/api/roles",
-          route: "/create-paid-receipt",
-          identifier: null,
-          navigation: true,
-          children:[
-
-          ]
-
-        },
-        {
-          id: 2,
           name: "Sales",
           icon: "customer",
           parent_id: null,
@@ -489,7 +475,7 @@ function Header() {
 
             {
               id: 33,
-              name: "Create Pre Sale Receipt",
+              name: "Create  Sale Request",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -500,7 +486,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Pre Sale Receipt List",
+              name: " Sale Request List",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -509,24 +495,51 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-            // {
-            //   id: 14,
-            //   name: "Receptions",
-            //   icon: "customer",
-            //   parent_id: null,
-            //   api: "/api/roles",
-            //   route: "/reception-list",
-            //   identifier: null,
-            //   navigation: true,
-            //   order_by: 14,
-            //   children:[],
-            //   childRoute: [],
-            //   }
-            ,
+          
 
           
           ],
         },
+        {
+          id: 8,
+          name: "Cashier",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/create-paid-receipt",
+          identifier: null,
+          navigation: true,
+          children: [
+
+            {
+              id: 33,
+              name: "Create Paid Receipt",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/create-paid-receipt",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Paid Receipt List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/paid-receipts",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+          
+
+          
+          ],
+
+        },
+       
         {
           id: 15,
           name: "Purchase",
@@ -676,17 +689,7 @@ function Header() {
               navigation: true,
               order_by: 40,
             },
-            {
-              id: 148,
-              name: "PnL customer statement",
-              icon: "customer",
-              parent_id: 12,
-              api: null,
-              route: "/profit-loss-customer-report",
-              identifier: null,
-              navigation: true,
-              order_by: 41,
-            },
+          
             {
               id: 41,
               name: "Balance sheet",
@@ -698,17 +701,7 @@ function Header() {
               navigation: true,
               order_by: 41,
             },
-            {
-              id: 147,
-              name: "PnL visas statement",
-              icon: "customer",
-              parent_id: 12,
-              api: null,
-              route: "/profit-loss-visa-report",
-              identifier: null,
-              navigation: true,
-              order_by: 42,
-            },
+           
           ],
           childRoute: [
             "/create-journal-voucher",

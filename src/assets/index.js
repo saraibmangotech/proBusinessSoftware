@@ -6,6 +6,8 @@ export const FontFamily = {
 };
 
 export const Images = {
+	headerRightImage:require("./Images/headerRightImage.png"),
+	headerLeftImage:require("./Images/headerLeftImage.png"),
 	invoiceIcon:require("./Images/invoiceIcon.png"),
 	blueCircle:require("./Images/blue.png"),
 	pinkCircle:require("./Images/pink.png"),
@@ -93,7 +95,10 @@ export const Images = {
 	fileIcon:require("./Images/fileIcon.png"),
 	pdfImg:require("./Images/pdfImg.png"),
 	header:require("./Images/header.png"),
+	Header2:require("./Images/header2.png"),
 	footer:require("./Images/footer.png"),
+	Footer2: require("./Images/footer2.jpeg"),
+
 };
 
 export const Icons = {
