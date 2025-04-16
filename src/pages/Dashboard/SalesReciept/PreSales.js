@@ -510,7 +510,7 @@ function PreSalesList() {
       header: "Actions",
       cell: ({ row }) => (
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          {row?.original?.is_paid && <Box
+          { <Box
             component={"img"}
             sx={{ cursor: "pointer" }}
             onClick={() => {

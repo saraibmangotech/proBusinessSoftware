@@ -273,9 +273,13 @@ const UpdatePaidReceipt = lazy(() =>
 const CardList = lazy(() =>
   import("pages/Dashboard/Cards/Cards")
 );
+const CreateCard = lazy(() =>
+  import("pages/Dashboard/Cards/CreateCard")
+);
 const UpdateCard = lazy(() =>
   import("pages/Dashboard/Cards/UpdateCard")
 );
+
 const AdminRoutes = [
   
   {
@@ -285,6 +289,14 @@ const AdminRoutes = [
   {
     path: "/create-paid-receipt",
     component: <CreatePaidReceipt />,
+  },
+  {
+    path: "/create-card",
+    component: <CreateCard />,
+  },
+  {
+    path: "/update-card/:id",
+    component: <UpdateCard />,
   },
   {
     path: "/update-paid-receipt/:id",

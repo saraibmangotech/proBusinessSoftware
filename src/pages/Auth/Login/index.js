@@ -268,16 +268,13 @@ function Login() {
                 <Grid item xs={12} sm={12}>
                   <InputField
                     size={"small"}
-                    label={'Email'}
-                    type={'email'}
-                    placeholder={'Email Address'}
+                    label={'Email/Employee ID'}
+                    type={'text'}
+                    placeholder={'Email/Employee ID'}
                     error={errors?.email?.message || inputError}
                     register={register("email", {
-                      required: 'Please enter your email.',
-                      pattern: {
-                        value: emailRegex,
-                        message: 'Please enter a valid email.',
-                      }
+                      required: 'Please enter your email/employee id.',
+                    
                     })}
                   />
                 </Grid>

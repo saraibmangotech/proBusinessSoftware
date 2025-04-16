@@ -152,15 +152,15 @@ function SalesReciept() {
     const newRow = { ...data, service: serviceItem };
 
     setRows((prevRows) => {
-        const updatedRows = [...prevRows, newRow];
-        const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
-        setSubTotal(newSubTotal);
-        return updatedRows;
+      const updatedRows = [...prevRows, newRow];
+      const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
+      setSubTotal(newSubTotal);
+      return updatedRows;
     });
 
     reset();
     setServiceItem("");
-};
+  };
 
   const [activeStep, setActiveStep] = React.useState(1);
 
@@ -253,7 +253,7 @@ function SalesReciept() {
       ...rest,
       service_id: id,
     }));
-    
+
     try {
       let obj = {
         token_number: formData?.token,
@@ -272,23 +272,23 @@ function SalesReciept() {
         total_amount: subTotal,
         items: updatedRows,
       };
-  
+
       console.log(formData, "formData");
-  
+
       const apiPromise = CustomerServices.CreateSaleReceipt(obj);
-  
+
       // Show the toast without awaiting immediately
       showPromiseToast(apiPromise, "Saving...", "Added Successfully", "Something Went Wrong");
-  
+
       // Wait for the result separately
       const response = await apiPromise;
-  
+
       // Now you can use the response data
       if (response?.responseCode === 200) {
-        console.log(response,'response');
-        
+        console.log(response, 'response');
+
         const invoice = {
-          id:response?.data?.id,
+          id: response?.data?.id,
           date: moment(date).format("DD-MM-YYYY"),
           invoiceType: formData?.invoice_number,
           trn: formData?.trn,
@@ -306,12 +306,12 @@ function SalesReciept() {
           totalPayable: 396.13,
         };
         console.log(invoice, 'invoice');
-  
+
         setInvoiceData(invoice);
-  
-       
+
+
       }
-  
+
     } catch (error) {
       ErrorToaster(error);
     } finally {
@@ -319,13 +319,13 @@ function SalesReciept() {
     }
   };
   useEffect(() => {
-    if(invoiceData){
+    if (invoiceData) {
       generatePDF()
     }
-    
-   
+
+
   }, [invoiceData])
-  
+
 
   // *For Get Account
   const getReceptionDetail = async (value) => {
@@ -401,39 +401,39 @@ function SalesReciept() {
     console.log(value, "idididid");
     setServiceItem(value);
     if (value) {
-        // setLoader(true)
-        try {
-            let params = {
-                service_id: value?.id,
-            };
+      // setLoader(true)
+      try {
+        let params = {
+          service_id: value?.id,
+        };
 
-            const { data } = await CustomerServices.DetailServiceItem(params);
-            setValue("id", data?.service?.id);
-            setValue("govt_fee", data?.service?.bank_service_charge);
-            setValue("center_fee", data?.service?.center_fee);
-            setValue("bank_charge", data?.service?.bank_service_charge);
-            // setValue("transaction_id", data?.transaction_id);
-            setServiceItem(data?.service);
-            setValue("quantity", 1);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
+        const { data } = await CustomerServices.DetailServiceItem(params);
+        setValue("id", data?.service?.id);
+        setValue("govt_fee", data?.service?.bank_service_charge);
+        setValue("center_fee", data?.service?.center_fee);
+        setValue("bank_charge", data?.service?.bank_service_charge);
+        // setValue("transaction_id", data?.transaction_id);
+        setServiceItem(data?.service);
+        setValue("quantity", 1);
+      } catch (error) {
+        ErrorToaster(error);
+      } finally {
+        // setLoader(false)
+      }
     }
     else {
-        setValue("id", '');
-        setValue("govt_fee", '');
-        setValue("center_fee", '');
-        setValue("bank_charge", '');
-        setValue("transaction_id", '');
-        setValue("application_id", '');
-        setValue("ref_no", '');
-        setServiceItem(null);
-        setValue("quantity", '');
+      setValue("id", '');
+      setValue("govt_fee", '');
+      setValue("center_fee", '');
+      setValue("bank_charge", '');
+      setValue("transaction_id", '');
+      setValue("application_id", '');
+      setValue("ref_no", '');
+      setServiceItem(null);
+      setValue("quantity", '');
     }
 
-};
+  };
 
 
   const getAccounts = async (page, limit, filter) => {
@@ -519,34 +519,34 @@ function SalesReciept() {
     console.log("Current serviceItem:", serviceItem);
 
     if (!data?.id) {
-        console.warn("No valid ID found in data. Skipping update.");
-        return;
+      console.warn("No valid ID found in data. Skipping update.");
+      return;
     }
 
     const updatedItem = { ...data, service: serviceItem };
     console.log("Updated item to be saved:", updatedItem);
 
     setRows(prevItems => {
-        console.log("Previous rows:", prevItems);
-        
-        const updatedRows = prevItems.map(item => {
-            if (item.id === data.id) {
-                console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
-                return updatedItem;
-            } else {
-                return item;
-            }
-        });
+      console.log("Previous rows:", prevItems);
 
-        console.log("Rows after update:", updatedRows);
-        return updatedRows;
+      const updatedRows = prevItems.map(item => {
+        if (item.id === data.id) {
+          console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
+          return updatedItem;
+        } else {
+          return item;
+        }
+      });
+
+      console.log("Rows after update:", updatedRows);
+      return updatedRows;
     });
 
     console.log("Resetting form and states...");
     reset();
     setServiceItem(null);
     setEditState(false);
-};
+  };
 
   useEffect(() => {
     getAccounts();
@@ -600,22 +600,22 @@ function SalesReciept() {
               <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
                 Create Sales Receipt
               </Typography>
-                <Button
-                      type="submit"
+              <Button
+                type="submit"
 
-                      disabled={rows?.length === 0}
-                      variant="contained"
-                      sx={{
-                        width: "200px",
-                        textTransform: "capitalize",
-                        backgroundColor: "#bd9b4a",
-                        ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
-                        },
-                      }}
-                    >
-                      Place Invoice
-                    </Button>
+                disabled={rows?.length === 0}
+                variant="contained"
+                sx={{
+                  width: "200px",
+                  textTransform: "capitalize",
+                  backgroundColor: "#bd9b4a",
+                  ":hover": {
+                    backgroundColor: "rgb(189 155 74)",
+                  },
+                }}
+              >
+                Place Invoice
+              </Button>
             </Box>
 
             <Box sx={{ p: 3 }}>
@@ -635,8 +635,8 @@ function SalesReciept() {
                               <IconButton
                                 onClick={() => {
                                   getReceiptDetail();
-                                 
-                                 
+
+
                                 }}
                               >
                                 <SearchIcon sx={{ color: "#bd9b4a" }} />
@@ -657,8 +657,8 @@ function SalesReciept() {
                               <IconButton
                                 onClick={() => {
                                   getReceiptDetail();
-                                 
-                                  
+
+
                                 }}
                               >
                                 <SearchIcon sx={{ color: "#bd9b4a" }} />
@@ -804,7 +804,7 @@ function SalesReciept() {
                         size="small"
                         placeholder="Email"
                         register={register1("email", {
-                          required: "please enter email .",
+                          required: false,
                         })}
                         error={errors1?.email?.message}
                       />
@@ -867,7 +867,7 @@ function SalesReciept() {
                         multiline
                         rows={2}
                         register={register1("address", {
-                          required: "please enter address .",
+                          required: false,
                         })}
                         error={errors1?.address?.message}
                       />
@@ -878,1003 +878,1035 @@ function SalesReciept() {
             </Box>
 
           </Box>
-          </Box>
-          <form onSubmit={handleSubmit(!editState ? addItem : updateItem)}>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
-                                            <TableCell sx={{ width: "400px" }}>Service</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Qty</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Trsn Id</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>App/Case ID</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Total</TableCell>
-                                            <TableCell sx={{ width: "150px" }}>Action</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {<TableRow>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    disabled={true}
-                                                    placeholder="Item code"
-                                                    register={register("id", { required: "Item code is required" })}
-                                                />
-                                                {errors.id && <span>{errors.id.message}</span>}
-                                            </TableCell>
-                                            <TableCell>
-                                                <SelectField
-                                                    size="small"
-                                                    options={services}
-                                                    disabled={detail?.is_paid}
-                                                    selected={serviceItem}
-                                                    onSelect={handleServiceSelect}
-                                                    //  error={errors?.service?.message}
-                                                    register={register("service", {
-                                                        required: "Please select a service.",
-                                                    })}
-                                                />
-                                                {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    disabled={detail?.is_paid}
-                                                    placeholder="Quantity"
-                                                    type="number"
-                                                    register={register("quantity", { required: "Quantity is required" })}
-                                                />
-                                                {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    disabled={detail?.is_paid}
-                                                    placeholder="Govt fee"
-                                                    type="number"
-                                                    register={register("govt_fee", { required: "Govt fee is required" })}
-                                                />
-                                                {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    disabled={detail?.is_paid}
-                                                    placeholder="Center Fee"
-                                                    type="number"
-                                                    register={register("center_fee", { required: "Center fee is required" })}
-                                                />
-                                                {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    disabled={detail?.is_paid}
-                                                    placeholder="Bank Charges"
-                                                    type="number"
-                                                    register={register("bank_charge", { required: "Bank charges are required" })}
-                                                    
-                                                />
-                                                {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
+        </Box>
+        <form onSubmit={handleSubmit(!editState ? addItem : updateItem)}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
+                  <TableCell sx={{ width: "400px" }}>Service</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Qty</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Govt fee</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Center fee</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Bank Charge</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Trsn Id</TableCell>
+                  <TableCell sx={{ width: "150px" }}>App/Case ID</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Total</TableCell>
+                  <TableCell sx={{ width: "150px" }}>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {<TableRow>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      disabled={true}
+                      placeholder="Item code"
+                      register={register("id", { required: "Item code is required" })}
+                    />
+                    {errors.id && <span>{errors.id.message}</span>}
+                  </TableCell>
+                  <TableCell>
+                    <SelectField
+                      size="small"
+                      options={services}
+                      disabled={detail?.is_paid}
+                      selected={serviceItem}
+                      onSelect={handleServiceSelect}
+                      //  error={errors?.service?.message}
+                      register={register("service", {
+                        required: "Please select a service.",
+                      })}
+                    />
+                    {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      disabled={detail?.is_paid}
+                      placeholder="Quantity"
+                      type="number"
+                      register={register("quantity", { required: "Quantity is required" })}
+                    />
+                    {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      disabled={detail?.is_paid}
+                      placeholder="Govt fee"
+                      type="number"
+                      register={register("govt_fee", { required: "Govt fee is required" })}
+                    />
+                    {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      disabled={detail?.is_paid}
+                      placeholder="Center Fee"
+                      type="number"
+                      register={register("center_fee", { required: "Center fee is required" })}
+                    />
+                    {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      disabled={detail?.is_paid}
+                      placeholder="Bank Charges"
+                      type="number"
+                      register={register("bank_charge", { required: "Bank charges are required" })}
 
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    placeholder="Transaction Id"
-                                                    type="number"
-                                                    register={register("transaction_id", { required: false })}
+                    />
+                    {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
 
-                                                />
-                                                {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      placeholder="Transaction Id"
+                      type="number"
+                      register={register("transaction_id", { required: false })}
 
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    placeholder="Application Id"
-                                                    type="number"
-                                                    register={register("application_id", {
-                                                      required: false ,
-                                                    })}
-                                                />
-                                                {errors.application_id && (
-                                                    <span style={{ color: "red" }}>
-                                                        {errors.application_id.message}
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <InputField
-                                                    size="small"
-                                                    placeholder=" Ref No"
-                                                    type="number"
-                                                    register={register("ref_no", {
-                                                      required: false ,
-                                                    })}
-                                                />
-                                                {errors.ref_no && (
-                                                    <span style={{ color: "red" }}>
-                                                        {errors.ref_no.message}
-                                                    </span>
-                                                )}
-                                            </TableCell>
+                    />
+                    {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
 
-                                            <TableCell>
-                                                <InputField
-                                                    disabled={true}
-                                                    style={{ border: "none" }}
-                                                    size="small"
-                                                    placeholder=""
-                                                    register={register("total")}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                {(!editState && !detail?.is_paid) && <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    type="submit"
-                                                    sx={{
-                                                        textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
-                                                        fontSize: "12px",
-                                                        ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
-                                                        },
-                                                    }}
-                                                >
-                                                    <AddIcon />
-                                                </Button>}
-                                                {editState && <> <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    type="submit"
-                                                    sx={{
-                                                        textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
-                                                        fontSize: "12px",
-                                                        ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
-                                                        },
-                                                    }}
-                                                >
-                                                    Update
-                                                </Button>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      placeholder="Application Id"
+                      type="number"
+                      register={register("application_id", {
+                        required: false,
+                      })}
+                    />
+                    {errors.application_id && (
+                      <span style={{ color: "red" }}>
+                        {errors.application_id.message}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <InputField
+                      size="small"
+                      placeholder=" Ref No"
+                      type="number"
+                      register={register("ref_no", {
+                        required: false,
+                      })}
+                    />
+                    {errors.ref_no && (
+                      <span style={{ color: "red" }}>
+                        {errors.ref_no.message}
+                      </span>
+                    )}
+                  </TableCell>
 
-                                                        onClick={() => {
-                                                            setEditState(false)
+                  <TableCell>
+                    <InputField
+                      disabled={true}
+                      style={{ border: "none" }}
+                      size="small"
+                      placeholder=""
+                      register={register("total")}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {(!editState && !detail?.is_paid) && <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{
+                        textTransform: 'capitalize',
+                        backgroundColor: "rgb(189 155 74)",
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "rgb(189 155 74)",
+                        },
+                      }}
+                    >
+                      <AddIcon />
+                    </Button>}
+                    {editState && <> <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{
+                        textTransform: 'capitalize',
+                        backgroundColor: "rgb(189 155 74)",
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "rgb(189 155 74)",
+                        },
+                      }}
+                    >
+                      Update
+                    </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
 
-                                                            setValue("id", '');
-                                                            setValue("govt_fee", '');
-                                                            setValue("center_fee", '');
-                                                            setValue("bank_charge", '');
-                                                            setValue("transaction_id", '');
-                                                            setValue("application_id", '');
-                                                            setValue("ref_no", '');
-                                                            setServiceItem(null);
-                                                            setValue("quantity", '');
-                                                        }}
-                                                        sx={{
-                                                            mt: 2,
-                                                            textTransform: 'capitalize',
-                                                            backgroundColor: "rgb(189 155 74)",
-                                                            fontSize: "12px",
-                                                            ":hover": {
-                                                                backgroundColor: "rgb(189 155 74)",
-                                                            },
-                                                        }}
-                                                    >
-                                                        Cancel
-                                                    </Button></>}
-                                            </TableCell>
-                                        </TableRow>}
+                        onClick={() => {
+                          setEditState(false)
 
-                                        {rows?.length > 0 && rows?.map((item, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell>{item?.id}</TableCell>
-                                                <TableCell>{item?.service?.name}</TableCell>
-                                                <TableCell>{item?.quantity}</TableCell>
-                                                <TableCell>{item?.govt_fee}</TableCell>
-                                                <TableCell>{item?.center_fee}</TableCell>
-                                                <TableCell>{item?.bank_charge}</TableCell>
-                                                <TableCell>{item?.transaction_id}</TableCell>
-                                                <TableCell>{item?.application_id}</TableCell>
-                                                <TableCell>{item?.ref_no}</TableCell>
+                          setValue("id", '');
+                          setValue("govt_fee", '');
+                          setValue("center_fee", '');
+                          setValue("bank_charge", '');
+                          setValue("transaction_id", '');
+                          setValue("application_id", '');
+                          setValue("ref_no", '');
+                          setServiceItem(null);
+                          setValue("quantity", '');
+                        }}
+                        sx={{
+                          mt: 2,
+                          textTransform: 'capitalize',
+                          backgroundColor: "rgb(189 155 74)",
+                          fontSize: "12px",
+                          ":hover": {
+                            backgroundColor: "rgb(189 155 74)",
+                          },
+                        }}
+                      >
+                        Cancel
+                      </Button></>}
+                  </TableCell>
+                </TableRow>}
 
-                                                <TableCell>{item?.total}</TableCell>
-                                                <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
+                {rows?.length > 0 && rows?.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item?.id}</TableCell>
+                    <TableCell>{item?.service?.name}</TableCell>
+                    <TableCell>{item?.quantity}</TableCell>
+                    <TableCell>{item?.govt_fee}</TableCell>
+                    <TableCell>{item?.center_fee}</TableCell>
+                    <TableCell>{item?.bank_charge}</TableCell>
+                    <TableCell>{item?.transaction_id}</TableCell>
+                    <TableCell>{item?.application_id}</TableCell>
+                    <TableCell>{item?.ref_no}</TableCell>
 
-                                                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
-                                                        setSelectedRow(item); setEditState(true)
-                                                        console.log(item);
-                                                        
-                                                        setValue("id", item?.id);
-                                                        setValue("govt_fee", item?.govt_fee);
-                                                        setValue("center_fee", item?.service?.center_fee);
-                                                        setValue("bank_charge", item?.service?.bank_service_charge);
-                                                        setValue("transaction_id", item?.transaction_id);
-                                                        setValue("application_id", item?.application_id);
-                                                        setValue("ref_no", item?.ref_no);
-                                                        setValue("service", item?.service);
-                                                        setServiceItem(item?.service);
-                                                        setValue("quantity", item?.quantity);
-                                                        console.log(item?.service)
+                    <TableCell>{item?.total}</TableCell>
+                    <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
-                                                    }} src={Images.editIcon} width={'35px'}></Box>}
-                                                    <Box>
-                                                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+                      {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
+                        setSelectedRow(item); setEditState(true)
+                        console.log(item);
 
-                                                            let selectedID = item?.id
-                                                            setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                        }} width={'35px'}></Box>}
+                        setValue("id", item?.id);
+                        setValue("govt_fee", item?.govt_fee);
+                        setValue("center_fee", item?.service?.center_fee);
+                        setValue("bank_charge", item?.service?.bank_service_charge);
+                        setValue("transaction_id", item?.transaction_id);
+                        setValue("application_id", item?.application_id);
+                        setValue("ref_no", item?.ref_no);
+                        setValue("service", item?.service);
+                        setServiceItem(item?.service);
+                        setValue("quantity", item?.quantity);
+                        console.log(item?.service)
+
+                      }} src={Images.editIcon} width={'35px'}></Box>}
+                      <Box>
+                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+
+                          let selectedID = item?.id
+                          setRows(rows?.filter(item2 => item2?.id != item?.id))
+                        }} width={'35px'}></Box>}
 
 
-                                                    </Box>
+                      </Box>
 
-                                                </Box></TableCell>
-                                            </TableRow>
-                                        ))}
+                    </Box></TableCell>
+                  </TableRow>
+                ))}
 
-                                        <TableRow>
-                                            <TableCell colSpan={9} align="right">
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
-                                            </TableCell>
-                                        </TableRow>
+                <TableRow>
+                  <TableCell colSpan={9} align="right">
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell colSpan={9} align="right">
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>Net Taxable Amount:</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows
+                      ?.reduce(
+                        (total, item) =>
+                          total + parseFloat(item?.center_fee ?? 0),
+                        0
+                      ).toFixed(2)
+                    }</Typography> {/* Display the Sub-total */}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell colSpan={9} align="right">
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(rows
+                      ?.reduce(
+                        (total, item) =>
+                          total + parseFloat(item?.center_fee ?? 0),
+                        0
+                      ) * 0.05).toFixed(2)
+                    }</Typography> {/* Display the Sub-total */}
+                  </TableCell>
+                </TableRow>
+                {/* Amount Total Row (optional, if needed for the final sum) */}
+                <TableRow>
+                  <TableCell colSpan={9} align="right">
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(parseFloat(subTotal) + parseFloat(rows
+                      ?.reduce(
+                        (total, item) =>
+                          total + parseFloat(item?.center_fee ?? 0),
+                        0
+                      ) * 0.05)).toFixed(2)}</Typography> {/* This can be the same as Sub-total */}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </form>
 
-                                        {/* Amount Total Row (optional, if needed for the final sum) */}
-                                        <TableRow>
-                                            <TableCell colSpan={9} align="right">
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* This can be the same as Sub-total */}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </form>
 
-         
-        
+
       </Box>
       {console.log(invoiceData)}
-       <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
-             <div className="w-full h-[115px] flex justify-center items-center mb-4">
-               <img
-                 src={Images.header}
-                 alt="Header"
-                 style={{ width: "100%" }}
-                 className="max-w-full h-auto"
-               />
-             </div>
-     
-             <Box
-               sx={{
-                 display: "flex",
-                 border: "1px solid #000",
-                 my: 2,
-                 fontSize: "15px",
-               }}
-             >
-               <Box
-                 sx={{
-                   width: "50%",
-                   p: 2,
-                   borderRight: "1px solid #000",
-                   display: "flex",
-                   flexDirection: "column",
-                 }}
-               >
-     
-     
-                 <Grid container spacing={1}>
-     
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "15px" }}
-                     >
-                       Invoice Type - Invoice No
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                       {invoiceData?.invoiceType}
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <p
-                       variant="body2"
-                       style={{
-                         fontWeight: "bold",
-                         fontSize: "12px",
-                         margin: 0,
-                       }}
-                     >
-                       Date/التاريخ والوقت
-                     </p>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "12px" }}>
-                       {invoiceData?.date}
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "15px" }}
-                     >
-                       Name Of Employee (Typist)
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                       Typist
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "15px" }}
-                     >
-                       Name Of Employee (Cashier)
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                       Cashier
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "15px" }}
-                     >
-                       Application number/Case number
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-     
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "15px" }}
-                     >
-                       TRN:
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                       {invoiceData?.trn}
-                     </Typography>
-                   </Grid>
-     
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "15px" }}
-                     >
-                       Token Number
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                       {invoiceData?.tokenNumber}
-                     </Typography>
-                   </Grid>
-                 </Grid>
-               </Box>
-     
-               <Box sx={{ width: "50%", p: 2 }}>
-                 <Grid item xs={6}>
-                   <p
-                     variant="body2"
-                     style={{
-                       fontSize: "12px",
-                       fontWeight: "bold",
-                       margin: 0,
-                       // textAlign:"center",
-                       // marginBottom:2
-                     }}
-                   >
-                     Customer Information معلومات المتعاملين
-                   </p>
-                 </Grid>
-     
-     
-                 <Grid container spacing={1}>
-                   <Grid item xs={6}>
-                     <p
-                       variant="body2"
-                       style={{
-                         fontSize: "12px",
-                         fontWeight: "bold",
-                         margin: 0,
-                         // textAlign:"center",
-                         // marginBottom:2
-                       }}
-                     >
-                       Name.. / الاسم
-                     </p>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "12px" }}>
-                       {invoiceData?.customerName}
-                     </Typography>
-                   </Grid>
-     
-                   <Grid item xs={6}>
-                     <p
-                       variant="body2"
-                       style={{
-                         fontSize: "12px",
-                         fontWeight: "bold",
-                         margin: 0,
-                       }}
-                     >
-                       Phone/ الهاتف رق
-                     </p>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                       {invoiceData?.mobileNo}
-                     </Typography>
-                   </Grid>
-     
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "12px" }}
-                     >
-                       Email / الالكتروني البريد
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "12px" }}>
-                       {invoiceData?.email}
-                     </Typography>
-                   </Grid>
-     
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "12px" }}
-                     >
-                       The No.of the Claim Or Request /
-                       رقم الطلب أو الدعوى
-     
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "12px" }}>
-     
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontWeight: "bold", fontSize: "12px" }}
-                     >
-                       Customer Address
-     
-                     </Typography>
-                   </Grid>
-                   <Grid item xs={6}>
-                     <Typography variant="body2" sx={{ fontSize: "12px" }}>
-                       {invoiceData?.customerAddress}
-                     </Typography>
-                   </Grid>
-                 </Grid>
-               </Box>
-             </Box>
-     
-             <Box sx={{ my: 5 }}>
-               <p
-                 variant="h6"
-                 style={{
-                   fontSize: "15px",
-                 }}
-               >
-                 Particulars تفاصيل
-               </p>
-     
-               <table className="mytable" style={{ width: "100%", borderCollapse: "collapse" }}>
-                 <thead>
-                   <tr style={{ backgroundColor: "transparent" }}>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "5%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black', }}>Sl.No الرقم</p>
-                     </th>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "30%",
-                         fontWeight: "bold",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black' }}>Service - الخدمات</p>
-                     </th>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "8%",
-                         fontWeight: "bold",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black', }}>Qty - الكمية</p>
-                     </th>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "18%",
-                         fontWeight: "bold",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black' }}>
-                         Govt Fee and Bank Charge - الرسوم الحكومية
-                       </p>
-                     </th>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "15%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black' }}>
-                         Service Charge Taxable - تكلفة الخدمة
-                       </p>
-                     </th>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "15%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black' }}>Tax Amt - قيمة المضافة</p>
-                     </th>
-                     <th
-                       style={{
-                         border: "1px solid black !important",
-                         padding: "8px",
-                         textAlign: "center",
-                         width: "15%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", color: 'black' }}>Total - الإجمالي بالدرهم</p>
-                     </th>
-                   </tr>
-                 </thead>
-                 <tbody>
-                   {invoiceData?.items?.map((item) => (
-                     <tr key={item.id}>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                         }}
-                       >
-                         {item?.id}
-                       </td>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                         }}
-                       >
-                         <div
-                           style={{
-                             display: "flex",
-                             justifyContent: "space-between",
-                           }}
-                         >
-                           <span style={{ fontSize: "12px", fontWeight: "bold" }}>
-                             {item?.service?.name}
-                           </span>
-                           <span style={{ fontSize: "12px" }}>
-                             {item.service?.name_ar}
-                           </span>
-                         </div>
-                         {/* <p style={{ fontSize: "9px", textAlign: "left" }}>
+      <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
+        <div className="w-full h-[115px] flex justify-center items-center mb-4">
+          <img
+            src={Images.header}
+            alt="Header"
+            style={{ width: "100%" }}
+            className="max-w-full h-auto"
+          />
+        </div>
+
+        <Box
+          sx={{
+            display: "flex",
+            border: "1px solid #000",
+            my: 2,
+            fontSize: "15px",
+          }}
+        >
+          <Box
+            sx={{
+              width: "50%",
+              p: 2,
+              borderRight: "1px solid #000",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+
+
+            <Grid container spacing={1}>
+
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                >
+                  Invoice Type - Invoice No
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                  {invoiceData?.invoiceType}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <p
+                  variant="body2"
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "12px",
+                    margin: 0,
+                  }}
+                >
+                  Date/التاريخ والوقت
+                </p>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                  {invoiceData?.date}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                >
+                  Name Of Employee (Typist)
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                  Typist
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                >
+                  Name Of Employee (Cashier)
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                  Cashier
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                >
+                  Application number/Case number
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                >
+                  TRN:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                  {invoiceData?.trn}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                >
+                  Token Number
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                  {invoiceData?.tokenNumber}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+
+          <Box sx={{ width: "50%", p: 2 }}>
+            <Grid item xs={6}>
+              <p
+                variant="body2"
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  margin: 0,
+                  // textAlign:"center",
+                  // marginBottom:2
+                }}
+              >
+                Customer Information معلومات المتعاملين
+              </p>
+            </Grid>
+
+
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
+                <p
+                  variant="body2"
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    margin: 0,
+                    // textAlign:"center",
+                    // marginBottom:2
+                  }}
+                >
+                  Name.. / الاسم
+                </p>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                  {invoiceData?.customerName}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <p
+                  variant="body2"
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    margin: 0,
+                  }}
+                >
+                  Phone/ الهاتف رق
+                </p>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                  {invoiceData?.mobileNo}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "12px" }}
+                >
+                  Email / الالكتروني البريد
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                  {invoiceData?.email}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "12px" }}
+                >
+                  The No.of the Claim Or Request /
+                  رقم الطلب أو الدعوى
+
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "12px" }}
+                >
+                  Customer Address
+
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                  {invoiceData?.customerAddress}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+
+        <Box sx={{ my: 5 }}>
+          <p
+            variant="h6"
+            style={{
+              fontSize: "15px",
+            }}
+          >
+            Particulars تفاصيل
+          </p>
+
+          <table className="mytable" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ backgroundColor: "transparent" }}>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "5%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black', }}>Sl.No الرقم</p>
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "30%",
+                    fontWeight: "bold",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black' }}>Service - الخدمات</p>
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "8%",
+                    fontWeight: "bold",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black', }}>Qty - الكمية</p>
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "18%",
+                    fontWeight: "bold",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black' }}>
+                    Govt Fee and Bank Charge - الرسوم الحكومية
+                  </p>
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "15%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black' }}>
+                    Service Charge Taxable - تكلفة الخدمة
+                  </p>
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "15%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black' }}>Tax Amt - قيمة المضافة</p>
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black !important",
+                    padding: "8px",
+                    textAlign: "center",
+                    width: "15%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", color: 'black' }}>Total - الإجمالي بالدرهم</p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoiceData?.items?.map((item) => (
+                <tr key={item.id}>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {item?.id}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span style={{ fontSize: "12px", fontWeight: "bold" }}>
+                        {item?.service?.name}
+                      </span>
+                      <span style={{ fontSize: "12px" }}>
+                        {item.service?.name_ar}
+                      </span>
+                    </div>
+                    {/* <p style={{ fontSize: "9px", textAlign: "left" }}>
                                {item?.details}
                              </p> */}
-                       </td>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                           fontSize: "12px",
-                         }}
-                       >
-                         {item?.quantity}
-                       </td>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                           fontSize: "12px",
-                         }}
-                       >
-                         {(
-                           parseFloat(item?.govt_fee || 0) +
-                           parseFloat(item?.bank_charge || 0)
-                         ).toFixed(2)}
-                       </td>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                           fontSize: "12px",
-                         }}
-                       >
-                         {parseFloat(item?.center_fee).toFixed(2)}
-                       </td>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                           fontSize: "12px",
-                         }}
-                       >
-                         {parseFloat(item?.bank_charge).toFixed(2)}
-                       </td>
-                       <td
-                         style={{
-                           border: "1px solid black !important",
-                           padding: "8px",
-                           textAlign: "center",
-                           fontSize: "12px",
-                         }}
-                       >
-                         {parseFloat(item?.total).toFixed(2)}
-                       </td>
-                     </tr>
-                   ))}
-                 </tbody>
-               </table>
-     
-               <table className="mytable" style={{ width: "100%", borderCollapse: "collapse" }}>
-                 <tbody>
-                   <tr>
-                     <td
-                       colSpan={5}
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "right",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                         Total Govt.fee & Bank Charge
-                       </p>
-                     </td>
-                     <td
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "center",
-                         width: "8%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                         {invoiceData?.items
-                           ?.reduce(
-                             (total, item) =>
-                               parseFloat(total) +
-                               parseFloat(item?.govt_fee ?? 0) +
-                               parseFloat(item?.bank_charge ?? 0),
-                             0
-                           )
-                           ?.toFixed(2)}
-                       </p>
-                     </td>
-                   </tr>
-                   <tr>
-                     <td
-                       colSpan={5}
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "right",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount</p>
-                     </td>
-                     <td
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "center",
-                         width: "10%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                         {invoiceData?.items
-                           ?.reduce(
-                             (total, item) =>
-                               total + parseFloat(item?.center_fee ?? 0),
-                             0
-                           )
-                           ?.toFixed(2)}
-                       </p>
-                     </td>
-                   </tr>
-                   <tr>
-                     <td
-                       colSpan={5}
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "right",
-                       }}
-                     >
-                       <p
-                         style={{
-                           fontSize: "12px",
-                           fontFamily: "'Amiri', Arial, sans-serif",
-                           fontWeight: 'bold'
-                         }}
-                         className="arabic-text"
-                       >
-                         Total VAT إجمالي القيمة المضافة
-                       </p>
-                     </td>
-                     <td
-                       align="center"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "center",
-                         width: "10%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                         {invoiceData?.items
-                           ?.reduce(
-                             (total, item) =>
-                               total + parseFloat(item?.bank_charge ?? 0),
-                             0
-                           )
-                           ?.toFixed(2)}
-                       </p>
-                     </td>
-                   </tr>
-                   <tr>
-                     <td
-                       colSpan={5}
-                       align="right"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "right",
-                       }}
-                     >
-                       <p
-                         style={{
-                           fontSize: "12px",
-                           fontFamily: "'Amiri', Arial, sans-serif",
-                           fontWeight: 'bold'
-                         }}
-                         className="arabic-text"
-                       >
-                         Gross Total إجمالي القيمة
-                       </p>
-                     </td>
-                     <td
-                       align="center"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "center",
-                         width: "10%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                         {invoiceData?.items
-                           ?.reduce(
-                             (total2, item) =>
-                               parseFloat(total2) + parseFloat(item?.total ?? 0),
-                             0
-                           )
-                           ?.toFixed(2)}
-                       </p>
-                     </td>
-                   </tr>
-                   <tr>
-                     <td
-                       colSpan={5}
-                       align="right"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "right",
-                       }}
-                     >
-                       <p
-                         style={{
-                           fontSize: "12px",
-                           fontFamily: "'Amiri', Arial, sans-serif", fontWeight: 'bold'
-                         }}
-                         className="arabic-text"
-                       >
-                         Customer Card Payment الإجمالي
-                       </p>
-                     </td>
-                     <td
-                       align="right"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "center",
-                         width: "10%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                         {invoiceData?.items
-                           ?.reduce(
-                             (total, item) =>
-                               total + parseFloat(item?.bank_charge ?? 0),
-                             0
-                           )
-                           ?.toFixed(2)}
-                       </p>
-                     </td>
-                   </tr>
-                   <tr>
-                     <td
-                       colSpan={5}
-                       align="right"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "right",
-                       }}
-                     >
-                       <p
-                         style={{
-                           fontSize: "12px",
-                           fontFamily: "'Amiri', Arial, sans-serif", fontWeight: 'bold'
-                         }}
-                         className="arabic-text"
-                       >
-                         Total Payable الإجمالي
-                       </p>
-                     </td>
-                     <td
-                       align="right"
-                       style={{
-                         border: "1px solid #000",
-                         padding: "0.01rem",
-                         textAlign: "center",
-                         width: "10%",
-                       }}
-                     >
-                       <p style={{ fontSize: "12px" }}>
-                         {invoiceData?.items
-                           ?.reduce(
-                             (total2, item) =>
-                               parseFloat(total2) + parseFloat(item?.total ?? 0),
-                             0
-                           )
-                           ?.toFixed(2)}
-                       </p>
-                     </td>
-                   </tr>
-                 </tbody>
-               </table>
-             </Box>
-             <Box class="footer" style={{marginTop:'100px'}}>
-               <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "200px" }}>
-                 <Box
-                   display="flex"
-                   justifyContent="space-between"
-                   alignItems="flex-start"
-                 >
-                   <Box textAlign="center">
-                     <Typography
-                       variant="h6"
-                       fontWeight="bold"
-                       sx={{ fontSize: "12px" }}
-                     >
-                       SabelahHaq Naqaz
-                     </Typography>
-                     <p
-                       variant="body2"
-                       style={{
-                         fontSize: "12px",
-                       }}
-                     >
-                       Authorized Signatory - المخول بالتوقيع
-                     </p>
-                     <Typography
-                       variant="body2"
-                       sx={{ fontSize: "12px", textAlign: "center" }}
-                     >
-                       (REPRINT)
-                     </Typography>
-                   </Box>
-     
-                   <Box textAlign="right" sx={{ fontSize: "12px" }}>
-                     <p
-                       variant="body2"
-                       style={{
-                         fontSize: "12px",
-                       }}
-                     >
-                       Note - ملاحظات
-                     </p>
-                     <p
-                       variant="body2"
-                       style={{
-                         fontSize: "12px",
-                       }}
-                     >
-                       الرجاء التأكد من الفاتورة والمستندات قبل مغادرة الكاونتر
-                     </p>
-                     <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px" }}>
-                       Kindly check the invoice and documents before leaving the
-                       counter
-                     </Typography>
-                   </Box>
-                 </Box>
-     
-     
-               </Box>
-     
-               <div className="w-full h-[115px] flex justify-center items-center mb-4 mt-4" >
-                 <img
-                   src={Images.footer}
-                   alt="Header"
-                   style={{ width: "100%" }}
-                   className="max-w-full h-auto"
-                 />
-               </div>
-               < hr style={{ color: 'black !important' }} />
-               <Typography
-                 variant="body2"
-                 sx={{ fontWeight: "bold", fontSize: "15px",textAlign:'right' }}
-               >
-                 Powered By : MangoTechDevs.ae
-               </Typography>
-             </Box>
-           </Box>
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {item?.quantity}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {(
+                      parseFloat(item?.govt_fee || 0) +
+                      parseFloat(item?.bank_charge || 0)
+                    ).toFixed(2)}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {parseFloat(item?.center_fee).toFixed(2)}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {parseFloat(item?.bank_charge).toFixed(2)}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black !important",
+                      padding: "8px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {parseFloat(item?.total).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <table className="mytable" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              <tr>
+                <td
+                  colSpan={5}
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    Total Govt.fee & Bank Charge
+                  </p>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "center",
+                    width: "8%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total, item) =>
+                          parseFloat(total) +
+                          parseFloat(item?.govt_fee ?? 0) +
+                          parseFloat(item?.bank_charge ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount</p>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total, item) =>
+                          total + parseFloat(item?.center_fee ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "'Amiri', Arial, sans-serif",
+                      fontWeight: 'bold'
+                    }}
+                    className="arabic-text"
+                  >
+                    Total VAT إجمالي القيمة المضافة
+                  </p>
+                </td>
+                <td
+                  align="center"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total, item) =>
+                          total + parseFloat(item?.bank_charge ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "'Amiri', Arial, sans-serif",
+                      fontWeight: 'bold'
+                    }}
+                    className="arabic-text"
+                  >
+                    Gross Total إجمالي القيمة
+                  </p>
+                </td>
+                <td
+                  align="center"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total2, item) =>
+                          parseFloat(total2) + parseFloat(item?.total ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "'Amiri', Arial, sans-serif", fontWeight: 'bold'
+                    }}
+                    className="arabic-text"
+                  >
+                    Customer Card Payment الإجمالي
+                  </p>
+                </td>
+                <td
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total, item) =>
+                          total + parseFloat(item?.bank_charge ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "right",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "'Amiri', Arial, sans-serif", fontWeight: 'bold'
+                    }}
+                    className="arabic-text"
+                  >
+                    Total Payable الإجمالي
+                  </p>
+                </td>
+                <td
+                  align="right"
+                  style={{
+                    border: "1px solid #000",
+                    padding: "0.01rem",
+                    textAlign: "center",
+                    width: "10%",
+                  }}
+                >
+                  <p style={{ fontSize: "12px" }}>
+                    {invoiceData?.items
+                      ?.reduce(
+                        (total2, item) =>
+                          parseFloat(total2) + parseFloat(item?.total ?? 0),
+                        0
+                      )
+                      ?.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </Box>
+        <Box class="footer" style={{ marginTop: '100px' }}>
+          <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "200px" }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="flex-start"
+            >
+              <Box textAlign="center">
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  sx={{ fontSize: "12px" }}
+                >
+                  SabelahHaq Naqaz
+                </Typography>
+                <p
+                  variant="body2"
+                  style={{
+                    fontSize: "12px",
+                  }}
+                >
+                  Authorized Signatory - المخول بالتوقيع
+                </p>
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: "12px", textAlign: "center" }}
+                >
+                  (REPRINT)
+                </Typography>
+              </Box>
+
+              <Box textAlign="right" sx={{ fontSize: "12px" }}>
+                <p
+                  variant="body2"
+                  style={{
+                    fontSize: "12px",
+                  }}
+                >
+                  Note - ملاحظات
+                </p>
+                <p
+                  variant="body2"
+                  style={{
+                    fontSize: "12px",
+                  }}
+                >
+                  الرجاء التأكد من الفاتورة والمستندات قبل مغادرة الكاونتر
+                </p>
+                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px" }}>
+                  Kindly check the invoice and documents before leaving the
+                  counter
+                </Typography>
+              </Box>
+            </Box>
+
+
+          </Box>
+
+          <div className="w-full h-[115px] flex justify-center items-center mb-4 mt-4" >
+            <img
+              src={Images.footer}
+              alt="Header"
+              style={{ width: "100%" }}
+              className="max-w-full h-auto"
+            />
+          </div>
+          < hr style={{ color: 'black !important' }} />
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", fontSize: "15px", textAlign: 'right' }}
+          >
+            Powered By : MangoTechDevs.ae
+          </Typography>
+        </Box>
+      </Box>
     </>
   );
 }

@@ -103,13 +103,14 @@ function CreateUser() {
   // *For Create Role
   const CreateUser = async (formData) => {
     console.log(selectedCategoryObjects);
-    
+
     setLoading(true)
     setButtondisabled(true)
     console.log(formData);
     try {
       let obj = {
         name: getValues('name'),
+        employee_id: getValues('id'),
         email: getValues('email'),
         phone: getValues('phone'),
         password: getValues('password'),
@@ -223,12 +224,28 @@ function CreateUser() {
           <Grid item xs={12} sm={5}>
 
             <InputField
-              label={"Email :*"}
+              label={" Employee ID :*"}
+              size={'small'}
+              placeholder={" Employee ID "}
+              error={errors?.id?.message}
+              register={register("id", {
+                required:
+                  "Please enter id."
+
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={5}>
+
+            <InputField
+              label={"Email :"}
               size={'small'}
               placeholder={"Email"}
               error={errors?.email?.message}
               register={register("email", {
-                required: "Please enter your email.",
+                required: false,
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: "Please enter a valid email address."
@@ -272,7 +289,7 @@ function CreateUser() {
               })}
             />
           </Grid>
-     
+
 
 
 
@@ -323,34 +340,34 @@ function CreateUser() {
           </Grid>
           {selectedRole?.name === 'Typist' && (
             <Grid item xs={12} sm={12}>
-            
-                <Typography variant="h5" gutterBottom>
-                  Select Categories
-                </Typography>
 
-                {selectedRole?.name === "Typist" && (
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={5}>
-                      <FormGroup>
-                        {categories?.map((category) => (
-                          <FormControlLabel
-                            key={category.id}
-                            control={
-                              <Checkbox
-                                checked={selectedCategory?.includes(category.id)}
-                                onChange={() => handleCategoryChange(category.id)}
-                              />
-                            }
-                            label={category.name}
-                          />
-                        ))}
-                      </FormGroup>
-                    </Grid>
+              <Typography variant="h5" gutterBottom>
+                Select Categories
+              </Typography>
 
-                   
+              {selectedRole?.name === "Typist" && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={5}>
+                    <FormGroup>
+                      {categories?.map((category) => (
+                        <FormControlLabel
+                          key={category.id}
+                          control={
+                            <Checkbox
+                              checked={selectedCategory?.includes(category.id)}
+                              onChange={() => handleCategoryChange(category.id)}
+                            />
+                          }
+                          label={category.name}
+                        />
+                      ))}
+                    </FormGroup>
                   </Grid>
-                )}
-           
+
+
+                </Grid>
+              )}
+
             </Grid>
           )}
         </Grid>

@@ -158,18 +158,18 @@ function UpdatePreSale() {
     const updateItem = (data) => {
         console.log("Raw data passed to updateItem:", data);
         console.log("Current serviceItem:", serviceItem);
-
+    
         if (!data?.id) {
             console.warn("No valid ID found in data. Skipping update.");
             return;
         }
-
+    
         const updatedItem = { ...data, service: serviceItem };
         console.log("Updated item to be saved:", updatedItem);
-
+    
         setRows(prevItems => {
             console.log("Previous rows:", prevItems);
-
+    
             const updatedRows = prevItems.map(item => {
                 if (item.id === data.id) {
                     console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
@@ -178,17 +178,29 @@ function UpdatePreSale() {
                     return item;
                 }
             });
-
+    
             console.log("Rows after update:", updatedRows);
+    
+            // 👇 Calculate total after updating rows
+            const total = updatedRows.reduce((sum, item) => {
+                // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
+                return sum + (parseFloat(item.total) || 0);
+            }, 0);
+    
+            console.log("New total after update:", total);
+    
+            // You can update a state for total if you have one:
+            setSubTotal(total); // <-- Make sure to declare this with useState
+    
             return updatedRows;
         });
-
+    
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
         setEditState(false);
     };
-
+    
 
     const getInvoiceNumber = async () => {
         // setLoader(true)
@@ -994,9 +1006,9 @@ function UpdatePreSale() {
                                                     {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                         setSelectedRow(item); setEditState(true)
                                                         setValue("id", item?.id);
-                                                        setValue("govt_fee", item?.service?.bank_service_charge);
-                                                        setValue("center_fee", item?.service?.center_fee);
-                                                        setValue("bank_charge", item?.service?.bank_service_charge);
+                                                        setValue("govt_fee", item?.govt_fee);
+                                                        setValue("center_fee", item?.center_fee);
+                                                        setValue("bank_charge", item?.bank_charge);
                                                         setValue("transaction_id", item?.transaction_id);
                                                         setValue("application_id", item?.application_id);
                                                         setValue("ref_no", item?.ref_no);
@@ -1020,24 +1032,56 @@ function UpdatePreSale() {
                                             </TableRow>
                                         ))}
 
-                                        <TableRow>
-                                            <TableCell colSpan={9} align="right">
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
-                                            </TableCell>
-                                        </TableRow>
-
-                                        {/* Amount Total Row (optional, if needed for the final sum) */}
-                                        <TableRow>
-                                            <TableCell colSpan={9} align="right">
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* This can be the same as Sub-total */}
-                                            </TableCell>
-                                        </TableRow>
+                                       <TableRow>
+                                                       <TableCell colSpan={9} align="right">
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
+                                                       </TableCell>
+                                                       <TableCell>
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                                                       </TableCell>
+                                                     </TableRow>
+                                                     <TableRow>
+                                                       <TableCell colSpan={9} align="right">
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Net Taxable Amount:</Typography>
+                                                       </TableCell>
+                                                       <TableCell>
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows
+                                                           ?.reduce(
+                                                             (total, item) =>
+                                                               total + parseFloat(item?.center_fee ?? 0),
+                                                             0
+                                                           ).toFixed(2)
+                                                         }</Typography> {/* Display the Sub-total */}
+                                                       </TableCell>
+                                                     </TableRow>
+                                                     <TableRow>
+                                                       <TableCell colSpan={9} align="right">
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                                                       </TableCell>
+                                                       <TableCell>
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(rows
+                                                           ?.reduce(
+                                                             (total, item) =>
+                                                               total + parseFloat(item?.center_fee ?? 0),
+                                                             0
+                                                           ) * 0.05).toFixed(2)
+                                                         }</Typography> {/* Display the Sub-total */}
+                                                       </TableCell>
+                                                     </TableRow>
+                                                     {/* Amount Total Row (optional, if needed for the final sum) */}
+                                                     <TableRow>
+                                                       <TableCell colSpan={9} align="right">
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                                                       </TableCell>
+                                                       <TableCell>
+                                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(parseFloat(subTotal) + parseFloat(rows
+                                                           ?.reduce(
+                                                             (total, item) =>
+                                                               total + parseFloat(item?.center_fee ?? 0),
+                                                             0
+                                                           ) * 0.05)).toFixed(2)}</Typography> {/* This can be the same as Sub-total */}
+                                                       </TableCell>
+                                                     </TableRow>
                                     </TableBody>
                                 </Table>
                             </TableContainer>

@@ -45,8 +45,12 @@ function Home() {
 		handleSubmit,
 		getValues,
 		setValue,
+		watch,
 		formState: { errors },
 	} = useForm();
+
+	console.log(watch());
+	
 	const [loading, setLoading] = useState(false);
 
 	const [showPassword, setShowPassword] = useState(false);
@@ -132,8 +136,8 @@ function Home() {
 								<InputField
 
 
-									type={'email'}
-									placeholder={'Email Address'}
+									type={'text'}
+									placeholder={'Email Address/Employee ID'}
 
 									error={errors?.email?.message || inputError}
 									InputProps={{
@@ -160,10 +164,7 @@ function Home() {
 									}}
 									register={register("email", {
 										required: 'Please enter your email.',
-										pattern: {
-											value: emailRegex,
-											message: 'Please enter a valid email.',
-										}
+									
 									})}
 
 								/>

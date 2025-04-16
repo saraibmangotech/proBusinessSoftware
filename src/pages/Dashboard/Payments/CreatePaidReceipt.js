@@ -209,6 +209,8 @@ function CreatePaidReceipt() {
   const [banks, setBanks] = useState([]);
   const [holdState, setHoldState] = useState(true);
   const [selectedMode, setSelectedMode] = useState(null);
+  const [cards, setCards] = useState([])
+  const [selectedCard, setSelectedCard] = useState(null)
   //documents array
 
   const handleNext = () => {
@@ -231,9 +233,10 @@ function CreatePaidReceipt() {
           selectedMode?.id == "Cash"
             ? 700117
             : selectedMode?.id == "Bank"
-              ? selectedBank?.account_id
-              : selectedMode?.id == "Payment Link"
-                ? 700171 : null,
+              ? selectedBank?.account_id :
+              selectedMode?.id == "Card" ? selectedCard?.account_id
+                : selectedMode?.id == "Payment Link"
+                  ? 700171 : null,
         ref_id: selectedMode?.id == "Bank" ? selectedBank?.id : null,
         remarks: formData?.remarks,
         narration: formData?.narration,
@@ -300,7 +303,30 @@ function CreatePaidReceipt() {
       setLoader(false);
     }
   };
+  // *For Get Customer Queue
+  const getCards = async (page, limit, filter) => {
+    setLoader(true);
 
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCards(params);
+      setCards(
+        data?.cards?.map(card => ({
+          ...card,
+          name: card.account_name,
+        }))
+      );
+      
+    } catch (error) {
+      showErrorToast(error);
+    } finally {
+      setLoader(false);
+    }
+  };
   // *For Get Account
   const getReceptionDetail = async (state) => {
     setFieldsDisabled(true);
@@ -469,6 +495,7 @@ function CreatePaidReceipt() {
         setValue1("paid", 0);
         setValue1("customer", data?.receipt?.customer_name);
         setValue1("invoice_date", moment().toDate());
+        setValue1("invoicenumber", data?.receipt?.id)
         setDate(new Date(data?.receipt?.invoice_date));
         setValue1("mobile", data?.receipt?.customer_mobile);
         setValue1("ref", data?.receipt?.ref);
@@ -484,8 +511,8 @@ function CreatePaidReceipt() {
         setValue1("cost_center", data?.receipt?.cost_center)
         setAccounts(data?.accounts?.rows);
       } else {
-       showErrorToast('Data Not Found')
-      
+        showErrorToast('Data Not Found')
+
       }
     } catch (error) {
       ErrorToaster(error);
@@ -495,6 +522,7 @@ function CreatePaidReceipt() {
   };
   useEffect(() => {
     getBanks();
+    getCards()
     getAccounts();
     getTax();
     getCategories();
@@ -803,7 +831,7 @@ function CreatePaidReceipt() {
                           <TextField
                             size="small"
                             placeholder="Transaction Id"
-                        
+
                             type="number"
                             value={item.transaction_id || ""}
                             onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
@@ -850,38 +878,60 @@ function CreatePaidReceipt() {
                     </TableRow>
 
                     {/* Amount Total Row (optional, if needed for the final sum) */}
+
                     <TableRow>
                       <TableCell colSpan={10} align="right">
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                          Amount Total:
-                        </Typography>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Net Taxable Amount:</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                          {subTotal}
-                        </Typography>{" "}
-                        {/* This can be the same as Sub-total */}
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows
+                          ?.reduce(
+                            (total, item) =>
+                              total + parseFloat(item?.center_fee ?? 0),
+                            0
+                          ).toFixed(2)
+                        }</Typography> {/* Display the Sub-total */}
                       </TableCell>
                     </TableRow>
-                    {/* </Grid> */}
                     <TableRow>
-                      <TableCell colSpan={10} align="center">
-                        {" "}
-                        {/* adjust colSpan to match total columns */}
-                        <Box
-                          sx={{
-                            display: "flex",
-                            gap: 2,
-                            justifyContent: "center",
-                          }}
-                        >
+                      <TableCell colSpan={10} align="right">
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(rows
+                          ?.reduce(
+                            (total, item) =>
+                              total + parseFloat(item?.center_fee ?? 0),
+                            0
+                          ) * 0.05).toFixed(2)
+                        }</Typography> {/* Display the Sub-total */}
+                      </TableCell>
+                    </TableRow>
+                    {/* Amount Total Row (optional, if needed for the final sum) */}
+                    <TableRow>
+                      <TableCell colSpan={10} align="right">
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(parseFloat(subTotal) + parseFloat(rows
+                          ?.reduce(
+                            (total, item) =>
+                              total + parseFloat(item?.center_fee ?? 0),
+                            0
+                          ) * 0.05)).toFixed(2)}</Typography> {/* This can be the same as Sub-total */}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={10} align="right">
+                        <Grid container gap={2} justifyContent={"center"}>
                           <Button
                             onClick={() => setPayButton(true)}
+                            disabled={rows?.length == 0}
                             variant="contained"
                             sx={{
-                              width: "350px",
                               textTransform: "capitalize",
                               backgroundColor: "#bd9b4a",
+                              width: '200px',
                               ":hover": {
                                 backgroundColor: "rgb(189 155 74)",
                               },
@@ -891,11 +941,12 @@ function CreatePaidReceipt() {
                           </Button>
                           <Button
                             onClick={() => setPayButton(false)}
+
                             variant="contained"
                             sx={{
-                              width: "350px",
                               textTransform: "capitalize",
                               backgroundColor: "#bd9b4a",
+                              width: '200px',
                               ":hover": {
                                 backgroundColor: "rgb(189 155 74)",
                               },
@@ -903,8 +954,9 @@ function CreatePaidReceipt() {
                           >
                             Cancel
                           </Button>
-                        </Box>
+                        </Grid>
                       </TableCell>
+
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -982,6 +1034,23 @@ function CreatePaidReceipt() {
                           required: "please enter bank .",
                         })}
                         error={errors1?.bank?.message}
+                      />
+                    </Grid>
+                  )}
+                  {selectedMode?.id == "Card" && (
+                    <Grid item md={3} sm={12} xs={12}>
+                      <SelectField
+                        label="Card"
+                        size="small"
+                        options={cards}
+                        selected={selectedCard}
+                        onSelect={(value) => {
+                          setSelectedCard(value);
+                        }}
+                        register={register1("card", {
+                          required: "please enter card .",
+                        })}
+                        error={errors1?.card?.message}
                       />
                     </Grid>
                   )}
