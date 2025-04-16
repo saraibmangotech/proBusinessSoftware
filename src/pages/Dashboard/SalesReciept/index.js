@@ -369,10 +369,13 @@ function SalesReciept() {
   const getServiceItem = async (id) => {
     // setLoader(true)
     try {
+
+      const categoryIds = user.categories.map(category => category.category_id).join(',');
+      console.log(categoryIds, "cats");
       let params = {
         page: 1,
         limit: 1000,
-        category_id: id,
+        category_id: categoryIds,
       };
 
       const { data } = await CustomerServices.getServiceItem(params);
@@ -549,6 +552,7 @@ function SalesReciept() {
   };
 
   useEffect(() => {
+    console.log(user, "user");
     getAccounts();
     getTax();
     getCategories();

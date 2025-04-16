@@ -115,7 +115,7 @@ function UserList() {
   const contentRef = useRef(null);
 
 
-  const tableHead = [{ name: 'Create Date', key: '' }, { name: 'User Name ', key: 'name' }, { name: 'User Role', key: '' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'Create Date', key: '' }, { name: 'User Name ', key: 'name' },{ name: 'Employee ID', key: 'employee_id' }, { name: 'User Role', key: '' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
 
@@ -371,6 +371,10 @@ function UserList() {
                                 </Cell>
                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                   {item?.name}
+                                </Cell>
+
+                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                  {item?.employee_id}
                                 </Cell>
 
                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
