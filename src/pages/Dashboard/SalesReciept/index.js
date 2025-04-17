@@ -147,21 +147,26 @@ function SalesReciept() {
 
   const addItem = (data) => {
     console.log(data);
-
+  
     // Create a new row with the serviceItem included
     const newRow = { ...data, service: serviceItem };
-
+  
     setRows((prevRows) => {
       const updatedRows = [...prevRows, newRow];
-      const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
-      setSubTotal(newSubTotal);
+  
+      // Ensure all totals are treated as floats
+      const newSubTotal = updatedRows.reduce((sum, row) => sum + parseFloat(row.total || 0), 0);
+  
+      // Optionally round to 2 decimal places
+      setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+  
       return updatedRows;
     });
-
+  
     reset();
     setServiceItem("");
   };
-
+  
   const [activeStep, setActiveStep] = React.useState(1);
 
   // const [fieldsDisabled, setFieldsDisabled] = useState({
@@ -530,18 +535,18 @@ function SalesReciept() {
   const updateItem = (data) => {
     console.log("Raw data passed to updateItem:", data);
     console.log("Current serviceItem:", serviceItem);
-
+  
     if (!data?.id) {
       console.warn("No valid ID found in data. Skipping update.");
       return;
     }
-
+  
     const updatedItem = { ...data, service: serviceItem };
     console.log("Updated item to be saved:", updatedItem);
-
+  
     setRows(prevItems => {
       console.log("Previous rows:", prevItems);
-
+  
       const updatedRows = prevItems.map(item => {
         if (item.id === data.id) {
           console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
@@ -550,16 +555,27 @@ function SalesReciept() {
           return item;
         }
       });
-
+  
       console.log("Rows after update:", updatedRows);
+  
+      // Calculate new subtotal
+      const newSubTotal = updatedRows.reduce((sum, row) => {
+        const total = parseFloat(row.total || 0);
+        return sum + (isNaN(total) ? 0 : total);
+      }, 0);
+  
+      // Round to 2 decimal places
+      setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+  
       return updatedRows;
     });
-
+  
     console.log("Resetting form and states...");
     reset();
     setServiceItem(null);
     setEditState(false);
   };
+  
 
   useEffect(() => {
     console.log(user, "user");
@@ -1115,8 +1131,8 @@ function SalesReciept() {
 
                         setValue("id", item?.id);
                         setValue("govt_fee", item?.govt_fee);
-                        setValue("center_fee", item?.service?.center_fee);
-                        setValue("bank_charge", item?.service?.bank_service_charge);
+                        setValue("center_fee", item?.center_fee);
+                        setValue("bank_charge", item?.bank_charge);
                         setValue("transaction_id", item?.transaction_id);
                         setValue("application_id", item?.application_id);
                         setValue("ref_no", item?.ref_no);
