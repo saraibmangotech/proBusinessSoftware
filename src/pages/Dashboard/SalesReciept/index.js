@@ -311,7 +311,7 @@ function SalesReciept() {
           customerCardPayment: 0.0,
           totalPayable: 396.13,
         };
-        console.log(invoice, 'invoiceinvoice');
+        console.log(invoice, 'invoice');
 
         setInvoiceData(invoice);
 
