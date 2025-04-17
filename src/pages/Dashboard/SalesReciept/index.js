@@ -295,6 +295,8 @@ function SalesReciept() {
 
         const invoice = {
           id: response?.data?.id,
+          created_by: response?.data?.creator,
+          payment_creator: response?.data?.payment_creator,
           date: moment(date).format("DD-MM-YYYY"),
           invoiceType: formData?.invoice_number,
           trn: formData?.trn,
@@ -949,8 +951,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Govt fee"
-                
-                    
+
+
                       register={register("govt_fee", { required: "Govt fee is required" })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -960,8 +962,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Center Fee"
-                       
-                  
+
+
                       register={register("center_fee", { required: "Center fee is required" })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -971,7 +973,7 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Bank Charges"
-                  
+
                       register={register("bank_charge", { required: "Bank charges are required" })}
 
                     />
@@ -1129,6 +1131,17 @@ function SalesReciept() {
 
                           let selectedID = item?.id
                           setRows(rows?.filter(item2 => item2?.id != item?.id))
+                          let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                          // 👇 Calculate total after updating rows
+                          const total = filteredData.reduce((sum, item) => {
+                            // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
+                            return sum + (parseFloat(item.total) || 0);
+                          }, 0);
+
+                          console.log("New total after update:", total);
+
+                          // You can update a state for total if you have one:
+                          setSubTotal(total); // <-- Make sure to declare this with useState
                         }} width={'35px'}></Box>}
 
 
@@ -1521,7 +1534,7 @@ function SalesReciept() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData?.items?.map((item,index) => (
+              {invoiceData?.items?.map((item, index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -1530,7 +1543,7 @@ function SalesReciept() {
                       textAlign: "center",
                     }}
                   >
-                    {index+1}
+                    {index + 1}
                   </td>
                   <td
                     style={{
@@ -1805,7 +1818,9 @@ function SalesReciept() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-
+                <Typography variant="body2" sx={{ fontSize: "15px",fontWeight:'bold' }}>
+                  {invoiceData?.created_by?.name}
+                </Typography>
                 <p
                   variant="body2"
                   style={{
