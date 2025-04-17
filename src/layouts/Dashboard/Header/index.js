@@ -294,17 +294,17 @@ function Header() {
     }
     else if (user?.role_id == 1003) {
       setNavigationData([
-        {
-          id: 2,
-          name: "Receptions",
-          icon: "customer",
-          parent_id: null,
-          api: "/api/roles",
-          route: "/reception-list",
-          identifier: null,
-          navigation: true,
+        // {
+        //   id: 2,
+        //   name: "Receptions",
+        //   icon: "customer",
+        //   parent_id: null,
+        //   api: "/api/roles",
+        //   route: "/reception-list",
+        //   identifier: null,
+        //   navigation: true,
 
-        },
+        // },
 
         {
           id: 2,
