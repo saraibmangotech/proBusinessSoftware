@@ -346,6 +346,9 @@ function CreatePaidReceipt() {
             data?.receipt?.sale_receipt_items?.reduce((total, item) => {
               const fee = Number.parseFloat(item?.center_fee ?? 0)
               const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
               return total + fee * qty
             }, 0) *
             0.05
@@ -358,7 +361,11 @@ function CreatePaidReceipt() {
             data?.receipt?.sale_receipt_items?.reduce((total, item) => {
               const fee = Number.parseFloat(item?.center_fee ?? 0)
               const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
               return total + fee * qty
+              
             }, 0) *
             0.05
           ).toFixed(2),
@@ -513,26 +520,34 @@ function CreatePaidReceipt() {
         setSubTotal(data?.receipt?.total_amount)
         setValue1(
           "total",
-          Number.parseFloat(
+          (
             Number.parseFloat(data?.receipt?.total_amount) +
-            Number.parseFloat(
-              data?.receipt?.sale_receipt_items?.reduce(
-                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                0,
-              ) * 0.05,
-            ),
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
+              return total + fee * qty
+              
+            }, 0) *
+            0.05
           ).toFixed(2),
         )
         setValue1(
           "balance",
-          Number.parseFloat(
+          (
             Number.parseFloat(data?.receipt?.total_amount) +
-            Number.parseFloat(
-              data?.receipt?.sale_receipt_items?.reduce(
-                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                0,
-              ) * 0.05,
-            ),
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
+              return total + fee * qty
+              
+            }, 0) *
+            0.05
           ).toFixed(2),
         )
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })

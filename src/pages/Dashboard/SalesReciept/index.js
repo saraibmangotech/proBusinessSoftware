@@ -713,7 +713,10 @@ function SalesReciept() {
                             ),
                           }}
                           register={register1("mobileValue", {
-                            required: false,
+                            required: false, pattern: {
+                              value: /^05[0-9]{8}$/,
+                              message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
+                            },
 
                             onChange: (e) => {
                               console.log("asdas");
@@ -1921,7 +1924,7 @@ function SalesReciept() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                  {(
+                    {(
                       invoiceData?.items?.reduce((total, item) => {
                         const fee = parseFloat(item?.center_fee ?? 0);
                         const qty = parseFloat(item?.quantity ?? 1);
@@ -1954,7 +1957,7 @@ function SalesReciept() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                  {(
+                    {(
                       invoiceData?.items?.reduce((total2, item) => {
                         return parseFloat(total2) + parseFloat(item?.total ?? 0);
                       }, 0) +
@@ -1991,7 +1994,7 @@ function SalesReciept() {
                   }}
                 >
                   <p style={{ fontSize: "12px" }}>
-                      {(
+                    {(
                       invoiceData?.items?.reduce((total2, item) => {
                         return parseFloat(total2) + parseFloat(item?.total ?? 0);
                       }, 0) +
