@@ -338,6 +338,15 @@ const CustomerServices = {
     const data = await post(routes.PayReceipt, obj);
     return data;
   },
+
+  getServiceReport: async (params) => {
+    const data = await get(routes.getServiceReport, params);
+    return data;
+  },
+  getCollectionReport: async (params) => {
+    const data = await get(routes.getCollectionReport, params);
+    return data;
+  },
 }
 
 export default CustomerServices

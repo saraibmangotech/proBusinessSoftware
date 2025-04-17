@@ -106,7 +106,7 @@ const useStyles = makeStyles({
   }
 })
 
-function ReceptionList() {
+function ServiceReport() {
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -153,30 +153,27 @@ function ReceptionList() {
   const [sort, setSort] = useState('desc')
 
   // *For Get Customer Queue
- 
+  const getCustomerQueue = async (page, limit, filter) => {
+    setLoader(true)
 
-
-    const getCustomerQueue = async (page, limit, filter) => {
-      setLoader(true)
-  
-      try {
+    try {
+   
+      let params = {
+        page: 1,
+        limit: 1000,
      
-        let params = {
-          page: 1,
-          limit: 1000,
-       
-  
-        }
-       
-        const { data } = await CustomerServices.getReceptionsList(params)
-        setCustomerQueue(data?.rows)
-       
-      } catch (error) {
-        showErrorToast(error)
-      } finally {
-        setLoader(false)
       }
+     
+      const { data } = await CustomerServices.getServiceReport(params)
+      setCustomerQueue(data?.rows)
+     
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      setLoader(false)
     }
+  }
+
 
 
 
@@ -247,74 +244,289 @@ function ReceptionList() {
     }
   };
 
-
-    const columns = [
-      {
-        header: "SR No.",
-        accessorKey: "id",
-  
-  
-      },
-      {
-        header: "Token Number.",
-        accessorKey: "token_number",
-  
-  
-      },
-      {
-        header: "Customer",
-        accessorKey: "customer_name",
-  
-  
-      },
-      {
-        header: "Mobile",
-        accessorKey: "mobile",
-  
-  
-      },
-      // {
-      //   header: "Type",
-      //   accessorKey: "cost_center",
-      //   cell: ({ row }) => (
-      //     <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-      //       {row?.original?.is_company ? 'Company' : "Individual"}
-      //     </Box>
-      //   ),
-  
-      // },
-      {
-        id: "created_at",
-        header: "Registration Date",
-        // Remove accessorKey and fix accessorFn to use row directly
-        accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
-        cell: ({ row }) => (
-          <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-            {moment(row.original.created_at).format("MM-DD-YYYY")}
-          </Box>
-        ),
-      },
-  
-     
-      {
-        header: "Actions",
-        cell: ({ row }) => (
-  
-          <Box sx={{display:'flex',gap:1}}>
-            {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/reception-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-            {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-reception/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-            <Box>
-              {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
-  
-              {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
-            </Box>
-  
-          </Box>
-        ),
-      },
-  
-    ]
-
+  const columns = [
+    {
+      header: "SR No.",
+      accessorKey: "id",
+    },
+    {
+      header: "Inv No.",
+      accessorKey: "invoice_number",
+      accessorFn: (row) => row?.creator,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.invoice_number}
+        </Box>
+      ),
+    },
+    {
+      header: "Inv Date",
+      accessorKey: "invoice_date",
+      accessorFn: (row) => row?.creator,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.invoice_date}
+        </Box>
+      ),
+    },
+    {
+      header: "Department",
+      accessorKey: "department",
+      accessorFn: (row) => row,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          Al-Adheed
+        </Box>
+      ),
+    },
+    {
+      header: "Stock ID",
+      accessorKey: "stock_id",
+      accessorFn: (row) => row?.service,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.service?.id}
+        </Box>
+      ),
+    },
+    {
+      header: "Service Name",
+      accessorKey: "service_name",
+      accessorFn: (row) => row?.service,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.service?.name}
+        </Box>
+      ),
+    },
+    {
+      header: "Category",
+      accessorKey: "category",
+      accessorFn: (row) => row?.service,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.service?.category?.name}
+        </Box>
+      ),
+    },
+    {
+      header: "Customer Ref",
+      accessorKey: "customer_ref",
+      accessorFn: (row) => row?.receipt,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          Walk-In Customer
+        </Box>
+      ),
+    },
+    {
+      header: "Display Customer",
+      accessorKey: "display_customer",
+      accessorFn: (row) => row?.receipt,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.customer_name}
+        </Box>
+      ),
+    },
+    {
+      header: "Customer Mobile",
+      accessorKey: "customer_mobile",
+      accessorFn: (row) => row?.receipt,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.customer_mobile}
+        </Box>
+      ),
+    },
+    {
+      header: "Customer Email",
+      accessorKey: "customer_email",
+      accessorFn: (row) => row?.receipt,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.customer_email}
+        </Box>
+      ),
+    },
+    {
+      header: "Quantity",
+      accessorKey: "quantity",
+    },
+    {
+      header: "Service Charge",
+      accessorKey: "center_fee",
+    },
+    {
+      header: "Total Service Charge",
+      accessorKey: "total_service_charge",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)).toFixed(2)}
+        </Box>
+      ),
+    },
+    {
+      header: "Total VAT",
+      accessorKey: "total_vat",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05}
+        </Box>
+      ),
+    },
+    {
+      header: "Govt. Fee",
+      accessorKey: "govt_fee",
+    },
+   
+    {
+      header: "Bank Service Charge",
+      accessorKey: "bank_charge",
+    },
+    {
+      header: "Other Charge",
+      accessorKey: "other_charge",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          0
+        </Box>
+      ),
+    },
+    {
+      header: "Total Govt. Fee",
+      accessorKey: "govt_fee",
+    },
+    {
+      header: "Transaction ID",
+      accessorKey: "transaction_id",
+    },
+    {
+      header: "Application/Case ID",
+      accessorKey: "application_id",
+    },
+    {
+      header: "Ref Name",
+      accessorKey: "ref_no",
+    },
+    {
+      header: "Payment Status",
+      accessorKey: "payment_status",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.payment_status}
+        </Box>
+      ),
+    },
+    {
+      header: "Employee ID",
+      accessorKey: "employee_id",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.created_by}
+        </Box>
+      ),
+    },
+    {
+      header: "Employee Name",
+      accessorKey: "employee_name",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt?.creator?.name}
+        </Box>
+      ),
+    },
+    {
+      header: "Line Total",
+      accessorKey: "total",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {parseFloat(row?.original?.total) + ((parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05)}
+        </Box>
+      ),
+    },
+    {
+      header: "Invoice Total",
+      accessorKey: "inv_total",
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {parseFloat(row?.original?.receipt?.total_amount) }
+        </Box>
+      ),
+    },
+  ];
 
 
   useEffect(() => {
@@ -392,13 +604,8 @@ function ReceptionList() {
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>
-        {true && <PrimaryButton
-         bgcolor={'#bd9b4a'}
-          title="Create "
-          onClick={() => { navigate('/create-reception'); localStorage.setItem("currentUrl", '/create-customer') }}
-          loading={loading}
-        />}
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
+      
 
 
       </Box>
@@ -414,4 +621,4 @@ function ReceptionList() {
   );
 }
 
-export default ReceptionList;
+export default ServiceReport;
