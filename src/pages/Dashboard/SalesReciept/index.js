@@ -348,13 +348,13 @@ function SalesReciept() {
       setButtonDisabled(false);
     }
   };
-  useEffect(() => {
-    if (invoiceData) {
-      generatePDF()
-    }
+  // useEffect(() => {
+  //   if (invoiceData) {
+  //     generatePDF()
+  //   }
 
 
-  }, [invoiceData])
+  // }, [invoiceData])
 
 
   // *For Get Account
