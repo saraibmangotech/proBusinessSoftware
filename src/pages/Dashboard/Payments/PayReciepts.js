@@ -219,15 +219,12 @@ function PayReceipts() {
     const generatePDF3 = async () => {
         if (!invoiceRef3.current) return;
 
-        // Temporarily hide the content while generating the PDF
         const invoiceElement = invoiceRef3.current;
-        invoiceElement.style.display = "block"; // Hide the element
+        invoiceElement.style.display = "block"; // Ensure visible before capture
 
-        // Capture the content using html2canvas
         const canvas = await html2canvas(invoiceElement, {
-            scale: 1,
+            scale: 2, // High quality
             useCORS: true,
-            logging: false,
         });
 
         const imgData = canvas.toDataURL("image/png");
@@ -237,23 +234,28 @@ function PayReceipts() {
             format: "a4",
         });
 
-        const imgWidth = 210;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pageWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgProps = {
+            width: pageWidth,
+            height: (canvas.height * pageWidth) / canvas.width,
+        };
 
-        // Add image to the PDF
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        // If image height is larger than A4, scale it down to fit within a single page
+        if (imgProps.height > pageHeight) {
+            imgProps.height = pageHeight;
+            imgProps.width = (canvas.width * pageHeight) / canvas.height;
+        }
 
-        // Save the generated PDF
+        const xOffset = (pageWidth - imgProps.width) / 2; // center horizontally
+
+        pdf.addImage(imgData, "PNG", xOffset, 0, imgProps.width, imgProps.height);
+
         const blob = pdf.output("blob");
-
-        // Create a blob URL
         const blobUrl = URL.createObjectURL(blob);
-
-        // Open the PDF in a new tab
         window.open(blobUrl);
 
-        // Restore the content visibility after generating the PDF
-        invoiceElement.style.display = "none"; // Show the content again
+        invoiceElement.style.display = "none";
     };
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
@@ -399,6 +401,8 @@ function PayReceipts() {
                 trn: data?.receipt?.trn,
                 tokenNumber: data?.receipt?.token_number,
                 customerName: data?.receipt?.customer_name,
+                created_by: data?.receipt?.creator,
+                payment_creator: data?.receipt?.payment_creator,
                 mobileNo: data?.receipt?.customer_mobile,
                 email: data?.receipt?.customer_email,
                 customerReference: data?.receipt?.ref,
@@ -992,7 +996,7 @@ function PayReceipts() {
                             </tr>
                         </thead>
                         <tbody>
-                            {invoiceData?.items?.map((item,index) => (
+                            {invoiceData?.items?.map((item, index) => (
                                 <tr key={item.id}>
                                     <td
                                         style={{
@@ -1001,7 +1005,7 @@ function PayReceipts() {
                                             textAlign: "center",
                                         }}
                                     >
-                                        {index+1}
+                                        {index + 1}
                                     </td>
                                     <td
                                         style={{
@@ -1088,178 +1092,178 @@ function PayReceipts() {
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <tbody>
                             <tr>
-                <td
-                  colSpan={6}
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "right",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    Total Govt.fee & Bank Charge إجمالي الرسوم الحكومية ورسوم البنك
-                  </p>
-                </td>
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "center",
-                    width: "8%",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {invoiceData?.items
-                      ?.reduce(
-                        (total, item) =>
-                          parseFloat(total) +
-                          parseFloat(item?.govt_fee ?? 0) +
-                          parseFloat(item?.bank_charge ?? 0),
-                        0
-                      )
-                      ?.toFixed(2)}
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={6}
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "right",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount صافي المبلغ الخاضع للضريبة</p>
-                </td>
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "center",
-                    width: "10%",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {invoiceData?.items
-                      ?.reduce((total, item) => {
-                        const fee = parseFloat(item?.center_fee ?? 0);
-                        const qty = parseFloat(item?.quantity ?? 1);
-                        return total + fee * qty;
-                      }, 0)
-                      .toFixed(2)}
+                                <td
+                                    colSpan={6}
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        Total Govt.fee & Bank Charge إجمالي الرسوم الحكومية ورسوم البنك
+                                    </p>
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "8%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {invoiceData?.items
+                                            ?.reduce(
+                                                (total, item) =>
+                                                    parseFloat(total) +
+                                                    parseFloat(item?.govt_fee ?? 0) +
+                                                    parseFloat(item?.bank_charge ?? 0),
+                                                0
+                                            )
+                                            ?.toFixed(2)}
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount صافي المبلغ الخاضع للضريبة</p>
+                                </td>
+                                <td
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "10%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {invoiceData?.items
+                                            ?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0)
+                                            .toFixed(2)}
 
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={6}
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "right",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}> Total VAT إجمالي القيمة المضافة</p>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}> Total VAT إجمالي القيمة المضافة</p>
 
-                </td>
-                <td
-                  align="center"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "center",
-                    width: "10%",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {(
-                      invoiceData?.items?.reduce((total, item) => {
-                        const fee = parseFloat(item?.center_fee ?? 0);
-                        const qty = parseFloat(item?.quantity ?? 1);
-                        return total + fee * qty;
-                      }, 0) * 0.05
-                    ).toFixed(2)}
+                                </td>
+                                <td
+                                    align="center"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "10%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {(
+                                            invoiceData?.items?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0) * 0.05
+                                        ).toFixed(2)}
 
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={6}
-                  align="right"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "right",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Gross Total إجمالي القيمة</p>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    align="right"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Gross Total إجمالي القيمة</p>
 
-                </td>
-                <td
-                  align="center"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "center",
-                    width: "10%",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {(
-                      invoiceData?.items?.reduce((total2, item) => {
-                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                      }, 0) +
-                      invoiceData?.items?.reduce((total, item) => {
-                        const fee = parseFloat(item?.center_fee ?? 0);
-                        const qty = parseFloat(item?.quantity ?? 1);
-                        return total + fee * qty;
-                      }, 0) * 0.05
-                    ).toFixed(2)}
+                                </td>
+                                <td
+                                    align="center"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "10%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
+                                        {(
+                                            invoiceData?.items?.reduce((total2, item) => {
+                                                return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                                            }, 0) +
+                                            invoiceData?.items?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0) * 0.05
+                                        ).toFixed(2)}
 
-                  </p>
-                </td>
-              </tr>
+                                    </p>
+                                </td>
+                            </tr>
 
-              <tr>
-                <td
-                  colSpan={6}
-                  align="right"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "right",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Total Payable الإجمالي</p>
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    align="right"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Total Payable الإجمالي</p>
 
-                </td>
-                <td
-                  align="right"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.5rem",
-                    textAlign: "center",
-                    width: "10%",
-                  }}
-                >
-                  <p style={{ fontSize: "12px" }}>
-                    {(
-                      invoiceData?.items?.reduce((total2, item) => {
-                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                      }, 0) +
-                      invoiceData?.items?.reduce((total, item) => {
-                        const fee = parseFloat(item?.center_fee ?? 0);
-                        const qty = parseFloat(item?.quantity ?? 1);
-                        return total + fee * qty;
-                      }, 0) * 0.05
-                    ).toFixed(2)}
+                                </td>
+                                <td
+                                    align="right"
+                                    style={{
+                                        border: "1px solid #000",
+                                        padding: "0.5rem",
+                                        textAlign: "center",
+                                        width: "10%",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "12px" }}>
+                                        {(
+                                            invoiceData?.items?.reduce((total2, item) => {
+                                                return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                                            }, 0) +
+                                            invoiceData?.items?.reduce((total, item) => {
+                                                const fee = parseFloat(item?.center_fee ?? 0);
+                                                const qty = parseFloat(item?.quantity ?? 1);
+                                                return total + fee * qty;
+                                            }, 0) * 0.05
+                                        ).toFixed(2)}
 
-                  </p>
-                </td>
-              </tr>
+                                    </p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </Box>
@@ -1654,7 +1658,7 @@ function PayReceipts() {
                             </tr>
                         </thead>
                         <tbody>
-                            {invoiceData2?.items?.map((item,index) => (
+                            {invoiceData2?.items?.map((item, index) => (
                                 <tr key={item.id}>
                                     <td
                                         style={{
@@ -1663,7 +1667,7 @@ function PayReceipts() {
                                             textAlign: "center",
                                         }}
                                     >
-                                        {index+1}
+                                        {index + 1}
                                     </td>
                                     <td
                                         style={{
@@ -2041,7 +2045,7 @@ function PayReceipts() {
                                         fontSize: "12px",
                                     }}
                                 >
-                                    Cashier
+                                    {invoiceData2?.payment_creator?.name}
                                 </td>
                                 <td
                                     style={{
@@ -2067,7 +2071,9 @@ function PayReceipts() {
                             alignItems="flex-start"
                         >
                             <Box textAlign="center">
-
+                                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px",fontWeight:'bold'  }}>
+                                    {invoiceData2?.created_by?.name}
+                                </Typography>
                                 <p
                                     variant="body2"
                                     style={{
@@ -2245,7 +2251,7 @@ function PayReceipts() {
                             </Grid>
                             <Grid item xs={6}>
                                 <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                                    Cashier
+                                    {payReceiptData?.payment_creator?.name}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -2564,7 +2570,9 @@ function PayReceipts() {
                             alignItems="flex-start"
                         >
                             <Box textAlign="center">
-
+                                <Typography variant="body2" sx={{ fontSize: "15px",fontWeight:'bold' }}>
+                                {payReceiptData?.payment_creator?.name}
+                                </Typography>
                                 <p
                                     variant="body2"
                                     style={{

@@ -275,15 +275,12 @@ function PreSalesList() {
   const generatePDF3 = async () => {
     if (!invoiceRef3.current) return;
 
-    // Temporarily hide the content while generating the PDF
     const invoiceElement = invoiceRef3.current;
-    invoiceElement.style.display = "block"; // Hide the element
+    invoiceElement.style.display = "block"; // Ensure visible before capture
 
-    // Capture the content using html2canvas
     const canvas = await html2canvas(invoiceElement, {
-      scale: 1,
+      scale: 2, // High quality
       useCORS: true,
-      logging: false,
     });
 
     const imgData = canvas.toDataURL("image/png");
@@ -293,24 +290,31 @@ function PreSalesList() {
       format: "a4",
     });
 
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const pageWidth = 210; // A4 width in mm
+    const pageHeight = 297; // A4 height in mm
+    const imgProps = {
+      width: pageWidth,
+      height: (canvas.height * pageWidth) / canvas.width,
+    };
 
-    // Add image to the PDF
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+    // If image height is larger than A4, scale it down to fit within a single page
+    if (imgProps.height > pageHeight) {
+      imgProps.height = pageHeight;
+      imgProps.width = (canvas.width * pageHeight) / canvas.height;
+    }
 
-    // Save the generated PDF
+    const xOffset = (pageWidth - imgProps.width) / 2; // center horizontally
+
+    pdf.addImage(imgData, "PNG", xOffset, 0, imgProps.width, imgProps.height);
+
     const blob = pdf.output("blob");
-
-    // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
-
-    // Open the PDF in a new tab
     window.open(blobUrl);
 
-    // Restore the content visibility after generating the PDF
-    invoiceElement.style.display = "none"; // Show the content again
+    invoiceElement.style.display = "none";
   };
+
+
 
   const getData2 = async (id) => {
     try {
@@ -325,6 +329,9 @@ function PreSalesList() {
         invoiceType: data?.receipt?.invoice_number,
         id: data?.receipt?.id,
         trn: data?.receipt?.trn,
+        created_by: data?.receipt?.creator,
+        payment_creator: data?.receipt?.payment_creator,
+
         tokenNumber: data?.receipt?.token_number,
         email: data?.receipt?.customer_email,
         customerName: data?.receipt?.customer_name,
@@ -383,6 +390,8 @@ function PreSalesList() {
       let invoice = {
         date: moment(data?.receipt?.date).format("DD-MM-YYYY"),
         invoiceType: data?.receipt?.invoice_number,
+        created_by: data?.receipt?.created_by,
+        payment_creator: data?.receipt?.payment_creator,
 
         trn: data?.receipt?.trn,
         tokenNumber: data?.receipt?.token_number,
@@ -1030,7 +1039,7 @@ function PreSalesList() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData?.items?.map((item,index) => (
+              {invoiceData?.items?.map((item, index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -1039,7 +1048,7 @@ function PreSalesList() {
                       textAlign: "center",
                     }}
                   >
-                    {index+1}
+                    {index + 1}
                   </td>
                   <td
                     style={{
@@ -1315,7 +1324,9 @@ function PreSalesList() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-
+                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px",fontWeight:'bold' }}>
+                  {invoiceData2?.created_by?.name}
+                </Typography>
                 <p
                   variant="body2"
                   style={{
@@ -1494,7 +1505,7 @@ function PreSalesList() {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                  Cashier
+                  {payReceiptData?.payment_creator?.name}
                 </Typography>
               </Grid>
             </Grid>
@@ -1813,7 +1824,9 @@ function PreSalesList() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-
+                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px",fontWeight:'bold'  }}>
+                  {payReceiptData?.payment_creator?.name}
+                </Typography>
                 <p
                   variant="body2"
                   style={{
@@ -2189,7 +2202,7 @@ function PreSalesList() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData2?.items?.map((item,index) => (
+              {invoiceData2?.items?.map((item, index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -2198,7 +2211,7 @@ function PreSalesList() {
                       textAlign: "center",
                     }}
                   >
-                    {index+1}
+                    {index + 1}
                   </td>
                   <td
                     style={{
@@ -2288,7 +2301,7 @@ function PreSalesList() {
                 </tr>
 
               ))}
-               <tr>
+              <tr>
                 <td
                   colSpan={6}
                   style={{
@@ -2576,7 +2589,7 @@ function PreSalesList() {
                     fontSize: "12px",
                   }}
                 >
-                  Cashier
+                  {invoiceData2?.payment_creator?.name}
                 </td>
                 <td
                   style={{
@@ -2602,7 +2615,9 @@ function PreSalesList() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-
+                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px",fontWeight:'bold'  }}>
+                  {invoiceData2?.created_by?.name}
+                </Typography>
                 <p
                   variant="body2"
                   style={{

@@ -134,14 +134,14 @@ function UpdatePreSale() {
     useEffect(() => {
         const feesTotal = (parseFloat(govtFee) || 0) + (parseFloat(centerFee) || 0) + (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", finalTotal);
+        setValue("total", parseFloat(finalTotal).toFixed(2));
     }, [govtFee, centerFee, bankCharges, qty]);
 
     const addItem = (data) => {
         console.log(serviceItem);
 
         // Create a new row with the serviceItem included
-        const newRow = { ...data, service: serviceItem ,service_id:serviceItem?.id};
+        const newRow = { ...data, service: serviceItem, service_id: serviceItem?.id };
 
         setRows((prevRows) => {
             const updatedRows = [...prevRows, newRow];
@@ -164,7 +164,7 @@ function UpdatePreSale() {
             return;
         }
 
-        const updatedItem = { ...data, service: serviceItem,service_id:serviceItem?.id };
+        const updatedItem = { ...data, service: serviceItem, service_id: serviceItem?.id };
         console.log("Updated item to be saved:", updatedItem);
 
         setRows(prevItems => {
@@ -355,8 +355,8 @@ function UpdatePreSale() {
             setValue1("mobile", data?.token?.mobile);
             setValue1("ref", data?.token?.reference);
             setValue1("display_customer", data?.token?.customer_name);
-            setValue1("email", data?.token?.email);
-            setValue1("address", data?.token?.address);
+            setValue1("email", data?.token?.customer_email);
+            setValue1("address", data?.token?.customer_address);
             setValue1("trn", data?.token?.trn);
             setValue1("cost_center", data?.token?.cost_center);
             setValue1("mobileValue", data?.token?.mobile);
@@ -680,7 +680,7 @@ function UpdatePreSale() {
                                                     placeholder="Email"
 
                                                     register={register1("email", {
-                                                        required: 'please enter email .'
+                                                        required: false
                                                     })}
                                                     error={errors1?.email?.message}
                                                 />
@@ -759,7 +759,7 @@ function UpdatePreSale() {
                                                     rows={2}
 
                                                     register={register1("address", {
-                                                        required: 'please enter address .'
+                                                        required: false
                                                     })}
                                                     error={errors1?.address?.message}
                                                 />
@@ -847,7 +847,7 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid}
                                                     placeholder="Govt fee"
-                                                    type="number"
+                                                 
                                                     register={register("govt_fee", { required: "Govt fee is required" })}
                                                 />
                                                 {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -857,7 +857,7 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid}
                                                     placeholder="Center Fee"
-                                                    type="number"
+                                                    
                                                     register={register("center_fee", { required: "Center fee is required" })}
                                                 />
                                                 {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -867,7 +867,7 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid}
                                                     placeholder="Bank Charges"
-                                                    type="number"
+                                                  
                                                     register={register("bank_charge", { required: "Bank charges are required" })}
 
                                                 />
@@ -878,7 +878,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder="Transaction Id"
-                                                    type="number"
+                                                  
                                                     register={register("transaction_id", { required: false })}
 
                                                 />
@@ -889,7 +889,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder="Application Id"
-                                                    type="number"
+                                                    
                                                     register={register("application_id", {
                                                         required: false,
                                                     })}
@@ -904,7 +904,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder=" Ref No"
-                                                    type="number"
+                                               
                                                     register={register("ref_no", {
                                                         required: false,
                                                     })}
@@ -1023,6 +1023,18 @@ function UpdatePreSale() {
 
                                                             let selectedID = item?.id
                                                             setRows(rows?.filter(item2 => item2?.id != item?.id))
+                                                            let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                                                            // 👇 Calculate total after updating rows
+                                                            const total = filteredData.reduce((sum, item) => {
+                                                                // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
+                                                                return sum + (parseFloat(item.total) || 0);
+                                                            }, 0);
+
+                                                            console.log("New total after update:", total);
+
+                                                            // You can update a state for total if you have one:
+                                                            setSubTotal(total); // <-- Make sure to declare this with useState
+
                                                         }} width={'35px'}></Box>}
 
 

@@ -142,26 +142,31 @@ function SalesReciept() {
       (parseFloat(centerFee) || 0) +
       (parseFloat(bankCharges) || 0);
     const finalTotal = feesTotal * (parseFloat(qty) || 1);
-    setValue("total", finalTotal);
+    setValue("total", parseFloat(finalTotal).toFixed(2));
   }, [govtFee, centerFee, bankCharges, qty]);
 
   const addItem = (data) => {
     console.log(data);
-
+  
     // Create a new row with the serviceItem included
     const newRow = { ...data, service: serviceItem };
-
+  
     setRows((prevRows) => {
       const updatedRows = [...prevRows, newRow];
-      const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
-      setSubTotal(newSubTotal);
+  
+      // Ensure all totals are treated as floats
+      const newSubTotal = updatedRows.reduce((sum, row) => sum + parseFloat(row.total || 0), 0);
+  
+      // Optionally round to 2 decimal places
+      setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+  
       return updatedRows;
     });
-
+  
     reset();
     setServiceItem("");
   };
-
+  
   const [activeStep, setActiveStep] = React.useState(1);
 
   // const [fieldsDisabled, setFieldsDisabled] = useState({
@@ -295,6 +300,8 @@ function SalesReciept() {
 
         const invoice = {
           id: response?.data?.id,
+          created_by: response?.data?.creator,
+          payment_creator: response?.data?.payment_creator,
           date: moment(date).format("DD-MM-YYYY"),
           invoiceType: formData?.invoice_number,
           trn: formData?.trn,
@@ -528,18 +535,18 @@ function SalesReciept() {
   const updateItem = (data) => {
     console.log("Raw data passed to updateItem:", data);
     console.log("Current serviceItem:", serviceItem);
-
+  
     if (!data?.id) {
       console.warn("No valid ID found in data. Skipping update.");
       return;
     }
-
+  
     const updatedItem = { ...data, service: serviceItem };
     console.log("Updated item to be saved:", updatedItem);
-
+  
     setRows(prevItems => {
       console.log("Previous rows:", prevItems);
-
+  
       const updatedRows = prevItems.map(item => {
         if (item.id === data.id) {
           console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
@@ -548,16 +555,27 @@ function SalesReciept() {
           return item;
         }
       });
-
+  
       console.log("Rows after update:", updatedRows);
+  
+      // Calculate new subtotal
+      const newSubTotal = updatedRows.reduce((sum, row) => {
+        const total = parseFloat(row.total || 0);
+        return sum + (isNaN(total) ? 0 : total);
+      }, 0);
+  
+      // Round to 2 decimal places
+      setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+  
       return updatedRows;
     });
-
+  
     console.log("Resetting form and states...");
     reset();
     setServiceItem(null);
     setEditState(false);
   };
+  
 
   useEffect(() => {
     console.log(user, "user");
@@ -949,8 +967,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Govt fee"
-                
-                    
+
+
                       register={register("govt_fee", { required: "Govt fee is required" })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -960,8 +978,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Center Fee"
-                       
-                  
+
+
                       register={register("center_fee", { required: "Center fee is required" })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -971,7 +989,7 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Bank Charges"
-                  
+
                       register={register("bank_charge", { required: "Bank charges are required" })}
 
                     />
@@ -1113,8 +1131,8 @@ function SalesReciept() {
 
                         setValue("id", item?.id);
                         setValue("govt_fee", item?.govt_fee);
-                        setValue("center_fee", item?.service?.center_fee);
-                        setValue("bank_charge", item?.service?.bank_service_charge);
+                        setValue("center_fee", item?.center_fee);
+                        setValue("bank_charge", item?.bank_charge);
                         setValue("transaction_id", item?.transaction_id);
                         setValue("application_id", item?.application_id);
                         setValue("ref_no", item?.ref_no);
@@ -1129,6 +1147,17 @@ function SalesReciept() {
 
                           let selectedID = item?.id
                           setRows(rows?.filter(item2 => item2?.id != item?.id))
+                          let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                          // 👇 Calculate total after updating rows
+                          const total = filteredData.reduce((sum, item) => {
+                            // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
+                            return sum + (parseFloat(item.total) || 0);
+                          }, 0);
+
+                          console.log("New total after update:", total);
+
+                          // You can update a state for total if you have one:
+                          setSubTotal(total); // <-- Make sure to declare this with useState
                         }} width={'35px'}></Box>}
 
 
@@ -1521,7 +1550,7 @@ function SalesReciept() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData?.items?.map((item,index) => (
+              {invoiceData?.items?.map((item, index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -1530,7 +1559,7 @@ function SalesReciept() {
                       textAlign: "center",
                     }}
                   >
-                    {index+1}
+                    {index + 1}
                   </td>
                   <td
                     style={{
@@ -1805,7 +1834,9 @@ function SalesReciept() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-
+                <Typography variant="body2" sx={{ fontSize: "15px",fontWeight:'bold' }}>
+                  {invoiceData?.created_by?.name}
+                </Typography>
                 <p
                   variant="body2"
                   style={{
