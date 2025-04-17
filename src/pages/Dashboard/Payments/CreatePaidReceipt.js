@@ -341,26 +341,26 @@ function CreatePaidReceipt() {
 
         setValue1(
           "total",
-          Number.parseFloat(
+          (
             Number.parseFloat(data?.receipt?.total_amount) +
-            Number.parseFloat(
-              data?.receipt?.sale_receipt_items?.reduce(
-                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                0,
-              ) * 0.05,
-            ),
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              return total + fee * qty
+            }, 0) *
+            0.05
           ).toFixed(2),
         )
         setValue1(
           "balance",
-          Number.parseFloat(
+          (
             Number.parseFloat(data?.receipt?.total_amount) +
-            Number.parseFloat(
-              data?.receipt?.sale_receipt_items?.reduce(
-                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                0,
-              ) * 0.05,
-            ),
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              return total + fee * qty
+            }, 0) *
+            0.05
           ).toFixed(2),
         )
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })

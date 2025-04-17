@@ -594,7 +594,7 @@ function UpdatePreSale() {
                                                     label={"Invoice Date :*"}
                                                     value={date}
                                                     size={'small'}
-
+                                                    disabled={true}
                                                     error={errors1?.date?.message}
                                                     register={register1("date", {
                                                         required:
@@ -847,7 +847,7 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid}
                                                     placeholder="Govt fee"
-                                                 
+
                                                     register={register("govt_fee", { required: "Govt fee is required" })}
                                                 />
                                                 {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -857,7 +857,7 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid}
                                                     placeholder="Center Fee"
-                                                    
+
                                                     register={register("center_fee", { required: "Center fee is required" })}
                                                 />
                                                 {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -867,7 +867,7 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid}
                                                     placeholder="Bank Charges"
-                                                  
+
                                                     register={register("bank_charge", { required: "Bank charges are required" })}
 
                                                 />
@@ -878,7 +878,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder="Transaction Id"
-                                                  
+
                                                     register={register("transaction_id", { required: false })}
 
                                                 />
@@ -889,7 +889,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder="Application Id"
-                                                    
+
                                                     register={register("application_id", {
                                                         required: false,
                                                     })}
@@ -904,7 +904,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder=" Ref No"
-                                               
+
                                                     register={register("ref_no", {
                                                         required: false,
                                                     })}
