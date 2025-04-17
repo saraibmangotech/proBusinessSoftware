@@ -193,125 +193,169 @@ function PreSalesList() {
   const invoiceRef = useRef(null);
   const invoiceRef2 = useRef(null);
   const invoiceRef3 = useRef(null);
+ 
   const generatePDF = async () => {
     if (!invoiceRef.current) return;
-
-    // Temporarily hide the content while generating the PDF
+  
+    // Temporarily show the content while generating the PDF
     const invoiceElement = invoiceRef.current;
-    invoiceElement.style.display = "block";
-
+    invoiceElement.style.display = "block"; // Show the element
+  
     // Capture the content using html2canvas
     const canvas = await html2canvas(invoiceElement, {
-      scale: 1,
+      scale: 2, // Higher scale for better quality
       useCORS: true,
       logging: false,
     });
-
+  
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
-
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    // Add image to the PDF
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
-    // // Save the generated PDF
-    // pdf.save("service_request.pdf");
+  
+    // A4 dimensions: 210mm × 297mm
+    const pageWidth = 210;
+    const pageHeight = 297;
+    
+    // Calculate dimensions to fit content on page with margins
+    const margin = 14; // 14mm margins
+    const contentWidth = pageWidth - (margin * 2);
+    
+    // Calculate height while maintaining aspect ratio
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    
+    // Check if content would exceed page height and scale if necessary
+    const availableHeight = pageHeight - (margin * 2);
+    const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+    
+    // Calculate final dimensions
+    const finalWidth = contentWidth * scale;
+    const finalHeight = contentHeight * scale;
+    
+    // Add image to the PDF with margins
+    pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+  
     const blob = pdf.output("blob");
-
+  
     // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
-
+  
     // Open the PDF in a new tab
     window.open(blobUrl);
-
+  
     // Restore the content visibility after generating the PDF
-    invoiceElement.style.display = "none"; // Show the content again
+    invoiceElement.style.display = "none"; // Hide the element again
   };
   const generatePDF2 = async () => {
     if (!invoiceRef2.current) return;
-
-    // Temporarily hide the content while generating the PDF
+  
+    // Temporarily show the content while generating the PDF
     const invoiceElement = invoiceRef2.current;
-    invoiceElement.style.display = "block"; // Hide the element
-
+    invoiceElement.style.display = "block"; // Show the element
+  
     // Capture the content using html2canvas
     const canvas = await html2canvas(invoiceElement, {
-      scale: 1,
+      scale: 2, // Higher scale for better quality
       useCORS: true,
       logging: false,
     });
-
+  
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
-
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    // Add image to the PDF
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
+  
+    // A4 dimensions: 210mm × 297mm
+    const pageWidth = 210;
+    const pageHeight = 297;
+    
+    // Calculate dimensions to fit content on page with margins
+    const margin = 14; // 14mm margins
+    const contentWidth = pageWidth - (margin * 2);
+    
+    // Calculate height while maintaining aspect ratio
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    
+    // Check if content would exceed page height and scale if necessary
+    const availableHeight = pageHeight - (margin * 2);
+    const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+    
+    // Calculate final dimensions
+    const finalWidth = contentWidth * scale;
+    const finalHeight = contentHeight * scale;
+    
+    // Add image to the PDF with margins
+    pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+  
     const blob = pdf.output("blob");
-
+  
     // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
-
+  
     // Open the PDF in a new tab
     window.open(blobUrl);
-
+  
     // Restore the content visibility after generating the PDF
-    invoiceElement.style.display = "none"; // Show the content again
+    invoiceElement.style.display = "none"; // Hide the element again
   };
-
+ 
   const generatePDF3 = async () => {
     if (!invoiceRef3.current) return;
-
+  
+    // Temporarily show the content while generating the PDF
     const invoiceElement = invoiceRef3.current;
-    invoiceElement.style.display = "block"; // Ensure visible before capture
-
+    invoiceElement.style.display = "block"; // Show the element
+  
+    // Capture the content using html2canvas
     const canvas = await html2canvas(invoiceElement, {
-      scale: 2, // High quality
+      scale: 2, // Higher scale for better quality
       useCORS: true,
+      logging: false,
     });
-
+  
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
-
-    const pageWidth = 210; // A4 width in mm
-    const pageHeight = 297; // A4 height in mm
-    const imgProps = {
-      width: pageWidth,
-      height: (canvas.height * pageWidth) / canvas.width,
-    };
-
-    // If image height is larger than A4, scale it down to fit within a single page
-    if (imgProps.height > pageHeight) {
-      imgProps.height = pageHeight;
-      imgProps.width = (canvas.width * pageHeight) / canvas.height;
-    }
-
-    const xOffset = (pageWidth - imgProps.width) / 2; // center horizontally
-
-    pdf.addImage(imgData, "PNG", xOffset, 0, imgProps.width, imgProps.height);
-
+  
+    // A4 dimensions: 210mm × 297mm
+    const pageWidth = 210;
+    const pageHeight = 297;
+    
+    // Calculate dimensions to fit content on page with margins
+    const margin = 14; // 14mm margins
+    const contentWidth = pageWidth - (margin * 2);
+    
+    // Calculate height while maintaining aspect ratio
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    
+    // Check if content would exceed page height and scale if necessary
+    const availableHeight = pageHeight - (margin * 2);
+    const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+    
+    // Calculate final dimensions
+    const finalWidth = contentWidth * scale;
+    const finalHeight = contentHeight * scale;
+    
+    // Add image to the PDF with margins
+    pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+  
     const blob = pdf.output("blob");
+  
+    // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
+  
+    // Open the PDF in a new tab
     window.open(blobUrl);
-
-    invoiceElement.style.display = "none";
+  
+    // Restore the content visibility after generating the PDF
+    invoiceElement.style.display = "none"; // Hide the element again
   };
 
 

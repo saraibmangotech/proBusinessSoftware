@@ -216,44 +216,60 @@ function SalesReciept() {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
+  
   const generatePDF = async () => {
     if (!invoiceRef.current) return;
-
-    // Temporarily hide the content while generating the PDF
+  
+    // Temporarily show the content while generating the PDF
     const invoiceElement = invoiceRef.current;
-    invoiceElement.style.display = 'block';  // Hide the element
-
+    invoiceElement.style.display = "block"; // Show the element
+  
     // Capture the content using html2canvas
     const canvas = await html2canvas(invoiceElement, {
-      scale: 1,
+      scale: 2, // Higher scale for better quality
       useCORS: true,
       logging: false,
     });
-
+  
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
-
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    // Add image to the PDF
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
-    // Save the generated PDF
+  
+    // A4 dimensions: 210mm × 297mm
+    const pageWidth = 210;
+    const pageHeight = 297;
+    
+    // Calculate dimensions to fit content on page with margins
+    const margin = 14; // 14mm margins
+    const contentWidth = pageWidth - (margin * 2);
+    
+    // Calculate height while maintaining aspect ratio
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    
+    // Check if content would exceed page height and scale if necessary
+    const availableHeight = pageHeight - (margin * 2);
+    const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+    
+    // Calculate final dimensions
+    const finalWidth = contentWidth * scale;
+    const finalHeight = contentHeight * scale;
+    
+    // Add image to the PDF with margins
+    pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+  
     const blob = pdf.output("blob");
-
+  
     // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
-
+  
     // Open the PDF in a new tab
     window.open(blobUrl);
-    navigate("/pre-sales");
+  
     // Restore the content visibility after generating the PDF
-    invoiceElement.style.display = 'none';  // Show the content again
+    invoiceElement.style.display = "none"; // Hide the element again
   };
 
 
