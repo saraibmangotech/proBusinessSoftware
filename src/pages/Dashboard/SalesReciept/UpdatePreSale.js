@@ -134,7 +134,7 @@ function UpdatePreSale() {
     useEffect(() => {
         const feesTotal = (parseFloat(govtFee) || 0) + (parseFloat(centerFee) || 0) + (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", finalTotal);
+        setValue("total", parseFloat(finalTotal).toFixed(2));
     }, [govtFee, centerFee, bankCharges, qty]);
 
     const addItem = (data) => {

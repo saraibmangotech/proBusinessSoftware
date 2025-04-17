@@ -195,10 +195,10 @@ function Header() {
     setMobileOpen(!mobileOpen)
   }
 
-  // Handle submenu toggle in mobile view
   const handleSubmenuToggle = (id) => {
-    setOpenSubmenu(openSubmenu === id ? null : id)
-  }
+    setOpenSubmenu((prev) => (prev !== id ? id : null));
+  };
+  
 
   // Check if a route is active
   const isActive = (route) => {
@@ -286,9 +286,9 @@ function Header() {
             navigation: true,
             order_by: 33,
           },
-        
 
-        
+
+
         ],
       },])
     }
@@ -485,7 +485,7 @@ function Header() {
           ],
         },
       ]);
-      
+
     }
     else {
       setNavigationData([
@@ -534,9 +534,9 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-          
 
-          
+
+
           ],
         },
         {
@@ -572,13 +572,13 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-          
 
-          
+
+
           ],
 
         },
-       
+
         {
           id: 15,
           name: "Purchase",
@@ -728,7 +728,7 @@ function Header() {
               navigation: true,
               order_by: 40,
             },
-          
+
             {
               id: 41,
               name: "Balance sheet",
@@ -740,7 +740,7 @@ function Header() {
               navigation: true,
               order_by: 41,
             },
-           
+
           ],
           childRoute: [
             "/create-journal-voucher",
@@ -950,7 +950,6 @@ function Header() {
         {navigationData?.map((item) => (
           <React.Fragment key={item.id}>
             {item.children ? (
-              // Item with submenu
               <>
                 <ListItem
                   button
@@ -983,7 +982,7 @@ function Header() {
                   {openSubmenu === item.id ? <ExpandLess /> : <ExpandMore />}
                 </ListItem>
 
-                <Collapse in={openSubmenu === item.id} timeout="auto" unmountOnExit>
+                <Collapse key={`collapse-${item.id}`} in={openSubmenu === item.id} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     {item.children.map((child) => (
                       <ListItem
@@ -991,8 +990,8 @@ function Header() {
                         button
                         onClick={() => {
                           if (child.route) {
-                            navigate(child.route)
-                            setMobileOpen(false)
+                            navigate(child.route);
+                            setMobileOpen(false);
                           }
                         }}
                         selected={isActive(child.route)}
@@ -1025,13 +1024,12 @@ function Header() {
                 </Collapse>
               </>
             ) : (
-              // Single item
               <ListItem
                 button
                 onClick={() => {
                   if (item.route) {
-                    navigate(item.route)
-                    setMobileOpen(false)
+                    navigate(item.route);
+                    setMobileOpen(false);
                   }
                 }}
                 selected={isActive(item.route)}
@@ -1061,9 +1059,12 @@ function Header() {
             )}
           </React.Fragment>
         ))}
+
       </List>
     </Box>
   )
+
+  
 
   return (
     <>
