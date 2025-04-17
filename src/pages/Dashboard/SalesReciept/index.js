@@ -1521,7 +1521,7 @@ function SalesReciept() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData?.items?.map((item) => (
+              {invoiceData?.items?.map((item,index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -1530,7 +1530,7 @@ function SalesReciept() {
                       textAlign: "center",
                     }}
                   >
-                    {item?.id}
+                    {index+1}
                   </td>
                   <td
                     style={{
