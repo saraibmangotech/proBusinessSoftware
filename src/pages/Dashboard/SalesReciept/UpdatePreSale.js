@@ -145,7 +145,7 @@ function UpdatePreSale() {
 
         setRows((prevRows) => {
             const updatedRows = [...prevRows, newRow];
-            const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
+            const newSubTotal = updatedRows.reduce((sum, row) => parseFloat(sum) + parseFloat(row.total), 0);
             setSubTotal(newSubTotal);
             return updatedRows;
         });
@@ -184,7 +184,7 @@ function UpdatePreSale() {
             // 👇 Calculate total after updating rows
             const total = updatedRows.reduce((sum, item) => {
                 // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
-                return sum + (parseFloat(item.total) || 0);
+                return parseFloat(sum) + (parseFloat(item.total) || 0);
             }, 0);
 
             console.log("New total after update:", total);
