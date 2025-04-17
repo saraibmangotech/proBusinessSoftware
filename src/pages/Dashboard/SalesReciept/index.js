@@ -949,7 +949,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Govt fee"
-                      type="number"
+                
+                    
                       register={register("govt_fee", { required: "Govt fee is required" })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -959,7 +960,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Center Fee"
-                      type="number"
+                       
+                  
                       register={register("center_fee", { required: "Center fee is required" })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -969,7 +971,7 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Bank Charges"
-                      type="number"
+                  
                       register={register("bank_charge", { required: "Bank charges are required" })}
 
                     />

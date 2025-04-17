@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/Input/index.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1744868839241,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1744868854087,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -56,9 +56,9 @@\n \t\t\t\t\tvariant={variant ?? \"outlined\"}\r\n \t\t\t\t\tsize={size}\r\n \t\t\t\t\tdir={dir}\r\n \t\t\t\t\r\n-\t\t\t\t\r\n+\t\t\t\t\tstep={step}\r\n \t\t\t\t\tvalue={value}\r\n \t\t\t\t\ttype={type}\r\n \t\t\t\t\tdisabled={disabled}\r\n \t\t\t\t\tplaceholder={placeholder}\r\n"
+                }
+            ],
+            "date": 1744868839241,
+            "name": "Commit-0",
+            "content": "import { Fragment, useRef } from \"react\";\r\nimport { FormControl, InputLabel, TextField, Typography, InputAdornment, } from \"@mui/material\";\r\nimport Colors from \"assets/Style/Colors\";\r\n\r\nfunction InputField(props) {\r\n\tconst {\r\n\t\tinputRef,\r\n\t\tvariant,\r\n\t\tstep,\r\n\t\tsize,\r\n\t\tdir,\r\n\t\tlabel,\r\n\t\tlabelIcon,\r\n\t\tplaceholder,\r\n\t\tdefaultValue,\r\n\t\tvalue,\r\n\t\tregister,\r\n\t\terror,\r\n\t\trows,\r\n\t\tmultiline,\r\n\t\ttype,\r\n\t\tInputProps,\r\n\t\tdisabled,\r\n\t\tinputProps,\r\n\t\tonInput,\r\n\t\tonBlur,\r\n\t\thelperText,\r\n\t\tstyle,\r\n\t\tid,\r\n\t\tinputStyle,\r\n\t\tstartAdornment,\r\n\t\tendAdornment,\r\n\t\tcustom,\r\n\t\tmax,\r\n\t\treadOnly\r\n\t} = props;\r\n\r\n\treturn (\r\n\t\t<Fragment>\r\n\t\t\t<InputLabel error={error && true} sx={custom ? custom : { textTransform: \"capitalize\", textAlign: 'left',fontWeight:700,color:Colors.gray }}>\r\n\t\t\t\t{\" \"}\r\n\t\t\t\t{labelIcon ? (\r\n\t\t\t\t\t<img src={labelIcon} alt=\"\" width={\"13px\"} height={\"13px\"} />\r\n\t\t\t\t) : (\r\n\t\t\t\t\t\"\"\r\n\t\t\t\t)}{\" \"}\r\n\t\t\t\t{label}\r\n\t\t\t</InputLabel>\r\n\t\t\t<FormControl\r\n\t\t\t\tvariant=\"standard\"\r\n\t\t\t\tfullWidth\r\n\t\t\t\tsx={{ mt: 1, mb: 2, ...style, \".MuiFormHelperText-root\": { ml: 0 } }}\r\n\t\t\t>\r\n\t\t\t\t<TextField\r\n\t\t\t\t\tinputRef={inputRef}\r\n\t\t\t\t\tvariant={variant ?? \"outlined\"}\r\n\t\t\t\t\tsize={size}\r\n\t\t\t\t\tdir={dir}\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tvalue={value}\r\n\t\t\t\t\ttype={type}\r\n\t\t\t\t\tdisabled={disabled}\r\n\t\t\t\t\tplaceholder={placeholder}\r\n\t\t\t\t\tdefaultValue={defaultValue}\r\n\t\t\t\t\tid={id}\r\n\t\t\t\t\terror={error && true}\r\n\t\t\t\t\tmultiline={multiline}\r\n\t\t\t\t\trows={rows ? 4 :''}\r\n\t\t\t\t\tonBlur={onBlur}\r\n\r\n\t\t\t\t\tInputProps={{\r\n\t\t\t\t\t\tstartAdornment: (\r\n\t\t\t\t\t\t\tstartAdornment && (\r\n\t\t\t\t\t\t\t\t<InputAdornment position=\"start\">\r\n\t\t\t\t\t\t\t\t\t{startAdornment}\r\n\t\t\t\t\t\t\t\t</InputAdornment>\r\n\t\t\t\t\t\t\t)\r\n\t\t\t\t\t\t),\r\n\t\t\t\t\t\tendAdornment: (\r\n\t\t\t\t\t\t\tendAdornment && (\r\n\t\t\t\t\t\t\t\t<InputAdornment position=\"end\">\r\n\t\t\t\t\t\t\t\t\t{endAdornment}\r\n\t\t\t\t\t\t\t\t</InputAdornment>\r\n\t\t\t\t\t\t\t)\r\n\t\t\t\t\t\t),\r\n\t\t\t\t\t\t...InputProps,\r\n\t\t\t\t\t}}\r\n\r\n\t\t\t\t\tinputProps={inputProps} // *For Input Attributes\r\n\t\t\t\t\tonInput={onInput}\r\n\t\t\t\t\thelperText={helperText}\r\n\t\t\t\t\t{...register}\r\n\t\t\t\t\tsx={{\r\n\t\t\t\t\t\tborderRadius: '10px !important',  // Apply border radius here\r\n\t\t\t\t\t\t'.MuiOutlinedInput-root': {\r\n\t\t\t\t\t\t\tborder: \"2px solid black !important\",\r\n\t\t\t\t\t\t\tborderRadius: \"10px !important\",\r\n\t\t\t\t\t\t\toutline: \"none !important\",\r\n\t\t\t\t\t\t\t'& fieldset' : {border:'none !important'},\r\n\t\t\t\t\t\t\t\"&.Mui-focused\": {\r\n\t\t\t\t\t\t\t\t'& fieldset' : {border:'none !important'},\r\n\t\t\t\t\t\t\t\t\"svg\": {\r\n\t\t\t\t\t\t\t\t\t\"path\": {\r\n\t\t\t\t\t\t\t\t\t\tfill: \"#0076bf\"\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\t...inputStyle,\r\n\t\t\t\t\t}} // Custom input style\r\n\t\t\t\t/>\r\n\t\t\t\t<Typography color=\"error\" sx={{ fontSize: 12, textAlign: \"left\" }}>\r\n\t\t\t\t\t{error}\r\n\t\t\t\t</Typography>\r\n\t\t\t</FormControl>\r\n\t\t</Fragment>\r\n\t);\r\n}\r\n\r\nexport default InputField;\r\n"
+        }
+    ]
+}

@@ -1030,7 +1030,7 @@ function PreSalesList() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData?.items?.map((item) => (
+              {invoiceData?.items?.map((item,index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -1039,7 +1039,7 @@ function PreSalesList() {
                       textAlign: "center",
                     }}
                   >
-                    {item?.id}
+                    {index+1}
                   </td>
                   <td
                     style={{
@@ -2189,7 +2189,7 @@ function PreSalesList() {
               </tr>
             </thead>
             <tbody>
-              {invoiceData2?.items?.map((item) => (
+              {invoiceData2?.items?.map((item,index) => (
                 <tr key={item.id}>
                   <td
                     style={{
@@ -2198,7 +2198,7 @@ function PreSalesList() {
                       textAlign: "center",
                     }}
                   >
-                    {item?.id}
+                    {index+1}
                   </td>
                   <td
                     style={{
