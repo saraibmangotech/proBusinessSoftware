@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 20,
+            "activePatchIndex": 23,
             "patches": [
                 {
                     "date": 1744507053958,
@@ -88,6 +88,18 @@
                 {
                     "date": 1744546821431,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -383,9 +383,9 @@\n \r\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>\r\n         {true && <PrimaryButton\r\n-          bgcolor={'bd9b4a'}\r\n+         bgcolor={'#bd9b4a'}\r\n           title=\"Create \"\r\n           onClick={() => { navigate('/create-reception'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n           loading={loading}\r\n         />}\r\n"
+                },
+                {
+                    "date": 1744911414731,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -388,9 +388,9 @@\n \r\n \r\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>\r\n-        {true && <PrimaryButton\r\n+        {1user?.role_id == 1003 && <PrimaryButton\r\n          bgcolor={'#bd9b4a'}\r\n           title=\"Create \"\r\n           onClick={() => { navigate('/create-reception'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n           loading={loading}\r\n"
+                },
+                {
+                    "date": 1744911443741,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -115,8 +115,9 @@\n   const [status, setStatus] = useState(null)\r\n   const [statusDialog, setStatusDialog] = useState(false)\r\n   const [selectedData, setSelectedData] = useState(null)\r\n   const [tableLoader, setTableLoader] = useState(false)\r\n+   const { user } = useAuth()\r\n   const {\r\n     register,\r\n     handleSubmit,\r\n     formState: { errors },\r\n@@ -124,9 +125,9 @@\n     getValues,\r\n     reset,\r\n   } = useForm();\r\n \r\n-  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]\r\n+  const tableHead = [{ name: 'SR No.', key: '' },{ name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]\r\n \r\n \r\n   const [loader, setLoader] = useState(false);\r\n \r\n@@ -251,8 +252,14 @@\n \r\n \r\n     },\r\n     {\r\n+      header: \"Token Number.\",\r\n+      accessorKey: \"token_number\",\r\n+\r\n+\r\n+    },\r\n+    {\r\n       header: \"Customer\",\r\n       accessorKey: \"customer_name\",\r\n \r\n \r\n@@ -262,18 +269,18 @@\n       accessorKey: \"mobile\",\r\n \r\n \r\n     },\r\n-    {\r\n-      header: \"Type\",\r\n-      accessorKey: \"cost_center\",\r\n-      cell: ({ row }) => (\r\n-        <Box variant=\"contained\" color=\"primary\" sx={{ cursor: \"pointer\", display: \"flex\", gap: 2 }}>\r\n-          {row?.original?.is_company ? 'Company' : \"Individual\"}\r\n-        </Box>\r\n-      ),\r\n+    // {\r\n+    //   header: \"Type\",\r\n+    //   accessorKey: \"cost_center\",\r\n+    //   cell: ({ row }) => (\r\n+    //     <Box variant=\"contained\" color=\"primary\" sx={{ cursor: \"pointer\", display: \"flex\", gap: 2 }}>\r\n+    //       {row?.original?.is_company ? 'Company' : \"Individual\"}\r\n+    //     </Box>\r\n+    //   ),\r\n \r\n-    },\r\n+    // },\r\n     {\r\n       id: \"created_at\",\r\n       header: \"Registration Date\",\r\n       // Remove accessorKey and fix accessorFn to use row directly\r\n@@ -382,9 +389,9 @@\n \r\n \r\n       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>\r\n         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>\r\n-        {1user?.role_id == 1003 && <PrimaryButton\r\n+      {!user?.role_id == 1003 && <PrimaryButton\r\n          bgcolor={'#bd9b4a'}\r\n           title=\"Create \"\r\n           onClick={() => { navigate('/create-reception'); localStorage.setItem(\"currentUrl\", '/create-customer') }}\r\n           loading={loading}\r\n"
+                },
+                {
+                    "date": 1744911456757,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,8 +39,9 @@\n import { showErrorToast, showPromiseToast } from 'components/NewToaster';\r\n import { useCallbackPrompt } from 'hooks/useCallBackPrompt';\r\n import DataTable from 'components/DataTable';\r\n import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';\r\n+import { useAuth } from 'context/UseContext';\r\n \r\n // *For Table Style\r\n const Row = styled(TableRow)(({ theme }) => ({\r\n   border: 0,\r\n"
                 }
             ],
             "date": 1744507053958,

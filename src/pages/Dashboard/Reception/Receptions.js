@@ -40,6 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import { useAuth } from 'context/UseContext';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -116,6 +117,7 @@ function ReceptionList() {
   const [statusDialog, setStatusDialog] = useState(false)
   const [selectedData, setSelectedData] = useState(null)
   const [tableLoader, setTableLoader] = useState(false)
+   const { user } = useAuth()
   const {
     register,
     handleSubmit,
@@ -389,7 +391,7 @@ function ReceptionList() {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>
-        {true && <PrimaryButton
+      {!user?.role_id == 1003 && <PrimaryButton
          bgcolor={'#bd9b4a'}
           title="Create "
           onClick={() => { navigate('/create-reception'); localStorage.setItem("currentUrl", '/create-customer') }}

@@ -1019,7 +1019,7 @@ function UpdatePreSale() {
 
                                                     }} src={Images.editIcon} width={'35px'}></Box>}
                                                     <Box>
-                                                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+                                                        {!detail?.is_paid && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
                                                             let selectedID = item?.id
                                                             setRows(rows?.filter(item2 => item2?.id != item?.id))

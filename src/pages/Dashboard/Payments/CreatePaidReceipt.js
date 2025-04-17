@@ -1,16 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client"
+
+import React, { useEffect, useRef, useState } from "react"
 import {
-  Avatar,
   Box,
-  Checkbox,
-  Container,
-  FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
-  InputLabel,
-  Radio,
-  RadioGroup,
   Table,
   TableCell,
   TableContainer,
@@ -20,65 +14,39 @@ import {
   TableHead,
   TextField,
   Paper,
-} from "@mui/material";
-import RegisterContainer from "container/Register";
-import { useTheme } from "@mui/material/styles";
-import MobileStepper from "@mui/material/MobileStepper";
-import Button from "@mui/material/Button";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import { PrimaryButton } from "components/Buttons";
-import Colors from "assets/Style/Colors";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Controller, useForm } from "react-hook-form";
-import UploadFile from "components/UploadFile";
-import InputField from "components/Input";
-import DatePicker from "components/DatePicker";
-import { ErrorToaster } from "components/Toaster";
-import { FormControl } from "@mui/base";
-import LabelCustomInput from "components/Input/LabelCustomInput";
-import SelectField from "components/Select";
-import {
-  CleanTypes,
-  Debounce,
-  Debounce2,
-  getFileSize,
-  handleDownload,
-} from "utils";
-import instance from "config/axios";
-import routes from "services/System/routes";
-import CustomerServices from "services/Customer";
-import CustomerService from "../DashboardPages/CustomerService";
-import { showErrorToast, showPromiseToast } from "components/NewToaster";
-import moment from "moment";
-import { Link, useNavigate } from "react-router-dom";
-import SystemServices from "services/System";
-import UploadFileSingle from "components/UploadFileSingle";
-import { Images } from "assets";
-import { useCallbackPrompt } from "hooks/useCallBackPrompt";
-import { addMonths } from "date-fns";
-import { useAuth } from "context/UseContext";
-import DoDisturbIcon from "@mui/icons-material/DoDisturb";
-import axios from "axios";
-import UploadIcon from "@mui/icons-material/Upload";
-import FinanceServices from "services/Finance";
-import SearchIcon from "@mui/icons-material/Search";
+} from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import Button from "@mui/material/Button"
+import { PrimaryButton } from "components/Buttons"
+import { useForm } from "react-hook-form"
+import InputField from "components/Input"
+import DatePicker from "components/DatePicker"
+import { ErrorToaster } from "components/Toaster"
+import SelectField from "components/Select"
+import CustomerServices from "services/Customer"
+import { showErrorToast, showPromiseToast } from "components/NewToaster"
+import moment from "moment"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "context/UseContext"
+import FinanceServices from "services/Finance"
+import SearchIcon from "@mui/icons-material/Search"
 // import { TableBody, TableHead } from "mui-datatables";
 
 function CreatePaidReceipt() {
-  const theme = useTheme();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [formChange, setFormChange] = useState(false);
-  const [submit, setSubmit] = useState(false);
-  const [excludeFromSales, setExcludeFromSales] = useState("no");
-  const [excludeFromPurchase, setExcludeFromPurchase] = useState("no");
-  const [total, setTotal] = useState(0);
-  const [subTotal, setSubTotal] = useState(0);
-  const [payButton, setPayButton] = useState(false);
-  const [rows, setRows] = useState([]);
+  const theme = useTheme()
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [formChange, setFormChange] = useState(false)
+  const [submit, setSubmit] = useState(false)
+  const [excludeFromSales, setExcludeFromSales] = useState("no")
+  const [excludeFromPurchase, setExcludeFromPurchase] = useState("no")
+  const [total, setTotal] = useState(0)
+  const [subTotal, setSubTotal] = useState(0)
+  const [payButton, setPayButton] = useState(false)
+  const [rows, setRows] = useState([])
   const [buttonDisabled, setButtonDisabled] = useState(false)
-  console.log(rows, "data");
+  const [amountError, setAmountError] = useState("")
+  console.log(rows, "data")
   const [items, setItems] = useState([
     {
       itemCode: "",
@@ -88,7 +56,7 @@ function CreatePaidReceipt() {
       applicationId: "",
       total: 17.1,
     },
-  ]);
+  ])
 
   // const addItem = () => {
   //   const newItem = {
@@ -110,7 +78,7 @@ function CreatePaidReceipt() {
     watch,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm()
   const {
     register: register1,
     handleSubmit: handleSubmit1,
@@ -119,439 +87,476 @@ function CreatePaidReceipt() {
     control,
     watch: watch1,
     formState: { errors: errors1 },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      amount: "",
+      payment: null,
+      bank: null,
+      card: null,
+    },
+  })
 
   // Watch all form data
 
   // Watch for changes in the fee-related fields
-  const govtFee = watch("govt_fee", 0);
-  const centerFee = watch("center_fee", 0);
-  const bankCharges = watch("bank_charges", 0);
-  const qty = watch("qty", 1);
+  const govtFee = watch("govt_fee", 0)
+  const centerFee = watch("center_fee", 0)
+  const bankCharges = watch("bank_charges", 0)
+  const qty = watch("qty", 1)
+  const paymentAmount = watch1("amount", 0)
+  const paymentMethod = watch1("payment")
+
   useEffect(() => {
     const feesTotal =
-      (parseFloat(govtFee) || 0) +
-      (parseFloat(centerFee) || 0) +
-      (parseFloat(bankCharges) || 0);
-    const finalTotal = feesTotal * (parseFloat(qty) || 1);
-    setValue("total", finalTotal);
-  }, [govtFee, centerFee, bankCharges, qty]);
+      (Number.parseFloat(govtFee) || 0) + (Number.parseFloat(centerFee) || 0) + (Number.parseFloat(bankCharges) || 0)
+    const finalTotal = feesTotal * (Number.parseFloat(qty) || 1)
+    setValue("total", finalTotal)
+  }, [govtFee, centerFee, bankCharges, qty])
+
+  // Validate amount against total
+  useEffect(() => {
+    if (paymentAmount && watch1("total")) {
+      const amount = Number.parseFloat(paymentAmount)
+      const total = Number.parseFloat(watch1("total"))
+
+      if (amount > total) {
+        setAmountError("Amount cannot exceed total")
+      } else if (amount <= 0) {
+        setAmountError("Amount must be greater than 0")
+      } else {
+        setAmountError("")
+        // Calculate balance
+        setValue1("balance", (total - amount).toFixed(2))
+      }
+    }
+  }, [paymentAmount, watch1("total")])
 
   const addItem = (data) => {
-    const total = data.total;
+    const total = data.total
     setRows((prevRows) => {
-      const updatedRows = [...prevRows, data];
-      const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0);
-      setSubTotal(newSubTotal);
-      return updatedRows;
-    });
-    reset();
-    setServiceItem("");
-  };
+      const updatedRows = [...prevRows, data]
+      const newSubTotal = updatedRows.reduce((sum, row) => sum + row.total, 0)
+      setSubTotal(newSubTotal)
+      return updatedRows
+    })
+    reset()
+    setServiceItem("")
+  }
 
-
-
-  const allowFilesType2 = ["image/png", "image/jpg", "image/jpeg"];
-  const [guarantors, setGuarantors] = useState([]);
-  const [activeStep, setActiveStep] = React.useState(1);
+  const allowFilesType2 = ["image/png", "image/jpg", "image/jpeg"]
+  const [guarantors, setGuarantors] = useState([])
+  const [activeStep, setActiveStep] = React.useState(1)
 
   // *For Deposit Slip
-  const [progress, setProgress] = useState(0);
-  const [uploadedSize, setUploadedSize] = useState(0);
-  const [slipDetail, setSlipDetail] = useState([]);
+  const [progress, setProgress] = useState(0)
+  const [uploadedSize, setUploadedSize] = useState(0)
+  const [slipDetail, setSlipDetail] = useState([])
 
   const [selectedDue, setSelectedDue] = useState({
     id: "Instant",
     name: "Instant",
-  });
-  const [passport, setPassport] = useState();
-  const [allocation, setAllocation] = useState(false);
-  const [depositError, setDepositError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [emailVerify, setEmailVerify] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [selectedBank, setSelectedBank] = useState(null);
-  const [loader, setLoader] = useState(false);
+  })
+  const [passport, setPassport] = useState()
+  const [allocation, setAllocation] = useState(false)
+  const [depositError, setDepositError] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [emailVerify, setEmailVerify] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [selectedBank, setSelectedBank] = useState(null)
+  const [loader, setLoader] = useState(false)
   console.log(selectedBank, "objobj")
 
-  const [center, setCenter] = useState(null);
-  const [status, setStatus] = useState(null);
-  const [fieldsDisabled, setFieldsDisabled] = useState(false);
+  const [center, setCenter] = useState(null)
+  const [status, setStatus] = useState(null)
+  const [fieldsDisabled, setFieldsDisabled] = useState(false)
 
   // *For Stepper Forms Data
-  const [stepFormData, setStepFormData] = useState();
-  const [step1FormData, setStep1FormData] = useState();
-  const [selectedType, setSelectedType] = useState(null);
-  const [date, setDate] = useState(null);
-  const [balanceType, setBalanceType] = useState(null);
-  const [imageURL, setImageURL] = useState(null);
-  const fileInputRef = useRef(null);
-  const [hovered, setHovered] = useState(false);
-  const [accounts, setAccounts] = useState([]);
-  const [salesAccount, setSalesAccount] = useState(null);
-  const [inventoryAccount, setInventoryAccount] = useState(null);
-  const [cogsAccount, setCogsAccount] = useState(null);
-  const [adjustmentAccount, setAdjustmentAccount] = useState(null);
-  const [assemblyAccount, setAssemblyAccount] = useState(null);
-  const [itemType, setItemType] = useState(null);
-  const [unit, setUnit] = useState(null);
-  const [taxes, setTaxes] = useState([]);
-  const [tax, setTax] = useState(null);
-  const [category, setCategory] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [governmentAccount, setGovernmnentAccount] = useState(null);
-  const [description, setDescription] = useState(null);
-  const [ownGovBank, setOwnGovBank] = useState(null);
-  const [services, setServices] = useState(null);
-  const [serviceItem, setServiceItem] = useState(null);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [detail, setDetail] = useState(null);
-  const [banks, setBanks] = useState([]);
-  const [holdState, setHoldState] = useState(true);
-  const [selectedMode, setSelectedMode] = useState(null);
+  const [stepFormData, setStepFormData] = useState()
+  const [step1FormData, setStep1FormData] = useState()
+  const [selectedType, setSelectedType] = useState(null)
+  const [date, setDate] = useState(null)
+  const [balanceType, setBalanceType] = useState(null)
+  const [imageURL, setImageURL] = useState(null)
+  const fileInputRef = useRef(null)
+  const [hovered, setHovered] = useState(false)
+  const [accounts, setAccounts] = useState([])
+  const [salesAccount, setSalesAccount] = useState(null)
+  const [inventoryAccount, setInventoryAccount] = useState(null)
+  const [cogsAccount, setCogsAccount] = useState(null)
+  const [adjustmentAccount, setAdjustmentAccount] = useState(null)
+  const [assemblyAccount, setAssemblyAccount] = useState(null)
+  const [itemType, setItemType] = useState(null)
+  const [unit, setUnit] = useState(null)
+  const [taxes, setTaxes] = useState([])
+  const [tax, setTax] = useState(null)
+  const [category, setCategory] = useState(null)
+  const [categories, setCategories] = useState(null)
+  const [governmentAccount, setGovernmnentAccount] = useState(null)
+  const [description, setDescription] = useState(null)
+  const [ownGovBank, setOwnGovBank] = useState(null)
+  const [services, setServices] = useState(null)
+  const [serviceItem, setServiceItem] = useState(null)
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [detail, setDetail] = useState(null)
+  const [banks, setBanks] = useState([])
+  const [holdState, setHoldState] = useState(true)
+  const [selectedMode, setSelectedMode] = useState(null)
   const [cards, setCards] = useState([])
   const [selectedCard, setSelectedCard] = useState(null)
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   //documents array
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-  console.log("objobj", watch1("bank"));
+    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+  }
+  console.log("objobj", watch1("bank"))
 
   const submitForm1 = async (formData) => {
     console.log(formData, "objobjj")
     setButtonDisabled(true)
     try {
-      let obj = {
+      const obj = {
         id: getValues1("invoicenumber"),
         total_amount: formData?.total,
         // paid_amount: formData?.paid,
-        paid_amount: formData?.total,
-        payment_status: "Paid",
+        paid_amount: formData?.amount || formData?.total,
+        payment_status: formData?.amount < formData?.total ? "Partially Paid" : "Paid",
         payment_mode: selectedMode?.id, // Cash, Bank, Card
         account_id:
           selectedMode?.id == "Cash"
             ? 700117
             : selectedMode?.id == "Bank"
-              ? selectedBank?.account_id :
-              selectedMode?.id == "Card" ? selectedCard?.account_id
+              ? selectedBank?.account_id
+              : selectedMode?.id == "Card"
+                ? selectedCard?.account_id
                 : selectedMode?.id == "Payment Link"
-                  ? 700171 : null,
+                  ? 700171
+                  : null,
         ref_id: selectedMode?.id == "Bank" ? selectedBank?.id : null,
         remarks: formData?.remarks,
         narration: formData?.narration,
 
-        charges: detail?.sale_receipt_items?.reduce(
-          (acc, item) => acc + Number(item?.center_fee || 0),
-          0
-        ),
-        govt_charges: detail?.sale_receipt_items?.reduce(
-          (acc, item) => acc + Number(item?.govt_fee || 0),
-          0
-        ),
-        bank_charges: detail?.sale_receipt_items?.reduce(
-          (acc, item) => acc + Number(item?.bank_charge || 0),
-          0
-        ),
+        charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.center_fee || 0), 0),
+        govt_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.govt_fee || 0), 0),
+        bank_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.bank_charge || 0), 0),
 
-        bank_name: selectedMode?.id == "Bank" ? selectedBank?.name : '',
-        bank_id: selectedMode?.id == "Bank" ? selectedBank?.id : '',
+        bank_name: selectedMode?.id == "Bank" ? selectedBank?.name : "",
+        bank_id: selectedMode?.id == "Bank" ? selectedBank?.id : "",
         customer_id: detail?.customer_id,
         invoice_prefix: detail?.invoice_prefix,
-        category_id: detail?.sale_receipt_items[0]?.service?.category_id
-      };
+        category_id: detail?.sale_receipt_items[0]?.service?.category_id,
+      }
 
       console.log(obj, "objobj")
       if (detail?.is_paid == true) {
-        ErrorToaster("Already paid");
+        ErrorToaster("Already paid")
       } else {
-
-        const promise = CustomerServices.PayReceipt(obj);
-        const response = await promise;
-        showPromiseToast(
-          promise,
-          "Saving...",
-          "Added Successfully",
-          "Something Went Wrong"
-        );
+        const promise = CustomerServices.PayReceipt(obj)
+        const response = await promise
+        showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
         if (response?.responseCode === 200) {
-          window.location.reload();
+          window.location.reload()
         }
       }
     } catch (error) {
-      ErrorToaster(error);
-    }
-    finally {
+      ErrorToaster(error)
+    } finally {
       setButtonDisabled(false)
     }
-  };
+  }
   // *For Get Customer Queue
   const getBanks = async (page, limit, filter) => {
-    setLoader(true);
+    setLoader(true)
 
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 1000,
-      };
+      }
 
-      const { data } = await CustomerServices.getBanks(params);
-      setBanks(data?.banks);
+      const { data } = await CustomerServices.getBanks(params)
+      setBanks(data?.banks)
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     } finally {
-      setLoader(false);
+      setLoader(false)
     }
-  };
+  }
   // *For Get Customer Queue
   const getCards = async (page, limit, filter) => {
-    setLoader(true);
+    setLoader(true)
 
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 1000,
-      };
+      }
 
-      const { data } = await CustomerServices.getCards(params);
+      const { data } = await CustomerServices.getCards(params)
       setCards(
-        data?.cards?.map(card => ({
+        data?.cards?.map((card) => ({
           ...card,
           name: card.account_name,
-        }))
-      );
-
+        })),
+      )
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     } finally {
-      setLoader(false);
+      setLoader(false)
     }
-  };
+  }
   // *For Get Account
   const getReceptionDetail = async (state) => {
-    setFieldsDisabled(true);
+    setFieldsDisabled(true)
     try {
       let params = {
         token_number: getValues1("token"),
-      };
+      }
       if (state) {
         params = {
           invoice_number: getValues1("invoicenumber"),
-        };
+        }
       }
-      const { data } = await CustomerServices.getReceiptDetail(params);
-      console.log(data?.receipt, "dataaa");
+      const { data } = await CustomerServices.getReceiptDetail(params)
+      console.log(data?.receipt, "dataaa")
       if (data?.receipt) {
-        setRows(data?.receipt?.sale_receipt_items);
-        setDetail(data?.receipt);
+        setRows(data?.receipt?.sale_receipt_items)
+        setDetail(data?.receipt)
 
-        setValue1("paid", 0);
-        setValue1("customer", data?.receipt?.customer_name);
-        setValue1("invoice_date", moment().toDate());
-        setDate(new Date(data?.receipt?.invoice_date));
-        setValue1("mobile", data?.receipt?.customer_mobile);
-        setValue1("ref", data?.receipt?.ref);
-        setValue1("display_customer", data?.receipt?.customer_name);
-        setValue1("email", data?.receipt?.customer_email);
-        setValue1("address", data?.receipt?.address);
-        setValue1("trn", data?.receipt?.trn);
-        setValue1("cost_center", data?.receipt?.cost_center);
-        setValue1("caseno", data?.receipt?.case_no);
-        setSubTotal(data?.receipt?.total_amount);
+        setValue1("paid", 0)
+        setValue1("customer", data?.receipt?.customer_name)
+        setValue1("invoice_date", moment().toDate())
+        setDate(new Date(data?.receipt?.invoice_date))
+        setValue1("mobile", data?.receipt?.customer_mobile)
+        setValue1("ref", data?.receipt?.ref)
+        setValue1("display_customer", data?.receipt?.customer_name)
+        setValue1("email", data?.receipt?.customer_email)
+        setValue1("address", data?.receipt?.customer_address)
+        setValue1("trn", data?.receipt?.trn)
+        setSelectedCostCenter({id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setValue1("caseno", data?.receipt?.case_no)
+        setSubTotal(data?.receipt?.total_amount)
 
-        setValue1("total", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
-          ?.reduce(
-            (total, item) =>
-              total + parseFloat(item?.center_fee ?? 0),
-            0
-          ) * 0.05)).toFixed(2));
-        setValue1("balance", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
-          ?.reduce(
-            (total, item) =>
-              total + parseFloat(item?.center_fee ?? 0),
-            0
-          ) * 0.05)).toFixed(2));
-        setValue1("cost_center", data?.receipt?.cost_center)
-        setAccounts(data?.accounts?.rows);
+        setValue1(
+          "total",
+          Number.parseFloat(
+            Number.parseFloat(data?.receipt?.total_amount) +
+              Number.parseFloat(
+                data?.receipt?.sale_receipt_items?.reduce(
+                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                  0,
+                ) * 0.05,
+              ),
+          ).toFixed(2),
+        )
+        setValue1(
+          "balance",
+          Number.parseFloat(
+            Number.parseFloat(data?.receipt?.total_amount) +
+              Number.parseFloat(
+                data?.receipt?.sale_receipt_items?.reduce(
+                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                  0,
+                ) * 0.05,
+              ),
+          ).toFixed(2),
+        )
+       setSelectedCostCenter( {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setAccounts(data?.accounts?.rows)
       }
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
 
   const getServiceItem = async () => {
     // setLoader(true)
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 1000,
-      };
+      }
 
-      const { data } = await CustomerServices.getServiceItem(params);
+      const { data } = await CustomerServices.getServiceItem(params)
 
-      setServices(data?.rows);
+      setServices(data?.rows)
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
   const handleServiceSelect = async (value) => {
-    console.log(value, "idididid");
-    setServiceItem(value);
+    console.log(value, "idididid")
+    setServiceItem(value)
     // setLoader(true)
     try {
-      let params = {
+      const params = {
         service_id: value?.id,
-      };
+      }
 
-      const { data } = await CustomerServices.DetailServiceItem(params);
-      setValue("item_code", data?.service?.id);
-      setValue("govt_fee", data?.service?.bank_service_charge);
-      setValue("center_fee", data?.service?.center_fee);
-      setValue("bank_charges", data?.service?.bank_service_charge);
+      const { data } = await CustomerServices.DetailServiceItem(params)
+      setValue("item_code", data?.service?.id)
+      setValue("govt_fee", data?.service?.bank_service_charge)
+      setValue("center_fee", data?.service?.center_fee)
+      setValue("bank_charges", data?.service?.bank_service_charge)
 
-      setValue("qty", 1);
+      setValue("qty", 1)
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
 
   const getAccounts = async (page, limit, filter) => {
     // setLoader(true)
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 1000,
-      };
+      }
 
-      const { data } = await FinanceServices.getAccounts(params);
-      console.log(data?.accounts?.rows);
+      const { data } = await FinanceServices.getAccounts(params)
+      console.log(data?.accounts?.rows)
 
-      setAccounts(data?.accounts?.rows);
+      setAccounts(data?.accounts?.rows)
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
 
   const handleInputChange = (index, field, value) => {
-    const updatedRows = [...rows];
+    const updatedRows = [...rows]
     updatedRows[index] = {
       ...updatedRows[index],
       [field]: value,
-    };
-    setRows(updatedRows);
-  };
-  console.log(rows);
+    }
+    setRows(updatedRows)
+  }
+  console.log(rows)
 
   const getTax = async () => {
     // setLoader(true)
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 1000,
-      };
+      }
 
-      const { data } = await FinanceServices.getTax(params);
-      console.log(data?.accounts?.rows);
+      const { data } = await FinanceServices.getTax(params)
+      console.log(data?.accounts?.rows)
 
-      setTaxes(data?.tax);
+      setTaxes(data?.tax)
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
   const getCategories = async () => {
     // setLoader(true)
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 1000,
-      };
+      }
 
-      const { data } = await CustomerServices.getCategoryList(params);
+      const { data } = await CustomerServices.getCategoryList(params)
 
-      setCategories(data?.categories);
+      setCategories(data?.categories)
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
 
   // *For Get Account
   const getReceiptDetail = async (state) => {
-    setFieldsDisabled(true);
+    setFieldsDisabled(true)
     try {
-      let params = {
+      const params = {
         token_number: getValues1("token"),
         invoice_date: date,
-      };
+      }
 
-      const { data } = await CustomerServices.getReceiptDetail(params);
-      console.log(data);
+      const { data } = await CustomerServices.getReceiptDetail(params)
+      console.log(data)
       if (data?.receipt) {
-        setHoldState(true);
+        setHoldState(true)
 
-        setRows(data?.receipt?.sale_receipt_items);
-        setDetail(data?.receipt);
+        setRows(data?.receipt?.sale_receipt_items)
+        setDetail(data?.receipt)
 
-        setValue1("paid", 0);
-        setValue1("customer", data?.receipt?.customer_name);
-        setValue1("invoice_date", moment().toDate());
+        setValue1("paid", 0)
+        setValue1("customer", data?.receipt?.customer_name)
+        setValue1("invoice_date", moment().toDate())
         setValue1("invoicenumber", data?.receipt?.id)
-        setDate(new Date(data?.receipt?.invoice_date));
-        setValue1("mobile", data?.receipt?.customer_mobile);
-        setValue1("ref", data?.receipt?.ref);
-        setValue1("display_customer", data?.receipt?.customer_name);
-        setValue1("email", data?.receipt?.customer_email);
-        setValue1("address", data?.receipt?.address);
-        setValue1("trn", data?.receipt?.trn);
-        setValue1("cost_center", data?.receipt?.cost_center);
-        setValue1("caseno", data?.receipt?.case_no);
-        setSubTotal(data?.receipt?.total_amount);
-        setValue1("total", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
-          ?.reduce(
-            (total, item) =>
-              total + parseFloat(item?.center_fee ?? 0),
-            0
-          ) * 0.05)).toFixed(2));
-        setValue1("balance", parseFloat(parseFloat(data?.receipt?.total_amount) + parseFloat(data?.receipt?.sale_receipt_items
-          ?.reduce(
-            (total, item) =>
-              total + parseFloat(item?.center_fee ?? 0),
-            0
-          ) * 0.05)).toFixed(2));
-        setValue1("cost_center", data?.receipt?.cost_center)
-        setAccounts(data?.accounts?.rows);
+        setDate(new Date(data?.receipt?.invoice_date))
+        setValue1("mobile", data?.receipt?.customer_mobile)
+        setValue1("ref", data?.receipt?.ref)
+        setValue1("display_customer", data?.receipt?.customer_name)
+        setValue1("email", data?.receipt?.customer_email)
+        setValue1("address", data?.receipt?.address)
+        setValue1("trn", data?.receipt?.trn)
+        setSelectedCostCenter( {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setValue1("caseno", data?.receipt?.case_no)
+        setSubTotal(data?.receipt?.total_amount)
+        setValue1(
+          "total",
+          Number.parseFloat(
+            Number.parseFloat(data?.receipt?.total_amount) +
+              Number.parseFloat(
+                data?.receipt?.sale_receipt_items?.reduce(
+                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                  0,
+                ) * 0.05,
+              ),
+          ).toFixed(2),
+        )
+        setValue1(
+          "balance",
+          Number.parseFloat(
+            Number.parseFloat(data?.receipt?.total_amount) +
+              Number.parseFloat(
+                data?.receipt?.sale_receipt_items?.reduce(
+                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                  0,
+                ) * 0.05,
+              ),
+          ).toFixed(2),
+        )
+        setSelectedCostCenter( {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setAccounts(data?.accounts?.rows)
       } else {
-        showErrorToast('Data Not Found')
-
+        showErrorToast("Data Not Found")
       }
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     } finally {
       // setLoader(false)
     }
-  };
+  }
   useEffect(() => {
-    getBanks();
+    getBanks()
     getCards()
-    getAccounts();
-    getTax();
-    getCategories();
-    getServiceItem();
+    getAccounts()
+    getTax()
+    getCategories()
+    getServiceItem()
     setDate(new Date())
-    setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
-    setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
-  }, []);
+    setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" })
+    setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
+  }, [])
 
   return (
     <>
@@ -569,9 +574,7 @@ function CreatePaidReceipt() {
                   alignItems: "flex-end",
                 }}
               >
-                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                  Pay Receipt
-                </Typography>
+                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Pay Receipt</Typography>
               </Box>
 
               <Box sx={{ p: 3 }}>
@@ -587,8 +590,8 @@ function CreatePaidReceipt() {
                           error={errors1?.date?.message}
                           register={register1("date")}
                           onChange={(date) => {
-                            setValue1("date", date);
-                            setDate(new Date(date));
+                            setValue1("date", date)
+                            setDate(new Date(date))
                           }}
                         />
                       </Grid>
@@ -601,9 +604,7 @@ function CreatePaidReceipt() {
                           register={register1("invoicenumber")}
                           InputProps={{
                             endAdornment: (
-                              <IconButton
-                                onClick={() => getReceptionDetail(true)}
-                              >
+                              <IconButton onClick={() => getReceptionDetail(true)}>
                                 <SearchIcon sx={{ color: "#bd9b4a" }} />
                               </IconButton>
                             ),
@@ -621,9 +622,7 @@ function CreatePaidReceipt() {
                             endAdornment: (
                               <IconButton
                                 onClick={() => {
-                                  getReceiptDetail();
-
-
+                                  getReceiptDetail()
                                 }}
                               >
                                 <SearchIcon sx={{ color: "#bd9b4a" }} />
@@ -637,18 +636,18 @@ function CreatePaidReceipt() {
                           bgcolor={"#bd9b4a"}
                           title="Clear"
                           onClick={() => {
-                            setFieldsDisabled(false);
-                            setValue1("token", "");
-                            setValue1("invoicenumber", "");
-                            setValue1("customer", "");
-                            setValue1("invoice_date", "");
-                            setValue1("mobile", "");
-                            setValue1("ref", "");
-                            setValue1("display_customer", "");
-                            setValue1("email", "");
-                            setValue1("address", "");
-                            setValue1("trn", "");
-                            setValue1("cost_center", "");
+                            setFieldsDisabled(false)
+                            setValue1("token", "")
+                            setValue1("invoicenumber", "")
+                            setValue1("customer", "")
+                            setValue1("invoice_date", "")
+                            setValue1("mobile", "")
+                            setValue1("ref", "")
+                            setValue1("display_customer", "")
+                            setValue1("email", "")
+                            setValue1("address", "")
+                            setValue1("trn", "")
+                            setValue1("cost_center", "")
                             setRows([])
                             setPayButton(false)
                             setSubTotal(0)
@@ -716,7 +715,7 @@ function CreatePaidReceipt() {
                           options={[{ id: "walkin", name: "Walk-in Customer" }]}
                           selected={selectedCustomer}
                           onSelect={(value) => {
-                            setSelectedCustomer(value);
+                            setSelectedCustomer(value)
                           }}
                           error={errors1?.customer?.message}
                           register={register1("customer")}
@@ -762,9 +761,8 @@ function CreatePaidReceipt() {
                           placeholder="TRN"
                           disabled={true}
                           register={register1("trn", {
-                            required: false
+                            required: false,
                           })}
-
                         />
                       </Grid>
                       {/* <Grid item md={3.8} sm={5.5} xs={12}>
@@ -795,14 +793,11 @@ function CreatePaidReceipt() {
                           size="small"
                           disabled={true}
                           options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
-                          selected={watch1("cost_center")}
-                          onSelect={(value) => setValue1("cost_center", value)}
-                          register={register1("cost_center",
-                            {
-                              required: false
-                            }
-                          )}
-
+                          selected={selectedCostCenter}
+                          onSelect={(value) => setSelectedCostCenter(value)}
+                          register={register1("cost_center", {
+                            required: false,
+                          })}
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
@@ -855,7 +850,6 @@ function CreatePaidReceipt() {
                           <TextField
                             size="small"
                             placeholder="Transaction Id"
-
                             type="number"
                             value={item.transaction_id || ""}
                             onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
@@ -886,7 +880,6 @@ function CreatePaidReceipt() {
                       </TableRow>
                     ))}
 
-
                     <TableRow>
                       <TableCell colSpan={10} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
@@ -905,48 +898,62 @@ function CreatePaidReceipt() {
 
                     <TableRow>
                       <TableCell colSpan={9} align="right">
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Net Taxable Amount:</Typography>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                          Net Taxable Amount:
+                        </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows
-                          ?.reduce((total, item) => {
-                            const fee = parseFloat(item?.center_fee ?? 0);
-                            const qty = parseInt(item?.quantity ?? 1);
-                            return total + fee * qty;
-                          }, 0)
-                          .toFixed(2)}</Typography> {/* Display the Sub-total */}
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                          {rows
+                            ?.reduce((total, item) => {
+                              const fee = Number.parseFloat(item?.center_fee ?? 0)
+                              const qty = Number.parseInt(item?.quantity ?? 1)
+                              return total + fee * qty
+                            }, 0)
+                            .toFixed(2)}
+                        </Typography>{" "}
+                        {/* Display the Sub-total */}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell colSpan={9} align="right">
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                          Total Vat:
+                        </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{(
-                          rows?.reduce((total, item) => {
-                            const fee = parseFloat(item?.center_fee ?? 0);
-                            const qty = parseFloat(item?.quantity ?? 1);
-                            return total + fee * qty;
-                          }, 0) * 0.05
-                        ).toFixed(2)}
-                        </Typography> {/* Display the Sub-total */}
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                          {(
+                            rows?.reduce((total, item) => {
+                              const fee = Number.parseFloat(item?.center_fee ?? 0)
+                              const qty = Number.parseFloat(item?.quantity ?? 1)
+                              return total + fee * qty
+                            }, 0) * 0.05
+                          ).toFixed(2)}
+                        </Typography>{" "}
+                        {/* Display the Sub-total */}
                       </TableCell>
                     </TableRow>
                     {/* Amount Total Row (optional, if needed for the final sum) */}
                     <TableRow>
                       <TableCell colSpan={9} align="right">
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                          Amount Total:
+                        </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{(
-                          parseFloat(subTotal) +
-                          rows?.reduce((total, item) => {
-                            const fee = parseFloat(item?.center_fee ?? 0);
-                            const qty = parseFloat(item?.quantity ?? 1);
-                            return total + fee * qty;
-                          }, 0) * 0.05
-                        ).toFixed(2)}
-                        </Typography> {/* This can be the same as Sub-total */}
+                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                          {(
+                            Number.parseFloat(subTotal) +
+                            rows?.reduce((total, item) => {
+                              const fee = Number.parseFloat(item?.center_fee ?? 0)
+                              const qty = Number.parseFloat(item?.quantity ?? 1)
+                              return total + fee * qty
+                            }, 0) *
+                              0.05
+                          ).toFixed(2)}
+                        </Typography>{" "}
+                        {/* This can be the same as Sub-total */}
                       </TableCell>
                     </TableRow>
                     <TableRow>
@@ -959,7 +966,7 @@ function CreatePaidReceipt() {
                             sx={{
                               textTransform: "capitalize",
                               backgroundColor: "#bd9b4a",
-                              width: '200px',
+                              width: "200px",
                               ":hover": {
                                 backgroundColor: "rgb(189 155 74)",
                               },
@@ -969,12 +976,11 @@ function CreatePaidReceipt() {
                           </Button>
                           <Button
                             onClick={() => setPayButton(false)}
-
                             variant="contained"
                             sx={{
                               textTransform: "capitalize",
                               backgroundColor: "#bd9b4a",
-                              width: '200px',
+                              width: "200px",
                               ":hover": {
                                 backgroundColor: "rgb(189 155 74)",
                               },
@@ -984,7 +990,6 @@ function CreatePaidReceipt() {
                           </Button>
                         </Grid>
                       </TableCell>
-
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -1005,14 +1010,21 @@ function CreatePaidReceipt() {
                   </Grid>
                   <Grid item md={3} sm={12} xs={12}>
                     <InputField
-                      label="Paid Amount"
+                      label="Amount to Pay"
                       size="small"
-                      disabled={true}
-                      placeholder="Paid Amount"
-                      register={register1("paid", {
-                        required: "please enter paid .",
+                      placeholder="Enter amount"
+                      type="number"
+                      register={register1("amount", {
+                        required: "Please enter amount to pay",
+                        validate: (value) => {
+                          const numValue = Number.parseFloat(value)
+                          if (isNaN(numValue)) return "Please enter a valid number"
+                          if (numValue <= 0) return "Amount must be greater than 0"
+                          if (numValue > Number.parseFloat(watch1("total"))) return "Amount cannot exceed total"
+                          return true
+                        },
                       })}
-                      error={errors1?.paid?.message}
+                      error={errors1?.amount?.message || amountError}
                     />
                   </Grid>
                   <Grid item md={3} sm={12} xs={12}>
@@ -1039,11 +1051,11 @@ function CreatePaidReceipt() {
                       ]}
                       selected={watch1("payment")}
                       onSelect={(value) => {
-                        setValue1("payment", value);
-                        setSelectedMode(value);
+                        setValue1("payment", value)
+                        setSelectedMode(value)
                       }}
                       register={register1("payment", {
-                        required: "please enter payment .",
+                        required: "Please select payment mode",
                       })}
                       error={errors1?.payment?.message}
                     />
@@ -1056,10 +1068,10 @@ function CreatePaidReceipt() {
                         options={banks}
                         selected={selectedBank}
                         onSelect={(value) => {
-                          setSelectedBank(value);
+                          setSelectedBank(value)
                         }}
                         register={register1("bank", {
-                          required: "please enter bank .",
+                          required: "Please select a bank",
                         })}
                         error={errors1?.bank?.message}
                       />
@@ -1073,10 +1085,10 @@ function CreatePaidReceipt() {
                         options={cards}
                         selected={selectedCard}
                         onSelect={(value) => {
-                          setSelectedCard(value);
+                          setSelectedCard(value)
                         }}
                         register={register1("card", {
-                          required: "please enter card .",
+                          required: "Please select a card",
                         })}
                         error={errors1?.card?.message}
                       />
@@ -1100,7 +1112,7 @@ function CreatePaidReceipt() {
                       error={errors1?.narration?.message}
                     />
                   </Grid>
-                  <Grid container justifyContent={"flex-end"}>
+                  <Grid container justifyContent={"flex-end"} mt={2} pr={2}>
                     <Button
                       type="submit"
                       disabled={rows?.length == 0 || buttonDisabled}
@@ -1123,7 +1135,7 @@ function CreatePaidReceipt() {
         }
       </Box>
     </>
-  );
+  )
 }
 
-export default CreatePaidReceipt;
+export default CreatePaidReceipt
