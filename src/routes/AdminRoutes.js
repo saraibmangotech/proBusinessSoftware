@@ -296,6 +296,10 @@ const AdminRoutes = [
     component: <CreateServiceItem />,
   },
   {
+    path: "/service-report",
+    component: <ServiceReport />,
+  },
+  {
     path: "/create-paid-receipt",
     component: <CreatePaidReceipt />,
   },

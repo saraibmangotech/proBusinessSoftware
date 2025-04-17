@@ -277,7 +277,12 @@ function ReceptionDetail() {
 
             const { data } = await CustomerServices.getReceptionDetail(params);
             let detail = data?.token
-            console.log(detail);
+            let newDetail = {
+                name: detail?.customer_name, // renaming customer_name to name
+                id: detail?.id,      // example: renaming company_id to id
+                location: detail?.address    // example: renaming address to location
+              };
+            setSelectedCustomer(newDetail)
             setNewDetail(detail)
             setCustomerType(!detail?.is_company ? 'individual' : 'company')
             if (!detail?.is_company) {
@@ -297,7 +302,7 @@ function ReceptionDetail() {
                 setValue1('tokenNumber', detail?.token_number)
                 setValue1('reference', detail?.reference)
                 setValue1('email', detail?.email)
-                getCompanies(detail?.customer_id)
+                // getCompanies(detail?.customer_id)
             }
 
         } catch (error) {
@@ -320,8 +325,7 @@ function ReceptionDetail() {
             console.log('Company:', company);
             console.log('Customer:', customer);
     
-            setValue('customer', customer);
-            setSelectedCustomer(customer);
+            
             setValue('company', company);
             setSelectedCompany(company);
         }
@@ -426,9 +430,9 @@ function ReceptionDetail() {
                                 },
                                 onChange: (e) => {
                                     console.log('asdas');
-                                    if (getValues('mobile').length == 10) {
-                                        Debounce2(() => getCustomerDetail(getValues('mobile')));
-                                    }
+                                    // if (getValues('mobile').length == 10) {
+                                    //     Debounce2(() => getCustomerDetail(getValues('mobile')));
+                                    // }
 
                                     // Delay the execution of verifyEmail by 2 seconds
 
@@ -447,9 +451,9 @@ function ReceptionDetail() {
                                 register={register("tokenNumber", {
                                     onChange: (e) => {
                                         console.log('asdas');
-                                        if (getValues('tokenNumber')) {
-                                            Debounce2(() => getTokenValidation(getValues('tokenNumber')));
-                                        }
+                                        // if (getValues('tokenNumber')) {
+                                        //     Debounce2(() => getTokenValidation(getValues('tokenNumber')));
+                                        // }
 
                                         // Delay the execution of verifyEmail by 2 seconds
 
@@ -530,9 +534,9 @@ function ReceptionDetail() {
                                     },
                                     onChange: (e) => {
                                         console.log('asdas');
-                                        if (getValues1('mobile').length == 10) {
-                                            Debounce2(() => getCustomerDetail2(getValues1('mobile')));
-                                        }
+                                        // if (getValues1('mobile').length == 10) {
+                                        //     Debounce2(() => getCustomerDetail2(getValues1('mobile')));
+                                        // }
 
                                         // Delay the execution of verifyEmail by 2 seconds
 
@@ -551,9 +555,9 @@ function ReceptionDetail() {
                                     register={register1("tokenNumber", {
                                         onChange: (e) => {
                                             console.log('asdas');
-                                            if (getValues1('tokenNumber')) {
-                                                Debounce2(() => getTokenValidation2(getValues1('tokenNumber')));
-                                            }
+                                            // if (getValues1('tokenNumber')) {
+                                            //     Debounce2(() => getTokenValidation2(getValues1('tokenNumber')));
+                                            // }
 
                                             // Delay the execution of verifyEmail by 2 seconds
 
@@ -613,23 +617,23 @@ function ReceptionDetail() {
                                     options={customers}
                                     selected={selectedCustomer}
                                     onSelect={(value) => {
-                                        setSelectedCustomer(value)
-                                        if (value?.name == 'Walk-In Customer') {
-                                            setSubCustDisable(true)
-                                            setValue1('customerName', '')
-                                            setValue1('email', '')
-                                            setValue1('mobile', '')
-                                        }
-                                        else {
-                                            console.log(value);
+                                        // setSelectedCustomer(value)
+                                        // if (value?.name == 'Walk-In Customer') {
+                                        //     setSubCustDisable(true)
+                                        //     setValue1('customerName', '')
+                                        //     setValue1('email', '')
+                                        //     setValue1('mobile', '')
+                                        // }
+                                        // else {
+                                        //     console.log(value);
 
-                                            setValue1('customerName', value?.name)
-                                            setValue1('email', value?.email)
-                                            setValue1('mobile', value?.mobile)
+                                        //     setValue1('customerName', value?.name)
+                                        //     setValue1('email', value?.email)
+                                        //     setValue1('mobile', value?.mobile)
 
-                                            setSubCustDisable(false)
-                                            Debounce2(() => getCompanies(value?.id));
-                                        }
+                                        //     setSubCustDisable(false)
+                                        //     Debounce2(() => getCompanies(value?.id));
+                                        // }
 
                                     }}
                                     error={errors1?.customer?.message}
@@ -638,25 +642,7 @@ function ReceptionDetail() {
                                     })}
                                 />
                             </Grid>
-                            <Grid item xs={2.8} >
-                                <SelectField
-                                    size={'small'}
-                                    label={'Company *:'}
-                                    disabled={true}
-                                    
-                                    options={companies}
-                                    selected={selectedCompany}
-                                    onSelect={(value) => {
-                                        setSelectedCompany(value)
-
-
-                                    }}
-                                    error={errors1?.company?.message}
-                                    register={register1("company", {
-                                        required: 'Please select company .',
-                                    })}
-                                />
-                            </Grid>
+                            
                          
                         </Grid>
                     </Box>

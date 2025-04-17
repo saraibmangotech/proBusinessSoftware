@@ -137,169 +137,169 @@ function PayReceipts() {
     const invoiceRef = useRef(null);
     const invoiceRef2 = useRef(null);
     const invoiceRef3 = useRef(null);
-     const generatePDF = async () => {
-       if (!invoiceRef.current) return;
-     
-       // Temporarily show the content while generating the PDF
-       const invoiceElement = invoiceRef.current;
-       invoiceElement.style.display = "block"; // Show the element
-     
-       // Capture the content using html2canvas
-       const canvas = await html2canvas(invoiceElement, {
-         scale: 2, // Higher scale for better quality
-         useCORS: true,
-         logging: false,
-       });
-     
-       const imgData = canvas.toDataURL("image/png");
-       const pdf = new jsPDF({
-         orientation: "portrait",
-         unit: "mm",
-         format: "a4",
-       });
-     
-       // A4 dimensions: 210mm × 297mm
-       const pageWidth = 210;
-       const pageHeight = 297;
-       
-       // Calculate dimensions to fit content on page with margins
-       const margin = 14; // 14mm margins
-       const contentWidth = pageWidth - (margin * 2);
-       
-       // Calculate height while maintaining aspect ratio
-       const contentHeight = (canvas.height * contentWidth) / canvas.width;
-       
-       // Check if content would exceed page height and scale if necessary
-       const availableHeight = pageHeight - (margin * 2);
-       const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
-       
-       // Calculate final dimensions
-       const finalWidth = contentWidth * scale;
-       const finalHeight = contentHeight * scale;
-       
-       // Add image to the PDF with margins
-       pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
-     
-       const blob = pdf.output("blob");
-     
-       // Create a blob URL
-       const blobUrl = URL.createObjectURL(blob);
-     
-       // Open the PDF in a new tab
-       window.open(blobUrl);
-     
-       // Restore the content visibility after generating the PDF
-       invoiceElement.style.display = "none"; // Hide the element again
-     };
-     const generatePDF2 = async () => {
-       if (!invoiceRef2.current) return;
-     
-       // Temporarily show the content while generating the PDF
-       const invoiceElement = invoiceRef2.current;
-       invoiceElement.style.display = "block"; // Show the element
-     
-       // Capture the content using html2canvas
-       const canvas = await html2canvas(invoiceElement, {
-         scale: 2, // Higher scale for better quality
-         useCORS: true,
-         logging: false,
-       });
-     
-       const imgData = canvas.toDataURL("image/png");
-       const pdf = new jsPDF({
-         orientation: "portrait",
-         unit: "mm",
-         format: "a4",
-       });
-     
-       // A4 dimensions: 210mm × 297mm
-       const pageWidth = 210;
-       const pageHeight = 297;
-       
-       // Calculate dimensions to fit content on page with margins
-       const margin = 14; // 14mm margins
-       const contentWidth = pageWidth - (margin * 2);
-       
-       // Calculate height while maintaining aspect ratio
-       const contentHeight = (canvas.height * contentWidth) / canvas.width;
-       
-       // Check if content would exceed page height and scale if necessary
-       const availableHeight = pageHeight - (margin * 2);
-       const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
-       
-       // Calculate final dimensions
-       const finalWidth = contentWidth * scale;
-       const finalHeight = contentHeight * scale;
-       
-       // Add image to the PDF with margins
-       pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
-     
-       const blob = pdf.output("blob");
-     
-       // Create a blob URL
-       const blobUrl = URL.createObjectURL(blob);
-     
-       // Open the PDF in a new tab
-       window.open(blobUrl);
-     
-       // Restore the content visibility after generating the PDF
-       invoiceElement.style.display = "none"; // Hide the element again
-     };
-    
-     const generatePDF3 = async () => {
-       if (!invoiceRef3.current) return;
-     
-       // Temporarily show the content while generating the PDF
-       const invoiceElement = invoiceRef3.current;
-       invoiceElement.style.display = "block"; // Show the element
-     
-       // Capture the content using html2canvas
-       const canvas = await html2canvas(invoiceElement, {
-         scale: 2, // Higher scale for better quality
-         useCORS: true,
-         logging: false,
-       });
-     
-       const imgData = canvas.toDataURL("image/png");
-       const pdf = new jsPDF({
-         orientation: "portrait",
-         unit: "mm",
-         format: "a4",
-       });
-     
-       // A4 dimensions: 210mm × 297mm
-       const pageWidth = 210;
-       const pageHeight = 297;
-       
-       // Calculate dimensions to fit content on page with margins
-       const margin = 14; // 14mm margins
-       const contentWidth = pageWidth - (margin * 2);
-       
-       // Calculate height while maintaining aspect ratio
-       const contentHeight = (canvas.height * contentWidth) / canvas.width;
-       
-       // Check if content would exceed page height and scale if necessary
-       const availableHeight = pageHeight - (margin * 2);
-       const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
-       
-       // Calculate final dimensions
-       const finalWidth = contentWidth * scale;
-       const finalHeight = contentHeight * scale;
-       
-       // Add image to the PDF with margins
-       pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
-     
-       const blob = pdf.output("blob");
-     
-       // Create a blob URL
-       const blobUrl = URL.createObjectURL(blob);
-     
-       // Open the PDF in a new tab
-       window.open(blobUrl);
-     
-       // Restore the content visibility after generating the PDF
-       invoiceElement.style.display = "none"; // Hide the element again
-     };
+    const generatePDF = async () => {
+        if (!invoiceRef.current) return;
+
+        // Temporarily show the content while generating the PDF
+        const invoiceElement = invoiceRef.current;
+        invoiceElement.style.display = "block"; // Show the element
+
+        // Capture the content using html2canvas
+        const canvas = await html2canvas(invoiceElement, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true,
+            logging: false,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+        });
+
+        // A4 dimensions: 210mm × 297mm
+        const pageWidth = 210;
+        const pageHeight = 297;
+
+        // Calculate dimensions to fit content on page with margins
+        const margin = 14; // 14mm margins
+        const contentWidth = pageWidth - (margin * 2);
+
+        // Calculate height while maintaining aspect ratio
+        const contentHeight = (canvas.height * contentWidth) / canvas.width;
+
+        // Check if content would exceed page height and scale if necessary
+        const availableHeight = pageHeight - (margin * 2);
+        const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+
+        // Calculate final dimensions
+        const finalWidth = contentWidth * scale;
+        const finalHeight = contentHeight * scale;
+
+        // Add image to the PDF with margins
+        pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+
+        const blob = pdf.output("blob");
+
+        // Create a blob URL
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(blobUrl);
+
+        // Restore the content visibility after generating the PDF
+        invoiceElement.style.display = "none"; // Hide the element again
+    };
+    const generatePDF2 = async () => {
+        if (!invoiceRef2.current) return;
+
+        // Temporarily show the content while generating the PDF
+        const invoiceElement = invoiceRef2.current;
+        invoiceElement.style.display = "block"; // Show the element
+
+        // Capture the content using html2canvas
+        const canvas = await html2canvas(invoiceElement, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true,
+            logging: false,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+        });
+
+        // A4 dimensions: 210mm × 297mm
+        const pageWidth = 210;
+        const pageHeight = 297;
+
+        // Calculate dimensions to fit content on page with margins
+        const margin = 14; // 14mm margins
+        const contentWidth = pageWidth - (margin * 2);
+
+        // Calculate height while maintaining aspect ratio
+        const contentHeight = (canvas.height * contentWidth) / canvas.width;
+
+        // Check if content would exceed page height and scale if necessary
+        const availableHeight = pageHeight - (margin * 2);
+        const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+
+        // Calculate final dimensions
+        const finalWidth = contentWidth * scale;
+        const finalHeight = contentHeight * scale;
+
+        // Add image to the PDF with margins
+        pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+
+        const blob = pdf.output("blob");
+
+        // Create a blob URL
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(blobUrl);
+
+        // Restore the content visibility after generating the PDF
+        invoiceElement.style.display = "none"; // Hide the element again
+    };
+
+    const generatePDF3 = async () => {
+        if (!invoiceRef3.current) return;
+
+        // Temporarily show the content while generating the PDF
+        const invoiceElement = invoiceRef3.current;
+        invoiceElement.style.display = "block"; // Show the element
+
+        // Capture the content using html2canvas
+        const canvas = await html2canvas(invoiceElement, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true,
+            logging: false,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+        });
+
+        // A4 dimensions: 210mm × 297mm
+        const pageWidth = 210;
+        const pageHeight = 297;
+
+        // Calculate dimensions to fit content on page with margins
+        const margin = 14; // 14mm margins
+        const contentWidth = pageWidth - (margin * 2);
+
+        // Calculate height while maintaining aspect ratio
+        const contentHeight = (canvas.height * contentWidth) / canvas.width;
+
+        // Check if content would exceed page height and scale if necessary
+        const availableHeight = pageHeight - (margin * 2);
+        const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+
+        // Calculate final dimensions
+        const finalWidth = contentWidth * scale;
+        const finalHeight = contentHeight * scale;
+
+        // Add image to the PDF with margins
+        pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
+
+        const blob = pdf.output("blob");
+
+        // Create a blob URL
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(blobUrl);
+
+        // Restore the content visibility after generating the PDF
+        invoiceElement.style.display = "none"; // Hide the element again
+    };
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
@@ -1156,15 +1156,17 @@ function PayReceipts() {
                                     }}
                                 >
                                     <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                                        {invoiceData?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    parseFloat(total) +
-                                                    parseFloat(item?.govt_fee ?? 0) +
-                                                    parseFloat(item?.bank_charge ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
+                                        {
+                                            invoiceData?.items
+                                                ?.reduce(
+                                                    (total, item) =>
+                                                        parseFloat(total) +
+                                                        (parseFloat(item?.govt_fee ?? 0) + parseFloat(item?.bank_charge ?? 0)) *
+                                                        (parseFloat(item?.quantity) || 1),
+                                                    0
+                                                )
+                                                ?.toFixed(2)
+                                        }
                                     </p>
                                 </td>
                             </tr>
@@ -1604,6 +1606,7 @@ function PayReceipts() {
                                     {invoiceData2?.trn}
                                 </Typography>
                             </Grid>
+
                         </Grid>
                     </Box>
                 </Box>
@@ -1822,15 +1825,17 @@ function PayReceipts() {
                                     }}
                                 >
                                     <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                                        {invoiceData2?.items
-                                            ?.reduce(
-                                                (total, item) =>
-                                                    parseFloat(total) +
-                                                    parseFloat(item?.govt_fee ?? 0) +
-                                                    parseFloat(item?.bank_charge ?? 0),
-                                                0
-                                            )
-                                            ?.toFixed(2)}
+                                        {
+                                            invoiceData2?.items
+                                                ?.reduce(
+                                                    (total, item) =>
+                                                        parseFloat(total) +
+                                                        (parseFloat(item?.govt_fee ?? 0) + parseFloat(item?.bank_charge ?? 0)) *
+                                                        (parseFloat(item?.quantity) || 1),
+                                                    0
+                                                )
+                                                ?.toFixed(2)
+                                        }
                                     </p>
                                 </td>
                             </tr>
@@ -2114,7 +2119,7 @@ function PayReceipts() {
                             alignItems="flex-start"
                         >
                             <Box textAlign="center">
-                                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px",fontWeight:'bold'  }}>
+                                <Typography variant="body2" dir="ltr" sx={{ fontSize: "12px", fontWeight: 'bold' }}>
                                     {invoiceData2?.created_by?.name}
                                 </Typography>
                                 <p
@@ -2358,6 +2363,24 @@ function PayReceipts() {
                             <Grid item xs={6}>
                                 <Typography variant="body2" sx={{ fontSize: "15px" }}>
                                     {payReceiptData?.customer_mobile}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <p
+                                    variant="body2"
+                                    style={{
+                                        fontWeight: "bold",
+                                        fontSize: "16px",
+                                        fontFamily: "Atlassian Sans",
+                                        margin: "2px",
+                                    }}
+                                >
+                                    Authorization Code/رمز التفويض
+                                </p>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                                    {payReceiptData?.payment?.remarks}
                                 </Typography>
                             </Grid>
 
@@ -2613,8 +2636,8 @@ function PayReceipts() {
                             alignItems="flex-start"
                         >
                             <Box textAlign="center">
-                                <Typography variant="body2" sx={{ fontSize: "15px",fontWeight:'bold' }}>
-                                {payReceiptData?.payment_creator?.name}
+                                <Typography variant="body2" sx={{ fontSize: "15px", fontWeight: 'bold' }}>
+                                    {payReceiptData?.payment_creator?.name}
                                 </Typography>
                                 <p
                                     variant="body2"

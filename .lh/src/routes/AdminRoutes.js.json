@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 67,
+            "activePatchIndex": 69,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -276,6 +276,14 @@
                 {
                     "date": 1744737357887,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -267,9 +267,9 @@\n const CreatePaidReceipt = lazy(() =>\r\n   import(\"pages/Dashboard/Payments/CreatePaidReceipt\")\r\n );\r\n const UpdatePaidReceipt = lazy(() =>\r\n-  import(\"pages/Dashboard/Payments/UpdatePaidReceipt\")\r\n+  import(\"pages/Dashboard/Payments/UpdateReceipt\")\r\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n"
+                },
+                {
+                    "date": 1744919056758,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -295,8 +295,12 @@\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n+    path: \"/service-report\",\r\n+    component: <CreateServiceItem />,\r\n+  },\r\n+  {\r\n     path: \"/create-paid-receipt\",\r\n     component: <CreatePaidReceipt />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1744919064940,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -208,8 +208,17 @@\n \r\n const CategoryDetail = lazy(() =>\r\n   import(\"pages/Dashboard/ServiceCategory/CategoryDetail\")\r\n );\r\n+\r\n+const ServiceReport = lazy(() =>\r\n+  import(\"pages/Dashboard/Reports/ServiceReport\")\r\n+);\r\n+\r\n+const CollectionReport = lazy(() =>\r\n+  import(\"pages/Dashboard/Reports/CollectionReport\")\r\n+);\r\n+\r\n const CreateReception = lazy(() =>\r\n   import(\"pages/Dashboard/Reception/CreateReception\")\r\n );\r\n const ReceptionList = lazy(() =>\r\n@@ -272,26 +281,38 @@\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n+const CreateCard = lazy(() =>\r\n+  import(\"pages/Dashboard/Cards/CreateCard\")\r\n+);\r\n const UpdateCard = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/UpdateCard\")\r\n );\r\n+\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n     path: \"/service-report\",\r\n-    component: <CreateServiceItem />,\r\n+    component: <ServiceReport />,\r\n   },\r\n   {\r\n     path: \"/create-paid-receipt\",\r\n     component: <CreatePaidReceipt />,\r\n   },\r\n   {\r\n+    path: \"/create-card\",\r\n+    component: <CreateCard />,\r\n+  },\r\n+  {\r\n+    path: \"/update-card/:id\",\r\n+    component: <UpdateCard />,\r\n+  },\r\n+  {\r\n     path: \"/update-paid-receipt/:id\",\r\n     component: <UpdatePaidReceipt />,\r\n   },\r\n   {\r\n@@ -759,8 +780,12 @@\n   {\r\n     path: \"/notifcations\",\r\n     component: <Notification />,\r\n   },\r\n+  {\r\n+    path: \"/collection-report\",\r\n+    component: <CollectionReport />,\r\n+  },\r\n  \r\n ];\r\n \r\n export default AdminRoutes;\r\n"
                 }
             ],
             "date": 1744496886534,

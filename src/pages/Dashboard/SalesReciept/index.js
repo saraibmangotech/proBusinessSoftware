@@ -147,26 +147,26 @@ function SalesReciept() {
 
   const addItem = (data) => {
     console.log(data);
-  
+
     // Create a new row with the serviceItem included
     const newRow = { ...data, service: serviceItem };
-  
+
     setRows((prevRows) => {
       const updatedRows = [...prevRows, newRow];
-  
+
       // Ensure all totals are treated as floats
       const newSubTotal = updatedRows.reduce((sum, row) => sum + parseFloat(row.total || 0), 0);
-  
+
       // Optionally round to 2 decimal places
       setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-  
+
       return updatedRows;
     });
-  
+
     reset();
     setServiceItem("");
   };
-  
+
   const [activeStep, setActiveStep] = React.useState(1);
 
   // const [fieldsDisabled, setFieldsDisabled] = useState({
@@ -216,58 +216,58 @@ function SalesReciept() {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  
+
   const generatePDF = async () => {
     if (!invoiceRef.current) return;
-  
+
     // Temporarily show the content while generating the PDF
     const invoiceElement = invoiceRef.current;
     invoiceElement.style.display = "block"; // Show the element
-  
+
     // Capture the content using html2canvas
     const canvas = await html2canvas(invoiceElement, {
       scale: 2, // Higher scale for better quality
       useCORS: true,
       logging: false,
     });
-  
+
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
-  
+
     // A4 dimensions: 210mm × 297mm
     const pageWidth = 210;
     const pageHeight = 297;
-    
+
     // Calculate dimensions to fit content on page with margins
     const margin = 14; // 14mm margins
     const contentWidth = pageWidth - (margin * 2);
-    
+
     // Calculate height while maintaining aspect ratio
     const contentHeight = (canvas.height * contentWidth) / canvas.width;
-    
+
     // Check if content would exceed page height and scale if necessary
     const availableHeight = pageHeight - (margin * 2);
     const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
-    
+
     // Calculate final dimensions
     const finalWidth = contentWidth * scale;
     const finalHeight = contentHeight * scale;
-    
+
     // Add image to the PDF with margins
     pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
-  
+
     const blob = pdf.output("blob");
-  
+
     // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
-  
+
     // Open the PDF in a new tab
     window.open(blobUrl);
-  
+    navigate('/pre-sales')
     // Restore the content visibility after generating the PDF
     invoiceElement.style.display = "none"; // Hide the element again
   };
@@ -319,9 +319,10 @@ function SalesReciept() {
           created_by: response?.data?.creator,
           payment_creator: response?.data?.payment_creator,
           date: moment(date).format("DD-MM-YYYY"),
-          invoiceType: formData?.invoice_number,
+          invoiceType: formData?.invoice_no,
           trn: formData?.trn,
-          tokenNumber: formData?.token_number,
+          tokenNumber: formData?.token,
+          email: formData?.email,
           customerName: formData?.display_customer,
           mobileNo: formData?.mobile,
           customerReference: formData?.ref,
@@ -551,18 +552,18 @@ function SalesReciept() {
   const updateItem = (data) => {
     console.log("Raw data passed to updateItem:", data);
     console.log("Current serviceItem:", serviceItem);
-  
+
     if (!data?.id) {
       console.warn("No valid ID found in data. Skipping update.");
       return;
     }
-  
+
     const updatedItem = { ...data, service: serviceItem };
     console.log("Updated item to be saved:", updatedItem);
-  
+
     setRows(prevItems => {
       console.log("Previous rows:", prevItems);
-  
+
       const updatedRows = prevItems.map(item => {
         if (item.id === data.id) {
           console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
@@ -571,27 +572,27 @@ function SalesReciept() {
           return item;
         }
       });
-  
+
       console.log("Rows after update:", updatedRows);
-  
+
       // Calculate new subtotal
       const newSubTotal = updatedRows.reduce((sum, row) => {
         const total = parseFloat(row.total || 0);
         return sum + (isNaN(total) ? 0 : total);
       }, 0);
-  
+
       // Round to 2 decimal places
       setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-  
+
       return updatedRows;
     });
-  
+
     console.log("Resetting form and states...");
     reset();
     setServiceItem(null);
     setEditState(false);
   };
-  
+
 
   useEffect(() => {
     console.log(user, "user");
@@ -776,6 +777,7 @@ function SalesReciept() {
                       <DatePicker
                         label={"Invoice Date :*"}
                         value={date}
+                        disabled={true}
                         size={"small"}
                         error={errors1?.invoice_date?.message}
                         register={register1("invoice_date", {
@@ -958,7 +960,7 @@ function SalesReciept() {
                     <SelectField
                       size="small"
                       options={services}
-                      disabled={detail?.is_paid}
+                      disabled={detail?.is_paid || editState}
                       selected={serviceItem}
                       onSelect={handleServiceSelect}
                       //  error={errors?.service?.message}
@@ -1016,7 +1018,7 @@ function SalesReciept() {
                     <InputField
                       size="small"
                       placeholder="Transaction Id"
-                      type="number"
+
                       register={register("transaction_id", { required: false })}
 
                     />
@@ -1027,7 +1029,7 @@ function SalesReciept() {
                     <InputField
                       size="small"
                       placeholder="Application Id"
-                      type="number"
+
                       register={register("application_id", {
                         required: false,
                       })}
@@ -1042,7 +1044,7 @@ function SalesReciept() {
                     <InputField
                       size="small"
                       placeholder=" Ref No"
-                      type="number"
+
                       register={register("ref_no", {
                         required: false,
                       })}
@@ -1687,15 +1689,17 @@ function SalesReciept() {
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {invoiceData?.items
-                      ?.reduce(
-                        (total, item) =>
-                          parseFloat(total) +
-                          parseFloat(item?.govt_fee ?? 0) +
-                          parseFloat(item?.bank_charge ?? 0),
-                        0
-                      )
-                      ?.toFixed(2)}
+                    {
+                      invoiceData?.items
+                        ?.reduce(
+                          (total, item) =>
+                            parseFloat(total) +
+                            (parseFloat(item?.govt_fee ?? 0) + parseFloat(item?.bank_charge ?? 0)) *
+                            (parseFloat(item?.quantity) || 1),
+                          0
+                        )
+                        ?.toFixed(2)
+                    }
                   </p>
                 </td>
               </tr>
@@ -1850,7 +1854,7 @@ function SalesReciept() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-                <Typography variant="body2" sx={{ fontSize: "15px",fontWeight:'bold' }}>
+                <Typography variant="body2" sx={{ fontSize: "15px", fontWeight: 'bold' }}>
                   {invoiceData?.created_by?.name}
                 </Typography>
                 <p

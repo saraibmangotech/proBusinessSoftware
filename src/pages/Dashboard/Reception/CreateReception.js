@@ -61,7 +61,7 @@ function ReceptionForm() {
                 service_category_id: selectedCategory?.id,
                 service_category: selectedCategory?.name,
                 customer_name: formData?.customerName,
-                email: formData?.email,
+                customer_email: formData?.email,
                 mobile: formData?.mobile,
                 token_number: formData?.tokenNumber,
                 reference: formData?.reference,

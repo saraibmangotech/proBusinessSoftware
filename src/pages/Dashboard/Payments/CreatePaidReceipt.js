@@ -218,6 +218,7 @@ function CreatePaidReceipt() {
       const obj = {
         id: getValues1("invoicenumber"),
         total_amount: formData?.total,
+        items: rows,
         // paid_amount: formData?.paid,
         paid_amount: formData?.amount || formData?.total,
         payment_status: formData?.amount < formData?.total ? "Partially Paid" : "Paid",
@@ -255,7 +256,7 @@ function CreatePaidReceipt() {
         const response = await promise
         showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
         if (response?.responseCode === 200) {
-          window.location.reload()
+          navigate('/paid-receipts')
         }
       }
     } catch (error) {
@@ -333,8 +334,8 @@ function CreatePaidReceipt() {
         setValue1("email", data?.receipt?.customer_email)
         setValue1("address", data?.receipt?.customer_address)
         setValue1("trn", data?.receipt?.trn)
-        setSelectedCostCenter({id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
-        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
+        setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("caseno", data?.receipt?.case_no)
         setSubTotal(data?.receipt?.total_amount)
 
@@ -342,28 +343,28 @@ function CreatePaidReceipt() {
           "total",
           Number.parseFloat(
             Number.parseFloat(data?.receipt?.total_amount) +
-              Number.parseFloat(
-                data?.receipt?.sale_receipt_items?.reduce(
-                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                  0,
-                ) * 0.05,
-              ),
+            Number.parseFloat(
+              data?.receipt?.sale_receipt_items?.reduce(
+                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                0,
+              ) * 0.05,
+            ),
           ).toFixed(2),
         )
         setValue1(
           "balance",
           Number.parseFloat(
             Number.parseFloat(data?.receipt?.total_amount) +
-              Number.parseFloat(
-                data?.receipt?.sale_receipt_items?.reduce(
-                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                  0,
-                ) * 0.05,
-              ),
+            Number.parseFloat(
+              data?.receipt?.sale_receipt_items?.reduce(
+                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                0,
+              ) * 0.05,
+            ),
           ).toFixed(2),
         )
-       setSelectedCostCenter( {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
-        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
+        setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setAccounts(data?.accounts?.rows)
       }
     } catch (error) {
@@ -506,36 +507,36 @@ function CreatePaidReceipt() {
         setValue1("email", data?.receipt?.customer_email)
         setValue1("address", data?.receipt?.address)
         setValue1("trn", data?.receipt?.trn)
-        setSelectedCostCenter( {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
-        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
+        setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("caseno", data?.receipt?.case_no)
         setSubTotal(data?.receipt?.total_amount)
         setValue1(
           "total",
           Number.parseFloat(
             Number.parseFloat(data?.receipt?.total_amount) +
-              Number.parseFloat(
-                data?.receipt?.sale_receipt_items?.reduce(
-                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                  0,
-                ) * 0.05,
-              ),
+            Number.parseFloat(
+              data?.receipt?.sale_receipt_items?.reduce(
+                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                0,
+              ) * 0.05,
+            ),
           ).toFixed(2),
         )
         setValue1(
           "balance",
           Number.parseFloat(
             Number.parseFloat(data?.receipt?.total_amount) +
-              Number.parseFloat(
-                data?.receipt?.sale_receipt_items?.reduce(
-                  (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
-                  0,
-                ) * 0.05,
-              ),
+            Number.parseFloat(
+              data?.receipt?.sale_receipt_items?.reduce(
+                (total, item) => total + Number.parseFloat(item?.center_fee ?? 0),
+                0,
+              ) * 0.05,
+            ),
           ).toFixed(2),
         )
-        setSelectedCostCenter( {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
-        setValue1("cost_center", {id:data?.receipt?.cost_center,name:data?.receipt?.cost_center})
+        setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
+        setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setAccounts(data?.accounts?.rows)
       } else {
         showErrorToast("Data Not Found")
@@ -881,7 +882,7 @@ function CreatePaidReceipt() {
                     ))}
 
                     <TableRow>
-                      <TableCell colSpan={10} align="right">
+                      <TableCell colSpan={9} align="right">
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
                           Sub-total:
                         </Typography>
@@ -950,7 +951,7 @@ function CreatePaidReceipt() {
                               const qty = Number.parseFloat(item?.quantity ?? 1)
                               return total + fee * qty
                             }, 0) *
-                              0.05
+                            0.05
                           ).toFixed(2)}
                         </Typography>{" "}
                         {/* This can be the same as Sub-total */}
@@ -1010,19 +1011,15 @@ function CreatePaidReceipt() {
                   </Grid>
                   <Grid item md={3} sm={12} xs={12}>
                     <InputField
-                      label="Amount to Pay"
+                      label="Paid Amount"
+                      value={0}
+                      disabled={true}
                       size="small"
                       placeholder="Enter amount"
-                      type="number"
+
                       register={register1("amount", {
-                        required: "Please enter amount to pay",
-                        validate: (value) => {
-                          const numValue = Number.parseFloat(value)
-                          if (isNaN(numValue)) return "Please enter a valid number"
-                          if (numValue <= 0) return "Amount must be greater than 0"
-                          if (numValue > Number.parseFloat(watch1("total"))) return "Amount cannot exceed total"
-                          return true
-                        },
+                        required: false,
+
                       })}
                       error={errors1?.amount?.message || amountError}
                     />
@@ -1094,15 +1091,17 @@ function CreatePaidReceipt() {
                       />
                     </Grid>
                   )}
-                  <Grid item md={3} sm={12} xs={12}>
+                  {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
                     <InputField
                       label="Authorization Code"
                       size="small"
                       placeholder="Authorization Code"
-                      register={register1("remarks")}
+                      register={register1("remarks", {
+                        required: "Please enter code",
+                      })}
                       error={errors1?.remarks?.message}
                     />
-                  </Grid>
+                  </Grid>}
                   <Grid item md={3} sm={12} xs={12}>
                     <InputField
                       label="Narration"
