@@ -251,6 +251,45 @@ function Header() {
         identifier: null,
         navigation: true,
 
+      },
+      {
+        id: 2,
+        name: "Sales",
+        icon: "customer",
+        parent_id: null,
+        api: "/api/customers",
+        route: "",
+        identifier: null,
+        navigation: true,
+        order_by: 2,
+        children: [
+
+          {
+            id: 33,
+            name: "Create  Sale Request",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-receipt",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
+          {
+            id: 33,
+            name: " Sale Request List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/pre-sales",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
+        
+
+        
+        ],
       },])
     }
     else if (user?.role_id == 1003) {

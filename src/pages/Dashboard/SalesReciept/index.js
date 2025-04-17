@@ -239,7 +239,13 @@ function SalesReciept() {
     pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
     // Save the generated PDF
-    pdf.save("invoice.pdf");
+    const blob = pdf.output("blob");
+
+    // Create a blob URL
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open the PDF in a new tab
+    window.open(blobUrl);
     navigate("/pre-sales");
     // Restore the content visibility after generating the PDF
     invoiceElement.style.display = 'none';  // Show the content again
@@ -367,10 +373,12 @@ function SalesReciept() {
   };
 
   const getServiceItem = async (id) => {
+    console.log(user, 'useruser');
+
     // setLoader(true)
     try {
 
-      const categoryIds = user.categories.map(category => category.category_id).join(',');
+      const categoryIds = user?.categories?.map(category => category?.category_id).join(',');
       console.log(categoryIds, "cats");
       let params = {
         page: 1,
@@ -941,7 +949,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Govt fee"
-                      type="number"
+                
+                    
                       register={register("govt_fee", { required: "Govt fee is required" })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -951,7 +960,8 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Center Fee"
-                      type="number"
+                       
+                  
                       register={register("center_fee", { required: "Center fee is required" })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -961,7 +971,7 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Bank Charges"
-                      type="number"
+                  
                       register={register("bank_charge", { required: "Bank charges are required" })}
 
                     />
@@ -1142,12 +1152,12 @@ function SalesReciept() {
                   </TableCell>
                   <TableCell>
                     <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ).toFixed(2)
-                    }</Typography> {/* Display the Sub-total */}
+                      ?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseInt(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0)
+                      .toFixed(2)}</Typography> {/* Display the Sub-total */}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -1155,13 +1165,14 @@ function SalesReciept() {
                     <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(rows
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ) * 0.05).toFixed(2)
-                    }</Typography> {/* Display the Sub-total */}
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{(
+                      rows?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+                    </Typography> {/* Display the Sub-total */}
                   </TableCell>
                 </TableRow>
                 {/* Amount Total Row (optional, if needed for the final sum) */}
@@ -1170,12 +1181,15 @@ function SalesReciept() {
                     <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{parseFloat(parseFloat(subTotal) + parseFloat(rows
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.center_fee ?? 0),
-                        0
-                      ) * 0.05)).toFixed(2)}</Typography> {/* This can be the same as Sub-total */}
+                    <Typography variant="h6" sx={{ fontSize: "15px" }}>{(
+                      parseFloat(subTotal) +
+                      rows?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                      }, 0) * 0.05
+                    ).toFixed(2)}
+                    </Typography> {/* This can be the same as Sub-total */}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -1188,15 +1202,34 @@ function SalesReciept() {
       </Box>
       {console.log(invoiceData)}
       <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
-        <div className="w-full h-[115px] flex justify-center items-center mb-4">
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', border: '1px solid black', marginBottom: 4, padding: '10px' }}>
           <img
-            src={Images.header}
+            src={Images.headerRightImage}
             alt="Header"
-            style={{ width: "100%" }}
-            className="max-w-full h-auto"
+            style={{ width: '180px' }}
+
+          />
+          <img
+            src={Images.headerLeftImage}
+            alt="Header"
+            style={{ width: '150px' }}
+
           />
         </div>
-
+        <p
+          variant="body2"
+          style={{
+            fontWeight: "bold",
+            fontSize: "20px",
+            margin: 0,
+            textAlign: 'center',
+            textDecoration: 'underline',
+            marginTop: '40px',
+            marginBottom: '40px',
+          }}
+        >
+          SERVICE REQUEST    طلب الخدمة
+        </p>
         <Box
           sx={{
             display: "flex",
@@ -1221,13 +1254,13 @@ function SalesReciept() {
               <Grid item xs={6}>
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                  sx={{ fontWeight: "bold", fontSize: "12px" }}
                 >
-                  Invoice Type - Invoice No
+                  Invoice Type - Invoice No نوع الفاتورة - رقم الفاتورة
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
                   {invoiceData?.invoiceType}
                 </Typography>
               </Grid>
@@ -1248,69 +1281,45 @@ function SalesReciept() {
                   {invoiceData?.date}
                 </Typography>
               </Grid>
-              <Grid item xs={6}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "15px" }}
-                >
-                  Name Of Employee (Typist)
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                  Typist
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "15px" }}
-                >
-                  Name Of Employee (Cashier)
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                  Cashier
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "15px" }}
-                >
-                  Application number/Case number
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+              {/* <Grid item xs={6}>
+                     <Typography
+                       variant="body2"
+                       sx={{ fontWeight: "bold", fontSize: "15px" }}
+                     >
+                       Name Of Employee (Typist)
+                     </Typography>
+                   </Grid>
+                   <Grid item xs={6}>
+                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                       Typist
+                     </Typography>
+                   </Grid>
+                   <Grid item xs={6}>
+                     <Typography
+                       variant="body2"
+                       sx={{ fontWeight: "bold", fontSize: "15px" }}
+                     >
+                       Name Of Employee (Cashier)
+                     </Typography>
+                   </Grid>
+                   <Grid item xs={6}>
+                     <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                       Cashier
+                     </Typography>
+                   </Grid> */}
 
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "15px" }}
-                >
-                  TRN:
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
-                  {invoiceData?.trn}
-                </Typography>
-              </Grid>
+
 
               <Grid item xs={6}>
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "15px" }}
+                  sx={{ fontWeight: "bold", fontSize: "12px" }}
                 >
-                  Token Number
+                  Token Number رقم الرمز المميز
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
                   {invoiceData?.tokenNumber}
                 </Typography>
               </Grid>
@@ -1346,7 +1355,7 @@ function SalesReciept() {
                     // marginBottom:2
                   }}
                 >
-                  Name.. / الاسم
+                  Name / الاسم
                 </p>
               </Grid>
               <Grid item xs={6}>
@@ -1368,7 +1377,7 @@ function SalesReciept() {
                 </p>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "15px" }}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
                   {invoiceData?.mobileNo}
                 </Typography>
               </Grid>
@@ -1387,33 +1396,32 @@ function SalesReciept() {
                 </Typography>
               </Grid>
 
+
               <Grid item xs={6}>
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: "bold", fontSize: "12px" }}
                 >
-                  The No.of the Claim Or Request /
-                  رقم الطلب أو الدعوى
-
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" sx={{ fontSize: "12px" }}>
-
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: "12px" }}
-                >
-                  Customer Address
+                  Customer Address عنوان العميل
 
                 </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" sx={{ fontSize: "12px" }}>
                   {invoiceData?.customerAddress}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: "bold", fontSize: "12px" }}
+                >
+                  TRN:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                  {invoiceData?.trn}
                 </Typography>
               </Grid>
             </Grid>
@@ -1539,11 +1547,19 @@ function SalesReciept() {
                     >
                       <span style={{ fontSize: "12px", fontWeight: "bold" }}>
                         {item?.service?.name}
+
                       </span>
                       <span style={{ fontSize: "12px" }}>
                         {item.service?.name_ar}
                       </span>
+
                     </div>
+                    <span style={{ fontSize: "12px" }}>
+                      {item?.application_id}
+                      {item?.transaction_id && ` || ${item.transaction_id}`}
+                      {item?.ref_id && ` || ${item.ref_id}`}
+                    </span>
+
                     {/* <p style={{ fontSize: "9px", textAlign: "left" }}>
                                {item?.details}
                              </p> */}
@@ -1589,7 +1605,7 @@ function SalesReciept() {
                       fontSize: "12px",
                     }}
                   >
-                    {parseFloat(item?.bank_charge).toFixed(2)}
+                    {parseFloat(parseFloat(item?.center_fee) * 0.05).toFixed(2)}
                   </td>
                   <td
                     style={{
@@ -1602,29 +1618,25 @@ function SalesReciept() {
                     {parseFloat(item?.total).toFixed(2)}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
 
-          <table className="mytable" style={{ width: "100%", borderCollapse: "collapse" }}>
-            <tbody>
+              ))}
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    Total Govt.fee & Bank Charge
+                    Total Govt.fee & Bank Charge إجمالي الرسوم الحكومية ورسوم البنك
                   </p>
                 </td>
                 <td
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                     width: "8%",
                   }}
@@ -1644,19 +1656,19 @@ function SalesReciept() {
               </tr>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount</p>
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>Net Taxable Amount صافي المبلغ الخاضع للضريبة</p>
                 </td>
                 <td
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                     width: "10%",
                   }}
@@ -1667,176 +1679,125 @@ function SalesReciept() {
                         (total, item) =>
                           total + parseFloat(item?.center_fee ?? 0),
                         0
-                      )
-                      ?.toFixed(2)}
+                      ).toFixed(2)
+                    }
                   </p>
                 </td>
               </tr>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontFamily: "'Amiri', Arial, sans-serif",
-                      fontWeight: 'bold'
-                    }}
-                    className="arabic-text"
-                  >
-                    Total VAT إجمالي القيمة المضافة
-                  </p>
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}> Total VAT إجمالي القيمة المضافة</p>
+
                 </td>
                 <td
                   align="center"
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                     width: "10%",
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {invoiceData?.items
+                    {parseFloat(invoiceData?.items
                       ?.reduce(
                         (total, item) =>
-                          total + parseFloat(item?.bank_charge ?? 0),
+                          total + parseFloat(item?.center_fee ?? 0),
                         0
-                      )
-                      ?.toFixed(2)}
+                      ) * 0.05).toFixed(2)}
                   </p>
                 </td>
               </tr>
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   align="right"
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontFamily: "'Amiri', Arial, sans-serif",
-                      fontWeight: 'bold'
-                    }}
-                    className="arabic-text"
-                  >
-                    Gross Total إجمالي القيمة
-                  </p>
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Gross Total إجمالي القيمة</p>
+
                 </td>
                 <td
                   align="center"
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                     width: "10%",
                   }}
                 >
                   <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {invoiceData?.items
+                    {parseFloat(invoiceData?.items
                       ?.reduce(
                         (total2, item) =>
                           parseFloat(total2) + parseFloat(item?.total ?? 0),
                         0
                       )
-                      ?.toFixed(2)}
+                      + parseFloat(invoiceData?.items
+                        ?.reduce(
+                          (total, item) =>
+                            total + parseFloat(item?.center_fee ?? 0),
+                          0
+                        ) * 0.05)).toFixed(2)}
                   </p>
                 </td>
               </tr>
+
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   align="right"
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "right",
                   }}
                 >
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontFamily: "'Amiri', Arial, sans-serif", fontWeight: 'bold'
-                    }}
-                    className="arabic-text"
-                  >
-                    Customer Card Payment الإجمالي
-                  </p>
+                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>     Total Payable الإجمالي</p>
+
                 </td>
                 <td
                   align="right"
                   style={{
                     border: "1px solid #000",
-                    padding: "0.01rem",
-                    textAlign: "center",
-                    width: "10%",
-                  }}
-                >
-                  <p style={{ fontSize: "12px", fontWeight: 'bold' }}>
-                    {invoiceData?.items
-                      ?.reduce(
-                        (total, item) =>
-                          total + parseFloat(item?.bank_charge ?? 0),
-                        0
-                      )
-                      ?.toFixed(2)}
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={5}
-                  align="right"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.01rem",
-                    textAlign: "right",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontFamily: "'Amiri', Arial, sans-serif", fontWeight: 'bold'
-                    }}
-                    className="arabic-text"
-                  >
-                    Total Payable الإجمالي
-                  </p>
-                </td>
-                <td
-                  align="right"
-                  style={{
-                    border: "1px solid #000",
-                    padding: "0.01rem",
+                    padding: "0.5rem",
                     textAlign: "center",
                     width: "10%",
                   }}
                 >
                   <p style={{ fontSize: "12px" }}>
-                    {invoiceData?.items
+                    {parseFloat(invoiceData?.items
                       ?.reduce(
                         (total2, item) =>
                           parseFloat(total2) + parseFloat(item?.total ?? 0),
                         0
                       )
-                      ?.toFixed(2)}
+                      + parseFloat(invoiceData?.items
+                        ?.reduce(
+                          (total, item) =>
+                            total + parseFloat(item?.center_fee ?? 0),
+                          0
+                        ) * 0.05)).toFixed(2)}
                   </p>
                 </td>
               </tr>
             </tbody>
           </table>
+
+
         </Box>
-        <Box class="footer" style={{ marginTop: '100px' }}>
+        <Box class="footer" style={{ marginTop: '250px' }}>
           <Box textAlign="center" pb={2} sx={{ my: "60px", mt: "200px" }}>
             <Box
               display="flex"
@@ -1844,13 +1805,7 @@ function SalesReciept() {
               alignItems="flex-start"
             >
               <Box textAlign="center">
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{ fontSize: "12px" }}
-                >
-                  SabelahHaq Naqaz
-                </Typography>
+
                 <p
                   variant="body2"
                   style={{
@@ -1859,12 +1814,7 @@ function SalesReciept() {
                 >
                   Authorized Signatory - المخول بالتوقيع
                 </p>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "12px", textAlign: "center" }}
-                >
-                  (REPRINT)
-                </Typography>
+
               </Box>
 
               <Box textAlign="right" sx={{ fontSize: "12px" }}>

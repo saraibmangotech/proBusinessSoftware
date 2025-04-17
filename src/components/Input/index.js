@@ -6,6 +6,7 @@ function InputField(props) {
 	const {
 		inputRef,
 		variant,
+		step,
 		size,
 		dir,
 		label,
@@ -56,7 +57,7 @@ function InputField(props) {
 					size={size}
 					dir={dir}
 				
-				
+					step={step}
 					value={value}
 					type={type}
 					disabled={disabled}

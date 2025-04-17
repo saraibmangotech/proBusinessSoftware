@@ -247,7 +247,7 @@ function PayReceipts() {
         const blob = pdf.output("blob");
 
         // Create a blob URL
-        const blobUrl = URL.createObjectURL(blob); 
+        const blobUrl = URL.createObjectURL(blob);
 
         // Open the PDF in a new tab
         window.open(blobUrl);
@@ -398,10 +398,11 @@ function PayReceipts() {
                 id: data?.receipt?.id,
                 trn: data?.receipt?.trn,
                 tokenNumber: data?.receipt?.token_number,
-                customerName: data?.receipt?.display_customer,
-                mobileNo: data?.receipt?.mobile,
+                customerName: data?.receipt?.customer_name,
+                mobileNo: data?.receipt?.customer_mobile,
+                email: data?.receipt?.customer_email,
                 customerReference: data?.receipt?.ref,
-                customerAddress: data?.receipt?.address,
+                customerAddress: data?.receipt?.customer_address,
                 items: data?.receipt?.sale_receipt_items,
                 totalSales: 367.25,
                 netTaxableAmount: 27.5,
@@ -991,7 +992,7 @@ function PayReceipts() {
                             </tr>
                         </thead>
                         <tbody>
-                            {invoiceData?.items?.map((item) => (
+                            {invoiceData?.items?.map((item,index) => (
                                 <tr key={item.id}>
                                     <td
                                         style={{
@@ -1000,7 +1001,7 @@ function PayReceipts() {
                                             textAlign: "center",
                                         }}
                                     >
-                                        {item?.id}
+                                        {index+1}
                                     </td>
                                     <td
                                         style={{
@@ -1653,7 +1654,7 @@ function PayReceipts() {
                             </tr>
                         </thead>
                         <tbody>
-                            {invoiceData2?.items?.map((item) => (
+                            {invoiceData2?.items?.map((item,index) => (
                                 <tr key={item.id}>
                                     <td
                                         style={{
@@ -1662,7 +1663,7 @@ function PayReceipts() {
                                             textAlign: "center",
                                         }}
                                     >
-                                        {item?.id}
+                                        {index+1}
                                     </td>
                                     <td
                                         style={{
