@@ -640,7 +640,12 @@ function UpdatePaidReceipt() {
                                                     size="small"
                                                     placeholder="Mobile No"
                                                     disabled={true}
-                                                    register={register1("mobile")}
+                                                    register={register1("mobile",{
+                                                        pattern: {
+                                                            value: /^05[0-9]{8}$/,
+                                                            message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
+                                                          },
+                                                    })}
                                                     error={errors1?.display_customer?.message}
                                                 />
                                             </Grid>

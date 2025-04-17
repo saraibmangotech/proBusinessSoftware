@@ -667,9 +667,13 @@ function UpdatePreSale() {
                                                     placeholder="Mobile No"
 
                                                     register={register1("mobile", {
-                                                        required: 'please enter mobile .'
+                                                        required: 'please enter mobile .',
+                                                        pattern: {
+                                                            value: /^05[0-9]{8}$/,
+                                                            message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
+                                                          },
                                                     })}
-                                                    error={errors1?.display_customer?.message}
+                                                    error={errors1?.mobile?.message}
                                                 />
                                             </Grid>
 
