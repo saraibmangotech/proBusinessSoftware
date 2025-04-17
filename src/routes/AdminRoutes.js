@@ -209,6 +209,15 @@ const UpdateCategory = lazy(() =>
 const CategoryDetail = lazy(() =>
   import("pages/Dashboard/ServiceCategory/CategoryDetail")
 );
+
+const ServiceReport = lazy(() =>
+  import("pages/Dashboard/Reports/ServiceReport")
+);
+
+const CollectionReport = lazy(() =>
+  import("pages/Dashboard/Reports/CollectionReport")
+);
+
 const CreateReception = lazy(() =>
   import("pages/Dashboard/Reception/CreateReception")
 );
@@ -767,6 +776,10 @@ const AdminRoutes = [
   {
     path: "/notifcations",
     component: <Notification />,
+  },
+  {
+    path: "/collection-report",
+    component: <CollectionReport />,
   },
  
 ];

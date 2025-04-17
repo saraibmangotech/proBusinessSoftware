@@ -82,6 +82,8 @@ const routes = {
   getCards:'/system/cards/',
   UpdateCard:'/system/cards/update',
   getInvoiceNumber:'/sales/receipts/invoiceNumber',
+  getServiceReport:'/reports/serviceReport',
+  getCollectionReport:'/reports/collectionReport',
   PayReceipt:'/sales/receipts/pay',
   UpdateReceipt:'/sales/reception/update'
 
