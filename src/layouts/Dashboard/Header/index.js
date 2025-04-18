@@ -196,7 +196,7 @@ function Header() {
   }
 
   const handleSubmenuToggle = (id) => {
-    setOpenSubmenu((prev) => (prev !== id ? id : null));
+    setOpenSubmenu((prev) => (prev === id ? null : id));
   };
   
 
@@ -340,8 +340,8 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-            
-            
+
+
 
 
           ],
@@ -1009,7 +1009,7 @@ function Header() {
                   {openSubmenu === item.id ? <ExpandLess /> : <ExpandMore />}
                 </ListItem>
 
-                <Collapse key={`collapse-${item.id}`} in={openSubmenu === item.id} timeout="auto" unmountOnExit>
+                <Collapse in={openSubmenu === item.id} timeout="auto">
                   <List component="div" disablePadding>
                     {item.children.map((child) => (
                       <ListItem
@@ -1091,7 +1091,7 @@ function Header() {
     </Box>
   )
 
-  
+
 
   return (
     <>
