@@ -24,12 +24,13 @@ import DatePicker from "components/DatePicker"
 import { ErrorToaster } from "components/Toaster"
 import SelectField from "components/Select"
 import CustomerServices from "services/Customer"
-import { showErrorToast, showPromiseToast } from "components/NewToaster"
+import { showErrorToast, showPromiseToast, showSuccessToast } from "components/NewToaster"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "context/UseContext"
 import FinanceServices from "services/Finance"
 import SearchIcon from "@mui/icons-material/Search"
+import DeleteIcon from '@mui/icons-material/Delete';
 // import { TableBody, TableHead } from "mui-datatables";
 
 function CreatePaidReceipt() {
@@ -105,6 +106,7 @@ function CreatePaidReceipt() {
   const qty = watch("qty", 1)
   const paymentAmount = watch1("amount", 0)
   const paymentMethod = watch1("payment")
+  console.log(errors1);
 
   useEffect(() => {
     const feesTotal =
@@ -113,23 +115,6 @@ function CreatePaidReceipt() {
     setValue("total", finalTotal)
   }, [govtFee, centerFee, bankCharges, qty])
 
-  // Validate amount against total
-  useEffect(() => {
-    if (paymentAmount && watch1("total")) {
-      const amount = Number.parseFloat(paymentAmount)
-      const total = Number.parseFloat(watch1("total"))
-
-      if (amount > total) {
-        setAmountError("Amount cannot exceed total")
-      } else if (amount <= 0) {
-        setAmountError("Amount must be greater than 0")
-      } else {
-        setAmountError("")
-        // Calculate balance
-        setValue1("balance", (total - amount).toFixed(2))
-      }
-    }
-  }, [paymentAmount, watch1("total")])
 
   const addItem = (data) => {
     const total = data.total
@@ -164,6 +149,7 @@ function CreatePaidReceipt() {
   const [isUploading, setIsUploading] = useState(false)
   const [selectedBank, setSelectedBank] = useState(null)
   const [loader, setLoader] = useState(false)
+  const [totalDepositVal, setTotalDepositVal] = useState(0)
   console.log(selectedBank, "objobj")
 
   const [center, setCenter] = useState(null)
@@ -204,6 +190,9 @@ function CreatePaidReceipt() {
   const [cards, setCards] = useState([])
   const [selectedCard, setSelectedCard] = useState(null)
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [payments, setPayments] = useState([])
+  const [chargesDisabled, setChargesDisabled] = useState(false)
+  const [paymentTotal, setPaymentTotal] = useState(0)
   //documents array
 
   const handleNext = () => {
@@ -213,56 +202,58 @@ function CreatePaidReceipt() {
 
   const submitForm1 = async (formData) => {
     console.log(formData, "objobjj")
-    setButtonDisabled(true)
-    try {
-      const obj = {
-        id: getValues1("invoicenumber"),
-        total_amount: formData?.total,
-        items: rows,
-        // paid_amount: formData?.paid,
-        paid_amount: formData?.amount || formData?.total,
-        payment_status: formData?.amount < formData?.total ? "Partially Paid" : "Paid",
-        payment_mode: selectedMode?.id, // Cash, Bank, Card
-        account_id:
-          selectedMode?.id == "Cash"
-            ? 700117
-            : selectedMode?.id == "Bank"
-              ? selectedBank?.account_id
-              : selectedMode?.id == "Card"
-                ? selectedCard?.account_id
-                : selectedMode?.id == "Payment Link"
-                  ? 700171
-                  : null,
-        ref_id: selectedMode?.id == "Bank" ? selectedBank?.id : null,
-        remarks: formData?.remarks,
-        narration: formData?.narration,
+    const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
 
-        charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.center_fee || 0), 0),
-        govt_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.govt_fee || 0), 0),
-        bank_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.bank_charge || 0), 0),
+    console.log(paymentModesString); // Output: "Cash, Bank, Card"
+    getValues1('total')
+    if (existingTotal == getValues1('finalTotal')) {
 
-        bank_name: selectedMode?.id == "Bank" ? selectedBank?.name : "",
-        bank_id: selectedMode?.id == "Bank" ? selectedBank?.id : "",
-        customer_id: detail?.customer_id,
-        invoice_prefix: detail?.invoice_prefix,
-        category_id: detail?.sale_receipt_items[0]?.service?.category_id,
-      }
+      setButtonDisabled(true)
+      try {
+        const obj = {
+          id: getValues1("invoicenumber"),
+          total_amount: detail?.total_amount,
+          items: rows,
 
-      console.log(obj, "objobj")
-      if (detail?.is_paid == true) {
-        ErrorToaster("Already paid")
-      } else {
-        const promise = CustomerServices.PayReceipt(obj)
-        const response = await promise
-        showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
-        if (response?.responseCode === 200) {
-          navigate('/paid-receipts')
+          paid_amount: detail?.amount,
+          additional_charges_percentage: formData?.percentage,
+          additional_charges_value: formData?.additionalCharges,
+          remarks: formData?.remarks,
+          narration: formData?.narration,
+          payment_mode: paymentModesString,
+          payment_status: 'Paid',
+          charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.center_fee || 0), 0),
+          govt_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.govt_fee || 0), 0),
+          bank_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.bank_charge || 0), 0),
+
+
+          customer_id: detail?.customer_id,
+          invoice_prefix: detail?.invoice_prefix,
+          category_id: detail?.sale_receipt_items[0]?.service?.category_id,
+          payment_methods:payments
         }
+
+        console.log(obj, "objobj")
+        if (detail?.is_paid == true) {
+          ErrorToaster("Already paid")
+        } else {
+          const promise = CustomerServices.PayReceipt(obj)
+          const response = await promise
+          showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
+          if (response?.responseCode === 200) {
+            navigate('/paid-receipts')
+          }
+        }
+      } catch (error) {
+        ErrorToaster(error)
+      } finally {
+        setButtonDisabled(false)
       }
-    } catch (error) {
-      ErrorToaster(error)
-    } finally {
-      setButtonDisabled(false)
+    }
+    else {
+      const difference = getValues1('finalTotal') - existingTotal;
+      showErrorToast(`Remaining amount to be added is ${difference.toFixed(2)}`)
     }
   }
   // *For Get Customer Queue
@@ -338,7 +329,18 @@ function CreatePaidReceipt() {
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("caseno", data?.receipt?.case_no)
         setSubTotal(data?.receipt?.total_amount)
-
+        setTotalDepositVal((
+          Number.parseFloat(data?.receipt?.total_amount) +
+          data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+            const fee = Number.parseFloat(item?.center_fee ?? 0)
+            const qty = Number.parseFloat(item?.quantity ?? 1)
+            console.log(fee);
+            console.log(qty);
+            console.log(total);
+            return total + fee * qty
+          }, 0) *
+          0.05
+        ))
         setValue1(
           "total",
           (
@@ -355,6 +357,30 @@ function CreatePaidReceipt() {
           ).toFixed(2),
         )
         setValue1(
+          "percentage",
+          0,
+        )
+        setValue1(
+          "additionalCharges",
+          0,
+        )
+        setValue1(
+          "finalTotal",
+          (
+            Number.parseFloat(data?.receipt?.total_amount) +
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
+              return total + fee * qty
+
+            }, 0) *
+            0.05
+          ).toFixed(2),
+        )
+        setValue1(
           "balance",
           (
             Number.parseFloat(data?.receipt?.total_amount) +
@@ -365,7 +391,7 @@ function CreatePaidReceipt() {
               console.log(qty);
               console.log(total);
               return total + fee * qty
-              
+
             }, 0) *
             0.05
           ).toFixed(2),
@@ -468,6 +494,83 @@ function CreatePaidReceipt() {
       // setLoader(false)
     }
   }
+
+  const addPayments = (amount, mode, bank, card, code) => {
+    const total = parseFloat(getValues1("finalTotal")) || 0;
+
+
+    // Convert amount to number for calculation
+    const currentAmount = parseFloat(amount) || 0;
+
+    // Calculate current total of payments
+    const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+
+    // Check if new total will exceed
+    if (existingTotal + currentAmount > total) {
+      showErrorToast("Total payment exceeds the required amount.");
+      return;
+    }
+
+    // Validation
+    if (!amount) {
+      showErrorToast("Amount is required");
+      return;
+    }
+
+    if (!mode) {
+      showErrorToast("Payment mode is required");
+      return;
+    }
+
+    if (mode === "Bank" && !bank) {
+      showErrorToast("Bank is required for Bank mode");
+      return;
+    }
+
+    if (mode === "Card" && !card) {
+      showErrorToast("Card is required for Card mode");
+      return;
+    }
+    if (mode === "Card" && !code) {
+      showErrorToast("Authorization code is required for Card mode");
+      return;
+    }
+    const paymentObj = {
+      amount: currentAmount,
+      payment_mode: mode,
+      account_id: mode === "Bank" ? bank?.account_id : mode === "Card" ? card?.account_id : mode === "Cash" ? 700117 : 700171,
+      ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
+      ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
+
+    };
+
+    setPayments((prev) => [...prev, paymentObj]);
+    setValue1('payamount', '')
+    setSelectedMode(null)
+    setSelectedBank(null)
+    setSelectedCard(null)
+    setValue1('authCode', '')
+  };
+  useEffect(() => {
+    console.log(payments, 'paymentspayments');
+
+    const total = parseFloat(getValues1("finalTotal")) || 0;
+    const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    console.log(total, 'total');
+    console.log(existingTotal, 'existingTotal');
+    console.log(total, 'total');
+    console.log(parseFloat(parseFloat(total) - parseFloat(existingTotal)), 'minusval');
+
+    setValue1('amount', parseFloat(existingTotal).toFixed(2))
+    setValue1('balance', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
+    if (payments?.length > 0) {
+      setChargesDisabled(true)
+    }
+    else if (payments?.length == 0) {
+      setChargesDisabled(false)
+    }
+  }, [payments])
+
   const getCategories = async () => {
     // setLoader(true)
     try {
@@ -518,6 +621,18 @@ function CreatePaidReceipt() {
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("caseno", data?.receipt?.case_no)
         setSubTotal(data?.receipt?.total_amount)
+        setTotalDepositVal((
+          Number.parseFloat(data?.receipt?.total_amount) +
+          data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+            const fee = Number.parseFloat(item?.center_fee ?? 0)
+            const qty = Number.parseFloat(item?.quantity ?? 1)
+            console.log(fee);
+            console.log(qty);
+            console.log(total);
+            return total + fee * qty
+          }, 0) *
+          0.05
+        ))
         setValue1(
           "total",
           (
@@ -529,7 +644,31 @@ function CreatePaidReceipt() {
               console.log(qty);
               console.log(total);
               return total + fee * qty
-              
+
+            }, 0) *
+            0.05
+          ).toFixed(2),
+        )
+        setValue1(
+          "percentage",
+          0,
+        )
+        setValue1(
+          "additionalCharges",
+          0,
+        )
+        setValue1(
+          "finalTotal",
+          (
+            Number.parseFloat(data?.receipt?.total_amount) +
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
+              return total + fee * qty
+
             }, 0) *
             0.05
           ).toFixed(2),
@@ -545,7 +684,7 @@ function CreatePaidReceipt() {
               console.log(qty);
               console.log(total);
               return total + fee * qty
-              
+
             }, 0) *
             0.05
           ).toFixed(2),
@@ -754,7 +893,7 @@ function CreatePaidReceipt() {
                           size="small"
                           placeholder="Mobile No"
                           disabled={true}
-                          register={register1("mobile",{
+                          register={register1("mobile", {
                             pattern: {
                               value: /^05[0-9]{8}$/,
                               message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
@@ -1031,8 +1170,58 @@ function CreatePaidReceipt() {
                   </Grid>
                   <Grid item md={3} sm={12} xs={12}>
                     <InputField
+                      label="Additional Percentage"
+                      size="small"
+                      disabled={chargesDisabled}
+                      placeholder="Additional Percentage"
+                      register={register1("percentage", {
+                        required: "please enter percentage.",
+                        onChange: (e) => {
+                          const percentage = parseFloat(e.target.value) || 0;
+                          const totalAmount = parseFloat(getValues1("total")) || 0;
+
+                          const additionalCharges = (totalAmount * percentage) / 100;
+
+                          console.log("Additional Charges:", additionalCharges.toFixed(2));
+
+                          setValue1("additionalCharges", additionalCharges.toFixed(2));
+                          setValue1('finalTotal', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
+                          setValue1('balance', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
+                        },
+                      })}
+                      error={errors1?.percentage?.message}
+                    />
+                  </Grid>
+
+
+                  <Grid item md={3} sm={12} xs={12}>
+                    <InputField
+                      label="Additional Charges"
+                      size="small"
+                      disabled={true}
+                      placeholder="Additional Charges"
+                      register={register1("additionalCharges", {
+                        required: "please enter additionalCharges .",
+                      })}
+                      error={errors1?.additionalCharges?.message}
+                    />
+                  </Grid>
+                  <Grid item md={3} sm={12} xs={12}>
+                    <InputField
+                      label="Final Total"
+                      size="small"
+                      disabled={true}
+                      placeholder="Final Total"
+                      register={register1("finalTotal", {
+                        required: "please enter finalTotal .",
+                      })}
+                      error={errors1?.finalTotal?.message}
+                    />
+                  </Grid>
+                  <Grid item md={3} sm={12} xs={12}>
+                    <InputField
                       label="Paid Amount"
-                      value={0}
+
                       disabled={true}
                       size="small"
                       placeholder="Enter amount"
@@ -1041,7 +1230,7 @@ function CreatePaidReceipt() {
                         required: false,
 
                       })}
-                      error={errors1?.amount?.message || amountError}
+                      error={errors1?.amount?.message}
                     />
                   </Grid>
                   <Grid item md={3} sm={12} xs={12}>
@@ -1056,72 +1245,7 @@ function CreatePaidReceipt() {
                       error={errors1?.balance?.message}
                     />
                   </Grid>
-                  <Grid item md={3} sm={12} xs={12}>
-                    <SelectField
-                      label="Payment Mode"
-                      size="small"
-                      options={[
-                        { id: "Cash", name: "Cash" },
-                        { id: "Bank", name: "Bank" },
-                        { id: "Card", name: "Card" },
-                        { id: "Payment Link", name: "Payment Link" },
-                      ]}
-                      selected={watch1("payment")}
-                      onSelect={(value) => {
-                        setValue1("payment", value)
-                        setSelectedMode(value)
-                      }}
-                      register={register1("payment", {
-                        required: "Please select payment mode",
-                      })}
-                      error={errors1?.payment?.message}
-                    />
-                  </Grid>
-                  {selectedMode?.id == "Bank" && (
-                    <Grid item md={3} sm={12} xs={12}>
-                      <SelectField
-                        label="Banks"
-                        size="small"
-                        options={banks}
-                        selected={selectedBank}
-                        onSelect={(value) => {
-                          setSelectedBank(value)
-                        }}
-                        register={register1("bank", {
-                          required: "Please select a bank",
-                        })}
-                        error={errors1?.bank?.message}
-                      />
-                    </Grid>
-                  )}
-                  {selectedMode?.id == "Card" && (
-                    <Grid item md={3} sm={12} xs={12}>
-                      <SelectField
-                        label="Card"
-                        size="small"
-                        options={cards}
-                        selected={selectedCard}
-                        onSelect={(value) => {
-                          setSelectedCard(value)
-                        }}
-                        register={register1("card", {
-                          required: "Please select a card",
-                        })}
-                        error={errors1?.card?.message}
-                      />
-                    </Grid>
-                  )}
-                  {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
-                    <InputField
-                      label="Authorization Code"
-                      size="small"
-                      placeholder="Authorization Code"
-                      register={register1("remarks", {
-                        required: "Please enter code",
-                      })}
-                      error={errors1?.remarks?.message}
-                    />
-                  </Grid>}
+
                   <Grid item md={3} sm={12} xs={12}>
                     <InputField
                       label="Narration"
@@ -1130,6 +1254,150 @@ function CreatePaidReceipt() {
                       register={register1("narration")}
                       error={errors1?.narration?.message}
                     />
+                  </Grid>
+
+                  <Grid container p={2} spacing={2}>
+                    <Grid item md={3} sm={12} xs={12}>
+                      <InputField
+                        label="Amount"
+                        size="small"
+
+                        placeholder="Amount"
+                        register={register1("payamount", {
+                          required: false,
+                        })}
+                        error={errors1?.payamount?.message}
+                      />
+                    </Grid>
+                    <Grid item md={3} sm={12} xs={12}>
+                      <SelectField
+                        label="Payment Mode"
+                        size="small"
+                        options={[
+                          { id: "Cash", name: "Cash" },
+                          { id: "Bank", name: "Bank" },
+                          { id: "Card", name: "Card" },
+                          { id: "Payment Link", name: "Payment Link" },
+                        ]}
+                        selected={watch1("payment")}
+                        onSelect={(value) => {
+                          setValue1("payment", value)
+                          setSelectedMode(value)
+                        }}
+                        register={register1("payment", {
+                          required: "Please select payment mode",
+                        })}
+                        error={errors1?.payment?.message}
+                      />
+                    </Grid>
+                    {selectedMode?.id == "Bank" && (
+                      <Grid item md={3} sm={12} xs={12}>
+                        <SelectField
+                          label="Banks"
+                          size="small"
+                          options={banks}
+                          selected={selectedBank}
+                          onSelect={(value) => {
+                            setSelectedBank(value)
+                          }}
+                          register={register1("bank", {
+                            required: "Please select a bank",
+                          })}
+                          error={errors1?.bank?.message}
+                        />
+                      </Grid>
+                    )}
+                    {selectedMode?.id == "Card" && (
+                      <Grid item md={3} sm={12} xs={12}>
+                        <SelectField
+                          label="Card"
+                          size="small"
+                          options={cards}
+                          selected={selectedCard}
+                          onSelect={(value) => {
+                            setSelectedCard(value)
+                          }}
+                          register={register1("card", {
+                            required: "Please select a card",
+                          })}
+                          error={errors1?.card?.message}
+                        />
+                      </Grid>
+                    )}
+                    {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
+                      <InputField
+                        label="Authorization Code"
+                        size="small"
+                        placeholder="Authorization Code"
+                        register={register1("remarks", {
+                          required: "Please enter code",
+                        })}
+                        error={errors1?.remarks?.message}
+                      />
+                    </Grid>}
+                    <Grid item md={12} sm={12} xs={12}>
+                      <Button
+                        onClick={() => addPayments(getValues1('payamount'), selectedMode?.id, selectedBank, selectedCard, getValues1('remarks'))}
+
+                        variant="contained"
+                        sx={{
+                          textTransform: "capitalize",
+                          backgroundColor: "#bd9b4a",
+                          width: "200px",
+                          ":hover": {
+                            backgroundColor: "rgb(189 155 74)",
+                          },
+                        }}
+                      >
+                        Add Payments
+                      </Button>
+                    </Grid>
+                    <Typography variant="body1" sx={{ p: 2, fontWeight: 'bold', mt: 2 }} color="initial">
+
+                      Payment Details
+                    </Typography>
+
+                    <Grid container mt={2} p={2}>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2, width: '100%' }}>
+                        {payments.map((payment, index) => (
+                          <Box
+                            key={index}
+                            sx={{
+                              border: '1px solid #ccc',
+                              borderRadius: 2,
+                              width: '30%',
+                              p: 2,
+                              mb: 1,
+                              backgroundColor: '#f9f9f9',
+                              position: 'relative',
+                            }}
+                          >
+                            <IconButton
+                              size="small"
+                              sx={{ position: 'absolute', top: 8, right: 8 }}
+                              onClick={() => {
+                                const updatedPayments = payments.filter((_, i) => i !== index);
+                                setPayments(updatedPayments);
+                              }}
+                            >
+                              <DeleteIcon color="error" fontSize="small" />
+                            </IconButton>
+
+                            <Typography variant="body1"><strong>Amount:</strong> {payment.amount}</Typography>
+                            <Typography variant="body1"><strong>Mode:</strong> {payment.payment_mode}</Typography>
+                            {payment.mode === 'Bank' && (
+                              <Typography variant="body1"><strong>Bank:</strong> {payment.bank?.name || payment.bank}</Typography>
+                            )}
+                            {payment.mode === 'Card' && (
+                              <Typography variant="body1"><strong>Card:</strong> {payment.card?.name || payment.card}</Typography>
+                            )}
+                          </Box>
+                        ))}
+                      </Box>
+                    </Grid>
+                    <Grid>
+
+                    </Grid>
                   </Grid>
                   <Grid container justifyContent={"flex-end"} mt={2} pr={2}>
                     <Button

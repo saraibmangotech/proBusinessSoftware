@@ -84,7 +84,7 @@ const routes = {
   getInvoiceNumber:'/sales/receipts/invoiceNumber',
   getServiceReport:'/reports/serviceReport',
   getCollectionReport:'/reports/collectionReport',
-  PayReceipt:'/sales/receipts/pay',
+  PayReceipt:'/sales/receipts/pay/v2',
   UpdateReceipt:'/sales/reception/update'
 
 };
