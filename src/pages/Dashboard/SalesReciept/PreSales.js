@@ -637,7 +637,10 @@ function PreSalesList() {
             <Tooltip title=" Invoice">
               <IconButton
                 onClick={() => {
-                  getData2(row?.original?.id);
+                  window.open(
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}?id=${row?.original?.id}`,
+                    '_blank'
+                  );
                 }}
                 sx={{
                   backgroundColor: "#f9f9f9",

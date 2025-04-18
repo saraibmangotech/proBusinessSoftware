@@ -252,7 +252,7 @@ function ServiceReport() {
     {
       header: "Inv No.",
       accessorKey: "invoice_number",
-      accessorFn: (row) => row?.creator,
+      accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -266,7 +266,7 @@ function ServiceReport() {
     {
       header: "Inv Date",
       accessorKey: "invoice_date",
-      accessorFn: (row) => row?.creator,
+      accessorFn: (row) => row?.receipt?.invoice_date,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -280,7 +280,7 @@ function ServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: (row) => row,
+      accessorFn: (row) =>  'Al-Adheed',
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -294,7 +294,7 @@ function ServiceReport() {
     {
       header: "Stock ID",
       accessorKey: "stock_id",
-      accessorFn: (row) => row?.service,
+      accessorFn: (row) => row?.service?.id,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -308,7 +308,7 @@ function ServiceReport() {
     {
       header: "Service Name",
       accessorKey: "service_name",
-      accessorFn: (row) => row?.service,
+      accessorFn: (row) => row?.service?.name,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -322,7 +322,7 @@ function ServiceReport() {
     {
       header: "Category",
       accessorKey: "category",
-      accessorFn: (row) => row?.service,
+      accessorFn: (row) => row?.service.category?.name,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -335,8 +335,8 @@ function ServiceReport() {
     },
     {
       header: "Customer Ref",
-      accessorKey: "customer_ref",
-      accessorFn: (row) => row?.receipt,
+      accessorFn: (row) => 'Walk-In Customer',
+  
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -349,8 +349,8 @@ function ServiceReport() {
     },
     {
       header: "Display Customer",
-      accessorKey: "display_customer",
-      accessorFn: (row) => row?.receipt,
+      accessorKey: "customer_name",
+      accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -364,7 +364,7 @@ function ServiceReport() {
     {
       header: "Customer Mobile",
       accessorKey: "customer_mobile",
-      accessorFn: (row) => row?.receipt,
+      accessorFn: (row) => row?.receipt?.customer_mobile,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -378,7 +378,7 @@ function ServiceReport() {
     {
       header: "Customer Email",
       accessorKey: "customer_email",
-      accessorFn: (row) => row?.receipt,
+      accessorFn: (row) => row?.receipt?.customer_email,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -400,6 +400,7 @@ function ServiceReport() {
     {
       header: "Total Service Charge",
       accessorKey: "total_service_charge",
+      accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)).toFixed(2),
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -413,6 +414,7 @@ function ServiceReport() {
     {
       header: "Total VAT",
       accessorKey: "total_vat",
+      accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -435,6 +437,7 @@ function ServiceReport() {
     {
       header: "Other Charge",
       accessorKey: "other_charge",
+      accessorFn: (row) => 0,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -464,6 +467,7 @@ function ServiceReport() {
     {
       header: "Payment Status",
       accessorKey: "payment_status",
+      accessorFn: (row) => row?.receipt?.payment_status,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -477,6 +481,7 @@ function ServiceReport() {
     {
       header: "Employee ID",
       accessorKey: "employee_id",
+      accessorFn: (row) => row?.receipt?.created_by,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -490,6 +495,7 @@ function ServiceReport() {
     {
       header: "Employee Name",
       accessorKey: "employee_name",
+      accessorFn: (row) => row?.receipt?.creator?.name,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -503,6 +509,7 @@ function ServiceReport() {
     {
       header: "Line Total",
       accessorKey: "total",
+      accessorFn: (row) => parseFloat(row?.total) + ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05),
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -516,6 +523,7 @@ function ServiceReport() {
     {
       header: "Invoice Total",
       accessorKey: "inv_total",
+      accessorFn: (row) => row?.receipt?.total_amount,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -614,7 +622,7 @@ function ServiceReport() {
       <Box >
 
 
-        {<DataTable loading={loader} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} csv={true} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>

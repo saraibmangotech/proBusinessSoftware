@@ -1034,7 +1034,7 @@ function SalesReciept() {
                       placeholder="Application Id"
 
                       register={register("application_id", {
-                        required: false,
+                        required: 'application id is require',
                       })}
                     />
                     {errors.application_id && (

@@ -895,7 +895,7 @@ function UpdatePreSale() {
                                                     placeholder="Application Id"
 
                                                     register={register("application_id", {
-                                                        required: false,
+                                                        required: 'application id is required',
                                                     })}
                                                 />
                                                 {errors.application_id && (
