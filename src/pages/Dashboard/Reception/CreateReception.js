@@ -28,7 +28,7 @@ function ReceptionForm() {
     const [subCustDisable, setSubCustDisable] = useState(false)
     const [categories, setCategories] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
-   
+
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -86,7 +86,7 @@ function ReceptionForm() {
         } catch (error) {
             ErrorToaster(error);
         }
-        finally{
+        finally {
             setButtonDisabled3(false)
         }
     };
@@ -125,12 +125,12 @@ function ReceptionForm() {
         } catch (error) {
             ErrorToaster(error);
         }
-        finally{
+        finally {
             setButtonDisabled3(false)
         }
     };
     // *For Get Customer Queue
-    const getCustomerQueue = async (page, limit, filter) => {
+    const getCustomerQueue = async (id) => {
 
 
         try {
@@ -144,8 +144,15 @@ function ReceptionForm() {
 
             const { data } = await CustomerServices.getCustomerQueue(params)
             setCustomers(data?.rows)
-            let filter = await data?.rows.find(item => item?.name == 'Walk-In Customer')
-            setSelectedCustomer(filter)
+            if(!id){
+                let filter = await data?.rows.find(item => item?.name == 'Walk-In Customer')
+                setSelectedCustomer(filter)
+            }
+            else{
+                let filter = await data?.rows.find(item => item?.id == id)
+                setSelectedCustomer(filter)
+            }
+           
         } catch (error) {
             showErrorToast(error)
         }
@@ -212,11 +219,11 @@ function ReceptionForm() {
             else {
                 let filter = await customers.find(item => item?.name == 'Walk-In Customer')
                 console.log(filter);
-                
+
                 setSelectedCustomer(filter)
                 setValue1('customer', filter?.name)
-               
-               
+
+
             }
 
 
@@ -293,13 +300,14 @@ function ReceptionForm() {
         console.log(formData);
         try {
             let obj = {
-                code: formData?.code,
+         
                 name: formData?.name,
-                customer_id: selectedCustomer?.id
+                mobile:formData?.mobileVal,
+                email:formData?.emailVal
 
 
             };
-            const promise = CustomerServices.addCompany(obj);
+            const promise = CustomerServices.addCustomer(obj);
 
             showPromiseToast(
                 promise,
@@ -309,7 +317,10 @@ function ReceptionForm() {
             );
             const response = await promise;
             if (response?.responseCode === 200) {
-                getCompanies();
+                console.log(response);
+                
+                getCustomerQueue(response?.data?.id)
+                
                 setCompanyDialog(false)
             }
 
@@ -345,14 +356,49 @@ function ReceptionForm() {
                                     })}
                                 />
                             </Grid>
+                        
                             <Grid item xs={12}>
                                 <InputField
-                                    label={"Code *:"}
+                                    label={"Mobile *:"}
                                     size={"small"}
-                                    placeholder={" Code"}
-                                    error={errors2?.code?.message}
-                                    register={register2("code", {
-                                        required: "Please enter  code.",
+                                    type={"number"}
+
+                                    placeholder={"Mobile"}
+                                    // InputProps={{
+                                    //   endAdornment: (
+                                    //     <IconButton
+                                    //       onClick={() => {
+                                    //         getReceiptDetail();
+
+
+                                    //       }}
+                                    //     >
+                                    //       <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                    //     </IconButton>
+                                    //   ),
+                                    // }}
+                                    register={register1("mobileVal", {
+                                        required: 'mobile is required',
+
+                                        onChange: (e) => {
+                                            console.log("asdas");
+                                            if (getValues1("mobile").length == 10) {
+
+                                            }
+
+                                            // Delay the execution of verifyEmail by 2 seconds
+                                        },
+                                    })}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <InputField
+                                    label={"Email :"}
+                                    size={"small"}
+                                    placeholder={" Email"}
+                                    error={errors2?.emailVal?.message}
+                                    register={register2("emailVal", {
+                                        required: false,
                                     })}
                                 />
                             </Grid>
@@ -577,13 +623,13 @@ function ReceptionForm() {
                                 <SelectField
                                     size={'small'}
                                     label={'Customer *:'}
-                                 
+
                                     options={customers}
                                     selected={selectedCustomer}
                                     onSelect={(value) => {
                                         setSelectedCustomer(value)
                                         if (value?.name == 'Walk-In Customer') {
-                                            setSubCustDisable(true)
+                                         
                                             setValue1('customerName', '')
                                             setValue1('email', '')
                                             setValue1('mobile', '')
@@ -596,7 +642,7 @@ function ReceptionForm() {
                                             setValue1('mobile', value?.mobile)
 
                                             setSubCustDisable(false)
-                                            // Debounce2(() => getCompanies(value?.id));
+                                            Debounce2(() => getCompanies(value?.id));
                                         }
 
                                     }}
@@ -622,36 +668,19 @@ function ReceptionForm() {
                                     })}
                                 />
                             </Grid> */}
-                            {/* <Grid item xs={2.8} >
-                                <SelectField
-                                    size={'small'}
-                                    label={'Company *:'}
-                                    disabled={subCustDisable}
-                                    options={companies}
-                                    selected={selectedCompany}
-                                    onSelect={(value) => {
-                                        setSelectedCompany(value)
-
-
-                                    }}
-                                    error={errors1?.company?.message}
-                                    register={register1("company", {
-                                        required: 'Please select company .',
-                                    })}
-                                />
-                            </Grid>
+                           
                             <Grid item xs={2.8} mt={4} >
                                 <PrimaryButton
 
                                     disabled={subCustDisable}
                                    bgcolor={'#bd9b4a'}
                                     onClick={() => setCompanyDialog(true)}
-                                    title="Add Company"
+                                    title="Add Customer"
 
 
 
                                 />
-                            </Grid> */}
+                            </Grid>
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
                                     // disabled={buttonDisabled2}
