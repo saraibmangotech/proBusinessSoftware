@@ -10,6 +10,10 @@ const CustomerServices = {
     const data = await post(routes.CreateBank, obj);
     return data;
   },
+  CreditReceipt: async (obj) => {
+    const data = await post(routes.CreditReceipt, obj);
+    return data;
+  },
   CreateAlDed: async (obj) => {
     const data = await post(routes.CreateAlDed, obj);
     return data;

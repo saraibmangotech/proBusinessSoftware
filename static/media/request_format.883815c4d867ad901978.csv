@@ -1,0 +1,6 @@
+sr.no,Visa type,Visa tenure,Vip medical charges,Employee ID,Candidate name,Phone,Email,Camp,Nationality,Passport,Passport expiry,Visa designation,Basic salary,Salary allowance,Total salary,End consumer,End consumer company
+1,In,2 years,TRUE,E-1,John Doe,1512345678,johndoe@example.com,Camp A,Pakistan,AB1234567,15/05/2026,Engineer,5000,1000,6000,Consumer A,Company A
+2,Out,1 year,FALSE,E-2,Jane Smith,1512345678,janesmith@example.com,Camp B,Pakistan,CD2345678,20/07/2025,Student,3000,0,3000,Consumer B,Company B
+3,In,1 year,TRUE,E-3,Michael Johnson,1512345678,michaelj@example.com,Camp C,Pakistan,EF3456789,25/08/2027,Technician,5500,1200,6700,Consumer C,Company C
+4,Out,2 years,FALSE,E-4,Sarah Lee,1512345678,sarahlee@example.com,Camp D,INDIA,GH4567890,10/12/2024,Tourist,2000,300,2300,Consumer D,Company D
+5,In,2 years,FALSE,E-5,David Brown,1512345678,davidb@example.com,Camp E,India,IJ5678901,18/04/2026,Manager,6000,1500,7500,Consumer E,Company E

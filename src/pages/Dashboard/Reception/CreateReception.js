@@ -339,7 +339,7 @@ function ReceptionForm() {
             <SimpleDialog
                 open={companyDialog}
                 onClose={() => setCompanyDialog(false)}
-                title={"Change Status?"}
+                title={"Create Customer?"}
             >
                 <Box component="form" onSubmit={handleSubmit2(CreateCompany)}>
                     <Grid container spacing={2}>
@@ -377,7 +377,7 @@ function ReceptionForm() {
                                     //     </IconButton>
                                     //   ),
                                     // }}
-                                    register={register1("mobileVal", {
+                                    register={register2("mobileVal", {
                                         required: 'mobile is required',
 
                                         onChange: (e) => {

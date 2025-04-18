@@ -193,6 +193,7 @@ function CreatePaidReceipt() {
   const [payments, setPayments] = useState([])
   const [chargesDisabled, setChargesDisabled] = useState(false)
   const [paymentTotal, setPaymentTotal] = useState(0)
+  const [creditButton, setCreditButton] = useState(false)
   //documents array
 
   const handleNext = () => {
@@ -231,7 +232,7 @@ function CreatePaidReceipt() {
           customer_id: detail?.customer_id,
           invoice_prefix: detail?.invoice_prefix,
           category_id: detail?.sale_receipt_items[0]?.service?.category_id,
-          payment_methods:payments
+          payment_methods: payments
         }
 
         console.log(obj, "objobj")
@@ -256,6 +257,45 @@ function CreatePaidReceipt() {
       showErrorToast(`Remaining amount to be added is ${difference.toFixed(2)}`)
     }
   }
+
+  const handleCredit = async (formData) => {
+
+
+    console.log(detail, 'detail');
+
+    try {
+      const obj = {
+        id: detail?.id,
+        customer: selectedCustomer?.id,
+        total_amount: subTotal,
+        final_amount: (
+          Number.parseFloat(subTotal) +
+          rows?.reduce((total, item) => {
+            const fee = Number.parseFloat(item?.center_fee ?? 0)
+            const qty = Number.parseFloat(item?.quantity ?? 1)
+            return total + fee * qty
+          }, 0) *
+          0.05
+        ).toFixed(2)
+      }
+      console.log(obj, 'detail');
+
+
+      const promise = CustomerServices.CreditReceipt(obj)
+      const response = await promise
+      showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
+      if (response?.responseCode === 200) {
+        navigate('/paid-receipts')
+      }
+
+    } catch (error) {
+      ErrorToaster(error)
+    } finally {
+      setButtonDisabled(false)
+    }
+  }
+
+
   // *For Get Customer Queue
   const getBanks = async (page, limit, filter) => {
     setLoader(true)
@@ -314,7 +354,7 @@ function CreatePaidReceipt() {
       if (data?.receipt) {
         setRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
-
+        setCreditButton(true)
         setValue1("paid", 0)
         setValue1("customer", data?.receipt?.customer_name)
         setValue1("invoice_date", moment().toDate())
@@ -396,9 +436,13 @@ function CreatePaidReceipt() {
             0.05
           ).toFixed(2),
         )
+        setSelectedCostCenter({ id: data?.receipt?.customer_id, name: data?.receipt?.customer_name })
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setAccounts(data?.accounts?.rows)
+      }
+      else {
+        setCreditButton(false)
       }
     } catch (error) {
       ErrorToaster(error)
@@ -602,7 +646,7 @@ function CreatePaidReceipt() {
       console.log(data)
       if (data?.receipt) {
         setHoldState(true)
-
+        setCreditButton(true)
         setRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
 
@@ -690,9 +734,11 @@ function CreatePaidReceipt() {
           ).toFixed(2),
         )
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
+        setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer_name })
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setAccounts(data?.accounts?.rows)
       } else {
+        setCreditButton(false)
         showErrorToast("Data Not Found")
       }
     } catch (error) {
@@ -709,8 +755,8 @@ function CreatePaidReceipt() {
     getCategories()
     getServiceItem()
     setDate(new Date())
-    setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" })
-    setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
+    setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
+    setValue1("customer", { id: 11002, name: "Walk-in Customer" })
   }, [])
 
   return (
@@ -791,6 +837,7 @@ function CreatePaidReceipt() {
                           bgcolor={"#bd9b4a"}
                           title="Clear"
                           onClick={() => {
+                            setCreditButton(false)
                             setFieldsDisabled(false)
                             setValue1("token", "")
                             setValue1("invoicenumber", "")
@@ -867,7 +914,7 @@ function CreatePaidReceipt() {
                           size={"small"}
                           label={"Customer *:"}
                           disabled={true}
-                          options={[{ id: "walkin", name: "Walk-in Customer" }]}
+                          options={[{ id: 11002, name: "Walk-in Customer" }]}
                           selected={selectedCustomer}
                           onSelect={(value) => {
                             setSelectedCustomer(value)
@@ -1134,6 +1181,23 @@ function CreatePaidReceipt() {
                           >
                             Pay
                           </Button>
+                          {console.log(selectedCustomer,'selectedCustomer')
+                          }
+                          {creditButton && !detail?.is_credited && selectedCustomer?.id != 11002 && <Button
+                            onClick={() => handleCredit()}
+
+                            variant="contained"
+                            sx={{
+                              textTransform: "capitalize",
+                              backgroundColor: "#bd9b4a",
+                              width: "200px",
+                              ":hover": {
+                                backgroundColor: "rgb(189 155 74)",
+                              },
+                            }}
+                          >
+                            Mark As Credit
+                          </Button>}
                           <Button
                             onClick={() => setPayButton(false)}
                             variant="contained"
