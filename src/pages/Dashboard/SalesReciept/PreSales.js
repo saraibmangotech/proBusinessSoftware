@@ -638,7 +638,7 @@ function PreSalesList() {
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}?id=${row?.original?.id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}`,
                     '_blank'
                   );
                 }}
@@ -659,7 +659,10 @@ function PreSalesList() {
             <Tooltip title="Sales Request">
               <IconButton
                 onClick={() => {
-                  getData(row?.original?.id);
+                  window.open(
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-request?id=${row?.original?.id}`,
+                    '_blank'
+                  );
                 }}
                 sx={{
                   backgroundColor: "#f9f9f9",
@@ -675,13 +678,14 @@ function PreSalesList() {
           </Box>
           {/* Payment Receipt Button */}
           <Box>
-            {row?.original?.is_paid && <Tooltip title="Payment Receipt">
+            {row?.original?.is_paid && 
+            <Tooltip title="Payment Receipt">
               <IconButton
                 onClick={() => {
-                  if (row?.original?.is_paid == true) {
-                    setPayReceiptData(row?.original);
-                    Debounce(() => generatePDF2());
-                  }
+                  window.open(
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.id}`,
+                    '_blank'
+                  );
                 }}
                 sx={{
                   backgroundColor: "#f9f9f9",

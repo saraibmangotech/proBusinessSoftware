@@ -38,6 +38,7 @@ const DataTable = ({
   nameColumnId = "name",
   alphabets,
   csv = false,
+  csvName = "",
 }) => {
   const [globalFilter, setGlobalFilter] = useState("")
   const [activeAlphabet, setActiveAlphabet] = useState("")
@@ -242,7 +243,7 @@ const DataTable = ({
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.setAttribute("href", url)
-    link.setAttribute("download", "table_data.csv")
+    link.setAttribute("download", csvName+".csv")
     link.style.visibility = "hidden"
     document.body.appendChild(link)
     link.click()

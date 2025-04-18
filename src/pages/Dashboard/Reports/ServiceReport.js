@@ -622,7 +622,7 @@ function ServiceReport() {
       <Box >
 
 
-        {<DataTable loading={loader} csv={true} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>
