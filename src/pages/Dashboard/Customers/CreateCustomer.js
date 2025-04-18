@@ -16,6 +16,7 @@ import DatePicker from 'components/DatePicker';
 import { ErrorToaster } from 'components/Toaster';
 import { FormControl } from '@mui/base';
 import LabelCustomInput from 'components/Input/LabelCustomInput';
+import SearchIcon from "@mui/icons-material/Search";
 import SelectField from 'components/Select';
 import { CleanTypes, Debounce2, getFileSize, handleDownload } from 'utils';
 import instance from 'config/axios';
@@ -53,7 +54,7 @@ function CreateCustomer() {
   } = useForm();
 
   // Watch all form data
-console.log(watch());
+  console.log(watch());
 
 
   const isFormDataEmpty = (data) => {
@@ -68,7 +69,7 @@ console.log(watch());
     });
   };
 
- 
+
 
 
 
@@ -98,7 +99,7 @@ console.log(watch());
 
 
   const [emailVerify, setEmailVerify] = useState(false)
-  
+
 
   const [center, setCenter] = useState(null)
   const [status, setStatus] = useState(null)
@@ -109,7 +110,8 @@ console.log(watch());
   const [selectedType, setSelectedType] = useState(null)
   const [date, setDate] = useState(null)
   const [balanceType, setBalanceType] = useState(null)
-
+  const [fieldsDisabled, setFieldsDisabled] = useState(false)
+  const [holdState, setHoldState] = useState(true)
   //documents array
 
 
@@ -124,7 +126,7 @@ console.log(watch());
 
 
 
- 
+
 
 
 
@@ -141,15 +143,16 @@ console.log(watch());
         eid: formData?.eid,
         trade_license_no: formData?.trade,
         opening_balance: formData?.balance,
-        opening_balance_type:balanceType?.id,
-        opening_balance_date:date,
-        credit_limit: formData?.credit,
+        opening_balance_type: balanceType?.id,
+        opening_balance_date: date,
+        credit_limit: formData?.credit || 0,
+        credit_balance: formData?.creditBalance || 0,
         credit_status: status?.id,
         cost_center: center?.id,
         general_notes: formData?.notes,
         email: formData?.email,
         address: formData?.address,
-      
+
 
       };
       const promise = CustomerServices.addCustomer(obj);
@@ -165,18 +168,41 @@ console.log(watch());
         navigate("/customer-list");
       }
 
-      
+
     } catch (error) {
       ErrorToaster(error);
     }
   };
 
 
-
-
+  const getReceiptDetail = async (state) => {
+    setFieldsDisabled(true);
+    try {
+      let params = {
+        mobile: getValues1("mobile"),
   
+      };
 
-  
+      const { data } = await CustomerServices.getCustomerDetail(params);
+      console.log(data);
+      if (data?.customer) {
+        setHoldState(true);
+
+        showErrorToast("account already exist with this mobile number");
+      } else {
+        console.log(data?.receipt);
+
+        setHoldState(false);
+      }
+    } catch (error) {
+      ErrorToaster(error);
+    } finally {
+      // setLoader(false)
+    }
+  };
+
+
+
 
 
 
@@ -186,7 +212,7 @@ console.log(watch());
 
 
       </Box>
-      <Box m={3} sx={{backgroundColor:'white',borderRadius:"12px"}} >
+      <Box m={3} sx={{ backgroundColor: 'white', borderRadius: "12px" }} >
         {<>
 
           <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
@@ -198,249 +224,219 @@ console.log(watch());
             <Box sx={{ p: 3 }}>
 
 
-              <Grid container sx={{ gap: '5px 25px' }}>
-                <Grid item xs={2.8}>
-                  <InputField
-                    label={" Name :*"}
+              <Grid container gap={2} justifyContent={'space-between'}>
+                <Grid container item xs={5.5} spacing={2} p={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                  <Grid item xs={6}>
+                    <InputField
+                      label={" Name :*"}
+                      size={'small'}
+                      placeholder={" Name"}
+                      error={errors1?.name?.message}
+                      register={register1("name", {
+                        required: "Please enter your name."
+                      })}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <InputField
+                      label={"Mobile *:"}
+                      size={"small"}
+                      type={"number"}
+
+                      placeholder={"Mobile"}
+                      // InputProps={{
+                      //   endAdornment: (
+                      //     <IconButton
+                      //       onClick={() => {
+                      //         getReceiptDetail();
+
+
+                      //       }}
+                      //     >
+                      //       <SearchIcon sx={{ color: "#bd9b4a" }} />
+                      //     </IconButton>
+                      //   ),
+                      // }}
+                      register={register1("mobile", {
+                        required: 'mobile is required',
+
+                        onChange: (e) => {
+                          console.log("asdas");
+                          if (getValues1("mobile").length == 10) {
+                            getReceiptDetail()
+                          }
+
+                          // Delay the execution of verifyEmail by 2 seconds
+                        },
+                      })}
+                    />
+                    {/* <Grid item md={1} sm={12} xs={12} mt={2}>
+                      <PrimaryButton
+                        bgcolor={"#bd9b4a"}
+                        title="Clear"
+                        onClick={() => {
+                          setFieldsDisabled(false);
+                          setValue1("customer", "");
+                          setValue1("invoice_date", moment().toDate());
+                          setValue1("mobile", "");
+                          setValue1("ref", "");
+                          setValue1("display_customer", "");
+                          setValue1("email", "");
+                          setValue1("address", "");
+
+                          setValue1("mobileValue", "");
+
+
+                         
+                        }}
+                      // loading={loading}
+                      />
+                    </Grid> */}
+                  </Grid>
+                  <Grid item xs={6}>
+                    <InputField
+                      label={"Email :*"}
+                      size={"small"}
+                      placeholder={"Email"}
+                      error={errors1?.email?.message}
+                      register={register1("email", {
+                        required: false,
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: "Please enter a valid email address."
+                        },
+                      })}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <InputField
+                      label={" Address :*"}
+                      size={'small'}
+                      placeholder={" Address"}
+                      error={errors1?.address?.message}
+                      register={register1("address", {
+                        required: false,
+                      })}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid container item xs={5.8} spacing={2} p={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                  <Grid item xs={6}><InputField
+                    label={"TRN Number :*"}
                     size={'small'}
-                    placeholder={" Name"}
-                    error={errors1?.name?.message}
-                    register={register1("name", {
+                    type={'number'}
+                    placeholder={"TRN Number"}
+                    error={errors1?.trn?.message}
+                    register={register1("trn", {
                       required:
-                        "Please enter your name."
+                        false,
 
                     })}
                   /></Grid>
-                <Grid item xs={2.8}><InputField
-                  label={"Mobile :*"}
-                  size={'small'}
-                  type={'number'}
-                  placeholder={"Mobile"}
-                  error={errors1?.mobile?.message}
-                  register={register1("mobile", {
-                    required:
-                      "Please enter your mobile.",
-                    pattern: {
-                      value: /^05[0-9]{8}$/,
-                      message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                    }
-
-                  })}
-                /></Grid>
-                <Grid item xs={2.8}>
-                  <InputField
-                    label={"Email :*"}
-                    size={"small"}
-                    placeholder={"Email"}
-                    error={errors1?.email?.message}
-                    register={register1("email", {
-                      required: "Please enter your email.",
-                      onChange: (e) => {
-                        console.log('asdas');
-
-
-
-                      },
-                      pattern: {
-                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "Please enter a valid email address."
-                      },
-
-                    })}
-                  />
-                </Grid>
-                <Grid item xs={2.8}><InputField
-                  label={" Address :*"}
-                  size={'small'}
-                  placeholder={" Address"}
-                  error={errors1?.address?.message}
-                  register={register1("address", {
-                    required:
-                      "Please enter your  address."
-
-                  })}
-                /></Grid>
-
-
-
-
-
-                <Grid item xs={2.8}><InputField
-                  label={"TRN Number :*"}
-                  size={'small'}
-                  type={'number'}
-                  placeholder={"TRN Number"}
-                  error={errors1?.trn?.message}
-                  register={register1("trn", {
-                    required:
-                      "Please enter your trn."
-
-                  })}
-                /></Grid>
-                <Grid item xs={2.8}><InputField
-                  label={"EID Number :*"}
-                  size={'small'}
-                  type={'number'}
-                  placeholder={"EID Number"}
-                  error={errors1?.eid?.message}
-                  register={register1("eid", {
-                    required:
-                      "Please enter your eid."
-
-                  })}
-                /></Grid>
-                <Grid item xs={2.8}><InputField
-                  label={"Trade License Number :*"}
-                  size={'small'}
-                  type={'number'}
-                  placeholder={"Trade License Number"}
-                  error={errors1?.trade?.message}
-                  register={register1("trade", {
-                    required:
-                      "Please enter your trade."
-
-                  })}
-                /></Grid>
-                <Grid item xs={2.8} >
-                  <SelectField
+                  <Grid item xs={6}><InputField
+                    label={"EID Number :*"}
                     size={'small'}
-                    label={'Payment Type *:'}
-
-                    options={[{ id: 'Credit', name: 'Credit' }, { id: 'Cash', name: 'Cash' }]}
-                    selected={selectedType}
-                    onSelect={(value) => {
-                      setSelectedType(value)
-
-
-                    }}
-                    error={errors?.type?.message}
-                    register={register("type", {
-                      required: 'Please select type account.',
-                    })}
-                  />
-                </Grid>
-                <Grid item xs={2.8} >
-                  <SelectField
-                    size={'small'}
-                    label={'Credit Status *:'}
-
-                    options={[{ id: 'Good History', name: 'Good History' }, { id: 'In Liquidation', name: 'In Liquidation' }, { id: 'No More Work until Payment Received', name: 'No More Work until Payment Received' }]}
-                    selected={status}
-                    onSelect={(value) => {
-                      setStatus(value)
-
-
-                    }}
-                    error={errors?.status?.message}
-                    register={register("status", {
-                      required: 'Please select status .',
-                    })}
-                  />
-                </Grid>
-                <Grid item xs={2.8} >
-                  <SelectField
-                    size={'small'}
-                    label={'Cost Center *:'}
-
-                    options={[{ id: 'Tasheel', name: 'Tasheel' }, { id: 'DED', name: 'DED' }, { id: 'Typing', name: 'Typing' }, { id: 'General', name: 'General' }]}
-                    selected={center}
-                    onSelect={(value) => {
-                      setCenter(value)
-
-
-                    }}
-                    error={errors?.center?.message}
-                    register={register("center", {
-                      required: 'Please select center .',
-                    })}
-                  />
-                </Grid>
-                <Grid item xs={2.8} >
-                  <SelectField
-                    size={'small'}
-                    label={'Balance Type *:'}
-
-                    options={[{ id: 'Credit', name: 'Credit' }, { id: 'Debit', name: 'Debit' }]}
-                    selected={balanceType}
-                    onSelect={(value) => {
-                      setBalanceType(value)
-
-
-                    }}
-                    error={errors?.credittype?.message}
-                    register={register("credittype", {
-                      required: 'Please select type account.',
-                    })}
-                  />
-                </Grid>
-                <Grid item xs={2.8}>
-                  <DatePicker
-                    label={"Opening Balance Date :*"}
-                    value={date}
-                    size={'small'}
-
-                    error={errors1?.date?.message}
-                    register={register1("date", {
+                    type={'number'}
+                    placeholder={"EID Number"}
+                    error={errors1?.eid?.message}
+                    register={register1("eid", {
                       required:
-                        date ? false :
-                          "please enter  date."
+                        false,
 
                     })}
-                    onChange={(date) => {
-
-                      setValue1('date', date)
-                      setDate(new Date(date));
-
-                    }
-
-                    }
                   /></Grid>
-                <Grid item xs={2.8}><InputField
-                  label={"Opening Balance :*"}
-                  size={'small'}
-                  type={'number'}
-                  placeholder={"Opening Balance "}
-                  error={errors1?.balance?.message}
-                  register={register1("balance", {
-                    required:
-                      "Please enter your balance."
+                  <Grid item xs={6}><InputField
+                    label={"Trade License Number :*"}
+                    size={'small'}
+                    type={'number'}
+                    placeholder={"Trade License Number"}
+                    error={errors1?.trade?.message}
+                    register={register1("trade", {
+                      required:
+                        false,
 
-                  })}
-                /></Grid>
-                <Grid item xs={2.8}><InputField
-                  label={"Credit Limit :*"}
-                  size={'small'}
-                  type={'number'}
-                  placeholder={"Credit Limit"}
-                  error={errors1?.credit?.message}
-                  register={register1("credit", {
-                    required:
-                      "Please enter your credit."
+                    })}
+                  /></Grid>
+                 
+                </Grid>
 
-                  })}
-                /></Grid>
 
-                <Grid item xs={5.5}><InputField
-                  label={"Notes :"}
-                  multiline
-                  rows={4}
-                  size={'small'}
-                  placeholder={"Notes"}
-                  error={errors1?.notes?.message}
-                  register={register1("notes", {
-                    required:
-                      false
 
-                  })}
-                /></Grid>
-                <Grid  container justifyContent={'flex-end'}>
-                <PrimaryButton 
-                 bgcolor={'#bd9b4a'}
-                  title="Submit"
-                  type={'submit'}
-                  
+                <Grid container item xs={5.5} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                <Grid item xs={6}><InputField
+                    label={"Credit Limit :*"}
+                    size={'small'}
+                    type={'number'}
+                    placeholder={"Credit Limit"}
+                    error={errors1?.credit?.message}
+                    register={register1("credit", {
+                      required:
+                        false,
 
-                />
+                    })}
+                  /></Grid>
+                   <Grid item xs={6}><InputField
+                    label={"Credit Balance :*"}
+                    size={'small'}
+                    type={'number'}
+                    placeholder={"Credit Balance"}
+                    error={errors1?.creditBalance?.message}
+                    register={register1("creditBalance", {
+                      required:
+                        false,
+
+                    })}
+                  /></Grid>
+                  <Grid item xs={6} >
+                    <SelectField
+                      size={'small'}
+                      label={'Credit Status *:'}
+
+                      options={[{ id: 'Good History', name: 'Good History' }, { id: 'In Liquidation', name: 'In Liquidation' }, { id: 'No More Work until Payment Received', name: 'No More Work until Payment Received' }]}
+                      selected={status}
+                      onSelect={(value) => {
+                        setStatus(value)
+
+
+                      }}
+                      error={errors?.status?.message}
+                      register={register("status", {
+                        required: false,
+                      })}
+                    />
+                  </Grid>
+                 
+
+                 
+                </Grid>
+
+                <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+
+                  <InputField
+                    label={"Additional Notes :"}
+                    multiline
+                    rows={5}
+                    size={'small'}
+                    placeholder={"Additional Notes"}
+                    error={errors1?.notes?.message}
+                    register={register1("notes", {
+                      required:
+                        false
+
+                    })}
+                  />
+                </Grid>
+
+                <Grid container justifyContent={'flex-end'}>
+                  <PrimaryButton
+                    disabled={holdState}
+                    bgcolor={'#bd9b4a'}
+                    title="Submit"
+                    type={'submit'}
+
+
+                  />
                 </Grid>
               </Grid>
             </Box>
