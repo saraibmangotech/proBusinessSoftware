@@ -537,7 +537,7 @@ function CollectionReport() {
       <Box >
 
 
-        {<DataTable loading={loader} csv={true} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} csv={true} csvName={'collection_report'} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>
