@@ -351,6 +351,10 @@ const CustomerServices = {
     const data = await get(routes.getCollectionReport, params);
     return data;
   },
+  getSystemSettings: async (params) => {
+    const data = await get(routes.getSystemSettings, params);
+    return data;
+  },
 }
 
 export default CustomerServices

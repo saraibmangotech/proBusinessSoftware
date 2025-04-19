@@ -80,6 +80,8 @@ function UpdatePreSale() {
     const [rows, setRows] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null)
     const [editState, setEditState] = useState(false)
+    const [settings, setSettings] = useState({})
+    
 
     console.log(rows, "data")
     const [items, setItems] = useState([
@@ -208,13 +210,30 @@ function UpdatePreSale() {
             const { data } = await CustomerServices.getInvoiceNumber();
 
             console.log(data);
-            setValue1("invoice_no", `AAD/${data?.next_invoice_number}`);
+            setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
         } catch (error) {
             ErrorToaster(error);
         } finally {
             // setLoader(false)
         }
     };
+
+      const getSystemSettings = async () => {
+        // setLoader(true)
+        try {
+          const { data } = await CustomerServices.getSystemSettings();
+    
+          console.log(data,"settings");
+          setSettings(data?.settings)
+          setValue1("cost_center", { id: data?.settings?.cost_center, name: data?.settings?.cost_center })
+    
+         // setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
+        } catch (error) {
+          ErrorToaster(error);
+        } finally {
+          // setLoader(false)
+        }
+      };
 
     const isFormDataEmpty = (data) => {
         // Check if all form fields are empty
@@ -308,7 +327,7 @@ function UpdatePreSale() {
                 id: detail?.id,
                 token_number: formData?.token,
                 token_date: date,
-                invoice_prefix: "AAD",
+                invoice_prefix: "DED",
                 trn: formData?.trn,
                 case_no: formData?.caseno,
                 customer_address: formData?.address,
@@ -481,11 +500,12 @@ function UpdatePreSale() {
     useEffect(() => {
         getAccounts();
         getTax();
+        getSystemSettings();
         getCategories();
         getServiceItem();
         setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" })
-        setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
-        setValue1("cost_center", { id: "Al-ADHEED", name: "Al-ADHEED" })
+        //setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
+        setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
     }, []);
     const getData = async () => {
         try {
@@ -510,6 +530,10 @@ function UpdatePreSale() {
             setValue1('caseno', data?.receipt?.case_no)
             setValue1('ref', data?.receipt?.ref)
             setValue1('address', data?.receipt?.customer_address)
+           // setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
+            setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name });
+            setValue1("customer", { id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name });
+
 
         } catch (error) {
             console.error("Error fetching location:", error);
@@ -718,7 +742,7 @@ function UpdatePreSale() {
                                                     label="Cost Center"
                                                     size="small"
 
-                                                    options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
+                                                    options={[{ id: settings?.cost_center, name: settings?.cost_center }]}
                                                     selected={selectedCostCenter}
                                                     onSelect={(value) => setSelectedCostCenter(value)}
                                                     register={register1("cost_center",
@@ -883,8 +907,9 @@ function UpdatePreSale() {
                                                     size="small"
                                                     placeholder="Transaction Id"
 
-                                                    register={register("transaction_id", { required: false })}
-
+                                                    register={register("transaction_id", { 
+                                                        required: settings?.required_trans_id ? 'Transaction id is required' : false,
+                                                      })}
                                                 />
                                                 {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
 
@@ -895,8 +920,8 @@ function UpdatePreSale() {
                                                     placeholder="Application Id"
 
                                                     register={register("application_id", {
-                                                        required: 'application id is required',
-                                                    })}
+                                                        required: settings?.required_app_id ? 'Application id is required' : false,
+                                                      })}
                                                 />
                                                 {errors.application_id && (
                                                     <span style={{ color: "red" }}>
@@ -910,8 +935,8 @@ function UpdatePreSale() {
                                                     placeholder=" Ref No"
 
                                                     register={register("ref_no", {
-                                                        required: false,
-                                                    })}
+                                                        required: settings?.required_ref_no ? 'Reference no is required' : false,
+                                                      })}
                                                 />
                                                 {errors.ref_no && (
                                                     <span style={{ color: "red" }}>

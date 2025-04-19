@@ -356,7 +356,7 @@ function CreatePaidReceipt() {
         setDetail(data?.receipt)
         setCreditButton(true)
         setValue1("paid", 0)
-        setValue1("customer", data?.receipt?.customer_name)
+        //setValue1("customer", data?.receipt?.customer_name)
         setValue1("invoice_date", moment().toDate())
         setDate(new Date(data?.receipt?.invoice_date))
         setValue1("mobile", data?.receipt?.customer_mobile)
@@ -368,6 +368,8 @@ function CreatePaidReceipt() {
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("caseno", data?.receipt?.case_no)
+        setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
+        setValue1("customer", { id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
         setSubTotal(data?.receipt?.total_amount)
         setTotalDepositVal((
           Number.parseFloat(data?.receipt?.total_amount) +
@@ -649,9 +651,10 @@ function CreatePaidReceipt() {
         setCreditButton(true)
         setRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
+   
 
         setValue1("paid", 0)
-        setValue1("customer", data?.receipt?.customer_name)
+        //setValue1("customer", data?.receipt?.customer_name)
         setValue1("invoice_date", moment().toDate())
         setValue1("invoicenumber", data?.receipt?.id)
         setDate(new Date(data?.receipt?.invoice_date))
@@ -664,6 +667,10 @@ function CreatePaidReceipt() {
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("caseno", data?.receipt?.case_no)
+        setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
+        setValue1("customer", { id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
+        // setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
+        // setValue1("customer", { id: 11002, name: "Walk-in Customer" })
         setSubTotal(data?.receipt?.total_amount)
         setTotalDepositVal((
           Number.parseFloat(data?.receipt?.total_amount) +
@@ -755,8 +762,8 @@ function CreatePaidReceipt() {
     getCategories()
     getServiceItem()
     setDate(new Date())
-    setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
-    setValue1("customer", { id: 11002, name: "Walk-in Customer" })
+    //setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
+    //setValue1("customer", { id: 11002, name: "Walk-in Customer" })
   }, [])
 
   return (
@@ -999,7 +1006,7 @@ function CreatePaidReceipt() {
                           label="Cost Center"
                           size="small"
                           disabled={true}
-                          options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
+                          options={[{ id: "TASHEEL", name: "TASHEEL" }]}
                           selected={selectedCostCenter}
                           onSelect={(value) => setSelectedCostCenter(value)}
                           register={register1("cost_center", {
@@ -1183,7 +1190,7 @@ function CreatePaidReceipt() {
                           </Button>
                           {console.log(selectedCustomer,'selectedCustomer')
                           }
-                          {creditButton && !detail?.is_credited && selectedCustomer?.id != 11002 && <Button
+                          {creditButton && !detail?.credited_by && selectedCustomer?.id != 11002 && <Button
                             onClick={() => handleCredit()}
 
                             variant="contained"

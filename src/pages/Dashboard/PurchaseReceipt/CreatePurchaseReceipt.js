@@ -237,7 +237,7 @@ function CreatePurchaseReceipt() {
             let obj = {
                 token_number: formData?.token,
                 token_date: date,
-                invoice_prefix: "AAD",
+                invoice_prefix: "DED",
                 cost_center: formData?.cost_center,
                 customer_name: formData?.display_customer,
                 reception_id: detail?.id,

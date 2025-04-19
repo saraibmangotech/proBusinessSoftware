@@ -313,7 +313,8 @@ function UpdatePaidReceipt() {
                 setDetail(data?.receipt);
 
                 setValue1("paid", 0);
-                setValue1("customer", data?.receipt?.customer_name);
+                setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
+                setValue1("customer", { id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
                 setValue1("invoice_date", moment().toDate());
                 setDate(new Date(data?.receipt?.invoice_date));
                 setValue1("mobile", data?.receipt?.customer_mobile);
@@ -696,7 +697,7 @@ function UpdatePaidReceipt() {
                                                     label="Cost Center"
                                                     size="small"
                                                     disabled={true}
-                                                    options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
+                                                    options={[{ id: "TASHEEL", name: "TASHEEL" }]}
                                                     selected={watch1("cost_center")}
                                                     onSelect={(value) => setValue1("cost_center", value)}
                                                     register={register1("cost_center")}

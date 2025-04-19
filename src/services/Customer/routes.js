@@ -86,7 +86,8 @@ const routes = {
   getCollectionReport:'/reports/collectionReport',
   PayReceipt:'/sales/receipts/pay/v2',
   UpdateReceipt:'/sales/reception/update',
-  CreditReceipt:'/sales/receipts/credit'
+  CreditReceipt:'/sales/receipts/credit',
+  getSystemSettings:'/system/settings'
 
 };
 

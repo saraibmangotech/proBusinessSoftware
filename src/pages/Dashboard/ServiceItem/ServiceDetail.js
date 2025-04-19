@@ -192,6 +192,7 @@ function CreateCategory() {
         id:id,
         name: formData?.name,
         name_ar: formData?.arabic,
+        item_code: formData?.item_code,
         category_id: category?.id,
         center_fee: Number(formData?.center_fee),
         govt_bank_account_id: governmentAccount?.id,
@@ -348,6 +349,7 @@ function CreateCategory() {
 
       setValue1("name", detail?.name);
       setValue1("arabic", detail?.name_ar);
+      setValue1("item_code", detail?.item_code);
       setValue1("center_fee", detail?.center_fee);
       setValue1("category", detail?.category);
       setCategory(detail?.category?.name);
@@ -416,6 +418,22 @@ function CreateCategory() {
                       error={errors1?.arabic?.message}
                       register={register1("arabic", {
                         required: "Please enter your arabic.",
+                        onChange: (e) => {
+                          console.log("asdas");
+                        },
+                      })}
+                    />
+                  </Grid>
+                  <Grid item xs={2.8}>
+                    <InputField
+                     disabled={true}
+
+                      label={"Item Code :*"}
+                      size={"small"}
+                      placeholder={"Item Code"}
+                      error={errors1?.item_code?.message}
+                      register={register1("item_code", {
+                        required: "Please enter Item Code.",
                         onChange: (e) => {
                           console.log("asdas");
                         },

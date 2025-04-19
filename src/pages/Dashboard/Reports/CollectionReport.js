@@ -259,7 +259,7 @@ function CollectionReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          Al-ADHEED
+          Tasheel
         </Box>
       ),
     },

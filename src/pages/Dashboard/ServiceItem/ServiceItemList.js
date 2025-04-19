@@ -261,8 +261,14 @@ const [data, setData] = useState([])
   };
   const columns = [
     {
-      header: "Item Code",
+      header: "ID",
       accessorKey: "id",
+
+
+    },
+    {
+      header: "Item Code",
+      accessorKey: "item_code",
 
 
     },

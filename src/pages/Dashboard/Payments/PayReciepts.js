@@ -509,53 +509,54 @@ function PayReceipts() {
         {
             header: "SR No.",
             accessorKey: "id",
-
-
         },
         {
             header: "Customer",
             accessorKey: "customer_name",
-
-
         },
         {
             header: "Token Number",
             accessorKey: "token_number",
-
-
         },
-      {
+        {
             header: "Total Amount",
-            accessorFn: (row) => {(
-              row?.sale_receipt_items?.reduce((total2, item) => {
-                return parseFloat(total2) + parseFloat(item?.total ?? 0);
-              }, 0) +
-              row?.sale_receipt_items?.reduce((total, item) => {
-                const fee = parseFloat(item?.center_fee ?? 0);
-                const qty = parseFloat(item?.quantity ?? 1);
-                return total + fee * qty;
-              }, 0) * 0.05
-            ).toFixed(2)},
+            accessorFn: (row) => {
+                if (row?.is_paid) {
+                    return (
+                        row?.sale_receipt_items?.reduce((total2, item) => {
+                            return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                        }, 0) +
+                        row?.sale_receipt_items?.reduce((total, item) => {
+                            const fee = parseFloat(item?.center_fee ?? 0);
+                            const qty = parseFloat(item?.quantity ?? 1);
+                            return total + fee * qty;
+                        }, 0) * 0.05
+                    ).toFixed(2);
+                }
+                return "N/A";
+            },
             accessorKey: "total_amount",
             cell: ({ row }) => (
-              <Box
-                variant="contained"
-                color="primary"
-                sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-              >
-                {(
-                  row?.original?.sale_receipt_items?.reduce((total2, item) => {
-                    return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                  }, 0) +
-                  row?.original?.sale_receipt_items?.reduce((total, item) => {
-                    const fee = parseFloat(item?.center_fee ?? 0);
-                    const qty = parseFloat(item?.quantity ?? 1);
-                    return total + fee * qty;
-                  }, 0) * 0.05
-                ).toFixed(2)}
-              </Box>
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {row?.original?.is_paid
+                        ? (
+                            row?.original?.sale_receipt_items?.reduce((total2, item) => {
+                                return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                            }, 0) +
+                            row?.original?.sale_receipt_items?.reduce((total, item) => {
+                                const fee = parseFloat(item?.center_fee ?? 0);
+                                const qty = parseFloat(item?.quantity ?? 1);
+                                return total + fee * qty;
+                            }, 0) * 0.05
+                        ).toFixed(2)
+                        : "N/A"}
+                </Box>
             ),
-          },
+        },
         {
             header: "Status",
             accessorKey: "is_paid",
@@ -564,7 +565,6 @@ function PayReceipts() {
                     {row?.original?.is_paid ? 'Paid' : 'Unpaid'}
                 </Box>
             ),
-
         },
         {
             header: "Created By",
@@ -575,12 +575,10 @@ function PayReceipts() {
                     {row?.original?.creator?.name}
                 </Box>
             ),
-
         },
         {
             id: "created_at",
             header: "Created At",
-            // Remove accessorKey and fix accessorFn to use row directly
             accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
@@ -588,51 +586,19 @@ function PayReceipts() {
                 </Box>
             ),
         },
-
-
         {
             header: "Actions",
             cell: ({ row }) => (
                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                    {/* Edit Icon */}
-                    {/* <Tooltip title="Edit">
-                        <Box
-                            component={"img"}
-                            sx={{ cursor: "pointer" }}
-                            onClick={() => {
-                                navigate(`/update-paid-receipt/${row?.original?.id}`);
-                                localStorage.setItem("currentUrl", "/update-customer");
-                            }}
-                            src={Images.editIcon}
-                            width={"35px"}
-                        />
-                    </Tooltip> */}
 
-
-                    {/* {row?.original?.is_paid && (
-                        <Tooltip title="Delete">
-                            <Box
-                                sx={{ cursor: "pointer", mt: 1 }}
-                                component={"img"}
-                                src={Images.deleteIcon}
-                                onClick={() => {
-                                    setSelectedData(row?.original);
-                                    setConfirmationDialog(true);
-                                }}
-                                width={"35px"}
-                            />
-                        </Tooltip>
-                    )} */}
-
-                    {/* View Invoice (getData2) */}
-                    {row?.original?.is_paid && (
-                        <Tooltip title=" Invoice">
+                    {(!row?.original?.is_paid && row?.original?.credited_by != null) && (
+                        <Tooltip title="Credit Invoice">
                             <IconButton
                                 onClick={() => {
                                     window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}`,
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.id}`,
                                         '_blank'
-                                      );
+                                    );
                                 }}
                                 sx={{
                                     backgroundColor: "#f9f9f9",
@@ -647,50 +613,53 @@ function PayReceipts() {
                         </Tooltip>
                     )}
 
-                    {/* View Receipt (getData) */}
-                    {/* <Tooltip title="View Receipt">
-                        <IconButton
-                            onClick={() => {
-                                getData(row?.original?.id);
-                            }}
-                            sx={{
-                                backgroundColor: "#f9f9f9",
-                                borderRadius: 2,
-                                border: "1px solid #eee",
-                                width: 40,
-                                height: 40,
-                            }}
-                        >
-                            <ReceiptLongIcon color="black" fontSize="small" />
-                        </IconButton>
-                    </Tooltip>  */}
 
-                    {/* Payment Receipt PDF */}
-                    <Tooltip title=" Payment Receipt">
-                        <IconButton
-                            onClick={() => {
-                                window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.id}`,
-                                    '_blank'
-                                  );
-                            }}
-                            sx={{
-                                backgroundColor: "#f9f9f9",
-                                borderRadius: 2,
-                                border: "1px solid #eee",
-                                width: 40,
-                                height: 40,
-                            }}
-                        >
-                            <PaymentIcon color="black" fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+                    {row?.original?.is_paid && (
+                        <Tooltip title="Invoice">
+                            <IconButton
+                                onClick={() => {
+                                    window.open(
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}`,
+                                        '_blank'
+                                    );
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <ReceiptIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                    {row?.original?.is_paid && (
+                        <Tooltip title="Payment Receipt">
+                            <IconButton
+                                onClick={() => {
+                                    window.open(
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.id}`,
+                                        '_blank'
+                                    );
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <PaymentIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </Box>
             ),
-        }
-
-
-    ]
+        },
+    ];
 
 
 

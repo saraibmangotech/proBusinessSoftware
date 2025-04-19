@@ -224,6 +224,7 @@ function CreateCategory() {
             let obj = {
                 name: formData?.name,
                 name_ar: formData?.arabic,
+                item_code: formData?.item_code,
                 category_id :category?.id,
                 center_fee:Number(formData?.center_fee),
                 govt_bank_account_id:governmentAccount?.id,
@@ -442,6 +443,25 @@ function CreateCategory() {
                                         error={errors1?.arabic?.message}
                                         register={register1("arabic", {
                                             required: "Please enter your arabic.",
+                                            onChange: (e) => {
+                                                console.log('asdas');
+
+
+
+                                            },
+
+
+                                        })}
+                                    />
+                                </Grid>
+                                <Grid item xs={2.8}>
+                                    <InputField
+                                        label={"Item Code :*"}
+                                        size={"small"}
+                                        placeholder={"Item Code"}
+                                        error={errors1?.item_code?.message}
+                                        register={register1("item_code", {
+                                            required: "Please enter Item Code.",
                                             onChange: (e) => {
                                                 console.log('asdas');
 

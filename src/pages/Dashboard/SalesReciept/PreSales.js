@@ -567,9 +567,9 @@ function PreSalesList() {
       cell: ({ row }) => (
         <Box variant="contained" sx={{ display: "flex", gap: 2 }}>
           {row?.original?.is_paid == null
-            ? "Unpaid"
+            ? "Pending"
             : row?.original?.is_paid == false
-              ? "Credit"
+              ? "Unpaid"
               : "Paid"}
         </Box>
       ),
@@ -620,7 +620,7 @@ function PreSalesList() {
             width={"35px"}
           ></Box>}
           <Box>
-            {!row?.original?.is_paid && (
+            {row?.original?.is_paid == null && (
               <Box
                 sx={{ cursor: "pointer", mt: 1 }}
                 component={"img"}
@@ -639,6 +639,28 @@ function PreSalesList() {
                 onClick={() => {
                   window.open(
                     `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}`,
+                    '_blank'
+                  );
+                }}
+                sx={{
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: 2,
+                  border: "1px solid #eee",
+                  width: 40,
+                  height: 40,
+                }}
+              >
+                <ReceiptIcon color="black" fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+
+  {(!row?.original?.is_paid && row?.original?.credited_by != null) && (
+            <Tooltip title=" Credit Invoice">
+              <IconButton
+                onClick={() => {
+                  window.open(
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.id}`,
                     '_blank'
                   );
                 }}

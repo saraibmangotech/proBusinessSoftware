@@ -151,6 +151,9 @@ function ReceptionForm() {
             else{
                 let filter = await data?.rows.find(item => item?.id == id)
                 setSelectedCustomer(filter)
+                setValue1('customerName', filter?.name)
+                setValue1('email', filter?.email)
+                setValue1('mobile', filter?.mobile)
             }
            
         } catch (error) {

@@ -84,6 +84,7 @@ function SalesReciept() {
   const [rows, setRows] = useState([]);
   const [invoiceData, setInvoiceData] = useState(null)
   const [buttonDisabled, setButtonDisabled] = useState(false)
+  const [settings, setSettings] = useState({})
 
   console.log(rows, "data");
   const [items, setItems] = useState([
@@ -285,7 +286,7 @@ function SalesReciept() {
       let obj = {
         token_number: formData?.token,
         token_date: date,
-        invoice_prefix: "AAD",
+        invoice_prefix: "DED",
         trn: formData?.trn,
         case_no: formData?.caseno,
         cost_center: formData?.cost_center,
@@ -309,6 +310,10 @@ function SalesReciept() {
 
       // Wait for the result separately
       const response = await apiPromise;
+
+      if (response?.responseCode === 200) {
+        navigate("/pre-sales");
+    }
 
       // Now you can use the response data
       if (response?.responseCode === 200) {
@@ -370,7 +375,9 @@ function SalesReciept() {
       const { data } = await CustomerServices.getReceptionDetail(params);
       console.log(data, "dataaa");
       setDetail(data?.token);
-      setValue1("customer", data?.token?.customer_name);
+      setSelectedCustomer({ id: data?.token?.customer_id, name: data?.token?.customer?.name });
+      setValue1("customer", { id: data?.token?.customer_id, name: data?.token?.customer?.name });
+      //setValue1("customer", data?.token?.customer_name);
       setValue1("invoice_date", moment().toDate());
       setValue1("mobile", data?.token?.mobile);
       setValue1("ref", data?.token?.reference);
@@ -425,13 +432,31 @@ function SalesReciept() {
       const { data } = await CustomerServices.getInvoiceNumber();
 
       console.log(data);
-      setValue1("invoice_no", `AAD/${data?.next_invoice_number}`);
+      setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
     } catch (error) {
       ErrorToaster(error);
     } finally {
       // setLoader(false)
     }
   };
+
+  const getSystemSettings = async () => {
+    // setLoader(true)
+    try {
+      const { data } = await CustomerServices.getSystemSettings();
+
+      console.log(data,"settings");
+      setSettings(data?.settings)
+      setValue1("cost_center", { id: data?.settings?.cost_center, name: data?.settings?.cost_center })
+
+     // setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
+    } catch (error) {
+      ErrorToaster(error);
+    } finally {
+      // setLoader(false)
+    }
+  };
+
   const handleServiceSelect = async (value) => {
     console.log(value, "idididid");
     setServiceItem(value);
@@ -444,7 +469,7 @@ function SalesReciept() {
 
         const { data } = await CustomerServices.DetailServiceItem(params);
         setValue("id", data?.service?.id);
-        setValue("govt_fee", data?.service?.bank_service_charge);
+        setValue("govt_fee", data?.service?.government_fee);
         setValue("center_fee", data?.service?.center_fee);
         setValue("bank_charge", data?.service?.bank_service_charge);
         // setValue("transaction_id", data?.transaction_id);
@@ -599,11 +624,12 @@ function SalesReciept() {
     getAccounts();
     getTax();
     getCategories();
+    getSystemSettings();
     // getServiceItem();
     getInvoiceNumber();
     setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
     setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
-    setValue1("cost_center", { id: "Al-ADHEED", name: "Al-ADHEED" })
+    setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
   }, []);
 
   const getCustomerDetail2 = async (phone) => {
@@ -898,7 +924,7 @@ function SalesReciept() {
                         label="Cost Center"
                         size="small"
 
-                        options={[{ id: "Al-ADHEED", name: "Al-ADHEED" }]}
+                        options={[{ id: settings?.cost_center, name: settings?.cost_center }]}
                         selected={watch1("cost_center")}
                         onSelect={(value) => setValue1("cost_center", value)}
                         register={register1("cost_center",
@@ -1022,7 +1048,9 @@ function SalesReciept() {
                       size="small"
                       placeholder="Transaction Id"
 
-                      register={register("transaction_id", { required: false })}
+                      register={register("transaction_id", { 
+                        required: settings?.required_trans_id ? 'Transaction id is required' : false,
+                      })}
 
                     />
                     {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
@@ -1034,7 +1062,7 @@ function SalesReciept() {
                       placeholder="Application Id"
 
                       register={register("application_id", {
-                        required: 'application id is require',
+                        required: settings?.required_app_id ? 'Application id is required' : false,
                       })}
                     />
                     {errors.application_id && (
@@ -1049,7 +1077,7 @@ function SalesReciept() {
                       placeholder=" Ref No"
 
                       register={register("ref_no", {
-                        required: false,
+                        required: settings?.required_ref_no ? 'Reference no is required' : false,
                       })}
                     />
                     {errors.ref_no && (
