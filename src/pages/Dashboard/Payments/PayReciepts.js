@@ -46,6 +46,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Barcode from "react-barcode";
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -315,7 +316,8 @@ function PayReceipts() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
-
+    const [fromDate, setFromDate] = useState();
+    const [toDate, setToDate] = useState();
 
 
     // *For Filters
@@ -334,7 +336,8 @@ function PayReceipts() {
         try {
 
             let params = {
-
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                 is_paid: true
 
 
@@ -366,6 +369,31 @@ function PayReceipts() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
+    const handleFromDate = (newDate) => {
+            try {
+                // eslint-disable-next-line eqeqeq
+                if (newDate == 'Invalid Date') {
+                    setFromDate('invalid')
+                    return
+                }
+                setFromDate(new Date(newDate))
+            } catch (error) {
+                ErrorToaster(error)
+            }
+        }
+
+        const handleToDate = (newDate) => {
+                try {
+                    // eslint-disable-next-line eqeqeq
+                    if (newDate == 'Invalid Date') {
+                        setToDate('invalid')
+                        return
+                    }
+                    setToDate(new Date(newDate))
+                } catch (error) {
+                    ErrorToaster(error)
+                }
+            }
 
 
     // *For Handle Filter
@@ -664,6 +692,8 @@ function PayReceipts() {
 
 
     useEffect(() => {
+        setFromDate(new Date())
+        setToDate(new Date())
         getCustomerQueue()
     }, []);
 
@@ -750,10 +780,46 @@ function PayReceipts() {
             </Box>
 
             {/* Filters */}
+
+       
+
+            <Grid container spacing={1}>
+                <Grid item xs={3}>
+                <DatePicker
+                    label={"From Date"}
+                    disableFuture={true}
+                    size="small"
+                    value={new Date()}
+                    onChange={(date) => handleFromDate(date)}
+                />
+                </Grid>
+                <Grid item xs={3}>
+                <DatePicker
+                    label={"To Date"}
+
+                    disableFuture={true}
+                    size="small"
+                    value={new Date()}
+                    onChange={(date) => handleToDate(date)}
+                />
+                </Grid>
+
+                <Grid item xs={1} sx={{marginTop: "30px"}}>
+                <PrimaryButton
+                                          bgcolor={"#bd9b4a"}
+                                          title="Search"
+                                          sx={{marginTop: "30px"}}
+                                          onClick={() => getCustomerQueue(null, null, null)}
+                                          loading={loading}
+                                        />
+                </Grid>
+            </Grid>
+
+
             <Box >
 
 
-                {<DataTable loading={loader} data={data} columns={columns} />}
+                {<DataTable loading={loader} csv={true} csvName={'paid_receipts'} data={data} columns={columns} />}
             </Box>
             <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
                 <div className="w-full h-[115px] flex justify-center items-center mb-4">
@@ -1382,186 +1448,186 @@ function PayReceipts() {
                 </Box>
             </Box>
             <Box className="showPdf" ref={invoiceRef3} sx={{ padding: "20px 60px" }}>
-            <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        width: "100%",
-        border: "1px solid #333",
-        borderRadius: "8px",
-        padding: "16px",
-        backgroundColor: "white",
-      }}
-    >
-      {/* Left Box - English Content */}
-      <div
-        style={{
-          // width: "32%",
-          // border: "1px solid #e2e2e2",
-          borderRadius: "6px",
-          padding: "12px",
-          // backgroundColor: "#f9f9f9",
-          textAlign: "left",
-          display:"flex",gap:"20px"
-        }}
-      >
-        <div>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        border: "1px solid #333",
+                        borderRadius: "8px",
+                        padding: "16px",
+                        backgroundColor: "white",
+                    }}
+                >
+                    {/* Left Box - English Content */}
+                    <div
+                        style={{
+                            // width: "32%",
+                            // border: "1px solid #e2e2e2",
+                            borderRadius: "6px",
+                            padding: "12px",
+                            // backgroundColor: "#f9f9f9",
+                            textAlign: "left",
+                            display: "flex", gap: "20px"
+                        }}
+                    >
+                        <div>
 
-      
-        <p
-          style={{
-            fontWeight: "bold",
-            fontSize: "14px",
-            color: "#333",
-            marginBottom: "4px",
-            
-          }}
-        >
-          PREMIUM PROFESSIONAL GOVERNMENT SERVICES L.L.C
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
 
-          }}
-        >
-One Deira Mall, Al Khaleej Street
-</p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            fontWeight:"bold",
+                            <p
+                                style={{
+                                    fontWeight: "bold",
+                                    fontSize: "14px",
+                                    color: "#333",
+                                    marginBottom: "4px",
 
-            margin: "2px 0",
-          }}
-        >
-        Deira, Dubai
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            fontWeight:"bold",
+                                }}
+                            >
+                                PREMIUM PROFESSIONAL GOVERNMENT SERVICES L.L.C
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    margin: "2px 0",
+                                    fontWeight: "bold"
 
-            margin: "2px 0",
-          }}
-        >
-          Tel: 045264466
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                                }}
+                            >
+                                One Deira Mall, Al Khaleej Street
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    fontWeight: "bold",
 
-          }}
-        >
-          TRN: 100465380200003
-        </p>
-        </div>
-      
-      </div>
+                                    margin: "2px 0",
+                                }}
+                            >
+                                Deira, Dubai
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    fontWeight: "bold",
 
-      {/* Center Box - Logos */}
-      
-      <div style={{display:"flex" ,gap:'25px',alignItems:'center'}}>
-      <div
-            
-          >
-           <img
-              src={Images.headerRightImage}
-              alt="Header"
-              style={{ width: '100px' }}
+                                    margin: "2px 0",
+                                }}
+                            >
+                                Tel: 045264466
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    margin: "2px 0",
+                                    fontWeight: "bold"
 
-            />
-          </div>  <div
-            
-          >
-           <img
-              src={Images.headerLeftImage}
-              alt="Header"
-              style={{ width: '100px' }}
+                                }}
+                            >
+                                TRN: 100465380200003
+                            </p>
+                        </div>
 
-            />
-          </div>
-      </div>
+                    </div>
 
-      {/* Right Box - Arabic Content */}
-      <div
-        style={{
-          // width: "32%",
-          // border: "1px solid #e2e2e2",
-          borderRadius: "6px",
-          padding: "12px",
-          // backgroundColor: "#f9f9f9",
-          textAlign: "right",
-          direction: "rtl",
-        }}
-      >
-        <p
-          style={{
-            fontWeight: "bold",
-            fontSize: "14px",
-            color: "#333",
-            marginBottom: "4px",
-            fontWeight:"bold"
+                    {/* Center Box - Logos */}
 
-          }}
-        >
-          بريميم بروفيشنل للخدمات الحكومية ش.ذ.م.م
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                    <div style={{ display: "flex", gap: '25px', alignItems: 'center' }}>
+                        <div
 
-          }}
-        >
-          ون ديرة مول، شارع الخليج
+                        >
+                            <img
+                                src={Images.headerRightImage}
+                                alt="Header"
+                                style={{ width: '100px' }}
 
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                            />
+                        </div>  <div
 
-          }}
-        >
-          ديرة — دبي
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                        >
+                            <img
+                                src={Images.headerLeftImage}
+                                alt="Header"
+                                style={{ width: '100px' }}
 
-          }}
-        >
-          هاتف: 045264466
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                            />
+                        </div>
+                    </div>
 
-          }}
-        >
-          الرقم الضريبي: 100465380200003
-        </p>
-      </div>
-    </div>
+                    {/* Right Box - Arabic Content */}
+                    <div
+                        style={{
+                            // width: "32%",
+                            // border: "1px solid #e2e2e2",
+                            borderRadius: "6px",
+                            padding: "12px",
+                            // backgroundColor: "#f9f9f9",
+                            textAlign: "right",
+                            direction: "rtl",
+                        }}
+                    >
+                        <p
+                            style={{
+                                fontWeight: "bold",
+                                fontSize: "14px",
+                                color: "#333",
+                                marginBottom: "4px",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            بريميم بروفيشنل للخدمات الحكومية ش.ذ.م.م
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            ون ديرة مول، شارع الخليج
+
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            ديرة — دبي
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            هاتف: 045264466
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            الرقم الضريبي: 100465380200003
+                        </p>
+                    </div>
+                </div>
                 <p
                     variant="body2"
                     style={{
@@ -2351,186 +2417,186 @@ One Deira Mall, Al Khaleej Street
                 </Box>
             </Box>
             <Box className="showPdf2" ref={invoiceRef2} sx={{ padding: "20px 60px" }}>
-            <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        width: "100%",
-        border: "1px solid #333",
-        borderRadius: "8px",
-        padding: "16px",
-        backgroundColor: "white",
-      }}
-    >
-      {/* Left Box - English Content */}
-      <div
-        style={{
-          // width: "32%",
-          // border: "1px solid #e2e2e2",
-          borderRadius: "6px",
-          padding: "12px",
-          // backgroundColor: "#f9f9f9",
-          textAlign: "left",
-          display:"flex",gap:"20px"
-        }}
-      >
-        <div>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        border: "1px solid #333",
+                        borderRadius: "8px",
+                        padding: "16px",
+                        backgroundColor: "white",
+                    }}
+                >
+                    {/* Left Box - English Content */}
+                    <div
+                        style={{
+                            // width: "32%",
+                            // border: "1px solid #e2e2e2",
+                            borderRadius: "6px",
+                            padding: "12px",
+                            // backgroundColor: "#f9f9f9",
+                            textAlign: "left",
+                            display: "flex", gap: "20px"
+                        }}
+                    >
+                        <div>
 
-      
-        <p
-          style={{
-            fontWeight: "bold",
-            fontSize: "14px",
-            color: "#333",
-            marginBottom: "4px",
-            
-          }}
-        >
-          PREMIUM PROFESSIONAL GOVERNMENT SERVICES L.L.C
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
 
-          }}
-        >
-One Deira Mall, Al Khaleej Street
-</p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            fontWeight:"bold",
+                            <p
+                                style={{
+                                    fontWeight: "bold",
+                                    fontSize: "14px",
+                                    color: "#333",
+                                    marginBottom: "4px",
 
-            margin: "2px 0",
-          }}
-        >
-        Deira, Dubai
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            fontWeight:"bold",
+                                }}
+                            >
+                                PREMIUM PROFESSIONAL GOVERNMENT SERVICES L.L.C
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    margin: "2px 0",
+                                    fontWeight: "bold"
 
-            margin: "2px 0",
-          }}
-        >
-          Tel: 045264466
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                                }}
+                            >
+                                One Deira Mall, Al Khaleej Street
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    fontWeight: "bold",
 
-          }}
-        >
-          TRN: 100465380200003
-        </p>
-        </div>
-      
-      </div>
+                                    margin: "2px 0",
+                                }}
+                            >
+                                Deira, Dubai
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    fontWeight: "bold",
 
-      {/* Center Box - Logos */}
-      
-      <div style={{display:"flex" ,gap:'25px',alignItems:'center'}}>
-      <div
-            
-          >
-           <img
-              src={Images.headerRightImage}
-              alt="Header"
-              style={{ width: '100px' }}
+                                    margin: "2px 0",
+                                }}
+                            >
+                                Tel: 045264466
+                            </p>
+                            <p
+                                style={{
+                                    fontSize: "12px",
+                                    color: "#333",
+                                    margin: "2px 0",
+                                    fontWeight: "bold"
 
-            />
-          </div>  <div
-            
-          >
-           <img
-              src={Images.headerLeftImage}
-              alt="Header"
-              style={{ width: '100px' }}
+                                }}
+                            >
+                                TRN: 100465380200003
+                            </p>
+                        </div>
 
-            />
-          </div>
-      </div>
+                    </div>
 
-      {/* Right Box - Arabic Content */}
-      <div
-        style={{
-          // width: "32%",
-          // border: "1px solid #e2e2e2",
-          borderRadius: "6px",
-          padding: "12px",
-          // backgroundColor: "#f9f9f9",
-          textAlign: "right",
-          direction: "rtl",
-        }}
-      >
-        <p
-          style={{
-            fontWeight: "bold",
-            fontSize: "14px",
-            color: "#333",
-            marginBottom: "4px",
-            fontWeight:"bold"
+                    {/* Center Box - Logos */}
 
-          }}
-        >
-          بريميم بروفيشنل للخدمات الحكومية ش.ذ.م.م
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                    <div style={{ display: "flex", gap: '25px', alignItems: 'center' }}>
+                        <div
 
-          }}
-        >
-          ون ديرة مول، شارع الخليج
+                        >
+                            <img
+                                src={Images.headerRightImage}
+                                alt="Header"
+                                style={{ width: '100px' }}
 
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                            />
+                        </div>  <div
 
-          }}
-        >
-          ديرة — دبي
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                        >
+                            <img
+                                src={Images.headerLeftImage}
+                                alt="Header"
+                                style={{ width: '100px' }}
 
-          }}
-        >
-          هاتف: 045264466
-        </p>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "#333",
-            margin: "2px 0",
-            fontWeight:"bold"
+                            />
+                        </div>
+                    </div>
 
-          }}
-        >
-          الرقم الضريبي: 100465380200003
-        </p>
-      </div>
-    </div>
+                    {/* Right Box - Arabic Content */}
+                    <div
+                        style={{
+                            // width: "32%",
+                            // border: "1px solid #e2e2e2",
+                            borderRadius: "6px",
+                            padding: "12px",
+                            // backgroundColor: "#f9f9f9",
+                            textAlign: "right",
+                            direction: "rtl",
+                        }}
+                    >
+                        <p
+                            style={{
+                                fontWeight: "bold",
+                                fontSize: "14px",
+                                color: "#333",
+                                marginBottom: "4px",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            بريميم بروفيشنل للخدمات الحكومية ش.ذ.م.م
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            ون ديرة مول، شارع الخليج
+
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            ديرة — دبي
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            هاتف: 045264466
+                        </p>
+                        <p
+                            style={{
+                                fontSize: "12px",
+                                color: "#333",
+                                margin: "2px 0",
+                                fontWeight: "bold"
+
+                            }}
+                        >
+                            الرقم الضريبي: 100465380200003
+                        </p>
+                    </div>
+                </div>
 
                 <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
                     <p

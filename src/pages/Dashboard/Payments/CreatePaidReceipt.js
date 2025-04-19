@@ -438,6 +438,22 @@ function CreatePaidReceipt() {
             0.05
           ).toFixed(2),
         )
+        setValue1(
+          "payamount",
+          (
+            Number.parseFloat(data?.receipt?.total_amount) +
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
+              return total + fee * qty
+
+            }, 0) *
+            0.05
+          ).toFixed(2),
+        )
         setSelectedCostCenter({ id: data?.receipt?.customer_id, name: data?.receipt?.customer_name })
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
@@ -563,6 +579,12 @@ function CreatePaidReceipt() {
       return;
     }
 
+    if (parseFloat(amount) == 0) {
+      showErrorToast("Amount is 0");
+      return;
+    }
+
+
     if (!mode) {
       showErrorToast("Payment mode is required");
       return;
@@ -591,11 +613,13 @@ function CreatePaidReceipt() {
     };
 
     setPayments((prev) => [...prev, paymentObj]);
-    setValue1('payamount', '')
-    setSelectedMode(null)
+    //setValue1('payamount', '')
+  
     setSelectedBank(null)
     setSelectedCard(null)
     setValue1('authCode', '')
+    // setValue1("payment", { id: "Cash", name: "Cash" })
+    // setSelectedMode({ id: "Cash", name: "Cash" })
   };
   useEffect(() => {
     console.log(payments, 'paymentspayments');
@@ -609,12 +633,16 @@ function CreatePaidReceipt() {
 
     setValue1('amount', parseFloat(existingTotal).toFixed(2))
     setValue1('balance', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
+    setValue1('payamount', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
+  
     if (payments?.length > 0) {
       setChargesDisabled(true)
     }
     else if (payments?.length == 0) {
       setChargesDisabled(false)
     }
+    setValue1("payment", { id: "Cash", name: "Cash" })
+    setSelectedMode({ id: "Cash", name: "Cash" })
   }, [payments])
 
   const getCategories = async () => {
@@ -652,7 +680,7 @@ function CreatePaidReceipt() {
         setRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
    
-
+        //alert("Data found")
         setValue1("paid", 0)
         //setValue1("customer", data?.receipt?.customer_name)
         setValue1("invoice_date", moment().toDate())
@@ -740,8 +768,24 @@ function CreatePaidReceipt() {
             0.05
           ).toFixed(2),
         )
+        setValue1(
+          "payamount",
+          (
+            Number.parseFloat(data?.receipt?.total_amount) +
+            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0)
+              const qty = Number.parseFloat(item?.quantity ?? 1)
+              console.log(fee);
+              console.log(qty);
+              console.log(total);
+              return total + fee * qty
+
+            }, 0) *
+            0.05
+          ).toFixed(2),
+        )
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
-        setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer_name })
+        setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
         setValue1("cost_center", { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setAccounts(data?.accounts?.rows)
       } else {
@@ -762,6 +806,8 @@ function CreatePaidReceipt() {
     getCategories()
     getServiceItem()
     setDate(new Date())
+    setValue1("payment", { id: "Cash", name: "Cash" })
+    setSelectedMode({ id: "Cash", name: "Cash" })
     //setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
     //setValue1("customer", { id: 11002, name: "Walk-in Customer" })
   }, [])
@@ -1258,6 +1304,7 @@ function CreatePaidReceipt() {
                           setValue1("additionalCharges", additionalCharges.toFixed(2));
                           setValue1('finalTotal', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
                           setValue1('balance', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
+                          setValue1('payamount', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
                         },
                       })}
                       error={errors1?.percentage?.message}

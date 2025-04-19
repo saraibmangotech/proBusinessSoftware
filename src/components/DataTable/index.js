@@ -239,7 +239,9 @@ const DataTable = ({
     const csvContent = `${headers}\n${rows}`
 
     // Create a blob and download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const csvWithBOM = '\uFEFF' + csvContent; // prepend BOM
+
+    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;  encoding='utf-8-sig'" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.setAttribute("href", url)
