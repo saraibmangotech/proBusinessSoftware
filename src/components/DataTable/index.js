@@ -245,7 +245,7 @@ const DataTable = ({
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.setAttribute("href", url)
-    link.setAttribute("download", csvName+".csv")
+    link.setAttribute("download", csvName + ".csv")
     link.style.visibility = "hidden"
     document.body.appendChild(link)
     link.click()
@@ -255,29 +255,52 @@ const DataTable = ({
   return (
     <div>
       <Paper sx={{ boxShadow: "none", backgroundColor: "transparent" }}>
-        <TextField
-          value={globalFilter ?? ""}
-          size="small"
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search all columns..."
-          variant="outlined"
-          sx={{
-            borderRadius: "12px",
-            mb: 4,
-            ".MuiOutlinedInput-root": {
-              border: "2px solid #e0e0e0",
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <TextField
+            value={globalFilter ?? ""}
+            size="small"
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Search all columns..."
+            variant="outlined"
+            sx={{
               borderRadius: "12px",
-              "& fieldset": { border: "none" },
-              "&:hover": {
-                border: "2px solid #0076bf",
-              },
-              "&.Mui-focused": {
-                border: "2px solid #0076bf",
+              mt: 2,
+              mb: 2,
+              ".MuiOutlinedInput-root": {
+                border: "2px solid #e0e0e0",
+                borderRadius: "12px",
                 "& fieldset": { border: "none" },
+                "&:hover": {
+                  border: "2px solid #0076bf",
+                },
+                "&.Mui-focused": {
+                  border: "2px solid #0076bf",
+                  "& fieldset": { border: "none" },
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
+          {csv && (
+            <Button
+
+              startIcon={<FileDownload />}
+              onClick={exportToExcel}
+              variant="contained"
+              color="primary"
+              sx={{
+                padding: '10px',
+                textTransform: 'capitalize !important',
+                backgroundColor: "#bd9b4a !important",
+                fontSize: "12px",
+                ":hover": {
+                  backgroundColor: "#bd9b4a !important",
+                },
+              }}
+            >
+              Export to Excel
+            </Button>
+          )}
+        </Box>
         {alphabets && (
           <Box
             sx={{
@@ -309,28 +332,10 @@ const DataTable = ({
               ))}
             </ButtonGroup>
 
-            {csv && (
-              <Button
 
-              startIcon={<FileDownload />}
-              onClick={exportToExcel}
-              variant="contained"
-              color="primary"
-              sx={{
-                textTransform: 'capitalize !important',
-                backgroundColor: "#bd9b4a !important",
-                fontSize: "12px",
-                ":hover": {
-                  backgroundColor: "#bd9b4a !important",
-                },
-              }}
-            >
-              Export to Excel
-            </Button>
-            )}
           </Box>
         )}
-        {!alphabets && csv && (
+        {/* {!alphabets && csv && (
           <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button
               variant="contained"
@@ -346,7 +351,7 @@ const DataTable = ({
               Export to Excel
             </Button>
           </Box>
-        )}
+        )} */}
 
         <TableContainer sx={{ maxHeight: 440, overflowX: "auto" }}>
           <Table stickyHeader>

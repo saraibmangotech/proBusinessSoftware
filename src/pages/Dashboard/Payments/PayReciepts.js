@@ -370,30 +370,30 @@ function PayReceipts() {
     }
 
     const handleFromDate = (newDate) => {
-            try {
-                // eslint-disable-next-line eqeqeq
-                if (newDate == 'Invalid Date') {
-                    setFromDate('invalid')
-                    return
-                }
-                setFromDate(new Date(newDate))
-            } catch (error) {
-                ErrorToaster(error)
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
             }
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
         }
+    }
 
-        const handleToDate = (newDate) => {
-                try {
-                    // eslint-disable-next-line eqeqeq
-                    if (newDate == 'Invalid Date') {
-                        setToDate('invalid')
-                        return
-                    }
-                    setToDate(new Date(newDate))
-                } catch (error) {
-                    ErrorToaster(error)
-                }
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
             }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
 
 
     // *For Handle Filter
@@ -769,49 +769,57 @@ function PayReceipts() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid Receipt List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#bd9b4a'}
-                    title="Create"
-                    onClick={() => { navigate('/create-paid-receipt'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
 
 
             </Box>
 
             {/* Filters */}
 
-       
 
-            <Grid container spacing={1}>
-                <Grid item xs={3}>
-                <DatePicker
-                    label={"From Date"}
-                    disableFuture={true}
-                    size="small"
-                    value={new Date()}
-                    onChange={(date) => handleFromDate(date)}
-                />
+
+            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={8}>
+                    <Grid container spacing={1}>
+                    <Grid item xs={5}>
+                        <DatePicker
+                            label={"From Date"}
+                            disableFuture={true}
+                            size="small"
+                            value={new Date()}
+                            onChange={(date) => handleFromDate(date)}
+                        />
+                    </Grid>
+                    <Grid item xs={5}>
+                        <DatePicker
+                            label={"To Date"}
+
+                            disableFuture={true}
+                            size="small"
+                            value={new Date()}
+                            onChange={(date) => handleToDate(date)}
+                        />
+                    </Grid>
+
+                    <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                        <PrimaryButton
+                            bgcolor={"#bd9b4a"}
+                            icon={<SearchIcon />}
+                            title="Search"
+                            sx={{ marginTop: "30px" }}
+                            onClick={() => getCustomerQueue(null, null, null)}
+                            loading={loading}
+                        />
+                    </Grid>
+                    </Grid>
                 </Grid>
-                <Grid item xs={3}>
-                <DatePicker
-                    label={"To Date"}
-
-                    disableFuture={true}
-                    size="small"
-                    value={new Date()}
-                    onChange={(date) => handleToDate(date)}
-                />
-                </Grid>
-
-                <Grid item xs={1} sx={{marginTop: "30px"}}>
-                <PrimaryButton
-                                          bgcolor={"#bd9b4a"}
-                                          title="Search"
-                                          sx={{marginTop: "30px"}}
-                                          onClick={() => getCustomerQueue(null, null, null)}
-                                          loading={loading}
-                                        />
+                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+                    <PrimaryButton
+                        bgcolor={'#bd9b4a'}
+                        title="Create"
+                        
+                        onClick={() => { navigate('/create-paid-receipt'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />
                 </Grid>
             </Grid>
 

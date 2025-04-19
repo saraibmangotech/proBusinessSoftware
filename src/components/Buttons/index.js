@@ -28,7 +28,7 @@ export const PrimaryButton = (props) => {
         ...props.buttonStyle,
       }}
     >
-      {props.title}
+      {props.title ? props.title : ''}
     </LoadingButton>
   );
 };

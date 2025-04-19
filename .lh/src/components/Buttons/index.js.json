@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/Buttons/index.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745093305273,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745093305273,
+            "name": "Commit-0",
+            "content": "import { LoadingButton } from \"@mui/lab\";\r\nimport { Button, Switch } from \"@mui/material\";\r\nimport Colors from \"assets/Style/Colors\";\r\n\r\nexport const PrimaryButton = (props) => {\r\n  return (\r\n    <LoadingButton\r\n      startIcon={\r\n        (props.src || props.icon) && (\r\n          <span style={{ marginRight: \"8px\", display: \"flex\" }}>\r\n            {props.src ? <img src={props.src} alt=\"icon\" width={\"18px\"} height={\"18px\"} /> : props.icon}\r\n          </span>\r\n        )\r\n      }\r\n      variant=\"contained\"\r\n      {...props}\r\n      className={props.className}\r\n      sx={{\r\n        textTransform: \"capitalize\",\r\n        boxShadow: \"none\",\r\n        pl: '25px',\r\n        pr: '25px',\r\n        // minWidth: { xs: \"100px\", md: \"150px\" },\r\n        py: 1.2,\r\n        background: props.bgcolor ? props.bgcolor : Colors.primary,\r\n        color: props.textcolor ? props.textcolor : Colors.white, // Apply text color\r\n        fontSize: { xs: 12, md: 14 },\r\n        ...props.buttonStyle,\r\n      }}\r\n    >\r\n      {props.title ? props.title : ''}\r\n    </LoadingButton>\r\n  );\r\n};\r\n\r\nexport const PaginationButton = (props) => {\r\n  return (\r\n    <Button\r\n      {...props}\r\n      variant=\"contained\"\r\n      sx={{\r\n        py: 0.5,\r\n        mx: 0.5,\r\n        width: '10px',\r\n        height: '40px',\r\n        textTransform: \"capitalize\",\r\n        bgcolor: Colors.white,\r\n        color: Colors.black,\r\n        \"&:hover\": { bgcolor: Colors.white, color: Colors.black },\r\n      }}\r\n    >\r\n      {props.children}\r\n    </Button>\r\n  );\r\n}\r\n\r\nexport const SwitchButton = ({ isChecked, setIsChecked }) => {\r\n\r\n  return (\r\n    <Switch\r\n      checked={isChecked}\r\n      onClick={setIsChecked}\r\n      focusVisibleClassName=\".Mui-focusVisible\"\r\n      sx={{\r\n        width: 50,\r\n        height: 28,\r\n        padding: 0,\r\n        margin: 0,\r\n        '& .MuiSwitch-switchBase': {\r\n          padding: '0px !important',\r\n          margin: 0,\r\n          transitionDuration: '300ms',\r\n          '&.Mui-checked': {\r\n            transform: 'translateX(21px)',\r\n            color: Colors.white,\r\n            '& + .MuiSwitch-track': {\r\n              backgroundColor: Colors.primary,\r\n              opacity: 1,\r\n              border: 0,\r\n            },\r\n            '&.Mui-disabled + .MuiSwitch-track': {\r\n              opacity: 0.5,\r\n            },\r\n          },\r\n          '&.Mui-focusVisible .MuiSwitch-thumb': {\r\n            color: Colors.primary,\r\n            border: '6px solid #fff',\r\n          },\r\n          '&.Mui-disabled .MuiSwitch-thumb': {\r\n            color: 'red',\r\n          },\r\n          '&.Mui-disabled + .MuiSwitch-track': {\r\n            opacity: 0.3,\r\n          },\r\n        },\r\n        '& .MuiSwitch-thumb': {\r\n          boxSizing: 'border-box',\r\n          width: 20,\r\n          height: 20,\r\n        },\r\n        '& .MuiSwitch-track': {\r\n          borderRadius: 24 / 2,\r\n          backgroundColor: '#E9E9EA',\r\n          opacity: 1,\r\n          transition: 500,\r\n        },\r\n      }}\r\n    />\r\n  );\r\n};\r\n"
+        }
+    ]
+}
