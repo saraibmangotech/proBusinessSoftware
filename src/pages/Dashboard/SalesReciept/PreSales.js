@@ -74,6 +74,7 @@ import PaymentIcon from "@mui/icons-material/Payment"; // for payment receipt
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Barcode from "react-barcode";
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -147,6 +148,7 @@ function PreSalesList() {
   const [statusDialog, setStatusDialog] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [tableLoader, setTableLoader] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -181,6 +183,8 @@ function PreSalesList() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [invoiceData, setInvoiceData] = useState(null);
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
 
   // *For Filters
   const [filters, setFilters] = useState({});
@@ -405,6 +409,8 @@ function PreSalesList() {
     try {
       let params = {
         is_presale: true,
+        from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+        to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
       };
 
       const { data } = await CustomerServices.getPreSales(params);
@@ -457,6 +463,33 @@ function PreSalesList() {
       console.error("Error fetching location:", error);
     }
   };
+
+    const handleFromDate = (newDate) => {
+          try {
+              // eslint-disable-next-line eqeqeq
+              if (newDate == 'Invalid Date') {
+                  setFromDate('invalid')
+                  return
+              }
+              console.log(newDate, "newDate")
+              setFromDate(new Date(newDate))
+          } catch (error) {
+              ErrorToaster(error)
+          }
+      }
+  
+      const handleToDate = (newDate) => {
+          try {
+              // eslint-disable-next-line eqeqeq
+              if (newDate == 'Invalid Date') {
+                  setToDate('invalid')
+                  return
+              }
+              setToDate(new Date(newDate))
+          } catch (error) {
+              ErrorToaster(error)
+          }
+      }
 
   // *For Handle Filter
 
@@ -733,6 +766,8 @@ function PreSalesList() {
   }, [invoiceData]);
 
   useEffect(() => {
+    setFromDate(new Date())
+    setToDate(new Date())
     getCustomerQueue();
   }, []);
 
@@ -805,7 +840,7 @@ function PreSalesList() {
           {" "}
           Sales List
         </Typography>
-        {true && (
+        {/* {true && (
           <PrimaryButton
             bgcolor={"#bd9b4a"}
             title="Create"
@@ -815,11 +850,59 @@ function PreSalesList() {
             }}
             loading={loading}
           />
-        )}
+        )} */}
       </Box>
 
       {/* Filters */}
-      <Box>{<DataTable loading={loader} data={data} columns={columns} />}</Box>
+
+  <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={8}>
+                    <Grid container spacing={1}>
+                    <Grid item xs={5}>
+                        <DatePicker
+                            label={"From Date"}
+                            disableFuture={true}
+                            size="small"
+                            value={fromDate}
+                            onChange={(date) => handleFromDate(date)}
+                        />
+                    </Grid>
+                    <Grid item xs={5}>
+                        <DatePicker
+                            label={"To Date"}
+
+                            disableFuture={true}
+                            size="small"
+                            value={toDate}
+                            onChange={(date) => handleToDate(date)}
+                        />
+                    </Grid>
+
+                    <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                        <PrimaryButton
+                            bgcolor={"#bd9b4a"}
+                            icon={<SearchIcon />}
+                            title="Search"
+                            sx={{ marginTop: "30px" }}
+                            onClick={() => getCustomerQueue(null, null, null)}
+                            loading={loading}
+                        />
+                    </Grid>
+                    </Grid>
+                </Grid>
+                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+                    <PrimaryButton
+                        bgcolor={'#bd9b4a'}
+                        title="Create"
+                        
+                        onClick={() => { navigate("/sales-receipt");
+                          localStorage.setItem("currentUrl", "/create-customer"); }}
+                        loading={loading}
+                    />
+                </Grid>
+            </Grid>
+
+      <Box>{<DataTable loading={loader} data={data}  csv={true} csvName={'presale_requests'} columns={columns} />}</Box>
       <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
         <div
           style={{

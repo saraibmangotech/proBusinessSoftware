@@ -73,6 +73,7 @@ const routes = {
   getBankDetail:'/system/banks/details',
   CreateSaleReceipt:'/sales/receipts/pre/add',
   getPreSales:'/sales/receipts',
+  getInvoices:'/sales/receipts/paid',
   getPreSaleDetail:'/sales/receipts/details',
   DeletePreSale:'/sales/receipts/delete',
   UpdateSaleReceipt:'/sales/receipts/update',

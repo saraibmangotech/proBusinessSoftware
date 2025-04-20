@@ -161,6 +161,7 @@ function CreatePaidReceipt() {
   const [step1FormData, setStep1FormData] = useState()
   const [selectedType, setSelectedType] = useState(null)
   const [date, setDate] = useState(null)
+  const [paidAt, setPaidAt] = useState(null)
   const [balanceType, setBalanceType] = useState(null)
   const [imageURL, setImageURL] = useState(null)
   const fileInputRef = useRef(null)
@@ -216,7 +217,7 @@ function CreatePaidReceipt() {
           id: getValues1("invoicenumber"),
           total_amount: detail?.total_amount,
           items: rows,
-
+          paid_date: paidAt || new Date(),
           paid_amount: detail?.amount,
           additional_charges_percentage: formData?.percentage,
           additional_charges_value: formData?.additionalCharges,
@@ -352,6 +353,12 @@ function CreatePaidReceipt() {
       const { data } = await CustomerServices.getReceiptDetail(params)
       console.log(data?.receipt, "dataaa")
       if (data?.receipt) {
+
+        if (data?.receipt?.is_paid) {
+          ErrorToaster("Receipt already Paid")
+          return;
+        }
+
         setRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
         setCreditButton(true)
@@ -557,7 +564,7 @@ function CreatePaidReceipt() {
     }
   }
 
-  const addPayments = (amount, mode, bank, card, code) => {
+  const addPayments = (amount, mode, bank, card, code, submit = null) => {
     const total = parseFloat(getValues1("finalTotal")) || 0;
 
 
@@ -962,6 +969,19 @@ function CreatePaidReceipt() {
                     }}
                   >
                     <Grid container sx={{ gap: "5px 25px" }}>
+                    <Grid item md={3.8} sm={5.5} xs={12}>
+                        <DatePicker
+                          label={"Payment Date :*"}
+                          value={date}
+                          size={"small"}
+                          error={errors1?.date?.message}
+                          register={register1("paidAt")}
+                          onChange={(date) => {
+                            setValue1("paidAt", date)
+                            setPaidAt(new Date(date))
+                          }}
+                        />
+                      </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>
                         <SelectField
                           size={"small"}
@@ -1047,7 +1067,7 @@ function CreatePaidReceipt() {
                         />
                       </Grid>
 
-                      <Grid item md={3.8} sm={5.5} xs={12}>
+                      {/* <Grid item md={3.8} sm={5.5} xs={12}>
                         <SelectField
                           label="Cost Center"
                           size="small"
@@ -1059,7 +1079,8 @@ function CreatePaidReceipt() {
                             required: false,
                           })}
                         />
-                      </Grid>
+                      </Grid> */}
+                      
                       <Grid item md={3.8} sm={5.5} xs={12}>
                         <InputField
                           label="Address"
@@ -1098,7 +1119,8 @@ function CreatePaidReceipt() {
                   <TableBody>
                     {rows?.map((item, index) => (
                       <TableRow key={index}>
-                        <TableCell>{item?.id}</TableCell>
+                        <TableCell sx={{display: "none"}}>{item?.id}</TableCell>
+                        <TableCell>{item?.service?.item_code}</TableCell>
                         <TableCell>{item?.service?.name}</TableCell>
                         <TableCell>{item?.quantity}</TableCell>
                         <TableCell>{item?.govt_fee}</TableCell>
@@ -1467,8 +1489,10 @@ function CreatePaidReceipt() {
                           },
                         }}
                       >
-                        Add Payments
+                        Add New Method
                       </Button>
+
+                      
                     </Grid>
                     <Typography variant="body1" sx={{ p: 2, fontWeight: 'bold', mt: 2 }} color="initial">
 
@@ -1530,7 +1554,7 @@ function CreatePaidReceipt() {
                         },
                       }}
                     >
-                      Submit
+                      Create Receipt
                     </Button>
                   </Grid>
                 </Grid>

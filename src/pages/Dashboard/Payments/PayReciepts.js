@@ -316,8 +316,8 @@ function PayReceipts() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
-    const [fromDate, setFromDate] = useState();
-    const [toDate, setToDate] = useState();
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
 
 
     // *For Filters
@@ -343,7 +343,7 @@ function PayReceipts() {
 
             }
 
-            const { data } = await CustomerServices.getPreSales(params)
+            const { data } = await CustomerServices.getInvoices(params)
             setData(data?.rows);
 
 
@@ -376,6 +376,7 @@ function PayReceipts() {
                 setFromDate('invalid')
                 return
             }
+            console.log(newDate, "newDate")
             setFromDate(new Date(newDate))
         } catch (error) {
             ErrorToaster(error)
@@ -549,7 +550,7 @@ function PayReceipts() {
         {
             header: "Total Amount",
             accessorFn: (row) => {
-                if (row?.is_paid) {
+               
                     return (
                         row?.sale_receipt_items?.reduce((total2, item) => {
                             return parseFloat(total2) + parseFloat(item?.total ?? 0);
@@ -560,8 +561,7 @@ function PayReceipts() {
                             return total + fee * qty;
                         }, 0) * 0.05
                     ).toFixed(2);
-                }
-                return "N/A";
+               
             },
             accessorKey: "total_amount",
             cell: ({ row }) => (
@@ -570,8 +570,7 @@ function PayReceipts() {
                     color="primary"
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
-                    {row?.original?.is_paid
-                        ? (
+                    {(
                             row?.original?.sale_receipt_items?.reduce((total2, item) => {
                                 return parseFloat(total2) + parseFloat(item?.total ?? 0);
                             }, 0) +
@@ -580,8 +579,7 @@ function PayReceipts() {
                                 const qty = parseFloat(item?.quantity ?? 1);
                                 return total + fee * qty;
                             }, 0) * 0.05
-                        ).toFixed(2)
-                        : "N/A"}
+                        ).toFixed(2)}
                 </Box>
             ),
         },
@@ -785,7 +783,7 @@ function PayReceipts() {
                             label={"From Date"}
                             disableFuture={true}
                             size="small"
-                            value={new Date()}
+                            value={fromDate}
                             onChange={(date) => handleFromDate(date)}
                         />
                     </Grid>
@@ -795,7 +793,7 @@ function PayReceipts() {
 
                             disableFuture={true}
                             size="small"
-                            value={new Date()}
+                            value={toDate}
                             onChange={(date) => handleToDate(date)}
                         />
                     </Grid>

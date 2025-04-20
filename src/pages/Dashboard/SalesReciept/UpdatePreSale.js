@@ -417,6 +417,7 @@ function UpdatePreSale() {
 
                 const { data } = await CustomerServices.DetailServiceItem(params);
                 setValue("id", data?.service?.id);
+                setValue("item_code", data?.service?.item_code);
                 setValue("govt_fee", data?.service?.bank_service_charge);
                 setValue("center_fee", data?.service?.center_fee);
                 setValue("bank_charge", data?.service?.bank_service_charge);
@@ -520,7 +521,7 @@ function UpdatePreSale() {
             setValue1("mobileValue", data?.receipt?.customer_mobile);
             setRows(data?.receipt?.sale_receipt_items)
             setSubTotal(data?.receipt?.total_amount)
-            setDate(new Date(data?.receipt?.invoice_date))
+            setDate(new Date(data?.receipt?.created_at))
             setValue1('display_customer', data?.receipt?.customer_name)
             setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
             setValue1('cost_center', { id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
@@ -604,7 +605,7 @@ function UpdatePreSale() {
                                         }}
                                     >
                                         <Grid container sx={{ gap: "5px 25px" }}>
-                                            <Grid item md={5.7} sm={12} xs={12}>
+                                            {/* <Grid item md={5.7} sm={12} xs={12}>
                                                 <InputField
                                                     disabled={true}
                                                     label="Invoice No"
@@ -612,10 +613,10 @@ function UpdatePreSale() {
                                                     placeholder="TSL/83540"
                                                     register={register1("invoice_no")}
                                                 />
-                                            </Grid>
+                                            </Grid> */}
                                             <Grid item xs={5.7}>
                                                 <DatePicker
-                                                    label={"Invoice Date :*"}
+                                                    label={"Request Date :*"}
                                                     value={date}
                                                     size={'small'}
                                                     disabled={true}
@@ -837,14 +838,23 @@ function UpdatePreSale() {
                                     </TableHead>
                                     <TableBody>
                                         {<TableRow>
-                                            <TableCell>
+                                            <TableCell sx={{ display: "none" }}>
+                                                <InputField
+                                                    size="small"
+                                                    disabled={true}
+                                                    placeholder="Item Id"
+                                                    register={register("id", { required: "Item id is required" })}
+                                                />
+                                                {errors.id && <span>{errors.id.message}</span>}
+                                            </TableCell>
+                                            <TableCell >
                                                 <InputField
                                                     size="small"
                                                     disabled={true}
                                                     placeholder="Item code"
-                                                    register={register("id", { required: "Item code is required" })}
+                                                    register={register("item_code", { required: "Item code is required" })}
                                                 />
-                                                {errors.id && <span>{errors.id.message}</span>}
+                                                {errors.item_code && <span>{errors.item_code.message}</span>}
                                             </TableCell>
                                             <TableCell>
                                                 <SelectField
@@ -993,6 +1003,7 @@ function UpdatePreSale() {
                                                             setEditState(false)
 
                                                             setValue("id", '');
+                                                            setValue("item_code", '');
                                                             setValue("govt_fee", '');
                                                             setValue("center_fee", '');
                                                             setValue("bank_charge", '');
@@ -1019,7 +1030,8 @@ function UpdatePreSale() {
 
                                         {rows?.length > 0 && rows?.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item?.id}</TableCell>
+                                                <TableCell  sx={{ display: "none" }}>{item?.id}</TableCell>
+                                                <TableCell>{item?.service?.item_code}</TableCell>
                                                 <TableCell>{item?.service?.name}</TableCell>
                                                 <TableCell>{item?.quantity}</TableCell>
                                                 <TableCell>{item?.govt_fee}</TableCell>
@@ -1035,6 +1047,7 @@ function UpdatePreSale() {
                                                     {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                         setSelectedRow(item); setEditState(true)
                                                         setValue("id", item?.id);
+                                                        setValue("item_code", item?.service?.item_code);
                                                         setValue("govt_fee", item?.govt_fee);
                                                         setValue("center_fee", item?.center_fee);
                                                         setValue("bank_charge", item?.bank_charge);

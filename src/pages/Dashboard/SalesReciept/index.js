@@ -373,6 +373,11 @@ function SalesReciept() {
           : { mobile: getValues1("mobileValue") };
 
       const { data } = await CustomerServices.getReceptionDetail(params);
+      if(!data.token){
+        ErrorToaster("Token might be expired or invalid");
+        return;
+
+      }
       console.log(data, "dataaa");
       setDetail(data?.token);
       setSelectedCustomer({ id: data?.token?.customer_id, name: data?.token?.customer?.name });
@@ -432,7 +437,7 @@ function SalesReciept() {
       const { data } = await CustomerServices.getInvoiceNumber();
 
       console.log(data);
-      setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
+      setValue1("invoice_no", `SR/${data?.next_invoice_number}`);
     } catch (error) {
       ErrorToaster(error);
     } finally {
@@ -469,6 +474,7 @@ function SalesReciept() {
 
         const { data } = await CustomerServices.DetailServiceItem(params);
         setValue("id", data?.service?.id);
+        setValue("item_code", data?.service?.item_code);
         setValue("govt_fee", data?.service?.government_fee);
         setValue("center_fee", data?.service?.center_fee);
         setValue("bank_charge", data?.service?.bank_service_charge);
@@ -792,7 +798,7 @@ function SalesReciept() {
                   <Grid container sx={{ gap: "5px 25px" }}>
                     <Grid item md={5.7} sm={12} xs={12}>
                       <InputField
-                        label="Invoice No"
+                        label="Request No"
                         size="small"
                         disabled={true}
                         placeholder="TSL/83540"
@@ -976,12 +982,21 @@ function SalesReciept() {
               </TableHead>
               <TableBody>
                 {<TableRow>
+                  <TableCell sx={{ display: "none" }}>
+                    <InputField
+                      size="small"
+                      disabled={true}
+                      placeholder="Item id"
+                      register={register("id", { required: "Item id is required" })}
+                    />
+                    {errors.id && <span>{errors.id.message}</span>}
+                  </TableCell>
                   <TableCell>
                     <InputField
                       size="small"
                       disabled={true}
                       placeholder="Item code"
-                      register={register("id", { required: "Item code is required" })}
+                      register={register("item_code", { required: "Item code is required" })}
                     />
                     {errors.id && <span>{errors.id.message}</span>}
                   </TableCell>
@@ -1135,6 +1150,7 @@ function SalesReciept() {
                           setEditState(false)
 
                           setValue("id", '');
+                          setValue("item_code", '');
                           setValue("govt_fee", '');
                           setValue("center_fee", '');
                           setValue("bank_charge", '');
@@ -1161,7 +1177,8 @@ function SalesReciept() {
 
                 {rows?.length > 0 && rows?.map((item, index) => (
                   <TableRow key={index}>
-                    <TableCell>{item?.id}</TableCell>
+                    <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
+                    <TableCell>{item?.item_code}</TableCell>
                     <TableCell>{item?.service?.name}</TableCell>
                     <TableCell>{item?.quantity}</TableCell>
                     <TableCell>{item?.govt_fee}</TableCell>
@@ -1179,6 +1196,7 @@ function SalesReciept() {
                         console.log(item);
 
                         setValue("id", item?.id);
+                        setValue("item_code", item?.item_code);
                         setValue("govt_fee", item?.govt_fee);
                         setValue("center_fee", item?.center_fee);
                         setValue("bank_charge", item?.bank_charge);

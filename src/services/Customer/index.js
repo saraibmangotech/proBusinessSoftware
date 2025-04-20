@@ -134,6 +134,10 @@ const CustomerServices = {
     const data = await get(routes.getReceiptDetail, params);
     return data;
   },
+  getInvoiceDetail: async (params) => {
+    const data = await get(routes.getInvoiceDetail, params);
+    return data;
+  },
   getReceptionsList: async (params) => {
     const data = await get(routes.getReceptionsList, params);
     return data;
@@ -164,6 +168,10 @@ const CustomerServices = {
   },
   getPreSales: async (params) => {
     const data = await get(routes.getPreSales, params);
+    return data;
+  },
+  getInvoices: async (params) => {
+    const data = await get(routes.getInvoices, params);
     return data;
   },
   getWPSList: async (params) => {
