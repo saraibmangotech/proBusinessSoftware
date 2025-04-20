@@ -278,8 +278,8 @@ function ReceptionDetail() {
             const { data } = await CustomerServices.getReceptionDetail(params);
             let detail = data?.token
             let newDetail = {
-                name: detail?.customer_name, // renaming customer_name to name
-                id: detail?.id,      // example: renaming company_id to id
+                name: detail?.customer?.name, // renaming customer_name to name
+                id: detail?.customer_id,      // example: renaming company_id to id
                 location: detail?.address    // example: renaming address to location
               };
             setSelectedCustomer(newDetail)

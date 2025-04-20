@@ -378,6 +378,14 @@ function SalesReciept() {
         return;
 
       }
+      if (data?.token?.created_at) {
+        const tokenDate = moment(data.token.created_at);
+        const today = moment().startOf('day');
+        if (!tokenDate.isSame(today, 'day')) {
+          ErrorToaster("Token might be expired or invalid");
+          return;
+        }
+      }
       console.log(data, "dataaa");
       setDetail(data?.token);
       setSelectedCustomer({ id: data?.token?.customer_id, name: data?.token?.customer?.name });

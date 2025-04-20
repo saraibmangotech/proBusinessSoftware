@@ -671,7 +671,7 @@ function PreSalesList() {
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.invoice_id}`,
                     '_blank'
                   );
                 }}
@@ -693,7 +693,7 @@ function PreSalesList() {
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.invoice_id}`,
                     '_blank'
                   );
                 }}
@@ -738,7 +738,7 @@ function PreSalesList() {
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.invoice_id}`,
                     '_blank'
                   );
                 }}

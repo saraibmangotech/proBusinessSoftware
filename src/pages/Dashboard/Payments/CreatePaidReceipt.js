@@ -326,12 +326,22 @@ function CreatePaidReceipt() {
       }
 
       const { data } = await CustomerServices.getCards(params)
+      let cardsData =  data?.cards?.map((card) => ({
+        ...card,
+        name: card.account_name,
+      }));
       setCards(
         data?.cards?.map((card) => ({
           ...card,
           name: card.account_name,
         })),
+
       )
+      
+      setSelectedCard({id: cardsData[0]?.id, name: cardsData[0]?.name})
+      setValue1("card", {id: cardsData[0]?.id, name: cardsData[0]?.name})
+
+
     } catch (error) {
       showErrorToast(error)
     } finally {
