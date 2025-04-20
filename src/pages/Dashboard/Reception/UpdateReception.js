@@ -186,8 +186,13 @@ function UpdateReception() {
             const { data } = await CustomerServices.getCustomerDetail(params);
             let detail = data?.customer
             console.log(detail);
+            let newDetail = {
+                name: detail?.customer?.name, // renaming customer_name to name
+                id: detail?.customer_id,      // example: renaming company_id to id
+                location: detail?.address    // example: renaming address to location
+              };
             if (data?.customer) {
-                setSelectedCustomer(detail)
+                setSelectedCustomer(newDetail)
                 setValue1('customer', detail)
                 setValue1('customerName', detail?.name)
                 setValue1('email', detail?.email)
@@ -197,7 +202,7 @@ function UpdateReception() {
                 let filter = await customers.find(item => item?.name == 'Walk-In Customer')
                 console.log(filter);
 
-                setSelectedCustomer(filter)
+                setSelectedCustomer(newDetail)
                 setValue1('customer', filter?.name)
 
 
@@ -312,12 +317,17 @@ function UpdateReception() {
             let detail = data?.token
             console.log(detail);
             setNewDetail(detail)
+            let newDetail = {
+                name: detail?.customer?.name, // renaming customer_name to name
+                id: detail?.customer_id,      // example: renaming company_id to id
+                location: detail?.address    // example: renaming address to location
+              };
             let updatedObj = {...detail,name:detail?.customer_name}
             // setSelectedCustomer(updatedObj)
             let filter = await customers.find(item => item?.id == detail?.customer_id)
             console.log(filter,'filterfilter');
             
-            setSelectedCustomer(filter)
+            setSelectedCustomer(newDetail)
             setValue1('customer', filter);
             setValue('mobile', detail?.mobile)
             setValue('customerName', detail?.customer_name)
