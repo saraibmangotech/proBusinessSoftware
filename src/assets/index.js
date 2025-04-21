@@ -98,6 +98,8 @@ export const Images = {
 	Header2:require("./Images/header2.png"),
 	footer:require("./Images/footer.png"),
 	Footer2: require("./Images/footer2.jpeg"),
+	headerCenterLogo: require("./Images/headercenterlogo.jpeg"),
+	mainLogo: require("./Images/mainLogo.jpeg"),
 
 };
 

@@ -24,6 +24,7 @@ import {
   ListItem,
   ListItemText,
   Collapse,
+  CardMedia,
 } from "@mui/material"
 import {
   Logout,
@@ -52,6 +53,7 @@ import ConfirmationDialog from "components/Dialog/ConfirmationDialog"
 import Avatar from "@mui/material/Avatar"
 import AuthServices from "services/Auth"
 import { ErrorToaster } from "components/Toaster"
+import { Images } from "assets"
 
 function DropDown({ anchorEl, openDropdown, handleClose }) {
   const [confirmationDialog, setConfirmationDialog] = useState(false)
@@ -178,20 +180,21 @@ function Header() {
   const isMobile = useMediaQuery("(max-width:960px)")
   const [navigationData, setNavigationData] = useState([])
 
-  // Handle dropdown menu open
   const handleDropdownOpen = (event, id) => {
-    setDropdownAnchorEl(event.currentTarget);
-    setOpenDropdownId(id);
-    setTimeout(() => {
-      setDropdownAnchorEl(event.currentTarget);
-      setOpenDropdownId(id);
-    }, 2000); // 2 seconds delay
-  }
-
+    if (openDropdownId != id) {
+      // setOpenDropdownId(null);
+      setOpenDropdownId(id);  
+      setDropdownAnchorEl(event.currentTarget);  
+    } else {
+      setOpenDropdownId(null);
+      setDropdownAnchorEl(null);
+    }
+  };
+  
   // Handle dropdown menu close
   const handleDropdownClose = () => {
     setDropdownAnchorEl(null)
-    setOpenDropdownId(null)
+    setOpenDropdownId(null) 
   }
 
   // Handle mobile drawer toggle
@@ -933,7 +936,7 @@ function Header() {
     }
 
   }, [user])
-
+  console.log("openDropdownId:", openDropdownId);
   // Mobile drawer content
   const drawer = (
     <Box sx={{ width: 280 }} role="presentation">
@@ -971,7 +974,7 @@ function Header() {
           <ListItemText
             primary={
               <Typography variant="body2" sx={{ fontWeight: location.pathname === "/dashboard" ? 500 : 400 }}>
-                Dashboard
+                Dashboardxxxxz
               </Typography>
             }
           />
@@ -1109,28 +1112,16 @@ function Header() {
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ minHeight: "64px" }}>
+          <Toolbar disableGutters sx={{ minHeight: "64px"  ,justifyContent:"space-between"}}>
             {/* Logo */}
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              onClick={() => navigate("/dashboard")}
-              sx={{
-                mr: 3,
-                display: { xs: "flex" },
-                fontWeight: 700,
-                color: "#bd9b4a",
-                textDecoration: "none",
-                fontSize: "24px",
-                cursor: "pointer",
-                fontFamily: "Arial, sans-serif",
-              }}
-            >
-              PRO<span style={{ color: "#232323" }}>&nbsp;Software</span>
-            </Typography>
+            <Box sx={{width:"150px"}}>
+  <CardMedia image={Images.mainLogo} sx={{  height:"100px"}} />
+</Box>
 
-            <Box sx={{ flexGrow: 1 }} />
+<Box sx={{width:"150px"}}>
+  <CardMedia image={Images.headerCenterLogo} sx={{height:"90px"}} />
+</Box>
+            {/* <Box sx={{ flexGrow: 1 }} /> */}
 
             {/* Right side - Language and User */}
             <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -1290,7 +1281,7 @@ function Header() {
                                   overflow: "hidden",
                                 }}
                               >
-                                <ClickAwayListener onClickAway={handleDropdownClose}>
+                                {/* <ClickAwayListener onClickAway={handleDropdownClose}> */}
                                   <MenuList autoFocusItem={openDropdownId === item.id}>
                                     {item.children.map((child) => (
                                       <MenuItem
@@ -1319,7 +1310,7 @@ function Header() {
                                       </MenuItem>
                                     ))}
                                   </MenuList>
-                                </ClickAwayListener>
+                                {/* </ClickAwayListener> */}
                               </Paper>
                             </Grow>
                           )}
