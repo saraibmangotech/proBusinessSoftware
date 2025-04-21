@@ -564,7 +564,7 @@ function PreSalesList() {
     },
     {
       header: "Total Amount",
-      accessorFn: (row) => {(
+      accessorFn: (row) => {return (
         row?.sale_receipt_items?.reduce((total2, item) => {
           return parseFloat(total2) + parseFloat(item?.total ?? 0);
         }, 0) +
