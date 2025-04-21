@@ -180,8 +180,12 @@ function Header() {
 
   // Handle dropdown menu open
   const handleDropdownOpen = (event, id) => {
-    setDropdownAnchorEl(event.currentTarget)
-    setOpenDropdownId(id)
+    setDropdownAnchorEl(event.currentTarget);
+    setOpenDropdownId(id);
+    setTimeout(() => {
+      setDropdownAnchorEl(event.currentTarget);
+      setOpenDropdownId(id);
+    }, 2000); // 2 seconds delay
   }
 
   // Handle dropdown menu close
@@ -967,7 +971,7 @@ function Header() {
           <ListItemText
             primary={
               <Typography variant="body2" sx={{ fontWeight: location.pathname === "/dashboard" ? 500 : 400 }}>
-                Dashboard
+                Dashboardxxxxz
               </Typography>
             }
           />
