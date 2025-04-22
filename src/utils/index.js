@@ -307,10 +307,12 @@ export const getPermissionsRoutes = (data) => {
 
 
 export let agencyType = {
-  "tasheel":{
-    imageUrl: Images.headerCenterLogo
+  "TASHEEL":{
+    imageUrl: Images.headerCenterLogoTasheel,
+    category: "TASHEEL"
   },
-  "pro":{
-    imageUrl: Images.logo
+  "AL-ADHEED":{
+    imageUrl: Images.headerCenterLogoAdheed,
+    category: "AL-ADHEED"
   },
 }

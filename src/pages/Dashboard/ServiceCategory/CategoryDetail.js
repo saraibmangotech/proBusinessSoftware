@@ -17,7 +17,7 @@ import { ErrorToaster } from 'components/Toaster';
 import { FormControl } from '@mui/base';
 import LabelCustomInput from 'components/Input/LabelCustomInput';
 import SelectField from 'components/Select';
-import { CleanTypes, Debounce2, getFileSize, handleDownload } from 'utils';
+import { agencyType, CleanTypes, Debounce2, getFileSize, handleDownload } from 'utils';
 import instance from 'config/axios';
 import routes from 'services/System/routes';
 import CustomerServices from 'services/Customer';
@@ -680,7 +680,7 @@ function CategoryDetail() {
                                         size={'small'}
                                         label={'Cost Center *:'}
                                         disabled={true}
-                                        options={[{ id: 'Tasheel', name: 'Tasheel' }, { id: 'DED', name: 'DED' }, { id: 'Typing', name: 'Typing' }, { id: 'General', name: 'General' }]}
+                                        options={[{ id: agencyType[process.env.REACT_APP_TYPE].category, name: agencyType[process.env.REACT_APP_TYPE].category }]}
                                         selected={center}
                                         onSelect={(value) => {
                                             setCenter(value)
