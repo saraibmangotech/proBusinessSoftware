@@ -418,7 +418,7 @@ function UpdatePreSale() {
                 const { data } = await CustomerServices.DetailServiceItem(params);
                 setValue("id", data?.service?.id);
                 setValue("item_code", data?.service?.item_code);
-                setValue("govt_fee", data?.service?.bank_service_charge);
+                setValue("govt_fee", data?.service?.government_fee);
                 setValue("center_fee", data?.service?.center_fee);
                 setValue("bank_charge", data?.service?.bank_service_charge);
                 // setValue("transaction_id", data?.transaction_id);

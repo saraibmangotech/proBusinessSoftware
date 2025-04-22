@@ -311,8 +311,8 @@ export let agencyType = {
     imageUrl: Images.headerCenterLogoTasheel,
     category: "TASHEEL"
   },
-  "AL-ADHEED":{
+  "AL-AHDEED":{
     imageUrl: Images.headerCenterLogoAdheed,
-    category: "AL-ADHEED"
+    category: "AL-AHDEED"
   },
 }
