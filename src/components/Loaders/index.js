@@ -14,7 +14,7 @@ export const CircleLoading = () => {
 export const PreLoading = () => {
   return (
     <Box sx={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
-      <Box component={'img'} src={Images.logoDark} sx={{ height: '150px' }} />
+      <Box component={'img'} src={Images.mainLogo} sx={{ height: '150px' }} />
     </Box>
   );
 }

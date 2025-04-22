@@ -976,7 +976,7 @@ function Header() {
           <ListItemText
             primary={
               <Typography variant="body2" sx={{ fontWeight: location.pathname === "/dashboard" ? 500 : 400 }}>
-                Dashboardxxxxz
+                Dashboard
               </Typography>
             }
           />

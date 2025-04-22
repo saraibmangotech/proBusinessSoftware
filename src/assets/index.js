@@ -101,6 +101,7 @@ export const Images = {
 	headerCenterLogoTasheel: require("./Images/headercenterlogo.jpeg"),
 	headerCenterLogoAdheed: require("./Images/headercenterlogoadheed.png"),
 	mainLogo: require("./Images/mainLogo.jpeg"),
+	loginSide: require("./Images/Login-amico.png"),
 
 };
 
