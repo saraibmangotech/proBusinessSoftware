@@ -182,15 +182,16 @@ function Header() {
   const [navigationData, setNavigationData] = useState([])
 
   const handleDropdownOpen = (event, id) => {
-    if (openDropdownId != id) {
-      // setOpenDropdownId(null);
-      setOpenDropdownId(id);  
-      setDropdownAnchorEl(event.currentTarget);  
-    } else {
+    if (openDropdownId === id) {
       setOpenDropdownId(null);
       setDropdownAnchorEl(null);
+    } else {
+      setDropdownAnchorEl(event.currentTarget);
+      setOpenDropdownId(id);
     }
   };
+  
+  
   
   // Handle dropdown menu close
   const handleDropdownClose = () => {
@@ -1259,11 +1260,11 @@ function Header() {
                         </Button>
                         <Popper
                           open={openDropdownId === item.id}
-                          anchorEl={dropdownAnchorEl}
+                          anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
                           role={undefined}
                           placement="bottom-start"
                           transition
-                          disablePortal
+                          disablePortal={true}
                           style={{
                             zIndex: 111,
                           }}
@@ -1271,6 +1272,7 @@ function Header() {
                           {({ TransitionProps, placement }) => (
                             <Grow
                               {...TransitionProps}
+                              timeout={300}
                               style={{
                                 transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
                               }}
