@@ -148,7 +148,7 @@ function PreSalesList() {
   const [statusDialog, setStatusDialog] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [tableLoader, setTableLoader] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -464,32 +464,32 @@ function PreSalesList() {
     }
   };
 
-    const handleFromDate = (newDate) => {
-          try {
-              // eslint-disable-next-line eqeqeq
-              if (newDate == 'Invalid Date') {
-                  setFromDate('invalid')
-                  return
-              }
-              console.log(newDate, "newDate")
-              setFromDate(new Date(newDate))
-          } catch (error) {
-              ErrorToaster(error)
-          }
+  const handleFromDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setFromDate('invalid')
+        return
       }
-  
-      const handleToDate = (newDate) => {
-          try {
-              // eslint-disable-next-line eqeqeq
-              if (newDate == 'Invalid Date') {
-                  setToDate('invalid')
-                  return
-              }
-              setToDate(new Date(newDate))
-          } catch (error) {
-              ErrorToaster(error)
-          }
+      console.log(newDate, "newDate")
+      setFromDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+
+  const handleToDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setToDate('invalid')
+        return
       }
+      setToDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
 
   // *For Handle Filter
 
@@ -688,7 +688,7 @@ function PreSalesList() {
             </Tooltip>
           )}
 
-  {(!row?.original?.is_paid && row?.original?.credited_by != null) && (
+          {(!row?.original?.is_paid && row?.original?.credited_by != null) && (
             <Tooltip title=" Credit Invoice">
               <IconButton
                 onClick={() => {
@@ -733,26 +733,26 @@ function PreSalesList() {
           </Box>
           {/* Payment Receipt Button */}
           <Box>
-            {row?.original?.is_paid && 
-            <Tooltip title="Payment Receipt">
-              <IconButton
-                onClick={() => {
-                  window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.invoice_id}`,
-                    '_blank'
-                  );
-                }}
-                sx={{
-                  backgroundColor: "#f9f9f9",
-                  borderRadius: 2,
-                  border: "1px solid #eee",
-                  width: 40,
-                  height: 40,
-                }}
-              >
-                <PaymentIcon color="black" fontSize="small" />
-              </IconButton>
-            </Tooltip>}
+            {row?.original?.is_paid &&
+              <Tooltip title="Payment Receipt">
+                <IconButton
+                  onClick={() => {
+                    window.open(
+                      `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.invoice_id}`,
+                      '_blank'
+                    );
+                  }}
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: 2,
+                    border: "1px solid #eee",
+                    width: 40,
+                    height: 40,
+                  }}
+                >
+                  <PaymentIcon color="black" fontSize="small" />
+                </IconButton>
+              </Tooltip>}
           </Box>
         </Box>
       ),
@@ -855,54 +855,56 @@ function PreSalesList() {
 
       {/* Filters */}
 
-  <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
-                    <Grid container spacing={1}>
-                    <Grid item xs={5}>
-                        <DatePicker
-                            label={"From Date"}
-                            disableFuture={true}
-                            size="small"
-                            value={fromDate}
-                            onChange={(date) => handleFromDate(date)}
-                        />
-                    </Grid>
-                    <Grid item xs={5}>
-                        <DatePicker
-                            label={"To Date"}
+      <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+        <Grid item xs={8}>
+          <Grid container spacing={1}>
+            <Grid item xs={5}>
+              <DatePicker
+                label={"From Date"}
+                disableFuture={true}
+                size="small"
+                value={fromDate}
+                onChange={(date) => handleFromDate(date)}
+              />
+            </Grid>
+            <Grid item xs={5}>
+              <DatePicker
+                label={"To Date"}
 
-                            disableFuture={true}
-                            size="small"
-                            value={toDate}
-                            onChange={(date) => handleToDate(date)}
-                        />
-                    </Grid>
-
-                    <Grid item xs={2} sx={{ marginTop: "30px" }}>
-                        <PrimaryButton
-                            bgcolor={"#bd9b4a"}
-                            icon={<SearchIcon />}
-                            title="Search"
-                            sx={{ marginTop: "30px" }}
-                            onClick={() => getCustomerQueue(null, null, null)}
-                            loading={loading}
-                        />
-                    </Grid>
-                    </Grid>
-                </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                    <PrimaryButton
-                        bgcolor={'#bd9b4a'}
-                        title="Create"
-                        
-                        onClick={() => { navigate("/sales-receipt");
-                          localStorage.setItem("currentUrl", "/create-customer"); }}
-                        loading={loading}
-                    />
-                </Grid>
+                disableFuture={true}
+                size="small"
+                value={toDate}
+                onChange={(date) => handleToDate(date)}
+              />
             </Grid>
 
-      <Box>{<DataTable loading={loader} data={data}  csv={true} csvName={'presale_requests'} columns={columns} />}</Box>
+            <Grid item xs={2} sx={{ marginTop: "30px" }}>
+              <PrimaryButton
+                bgcolor={"#bd9b4a"}
+                icon={<SearchIcon />}
+                title="Search"
+                sx={{ marginTop: "30px" }}
+                onClick={() => getCustomerQueue(null, null, null)}
+                loading={loading}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+          <PrimaryButton
+            bgcolor={'#bd9b4a'}
+            title="Create"
+
+            onClick={() => {
+              navigate("/sales-receipt");
+              localStorage.setItem("currentUrl", "/create-customer");
+            }}
+            loading={loading}
+          />
+        </Grid>
+      </Grid>
+
+      <Box>{<DataTable loading={loader} data={data} csv={true} csvName={'presale_requests'} columns={columns} />}</Box>
       <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
         <div
           style={{

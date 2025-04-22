@@ -4,11 +4,13 @@ import moment from "moment"
 import CryptoJS from 'crypto-js';
 import { PDFExport, savePDF } from "@progress/kendo-react-pdf";
 import { drawDOM, exportPDF } from "@progress/kendo-drawing";
+import { Images } from "assets";
 
 const PASS_SECRET_KEY = "Qb7C^sjNVfgd85^Wctv"
 const PASS_START = "ygpugjqhpcan"
 const PASS_END = "elrblpiijvjf"
 
+// const type = process.env.REACT_APP_TYPE
 
 export const encryptData = (data) => {
   const encryptedData = CryptoJS.AES.encrypt(data, PASS_SECRET_KEY).toString();
@@ -301,3 +303,14 @@ export const getPermissionsRoutes = (data) => {
   
   return permissionsRoutes;
 };
+
+
+
+export let agencyType = {
+  "tasheel":{
+    imageUrl: Images.headerCenterLogo
+  },
+  "pro":{
+    imageUrl: Images.logo
+  },
+}
