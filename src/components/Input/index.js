@@ -57,7 +57,7 @@ function InputField(props) {
 					size={size}
 					dir={dir}
 				
-					step={step}
+				
 					value={value}
 					type={type}
 					disabled={disabled}
@@ -87,7 +87,7 @@ function InputField(props) {
 						...InputProps,
 					}}
 
-					inputProps={inputProps} // *For Input Attributes
+					inputProps={{step:step,...inputProps}} // *For Input Attributes
 					onInput={onInput}
 					helperText={helperText}
 					{...register}
