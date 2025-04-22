@@ -143,6 +143,7 @@ function CreateCategory() {
     const [categories, setCategories] = useState(null)
     const [governmentAccount, setGovernmnentAccount] = useState(null)
     const [description, setDescription] = useState(null)
+    const [commissionApplicable, setCommissionApplicable] = useState(null)
     const [ownGovBank, setOwnGovBank] = useState(null)
     //documents array
 
@@ -239,6 +240,7 @@ function CreateCategory() {
                 cogs_account_id:cogsAccount?.id,
                 vat_bank_charge:Number(formData?.vat_bank_charge),
                 non_local_commission:Number(formData?.non_local_commission),
+                commission_applicable: commissionApplicable.id ?? true,
                 
         
 
@@ -735,12 +737,29 @@ function CreateCategory() {
                                         selected={description}
                                         onSelect={(value) => {
                                             setDescription(value)
-console.log(value)
 
                                         }}
                                         error={errors?.editable_description?.message}
                                         register={register("editable_description", {
                                             required: 'Please select Editable Description .',
+                                        })}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={2.8} >
+                                    <SelectField
+                                        size={'small'}
+                                        label={'Commission Applicable:'}
+
+                                        options={[{ id: true, name: 'Yes' }, { id: false, name: 'No' }]}
+                                        selected={commissionApplicable}
+                                        onSelect={(value) => {
+                                            setCommissionApplicable(value)
+
+                                        }}
+                                        error={errors?.commission_applicable?.message}
+                                        register={register("commission_applicable", {
+                                            required: 'Please select Commission Applicable.',
                                         })}
                                     />
                                 </Grid>

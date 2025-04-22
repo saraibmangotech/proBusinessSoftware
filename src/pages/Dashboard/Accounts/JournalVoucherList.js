@@ -555,7 +555,7 @@ function JournalVoucherList() {
                                                                     </Tooltip>
                                                                 </Cell>
                                                                 <Cell >
-                                                                    {permissions?.details && <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', gap: '20px' ,justifyContent:'space-between'}}>
+                                                                    {true && <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', gap: '20px' ,justifyContent:'space-between'}}>
                                                                         <Box
                                                                             onClick={() =>
                                                                                 navigate(

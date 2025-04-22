@@ -153,6 +153,7 @@ function CreateCategory() {
   const [categories, setCategories] = useState(null);
   const [governmentAccount, setGovernmnentAccount] = useState(null);
   const [description, setDescription] = useState(null);
+  const [commissionApplicable, setCommissionApplicable] = useState(null);
   const [ownGovBank, setOwnGovBank] = useState(null);
   //documents array
 
@@ -205,6 +206,7 @@ function CreateCategory() {
         sales_account_id: salesAccount?.id,
         use_own_govt_bank: ownGovBank?.id,
         cogs_account_id: cogsAccount?.id,
+        commission_applicable: commissionApplicable?.id,
         vat_bank_charge: Number(formData?.vat_bank_charge),
         non_local_commission: Number(formData?.non_local_commission),
       };
@@ -361,11 +363,13 @@ function CreateCategory() {
       setValue1("other_charge", detail?.other_charge);
       setValue1("local_commission", detail?.local_commission);
       setValue1("non_local_commission", detail?.non_local_commission);
+      setValue1("commission_applicable", detail?.commission_applicable);
       setValue1("vat_bank_charge", detail?.vat_bank_charge);
       setSalesAccount(detail?.sales_account);
       setCogsAccount(detail?.cogs_account);
       setOwnGovBank(detail?.use_own_govt_bank == true ? "Yes" : "No");
       setDescription(detail?.editable_description == true ? "Yes" : "No");
+      setCommissionApplicable(detail?.commission_applicable == true ? "Yes" : "No");
     } catch (error) {
       console.error("Error fetching location:", error);
     }
@@ -655,6 +659,26 @@ function CreateCategory() {
                       error={errors?.editable_description?.message}
                       register={register("editable_description", {
                         required: "Please select Editable Description .",
+                      })}
+                    />
+                  </Grid>
+
+                  <Grid item xs={2.8}>
+                    <SelectField
+                      size={"small"}
+                      label={"Commission Applicable :"}
+                      options={[
+                        { id: true, name: "Yes" },
+                        { id: false, name: "No" },
+                      ]}
+                      selected={commissionApplicable}
+                      onSelect={(value) => {
+                        console.log(value)
+                        setCommissionApplicable(value);
+                      }}
+                      error={errors?.commission_applicable?.message}
+                      register={register("commission_applicable", {
+                        required: "Please select Commission Applicable.",
                       })}
                     />
                   </Grid>

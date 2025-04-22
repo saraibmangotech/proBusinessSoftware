@@ -40,6 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -140,6 +141,9 @@ function ServiceReport() {
   const [totalCount, setTotalCount] = useState(0);
   const [pageLimit, setPageLimit] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
+  
 
 
 
@@ -161,6 +165,8 @@ function ServiceReport() {
       let params = {
         page: 1,
         limit: 1000,
+        from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+        to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
      
       }
      
@@ -198,6 +204,35 @@ function ServiceReport() {
     }
     Debounce(() => getCustomerQueue(1, '', data));
   }
+
+    const handleFromDate = (newDate) => {
+      try {
+        // eslint-disable-next-line eqeqeq
+        if (newDate == 'Invalid Date') {
+          setFromDate('invalid')
+          return
+        }
+        console.log(newDate, "newDate")
+        setFromDate(new Date(newDate))
+      } catch (error) {
+        ErrorToaster(error)
+      }
+    }
+  
+    const handleToDate = (newDate) => {
+      try {
+        // eslint-disable-next-line eqeqeq
+        if (newDate == 'Invalid Date') {
+          setToDate('invalid')
+          return
+        }
+        setToDate(new Date(newDate))
+      } catch (error) {
+        ErrorToaster(error)
+      }
+    }
+
+
   const handleDelete = async (item) => {
  
 
@@ -266,14 +301,14 @@ function ServiceReport() {
     {
       header: "Inv Date",
       accessorKey: "invoice_date",
-      accessorFn: (row) => row?.receipt?.invoice_date,
+      accessorFn: (row) => moment(row?.receipt?.invoice_date).format("DD/MM/YYYY"),
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.receipt?.invoice_date}
+          {moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY")}
         </Box>
       ),
     },
@@ -294,14 +329,14 @@ function ServiceReport() {
     {
       header: "Stock ID",
       accessorKey: "stock_id",
-      accessorFn: (row) => row?.service?.id,
+      accessorFn: (row) => row?.service?.item_code,
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.service?.id}
+          {row?.original?.service?.item_code}
         </Box>
       ),
     },
@@ -481,14 +516,14 @@ function ServiceReport() {
     {
       header: "Employee ID",
       accessorKey: "employee_id",
-      accessorFn: (row) => row?.receipt?.created_by,
+      accessorFn: (row) => row?.receipt?.creator?.employee_id,
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.receipt?.created_by}
+          {row?.original?.receipt?.creator?.employee_id}
         </Box>
       ),
     },
@@ -538,6 +573,8 @@ function ServiceReport() {
 
 
   useEffect(() => {
+    setFromDate(new Date())
+    setToDate(new Date())
     getCustomerQueue()
   }, []);
 
@@ -619,6 +656,49 @@ function ServiceReport() {
       </Box>
 
       {/* Filters */}
+
+
+                <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                        <Grid item xs={8}>
+                          <Grid container spacing={1}>
+                            <Grid item xs={5}>
+                              <DatePicker
+                                label={"From Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={fromDate}
+                                onChange={(date) => handleFromDate(date)}
+                              />
+                            </Grid>
+                            <Grid item xs={5}>
+                              <DatePicker
+                                label={"To Date"}
+                
+                                disableFuture={true}
+                                size="small"
+                                value={toDate}
+                                onChange={(date) => handleToDate(date)}
+                              />
+                            </Grid>
+                
+                            <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                              <PrimaryButton
+                                bgcolor={"#bd9b4a"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+                        
+                        </Grid>
+                      </Grid>
+
+
       <Box >
 
 

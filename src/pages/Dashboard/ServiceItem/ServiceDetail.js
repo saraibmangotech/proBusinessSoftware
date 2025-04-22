@@ -49,6 +49,7 @@ import axios from "axios";
 import UploadIcon from "@mui/icons-material/Upload";
 import FinanceServices from "services/Finance";
 
+
 function CreateCategory() {
   const theme = useTheme();
   const { user } = useAuth();
@@ -59,6 +60,8 @@ function CreateCategory() {
   const [submit, setSubmit] = useState(false);
   const [excludeFromSales, setExcludeFromSales] = useState("no");
   const [excludeFromPurchase, setExcludeFromPurchase] = useState("no");
+  const [commissionApplicable, setCommissionApplicable] = useState(null);
+  
 
   const {
     register,
@@ -364,6 +367,7 @@ function CreateCategory() {
       setCogsAccount(detail?.cogs_account);
       setOwnGovBank(detail?.use_own_govt_bank == true ? "Yes" : "No");
       setDescription(detail?.editable_description == true ? "Yes" : "No");
+      setCommissionApplicable(detail?.commission_applicable == true ? "Yes" : "No");
     } catch (error) {
       console.error("Error fetching location:", error);
     }
@@ -665,6 +669,27 @@ function CreateCategory() {
                       error={errors?.editable_description?.message}
                       register={register("editable_description", {
                         required: "Please select Editable Description .",
+                      })}
+                    />
+                  </Grid>
+
+                  <Grid item xs={2.8}>
+                    <SelectField
+                      disabled={true}
+                      size={"small"}
+                      label={"Commission Applicable *:"}
+                      options={[
+                        { id: true, name: "Yes" },
+                        { id: false, name: "No" },
+                      ]}
+                      selected={commissionApplicable}
+                      onSelect={(value) => {
+                        setCommissionApplicable(value);
+                        console.log(value);
+                      }}
+                      error={errors?.editable_description?.message}
+                      register={register("commission_applicable", {
+                        required: "Please select Commission Applicable.",
                       })}
                     />
                   </Grid>
