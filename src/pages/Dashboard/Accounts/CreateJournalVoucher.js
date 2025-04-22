@@ -1,12 +1,12 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Paper, Box, Grid, TableCell, TableContainer, TableHead, TableRow, TableBody, Table, tableCellClasses, Typography, IconButton } from "@mui/material";
+import { Paper, Box, Grid, TableCell, TableContainer, TableHead, TableRow, TableBody, Table, tableCellClasses, Typography, IconButton, Button } from "@mui/material";
 import styled from '@emotion/styled';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import SelectField from "components/Select";
 import { PrimaryButton } from "components/Buttons";
 import Colors from "assets/Style/Colors";
-import { FontFamily } from "assets";
+import { FontFamily, Images } from "assets";
 import { SuccessToaster } from "components/Toaster";
 import InputField from "components/Input";
 import FinanceServices from "services/Finance";
@@ -16,6 +16,7 @@ import DatePicker from "components/DatePicker";
 import { getYearMonthDateFormate } from "utils";
 import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
+import AddIcon from "@mui/icons-material/Add";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -73,11 +74,23 @@ const Cell = styled(TableCell)(({ theme }) => ({
 
 function CreateJournalVoucher() {
   const [handleBlockedNavigation] =
-  useCallbackPrompt(false)
+    useCallbackPrompt(false)
   const navigate = useNavigate();
+  const [isDebitDisabled, setIsDebitDisabled] = useState(false);
+  const [isCreditDisabled, setIsCreditDisabled] = useState(false);
+
   const { usdExchangeRate, cadExchangeRate } = useSelector((state) => state.navigationReducer);
 
   const { register, handleSubmit, formState: { errors }, setValue, reset, getValues } = useForm();
+  const {
+    register: register1,
+    handleSubmit: handleSubmit1,
+    setValue: setValue1,
+    getValues: getValues1,
+    control,
+    watch: watch1,
+    formState: { errors: errors1 },
+  } = useForm();
   const [loading, setLoading] = useState(false);
 
   const tableHead = ['Sr.No', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Action']
@@ -106,6 +119,11 @@ function CreateJournalVoucher() {
   const [fromDate, setFromDate] = useState();
   const [toDate, setToDate] = useState();
   const [journalNo, setJournalNo] = useState()
+  const [rows, setRows] = useState([])
+  const [subTotal, setSubTotal] = useState()
+  const [selectedRow, setSelectedRow] = useState(null)
+  const [totalCredit, setTotalCredit] = useState(0)
+  const [totalDebit, setTotalDebit] = useState(0)
 
   // *For Total of Credit & Debit
   let TotalDebit = 0
@@ -133,7 +151,7 @@ function CreateJournalVoucher() {
       const { data } = await FinanceServices.getJournalVouchers(params);
       console.log(data);
       setJournalData(data)
-      setValue('Journal', data?.vouchers?.rows.length > 0 ? "JV-" + (parseFloat(data?.vouchers?.rows[0].id) + 1) : "JV-" + 1)
+      setValue1('Journal', data?.vouchers?.rows.length > 0 ? "JV-" + (parseFloat(data?.vouchers?.rows[0].id) + 1) : "JV-" + 1)
     } catch (error) {
       showErrorToast(error);
     }
@@ -146,11 +164,11 @@ function CreateJournalVoucher() {
         category_id: id ?? ''
       }
       const { data } = await FinanceServices.getSubCategories(params)
-      if(id){
+      if (id) {
 
         setSubCategories(data?.categories)
       }
-      else{
+      else {
         setSubCategories([])
       }
     } catch (error) {
@@ -178,10 +196,16 @@ function CreateJournalVoucher() {
         page: 1,
         limit: 50,
         name: search,
-        primary_account_id: accountId ?? selectedParentAccount?.id,
+
       }
       const { data } = await FinanceServices.getAccounts(params)
-      setAccounts(data?.accounts?.rows)
+      const updatedAccounts = data?.accounts?.rows?.map(account => ({
+        ...account,
+        name: ` ${account.account_code} ${account.name}`
+      }));
+      console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+      setAccounts(updatedAccounts)
     } catch (error) {
       showErrorToast(error)
     }
@@ -247,24 +271,11 @@ function CreateJournalVoucher() {
   const createJournalVoucher = async (formData) => {
     setLoading(true)
     try {
-      const entries = journalVoucherList.map((item) => {
-        const debit_cur = item.currency === 'aed' ? '' : item.currency === 'usd' ? item.debit * usdExchangeRate : item.debit * cadExchangeRate
-        const credit_cur = item.currency === 'aed' ? '' : item.currency === 'usd' ? item.credit * usdExchangeRate : item.credit * cadExchangeRate
-        return {
-          account_id: item.account_id,
-          debit: item.debit,
-          debit_cur: debit_cur ? debit_cur : 0,
-          credit: item.credit,
-          credit_cur: credit_cur ? credit_cur : 0,
-          currency: item.currency,
-          description: item.description,
-
-        }
-      })
+     
       let obj = {
-        total: TotalDebit,
+        total: totalDebit,
         notes: getValues('note'),
-        entries: entries,
+        entries: rows,
         created_at: getYearMonthDateFormate(fromDate)
       }
 
@@ -291,7 +302,47 @@ function CreateJournalVoucher() {
     }
   }
 
+  const addItem = (data) => {
+    console.log(data);
+    const debit = parseFloat(data?.debit || 0);
+    const credit = parseFloat(data?.credit || 0);
+  
+    // Check if both debit and credit are 0
+    if (debit === 0 && credit === 0) {
+      showErrorToast('Either Debit or Credit must be greater than 0');
+      return;
+    }
+    // Create a new row with the serviceItem included
+    const newRow = { ...data, account_id: selectedAccount?.id, name: selectedAccount?.name };
+    let findElement=rows?.find(item => item?.account_id == newRow?.account_id)
+    if(findElement){
+      showErrorToast('Account Already Added')
+    }
+    else{
+
+      setRows((prevRows) => {
+        const updatedRows = [...prevRows, newRow];
+  
+        // Ensure all totals are treated as floats
+        const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
+        const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
+  
+        setTotalCredit(newTotalCredit)
+        setTotalDebit(newTotalDebit)
+        console.log(updatedRows);
+        setIsCreditDisabled(false)
+        setIsDebitDisabled(false)
+  
+        return updatedRows;
+      });
+      setSelectedAccount(null)
+      reset();
+    }
+
+  };
+
   useEffect(() => {
+    getAccounts()
     getMajorCategories()
     getSubCategories()
     setFromDate(new Date())
@@ -305,7 +356,7 @@ function CreateJournalVoucher() {
         Create Journal Voucher
       </Typography>
 
-      <Box component="form" onSubmit={handleSubmit(addVoucher)} >
+      <Box component="form" onSubmit={handleSubmit1(addVoucher)} >
         <Grid container spacing={2} >
           <Grid item xs={12} sm={3}>
             <DatePicker
@@ -323,241 +374,217 @@ function CreateJournalVoucher() {
               disabled={true}
               label={' Journal No.'}
               placeholder={'Journal No.'}
-              register={register("Journal")}
+              register={register1("Journal")}
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} >
 
-          <Grid item xs={12} sm={3}>
-            <SelectField
-              size={'small'}
-              label={'Major Category'}
-              options={majorCategories}
-              selected={selectedMajorCategory}
-              error={errors?.majorCategory?.message}
-              onSelect={(value) => {
-                if (!value) {
-                  setSubCategories([])
-                }
-                setSelectedMajorCategory(value); getSubCategories(value?.id); setSelectedSubCategory(null)
-              }}
-              register={register("majorCategory", {
-                required: 'Please select major category.',
-              })}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <SelectField
-              size={'small'}
-              label={'Sub Category'}
-              options={subCategories}
-              selected={selectedSubCategory}
-              onSelect={(value) => { setSelectedSubCategory(value); getAccountBySubCategory(value?.id) }}
-              error={errors?.subCategory?.message}
-              register={register("subCategory", {
-                required: 'Please select sub category.',
-              })}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <SelectField
-              disabled={selectedSubCategory ? false : true}
-              size={'small'}
-              label={'Account'}
-              options={parentAccounts}
-              selected={selectedParentAccount}
-              onSelect={(value) => { setSelectedParentAccount(value); getAccounts('', value?.id); setValue('accountCode', value?.account_code) }}
-              error={errors?.parentAccount?.message}
-              register={register("parentAccount", {
-                required: 'Please select parent account.',
-              })}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            {accounts?.length > 0 &&
-              <SelectField
-                disabled={selectedParentAccount ? false : true}
-                size={'small'}
-                label={'Child Account'}
-                onSearch={(v) => getAccounts(v)}
-                options={accounts}
-                selected={selectedAccount}
-                onSelect={(value) => { setSelectedAccount(value); setValue('accountCode', value?.account_code) }}
-                error={errors?.description?.message}
-                register={register("account", {
-                  required: accounts?.length > 0 ? 'Please select a account' : false,
-                })}
-              />
-            }
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <InputField
-              disabled={true}
-              size={'small'}
-              label={'Account Code'}
-              placeholder={'Account Code'}
-              register={register("accountCode")}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <InputField
-              size={'small'}
-              label={'Debit  (AED)'}
-              placeholder={'Debit'}
 
-              register={register("debit", {
-                onChange: (e) => {
-                  setValue('credit', 0)
-                  if (getValues('debit') < 0) {
-                    setValue('debit', 0)
-                  }
-                },
-              })}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <InputField
-              size={'small'}
-              label={'Credit  (AED)'}
-              placeholder={'Credit'}
 
-              register={register("credit", {
-                onChange: (e) => {
-                  setValue('debit', 0)
-                  if (getValues('credit') < 0) {
-                    setValue('credit', 0)
-                  }
-                },
-              })}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <InputField
-              size={'small'}
-              label={'Description'}
-              placeholder={'Description'}
-              register={register("description")}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} sx={{ mt: 2, textAlign: 'right' }}>
-            <PrimaryButton
-              title="Add"
-              type='submit'
-
-            />
-          </Grid>
-        </Grid>
+      
       </Box>
 
-      {/* ========== Table ========== */}
-      {journalVoucherList.length > 0 &&
-        <Fragment>
-          <TableContainer component={Paper} sx={{ mt: 2, boxShadow: '0px 8px 18px 0px #9B9B9B1A', borderRadius: 2, maxHeight: 'calc(100vh - 330px)' }}>
-            <Table stickyHeader sx={{ minWidth: 500 }}>
-              <TableHead>
-                <TableRow>
-                  {tableHead.map((item, index) => (
-                    <Cell key={index}>{item}</Cell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {journalVoucherList.map((item, index) => {
-                  TotalDebit += parseFloat(item.debit)
-                  TotalCredit += parseFloat(item.credit)
-                  return (
-                    <Row key={index} sx={{ bgcolor: index % 2 !== 0 && '#EEFBEE' }}>
-                      <Cell>
-                        {index + 1}
-                      </Cell>
-                      <Cell>
-                        {item?.coa_code ?? '-'}
-                      </Cell>
-                      <Cell>
-                        {item?.coa_name ?? '-'}
-                      </Cell>
-                      <Cell>
-                        {item?.debit ?? '-'}
-                      </Cell>
-                      <Cell>
-                        {item?.credit ?? '-'}
-                      </Cell>
-                      <Cell>
-                        {item?.description ?? '-'}
-                      </Cell>
-                      <Cell>
-                        <Box sx={{ gap: '16px !important' }}>
-                          <Box onClick={() => deleteJournalVoucher(index)}>
-                            <IconButton sx={{
-                              bgcolor: Colors.danger,
-                              "&:hover": {
-                                bgcolor: Colors.danger,
-                              },
-                            }}
-                            >
-                              <Delete sx={{ color: Colors.white, height: "16px !important" }} />
-                            </IconButton>
-                            <Typography variant="body2">
-                              Delete
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Cell>
-                    </Row>
-                  )
-                })}
-                <Row sx={{ bgcolor: '#EEFBEE' }}>
-                  <Cell colSpan={3}>
-                    <Typography variant="body1" sx={{ fontWeight: 700, }}>
-                      Total
-                    </Typography>
-                  </Cell>
-                  <Cell>
-                    <Typography variant="body1" sx={{ fontWeight: 700, }}>
-                      {parseFloat(TotalDebit).toFixed(2)}
-                    </Typography>
-                  </Cell>
-                  <Cell>
-                    <Typography variant="body1" sx={{ fontWeight: 700, }}>
-                      {parseFloat(TotalCredit).toFixed(2)}
-                    </Typography>
-                  </Cell>
-                  <Cell>
-                  </Cell>
-                  <Cell>
-                  </Cell>
-                </Row>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Grid container spacing={2} >
-            <Grid item xs={12} sm={12}>
-              {TotalCredit !== TotalDebit &&
-                <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
-                  Debit and Credit are not equal.
-                </Typography>
-              }
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <InputField
-                label={'Note'}
-                placeholder={'Note'}
-                register={register("note")}
-              />
-            </Grid>
-          </Grid>
-          <Box sx={{ mt: 2, textAlign: 'right' }}>
-            <PrimaryButton
-              disabled={TotalCredit !== TotalDebit}
-              title="Submit"
-              loading={loading}
-              onClick={() => createJournalVoucher()}
-            />
-          </Box>
-        </Fragment>
-      }
 
+      <form onSubmit={handleSubmit(addItem)}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+
+                <TableCell sx={{ width: "400px" }}>Accounts</TableCell>
+                <TableCell sx={{ width: "150px" }}>Debit</TableCell>
+                <TableCell sx={{ width: "150px" }}>Credit</TableCell>
+                <TableCell sx={{ width: "150px" }}>Description</TableCell>
+
+                <TableCell sx={{ width: "150px" }}>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {<TableRow>
+
+                <TableCell>
+                  <SelectField
+                    size="small"
+                    options={accounts}
+
+                    selected={selectedAccount}
+                    onSelect={(value) => {
+                      setSelectedAccount(value)
+                      console.log(value);
+                      setValue('AccountCode', value?.account_code)
+
+                    }}
+                    //  error={errors?.service?.message}
+                    register={register("service", {
+                      required: "Please select a service.",
+                    })}
+                  />
+                  {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                </TableCell>
+                <TableCell>
+                  <InputField
+                    size="small"
+                    placeholder="Debit"
+                    type="number"
+                    step='any'
+                    disabled={isDebitDisabled}
+                    register={register("debit", {
+                      required: "Debit is required",
+                      onChange: (e) => {
+                        const value = parseFloat(e.target.value);
+                        if (value > 0) {
+                          setValue("credit", 0);
+                          setIsCreditDisabled(true);
+                        } else {
+                          setIsCreditDisabled(false);
+                        }
+                      }
+                    })}
+                  />
+                  {errors.debit && <span style={{ color: "red" }}>{errors.debit.message}</span>}
+                </TableCell>
+
+                <TableCell>
+                  <InputField
+                    size="small"
+                    placeholder="Credit"
+                    type="number"
+                       step='any'
+                    disabled={isCreditDisabled}
+                    register={register("credit", {
+                      required: "Credit is required",
+                      onChange: (e) => {
+                        const value = parseFloat(e.target.value);
+                        if (value > 0) {
+                          setValue("debit", 0);
+                          setIsDebitDisabled(true);
+                        } else {
+                          setIsDebitDisabled(false);
+                        }
+                      }
+                    })}
+                  />
+                  {errors.credit && <span style={{ color: "red" }}>{errors.credit.message}</span>}
+                </TableCell>
+                <TableCell>
+                  <InputField
+                    size="small"
+
+                    placeholder="Description"
+
+
+                    register={register("description", { required: false })}
+                  />
+                  {errors.desc && <span style={{ color: "red" }}>{errors.desc.message}</span>}
+                </TableCell>
+
+                <TableCell>
+                  {<Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{
+                      textTransform: 'capitalize',
+                      backgroundColor: "rgb(189 155 74)",
+                      fontSize: "12px",
+                      ":hover": {
+                        backgroundColor: "rgb(189 155 74)",
+                      },
+                    }}
+                  >
+                    <AddIcon />
+                  </Button>}
+
+                </TableCell>
+              </TableRow>}
+
+              {rows?.length > 0 && rows?.map((item, index) => (
+                <TableRow key={index}>
+
+
+                  <TableCell>{item?.name}</TableCell>
+                  <TableCell>{item?.debit}</TableCell>
+                  <TableCell>{item?.credit}</TableCell>
+                  <TableCell>{item?.description}</TableCell>
+                  <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    <Box>
+                      {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+
+                        let selectedID = item?.id
+                        console.log(item?.id);
+
+                        setRows(rows?.filter(item2 => item2?.account_id != item?.account_id))
+                        let filteredData = rows?.filter(item2 => item2?.account_id != item?.account_id)
+
+                        const newTotalCredit = filteredData.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
+                        const newTotalDebit = filteredData.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
+
+                        setTotalCredit(newTotalCredit)
+                        setTotalDebit(newTotalDebit)
+
+
+                      }} width={'35px'}></Box>}
+
+
+                    </Box>
+
+                  </Box></TableCell>
+                </TableRow>
+              ))}
+              <Row sx={{ bgcolor: '#EEFBEE' }}>
+                <Cell colSpan={1}>
+                  <Typography variant="body1" sx={{ fontWeight: 700, }}>
+                    Total
+                  </Typography>
+                </Cell>
+                <Cell>
+                  <Typography variant="body1" sx={{ fontWeight: 700, }}>
+                    {parseFloat(totalDebit).toFixed(2)}
+                  </Typography>
+                </Cell>
+                <Cell>
+                  <Typography variant="body1" sx={{ fontWeight: 700, }}>
+                    {parseFloat(totalCredit).toFixed(2)}
+                  </Typography>
+                </Cell>
+                <Cell>
+                </Cell>
+                <Cell>
+                </Cell>
+              </Row>
+
+
+
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Grid container spacing={2} >
+          <Grid item xs={12} sm={12}>
+            {parseFloat(totalCredit).toFixed(2) != parseFloat(totalDebit).toFixed(2) &&
+              <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
+                Debit and Credit are not equal.
+              </Typography>
+            }
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <InputField
+              label={'Note'}
+              placeholder={'Note'}
+              register={register("note")}
+            />
+          </Grid>
+        </Grid>
+        <Box sx={{ mt: 2, textAlign: 'right' }}>
+          <PrimaryButton
+            disabled={parseFloat(totalCredit).toFixed(2) != parseFloat(totalDebit).toFixed(2)}
+            title="Submit"
+            loading={loading}
+            onClick={() => createJournalVoucher()}
+          />
+        </Box>
+      </form>
     </Box>
   );
 }
