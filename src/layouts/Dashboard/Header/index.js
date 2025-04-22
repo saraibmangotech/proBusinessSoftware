@@ -54,6 +54,7 @@ import Avatar from "@mui/material/Avatar"
 import AuthServices from "services/Auth"
 import { ErrorToaster } from "components/Toaster"
 import { Images } from "assets"
+import { agencyType, getDetailWithType } from "utils"
 
 function DropDown({ anchorEl, openDropdown, handleClose }) {
   const [confirmationDialog, setConfirmationDialog] = useState(false)
@@ -1117,9 +1118,8 @@ function Header() {
             <Box sx={{width:"150px"}}>
   <CardMedia image={Images.mainLogo} sx={{  height:"100px"}} />
 </Box>
-
 <Box sx={{width:"150px"}}>
-  <CardMedia image={Images.headerCenterLogo} sx={{height:"90px"}} />
+  <CardMedia image={agencyType[process.env.REACT_APP_TYPE]?.imageUrl} sx={{height:"90px"}} />
 </Box>
             {/* <Box sx={{ flexGrow: 1 }} /> */}
 
@@ -1180,6 +1180,9 @@ function Header() {
           boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)",
         }}
       >
+        <ClickAwayListener onClickAway={handleDropdownClose}>
+
+    
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ minHeight: "48px" }}>
             {/* Mobile Menu Icon */}
@@ -1310,8 +1313,8 @@ function Header() {
                                       </MenuItem>
                                     ))}
                                   </MenuList>
-                                {/* </ClickAwayListener> */}
                               </Paper>
+                                {/* </ClickAwayListener> */}
                             </Grow>
                           )}
                         </Popper>
@@ -1349,7 +1352,9 @@ function Header() {
             )}
           </Toolbar>
         </Container>
+        </ClickAwayListener>
       </AppBar>
+
 
       {/* Mobile Navigation Drawer */}
       <Drawer
