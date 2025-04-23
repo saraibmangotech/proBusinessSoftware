@@ -61,9 +61,11 @@ function CreateFundTransferVoucher() {
         limit: 50,
         name: search
       }
-      const { data } = await FinanceServices.getPaymentAccounts(params)
-      setAccounts([...data?.cashierAccounts?.rows, ...data?.bankAccounts?.rows])
-      setCashierAccounts(data?.cashierAccounts?.rows)
+      const { data } = await FinanceServices.getAccounts(params)
+      console.log(data?.rows);
+      
+      setAccounts(data?.accounts?.rows)
+    
     } catch (error) {
       ErrorToaster(error)
     }
@@ -190,7 +192,14 @@ function CreateFundTransferVoucher() {
               })}
             />
           </Grid>
+          
           <Grid item xs={12} sm={4}>
+            <InputField
+              size={'small'}
+              label={'Note'}
+              placeholder={'Note'}
+              register={register("note")}
+            />
           </Grid>
           <Grid item xs={12} sm={4}>
             <SelectField
@@ -230,49 +239,20 @@ function CreateFundTransferVoucher() {
               })}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <InputField
-              disabled={disabledExchangeRate}
-              size={'small'}
-              label={'Exchange Rate'}
-              placeholder={'Exchange Rate'}
-              defaultValue={usdExchangeRate}
-              register={register("exchangeRate", {
-                onChange: e => setUpdateExchangeRate(e.target.value)
-              })}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <InputField
-              disabled={true}
-              size={'small'}
-              label={'Received Amount'}
-              placeholder={'Received Amount'}
-              register={register("receivedAmount")}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <InputField
-              disabled={true}
-              size={'small'}
-              label={'Exchange Loss'}
-              placeholder={'Exchange Gain/Loss'}
-              register={register("exchangeLoss")}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <InputField
-              size={'small'}
-              label={'Note'}
-              placeholder={'Note'}
-              register={register("note")}
-            />
-          </Grid>
+          
+         
           <Grid item xs={12} sm={12} sx={{ mt: 2, textAlign: 'right' }}>
             <PrimaryButton
               title="Submit"
               type='submit'
               loading={loading}
+              sx={{
+                textTransform: "capitalize",
+                backgroundColor: "#bd9b4a",
+                ":hover": {
+                  backgroundColor: "rgb(189 155 74)",
+                },
+              }}
             />
           </Grid>
         </Grid>

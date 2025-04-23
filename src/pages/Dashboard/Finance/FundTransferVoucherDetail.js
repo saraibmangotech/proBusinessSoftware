@@ -1,681 +1,278 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { Box, CircularProgress, Grid, CardMedia, Typography, Container } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import Colors from 'assets/Style/Colors';
-import { ErrorToaster } from 'components/Toaster';
-import { PrimaryButton } from 'components/Buttons';
-import { GeneratePDF, handleExportWithComponent } from 'utils';
-import VehiclePaymentServices from 'services/VehiclePayment';
-import { FontFamily, Images, InvoiceGlobal, InvoiceLocation, InvoiceMail, InvoicePhone } from 'assets';
-import { makeStyles } from '@mui/styles';
-import moment from 'moment';
-import { QRCodeCanvas } from 'qrcode.react';
-import CurrencyServices from 'services/Currency';
-import FinanceServices from 'services/Finance';
-import { useReactToPrint } from 'react-to-print';
-import { PDFExport } from '@progress/kendo-react-pdf';
-
-const useStyle = makeStyles({
-  headingBg: {
-    margin: '32px 0px',
-    padding: '12px 0px',
-    textAlign: 'center',
-  },
-  heading: {
-    color: Colors.white,
-    textTransform: 'uppercase',
-    fontWeight: 300,
-    fontFamily: FontFamily.NunitoRegular
-  },
-  text: {
-    color: Colors.smokeyGrey,
-    fontWeight: 300,
-    fontFamily: FontFamily.NunitoRegular
-  },
-  tableCell: {
-    backgroundColor: Colors.aliceBlue,
-    border: '0.25px solid #D9D9D9',
-    '& .MuiTypography-root': {
-      padding: '4px 12px'
-    }
-  }
-})
+import React, { useEffect, useState } from "react";
+import { Box, Grid, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import SelectField from "components/Select";
+import { PrimaryButton } from "components/Buttons";
+import Colors from "assets/Style/Colors";
+import { FontFamily } from "assets";
+import { ErrorToaster, SuccessToaster } from "components/Toaster";
+import InputField from "components/Input";
+import FinanceServices from "services/Finance";
+import DatePicker from "components/DatePicker";
+import { useSelector } from "react-redux";
+import { setDate } from "date-fns";
 
 function FundTransferVoucherDetail() {
+  const { id } = useParams()
+  const navigate = useNavigate();
+  const { usdExchangeRate } = useSelector((state) => state.navigationReducer);
 
-  const { id } = useParams();
-  const contentRef = useRef(null);
-  const classes = useStyle();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
 
-  const [loader, setLoader] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // *For Invoice Detail
-  const [voucherDetail, setVoucherDetail] = useState();
+  // *For Accounts
+  const [accounts, setAccounts] = useState([]);
+  const [selectedFromAccount, setSelectedFromAccount] = useState(null);
+  const [selectedToAccount, setSelectedToAccount] = useState(null);
+  const [cashierAccounts, setCashierAccounts] = useState([])
 
-  // *For Get Fund Transfer Voucher Detail
-  const getFundTransferVoucherDetail = async () => {
-    setLoader(true)
+  // *For Handle Date
+  const [vaultDate, setVaultDate] = useState(new Date());
+
+  // *For Exchange Rate Disabled
+  const [disabledExchangeRate, setDisabledExchangeRate] = useState(false);
+
+  // *For Updated Exchange Rate
+  const [updateExchangeRate, setUpdateExchangeRate] = useState(usdExchangeRate);
+
+  // *For Transfer Amount
+  const [transferAmount, setTransferAmount] = useState();
+
+  // *For Handle Date
+  const handleVaultDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setVaultDate('invalid')
+        return
+      }
+      setVaultDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+
+  // *For Get Payment Accounts
+  const getPaymentAccounts = async (search) => {
     try {
       let params = {
-        voucher_id: id
+        page: 1,
+        limit: 50,
+        name: search
       }
-      const { data } = await FinanceServices.getFundTransferVoucherDetail(params)
-      setVoucherDetail(data.voucher)
+      const { data } = await FinanceServices.getAccounts(params)
+      console.log(data?.rows);
+
+      setAccounts(data?.accounts?.rows)
 
     } catch (error) {
       ErrorToaster(error)
-    } finally {
-      setLoader(false)
     }
   }
 
-  const handlePrint = useReactToPrint({
-    content: () => contentRef.current,
-    documentTitle: 'invoice',
-  });
+  // *For Create FUnd Transfer Voucher
+  const FundTransferVoucherDetail = async (formData) => {
+    setLoading(true)
+    try {
+      if (selectedFromAccount?.id === selectedToAccount?.id) {
+        ErrorToaster('Transfer account and Receiver account is same')
+        return
+      }
 
+      let fromAccount = null;
+      let toAccount = null;
+      let cashier = false
+      fromAccount = cashierAccounts?.find(item => item?.id == selectedFromAccount?.id)
+      toAccount = cashierAccounts?.find(item => item?.id == selectedToAccount?.id)
+
+      if (fromAccount && toAccount) {
+        cashier = true
+
+      }
+      else {
+        cashier = false
+
+      }
+      let obj = {
+        from_account_id: selectedFromAccount?.id,
+        to_account_id: selectedToAccount?.id,
+        from_currency: selectedFromAccount?.currency,
+        from_amount: formData?.transferAmount,
+        to_currency: selectedToAccount?.currency,
+        to_amount: formData?.receivedAmount,
+        exchange_rate: updateExchangeRate,
+        exchange_loss: formData.exchangeLoss,
+        ref_no: formData.ref,
+        notes: formData.note,
+        cashier: cashier
+      }
+
+      const { message } = await FinanceServices.createFundTransferVoucher(obj)
+      SuccessToaster(message)
+      navigate('/fund-transfer-vouchers')
+    } catch (error) {
+      ErrorToaster(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  const getFundTransferVoucherDetail = async () => {
+
+    try {
+      let params = {
+        id: id
+      }
+      const { data } = await FinanceServices.getFundTransferVoucherDetail(params)
+      console.log(data);
+      let voucher = data?.voucher
+      setDate(new Date(voucher?.createdAt))
+      setValue('transferAmount',parseFloat(voucher?.from_amount).toFixed(2))
+      setValue('note',voucher?.note)
+      setValue('ref',voucher?.ref)
+      setSelectedFromAccount(voucher?.from_account)
+      setSelectedToAccount(voucher?.to_account)
+
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+  useEffect(() => {
+    getFundTransferVoucherDetail()
+    getPaymentAccounts()
+  }, []);
 
   useEffect(() => {
-    if (id) {
-      getFundTransferVoucherDetail()
+    if (transferAmount) {
+      let aedIntoUsd = 0
+      let totalExchangeLoss = 0
+      if (selectedFromAccount?.currency === selectedToAccount?.currency) {
+        setDisabledExchangeRate(true)
+        aedIntoUsd = parseFloat(transferAmount)
+        setValue('receivedAmount', parseFloat(aedIntoUsd).toFixed(2))
+        setValue('exchangeLoss', 0);
+        return
+      }
+      setDisabledExchangeRate(false)
+      if (selectedFromAccount?.currency === 'usd') {
+        aedIntoUsd = parseFloat(transferAmount) * parseFloat(updateExchangeRate)
+        setValue('receivedAmount', parseFloat(aedIntoUsd).toFixed(2))
+        totalExchangeLoss = transferAmount * usdExchangeRate - transferAmount * updateExchangeRate;
+        setValue('exchangeLoss', parseFloat(totalExchangeLoss).toFixed(2));
+      }
+      if (selectedFromAccount?.currency === 'aed') {
+
+        aedIntoUsd = parseFloat(transferAmount) / parseFloat(updateExchangeRate)
+        console.log(aedIntoUsd);
+        console.log(transferAmount / usdExchangeRate);
+        console.log(transferAmount / updateExchangeRate);
+        console.log(usdExchangeRate);
+        console.log(updateExchangeRate);
+        setValue('receivedAmount', parseFloat(aedIntoUsd).toFixed(2))
+        totalExchangeLoss = (transferAmount / usdExchangeRate) - (transferAmount / updateExchangeRate);
+        setValue('exchangeLoss', parseFloat(totalExchangeLoss).toFixed(2));
+      }
+      if (selectedFromAccount?.currency === 'aed' && selectedToAccount?.currency === 'usd') {
+
+        aedIntoUsd = parseFloat(transferAmount) / parseFloat(updateExchangeRate)
+
+        setValue('receivedAmount', parseFloat(aedIntoUsd).toFixed(2))
+        totalExchangeLoss = (transferAmount / usdExchangeRate) - (transferAmount / updateExchangeRate);
+        setValue('exchangeLoss', parseFloat(parseFloat(totalExchangeLoss) * usdExchangeRate).toFixed(2));
+      }
     }
-  }, [id]);
+  }, [transferAmount, updateExchangeRate, selectedFromAccount, selectedToAccount]);
 
   return (
-    <Container>
-      {!loader && (
-        <Box sx={{ textAlign: "right", p: 4 }}>
-          <PrimaryButton
-            title="Download PDF"
-            type="button"
-            style={{ backgroundColor: Colors.bluishCyan }}
-            onClick={() => handleExportWithComponent(contentRef)}
-          />
-        </Box>
-      )}
-      <PDFExport ref={contentRef}
-        fileName="Fund Transfer Voucher"
-      >
-        <Box
-          sx={{
-            width: "1000px",
-            mx: 4,
-            my: 2,
-            bgcolor: Colors.white,
-            boxShadow: "0px 8px 18px 0px #9B9B9B1A",
-          }}
-        >
-          {!loader ? (
-            <Box >
-              <Grid container justifyContent={'space-between'} spacing={0}>
-                <Grid item xs={1} sm={1} md={1}>
-                  <Box
-                    component={"img"}
-                    src={Images.whiteLogo}
-                    sx={{ width: "280px", m: 2, my: 3 }}
-                  />
-                </Grid>
-                <Grid item xs={8.5} sm={8.5} md={8.5}>
-                  <CardMedia image={Images.invoiceHeader} sx={{ mb: 2 }}>
-                    <Typography
-                      variant="h3"
-                      sx={{ py: 3, textAlign: "center", color: Colors.white }}
-                    >
-                      Galaxy Used Cars Tr. LLC
-                    </Typography>
-                  </CardMedia>
-                  {/* <Box sx={{backgroundColor:'green', borderLeft: '60px solid transparent'}}>
-                <Typography
-                    variant="h3"
-                    sx={{ py: 3, textAlign: "center", color: Colors.white }}
-                  >
-                    Galaxy Used Cars Tr. LLC
-                  </Typography>
+    <Box sx={{ m: 4, p: 5, bgcolor: Colors.white, borderRadius: 3, boxShadow: '0px 8px 18px 0px #9B9B9B1A' }}>
 
-                </Box> */}
-                  <Grid
-                    container
-                    spacing={1.5}
-                    alignItems={"center"}
-                    justifyContent={"space-evenly"}
-                  >
-                    <Grid item xs={4} sm={4} md={4}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: "5px",
-                          alignItems: "center",
-                        }}
-                      >
-                        <InvoicePhone />
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: Colors.smokeyGrey,
-                            fontFamily: FontFamily.NunitoRegular,
-                          }}
-                        >
-                          +971 6 510 2000
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6} sm={6} md={6}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: "5px",
-                          alignItems: "center",
-                        }}
-                      >
-                        <InvoiceMail />
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: Colors.smokeyGrey,
-                            fontFamily: FontFamily.NunitoRegular,
-                          }}
-                        >
-                          info@galaxyshipping.com
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={4} sm={4} md={4}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: "5px",
-                          alignItems: "center",
-                        }}
-                      >
-                        <InvoiceGlobal />
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: Colors.smokeyGrey,
-                            fontFamily: FontFamily.NunitoRegular,
-                          }}
-                        >
-                          https://galaxyshipping.com
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6} sm={6} md={6}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: "5px",
-                          alignItems: "center",
-                        }}
-                      >
-                        <InvoiceLocation />
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: Colors.smokeyGrey,
-                            fontFamily: FontFamily.NunitoRegular,
-                          }}
-                        >
-                          Ind Area#4 P.O Box 83126, Sharjah , UAE
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Box
-                sx={{
-                  my: 5,
-                  position: "relative",
-                  bgcolor: Colors.bluishCyan,
-                  width: 1,
-                  height: "12px",
-                }}
-              >
-                <Typography
-                  component={"span"}
-                  variant="h2"
-                  sx={{
-                    color: Colors.charcoalGrey,
-                    bgcolor: Colors.white,
-                    p: 2,
-                    letterSpacing: "3px",
-                    position: "absolute",
-                    right: "90px",
-                    top: "-40px",
-                  }}
-                >
-                  FUND TRANSFER VOUCHER
-                </Typography>
-              </Box>
-              <Grid container spacing={0} justifyContent={"space-between"}>
-                <Grid item xs={5.5} sm={5.5} md={5.5}>
-                  <Box sx={{ ml: 4, mb: 5 }}>
-                    <Grid container spacing={0.5}>
-                      <Grid item xs={12} sm={12} md={12}>
-                        <Typography
-                          variant="h4"
-                          className={classes.text}
-                          sx={{ mb: 1 }}
-                        >
-                          Transfer From:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={5}>
-                        <Typography variant="body1" className={classes.text}>
-                          Account COA:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={6} md={6}>
-                        <Typography
-                          noWrap
-                          variant="body1"
-                          className={classes.text}
-                        >
-                          {voucherDetail?.from_account?.account_code ?? "-"}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={5}>
-                        <Typography variant="body1" className={classes.text}>
-                          Account Name:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={6} md={6}>
-                        <Typography
-                          noWrap
-                          variant="body1"
-                          className={classes.text}
-                        >
-                          {voucherDetail?.from_account?.name ?? "-"}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={5}>
-                        <Typography variant="body1" className={classes.text}>
-                          Currency:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={6} md={6}>
-                        <Typography
-                          noWrap
-                          variant="body1"
-                          className={classes.text}
-                        >
-                          {voucherDetail?.from_account?.currency.toUpperCase() ?? "-"}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={12} sx={{ mt: 3 }}>
-                        <Typography
-                          variant="h4"
-                          className={classes.text}
-                          sx={{ mb: 1 }}
-                        >
-                          Transfer To:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={5}>
-                        <Typography variant="body1" className={classes.text}>
-                          Account COA:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={6} md={6}>
-                        <Typography
-                          noWrap
-                          variant="body1"
-                          className={classes.text}
-                        >
-                          {voucherDetail?.to_account?.account_code ?? "-"}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={5}>
-                        <Typography variant="body1" className={classes.text}>
-                          Account Name:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={6} md={6}>
-                        <Typography
-                          noWrap
-                          variant="body1"
-                          className={classes.text}
-                        >
-                          {voucherDetail?.to_account?.name ?? "-"}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={5}>
-                        <Typography variant="body1" className={classes.text}>
-                          Currency:
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={6} md={6}>
-                        <Typography
-                          noWrap
-                          variant="body1"
-                          className={classes.text}
-                        >
-                          {voucherDetail?.to_account?.currency.toUpperCase() ?? "-"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
+      <Box component="form" onSubmit={handleSubmit(FundTransferVoucherDetail)} >
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={12}>
+            <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
+              Fund Transfer Voucher Detail
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <DatePicker
+              size={'small'}
+              label={'Date'}
+              disabled={true}
+              value={vaultDate}
+              onChange={(date) => handleVaultDate(date)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <InputField
+              size={'small'}
+              label={'Ref No'}
+              disabled={true}
+              placeholder={'Ref No'}
+              error={errors?.ref?.message}
+              register={register("ref", {
+                required: 'please enter ref no'
+              })}
+            />
+          </Grid>
 
-                  <Box
-                    className={classes.headingBg}
-                    sx={{ bgcolor: Colors.bluishCyan }}
-                  >
-                    <Typography variant="h4" className={classes.heading}>
-                      Notes
-                    </Typography>
-                  </Box>
-                  <Box sx={{ ml: 4, mr: 2 }}>
-                    <Typography variant="body1" className={classes.text}>
-                      {voucherDetail?.notes}
-                    </Typography>
-                  </Box>
+          <Grid item xs={12} sm={4}>
+            <InputField
+              size={'small'}
+              label={'Note'}
+              disabled={true}
+              placeholder={'Note'}
+              register={register("note")}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <SelectField
+              size={'small'}
+              label={'Fund Transfer From'}
+              disabled={true}
+              options={accounts}
+              selected={selectedFromAccount}
+              onSelect={(value) => setSelectedFromAccount(value)}
+              error={errors?.from?.message}
+              register={register("from", {
+                required: 'Please select from account.',
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <InputField
+              size={'small'}
+              disabled={true}
+              label={'Transfer Amount'}
+              placeholder={'Amount'}
+              error={errors?.transferAmount?.message}
+              register={register("transferAmount", {
+                required: 'Please enter transfer amount',
+                onChange: e => setTransferAmount(e.target.value)
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <SelectField
+              size={'small'}
+              disabled={true}
+              label={'Fund Transfer To'}
+              options={accounts}
+              selected={selectedToAccount}
+              onSelect={(value) => setSelectedToAccount(value)}
+              error={errors?.to?.message}
+              register={register("to", {
+                required: 'Please select to account.',
+              })}
+            />
+          </Grid>
 
-                </Grid>
-                <Grid item xs={5.5} sm={5.5} md={5.5}>
-                  <Box sx={{ mr: 3, mt: 0 }}>
-                    <Grid container spacing={0} justifyContent={"flex-end"}>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          Voucher #:
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          GPV-{voucherDetail?.id}
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          Ref No #:
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          {voucherDetail?.ref_no}
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          Creation on:
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          {moment(
-                            voucherDetail?.invoice?.booking?.created_at
-                          ).format("DD-MMM-YYYY hh:mm")}
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          Last Updated on:
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={6}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text}>
-                          {moment(voucherDetail?.updated_at).format(
-                            "DD-MMM-YYYY hh:mm"
-                          )}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                  <Box className={classes.headingBg} sx={{ bgcolor: Colors.primary }}>
-                    <Typography variant="h4" className={classes.heading}>
-                      Amount Paid
-                    </Typography>
-                  </Box>
 
-                  <Box sx={{ mr: 3, mb: 4 }}>
-                    <Grid container spacing={0} justifyContent={"flex-end"}>
-                      <Grid
-                        item
-                        xs={4}
-                        sm={4}
-                        md={4}
-                        className={classes.tableCell}
-                      >
-                        <Typography variant="body1" className={classes.text} sx={{ textAlign: "right", fontWeight: 'bold !important' }}>
-                          AED
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sm={4}
-                        md={4}
-                        className={classes.tableCell}
-                      >
-                        <Typography
-                          variant="body1"
-                          className={classes.text}
-                          sx={{ textAlign: "right", fontWeight: 'bold !important' }}
-                        >
-                          Rate
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sm={4}
-                        md={4}
-                        className={classes.tableCell}
-                      >
-                        <Typography
-                          variant="body1"
-                          className={classes.text}
-                          sx={{ textAlign: "right", fontWeight: 'bold !important' }}
-                        >
-                          USD
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sm={4}
-                        md={4}
-                        className={classes.tableCell}
-                        sx={{ backgroundColor: 'white !important' }}
-                      >
-                        <Typography variant="body1" className={classes.text} sx={{ textAlign: "right" }}>
-                          {parseFloat(
-                            voucherDetail?.from_amount
-                          )?.toFixed(2)}
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sm={4}
-                        md={4}
-                        className={classes.tableCell}
-                        sx={{ backgroundColor: 'white !important' }}
-                      >
-                        <Typography
-                          variant="body1"
-                          className={classes.text}
-                          sx={{ textAlign: "right" }}
-                        >
-                          {parseFloat(
-                            voucherDetail?.exchange_rate
-                          )?.toFixed(2)}
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sm={4}
-                        md={4}
-                        className={classes.tableCell}
-                        sx={{ backgroundColor: 'white !important' }}
-                      >
-                        <Typography
-                          variant="body1"
-                          className={classes.text}
-                          sx={{ textAlign: "right" }}
-                        >
-                          {parseFloat(
-                            voucherDetail?.to_amount
-                          )?.toFixed(2)}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                  <Box
-                    className={classes.headingBg}
-                    sx={{ pl: "32px !important", bgcolor: Colors.aliceBlue }}
-                  >
-                    <Typography
-                      variant="body1"
-                      className={classes.heading}
-                      sx={{
-                        textAlign: "left",
-                        color: `${Colors.charcoalGrey} !important`,
-                      }}
-                    >
-                      <b>Processed by :</b>
-                      <Typography
-                        component={"span"}
-                        variant="body2"
-                        sx={{ textTransform: "none" }}
-                      >
-                        &nbsp; {voucherDetail?.creator?.name}
-                      </Typography>
-                    </Typography>
-                  </Box>
+          
+        </Grid>
+      </Box>
 
-                </Grid>
-              </Grid>
-              <Grid container spacing={0} justifyContent={"flex-end"} mb={20}>
-                {/* <Grid item xs={9.5} sm={9.5} md={9.5}>
-                <Box sx={{ pl: 4, pr: 3, mb: 3, mt: 4 }}>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    PLEASE READ CAREFULLY BELOW TERM & CONDITION:
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    className={classes.text}
-                    sx={{ mb: 1 }}
-                  >
-                    1 - I've clearly informed and the make the understand all
-                    the vehicle information, amount, charges and rates.
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    className={classes.text}
-                    sx={{ mb: 1 }}
-                  >
-                    2 - Kindly pay the due amount within 3 business days from
-                    the purchase date to avoid the Late Payment and Storages
-                    that will be charged once vehicle arrived to final
-                    destination (Further, If there are some special
-                    annousment/memo ignore this and follow that)
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    className={classes.text}
-                    sx={{ mb: 1 }}
-                  >
-                    3 - If vehicle got relisted, the relist charges customer has
-                    to pay within 3 days otherwise 15% Penalty will applied
-                    after 3 days as issued memo on 9/Jun/2022.
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    className={classes.text}
-                    sx={{ mb: 1 }}
-                  >
-                    4 - Galaxy Customer care department will inform you about
-                    the latest updates about rates and charges through WhatsApp
-                    and emails.
-                  </Typography>
-                </Box>
-              </Grid> */}
-                <Grid item xs={2} sm={2} md={2} mt={7}>
-                  <Box sx={{ height: "100%", display: "flex", alignItems: "center" }}>
-                    <QRCodeCanvas
-                      value={
-                        window.location.origin +
-                        `/fund-transfer-voucher-preview/${btoa("voucher-" + id)}`
-                      }
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-              <Box sx={{ pl: 4, pr: 3, py: 1, bgcolor: Colors.primary }}>
-                <Typography
-                  variant="caption"
-                  sx={{ color: Colors.white, fontFamily: FontFamily.NunitoRegular }}
-                >
-                  Customer care Contact: Mohammed husni - +971523195682 (Arabic &
-                  English ) Ardamehr Shoev - +971545836028 (English ,Arabic, Tajik &
-                  Farsi)
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ color: Colors.white, fontFamily: FontFamily.NunitoRegular }}
-                >
-                  Ravin abdul kareem - +971528293801 (Kurdish , Arabic & English)
-                  Magsat Gylyjov - +97158666403 (Turken , Russian & English)
-                </Typography>
-              </Box>
-            </Box>
-          ) : (
-            <Box sx={{ textAlign: "center", py: 3 }}>
-              <CircularProgress />
-            </Box>
-          )}
-        </Box>
-      </PDFExport>
-    </Container>
+    </Box>
   );
 }
 
