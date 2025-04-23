@@ -258,6 +258,10 @@ const CustomerServices = {
     const data = await deleted(routes.handleDeleteDraft, params);
     return data;
   },
+  DeleteCustomerPayment: async (params) => {
+    const data = await deleted(routes.DeleteCustomerPayment, params);
+    return data;
+  },
   DeleteCategory: async (params) => {
     const data = await deleted(routes.DeleteCategory, params);
     return data;
