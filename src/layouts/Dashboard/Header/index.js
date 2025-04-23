@@ -664,6 +664,7 @@ function Header() {
           navigation: true,
           order_by: 12,
           children: [
+
             {
               id: 33,
               name: "Create Account",
@@ -696,6 +697,28 @@ function Header() {
               identifier: null,
               navigation: true,
               order_by: 34,
+            },
+            {
+              id: 33,
+              name: "Customer Payments",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/customer-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "IFT Vouchers",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/fund-transfer-vouchers",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
             },
             {
               id: 35,
@@ -975,7 +998,7 @@ function Header() {
           <ListItemText
             primary={
               <Typography variant="body2" sx={{ fontWeight: location.pathname === "/dashboard" ? 500 : 400 }}>
-                Dashboardxxxxz
+                Dashboard
               </Typography>
             }
           />

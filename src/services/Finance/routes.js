@@ -53,7 +53,9 @@ const routes = {
   getJournalVoucherPreview: 'accounts/journalVouchers/preview',
   getFundTransferVoucherPreview: 'accounts/iftVouchers/preview',
   getCustomerProfitLoss:'accounts/reportsByCustomer',
-  getTax:'/system/tax'
+  getTax:'/system/tax',
+  getCustomerPaymentList:"payments/customer",
+  getCustomerPaymentDetail:'payments/customer/details'
 
 };
 

@@ -301,6 +301,12 @@ const FundTransferVoucherList = lazy(() =>
 const FundTransferVoucherDetail = lazy(() =>
   import("pages/Dashboard/Finance/FundTransferVoucherDetail")
 );
+const CustomerPaymentList = lazy(() =>
+  import("pages/Dashboard/CustomerPayment/CustomerPaymentList")
+);
+const UpdateCustomerPayment = lazy(() =>
+  import("pages/Dashboard/CustomerPayment/CustomerPaymentDetail")
+);
 const AdminRoutes = [
   
   {
@@ -328,8 +334,16 @@ const AdminRoutes = [
     component: <FundTransferVoucherList />,
   },
   {
+    path: "/customer-payment-list",
+    component: <CustomerPaymentList />,
+  },
+  {
     path: "/fund-transfer-voucher-detail/:id",
     component: <FundTransferVoucherDetail />,
+  },
+  {
+    path: "/customer-payment-detail/:id",
+    component: <UpdateCustomerPayment />,
   },
   {
     path: "/create-card",
