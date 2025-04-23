@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 69,
+            "activePatchIndex": 73,
             "patches": [
                 {
                     "date": 1744496886534,
@@ -284,6 +284,22 @@
                 {
                     "date": 1744919064940,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -208,8 +208,17 @@\n \r\n const CategoryDetail = lazy(() =>\r\n   import(\"pages/Dashboard/ServiceCategory/CategoryDetail\")\r\n );\r\n+\r\n+const ServiceReport = lazy(() =>\r\n+  import(\"pages/Dashboard/Reports/ServiceReport\")\r\n+);\r\n+\r\n+const CollectionReport = lazy(() =>\r\n+  import(\"pages/Dashboard/Reports/CollectionReport\")\r\n+);\r\n+\r\n const CreateReception = lazy(() =>\r\n   import(\"pages/Dashboard/Reception/CreateReception\")\r\n );\r\n const ReceptionList = lazy(() =>\r\n@@ -272,26 +281,38 @@\n );\r\n const CardList = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/Cards\")\r\n );\r\n+const CreateCard = lazy(() =>\r\n+  import(\"pages/Dashboard/Cards/CreateCard\")\r\n+);\r\n const UpdateCard = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/UpdateCard\")\r\n );\r\n+\r\n const AdminRoutes = [\r\n   \r\n   {\r\n     path: \"/create-service-item\",\r\n     component: <CreateServiceItem />,\r\n   },\r\n   {\r\n     path: \"/service-report\",\r\n-    component: <CreateServiceItem />,\r\n+    component: <ServiceReport />,\r\n   },\r\n   {\r\n     path: \"/create-paid-receipt\",\r\n     component: <CreatePaidReceipt />,\r\n   },\r\n   {\r\n+    path: \"/create-card\",\r\n+    component: <CreateCard />,\r\n+  },\r\n+  {\r\n+    path: \"/update-card/:id\",\r\n+    component: <UpdateCard />,\r\n+  },\r\n+  {\r\n     path: \"/update-paid-receipt/:id\",\r\n     component: <UpdatePaidReceipt />,\r\n   },\r\n   {\r\n@@ -759,8 +780,12 @@\n   {\r\n     path: \"/notifcations\",\r\n     component: <Notification />,\r\n   },\r\n+  {\r\n+    path: \"/collection-report\",\r\n+    component: <CollectionReport />,\r\n+  },\r\n  \r\n ];\r\n \r\n export default AdminRoutes;\r\n"
+                },
+                {
+                    "date": 1745391580267,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -303,8 +303,12 @@\n     path: \"/create-paid-receipt\",\r\n     component: <CreatePaidReceipt />,\r\n   },\r\n   {\r\n+    path: \"/create-customer-payment\",\r\n+    component: <CreatePaidReceipt />,\r\n+  },\r\n+  {\r\n     path: \"/create-card\",\r\n     component: <CreateCard />,\r\n   },\r\n   {\r\n"
+                },
+                {
+                    "date": 1745391587467,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -304,9 +304,9 @@\n     component: <CreatePaidReceipt />,\r\n   },\r\n   {\r\n     path: \"/create-customer-payment\",\r\n-    component: <CreatePaidReceipt />,\r\n+    component: <CreateCustomerPayment />,\r\n   },\r\n   {\r\n     path: \"/create-card\",\r\n     component: <CreateCard />,\r\n"
+                },
+                {
+                    "date": 1745391598818,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -287,8 +287,11 @@\n );\r\n const UpdateCard = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/UpdateCard\")\r\n );\r\n+const CreateCustomerPayment = lazy(() =>\r\n+  import(\"pages/Dashboard/Payments/CreateCustomerPayment\")\r\n+);\r\n \r\n const AdminRoutes = [\r\n   \r\n   {\r\n"
+                },
+                {
+                    "date": 1745391604695,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -288,9 +288,9 @@\n const UpdateCard = lazy(() =>\r\n   import(\"pages/Dashboard/Cards/UpdateCard\")\r\n );\r\n const CreateCustomerPayment = lazy(() =>\r\n-  import(\"pages/Dashboard/Payments/CreateCustomerPayment\")\r\n+  import(\"pages/Dashboard/CustomerPayment/CreateCustomerPayment\")\r\n );\r\n \r\n const AdminRoutes = [\r\n   \r\n"
                 }
             ],
             "date": 1744496886534,
