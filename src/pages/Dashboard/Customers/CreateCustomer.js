@@ -96,7 +96,7 @@ function CreateCustomer() {
   const [progress, setProgress] = useState(0);
   const [uploadedSize, setUploadedSize] = useState(0);
   const [slipDetail, setSlipDetail] = useState([]);
-
+  const [categories, setCategories] = useState([])
 
   const [emailVerify, setEmailVerify] = useState(false)
 
@@ -134,6 +134,10 @@ function CreateCustomer() {
 
   const submitForm1 = async (formData) => {
     console.log(formData);
+    const simplifiedCategories = categories.map(({ id, commission_value }) => ({
+      category_id:id,
+      commission_value,
+    }));
     try {
       let obj = {
         name: formData?.name,
@@ -152,6 +156,7 @@ function CreateCustomer() {
         general_notes: formData?.notes,
         email: formData?.email,
         address: formData?.address,
+        commission_settings:simplifiedCategories
 
 
       };
@@ -180,7 +185,7 @@ function CreateCustomer() {
     try {
       let params = {
         mobile: getValues1("mobile"),
-  
+
       };
 
       const { data } = await CustomerServices.getCustomerDetail(params);
@@ -204,6 +209,27 @@ function CreateCustomer() {
 
 
 
+  const getCategories = async (state) => {
+
+    try {
+      let params = {
+
+
+      };
+
+      const { data } = await CustomerServices.getServiceCategories(params);
+
+      setCategories(data?.categories)
+
+    } catch (error) {
+      ErrorToaster(error);
+    } finally {
+      // setLoader(false)
+    }
+  };
+  useEffect(() => {
+    getCategories()
+  }, [])
 
 
   return (
@@ -358,13 +384,13 @@ function CreateCustomer() {
 
                     })}
                   /></Grid>
-                 
+
                 </Grid>
 
 
 
                 <Grid container item xs={5.5} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
-                <Grid item xs={6}><InputField
+                  <Grid item xs={6}><InputField
                     label={"Credit Limit :*"}
                     size={'small'}
                     type={'number'}
@@ -376,7 +402,7 @@ function CreateCustomer() {
 
                     })}
                   /></Grid>
-                   <Grid item xs={6}><InputField
+                  <Grid item xs={6}><InputField
                     label={"Credit Balance :*"}
                     size={'small'}
                     type={'number'}
@@ -406,9 +432,9 @@ function CreateCustomer() {
                       })}
                     />
                   </Grid>
-                 
 
-                 
+
+
                 </Grid>
 
                 <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
@@ -426,6 +452,32 @@ function CreateCustomer() {
 
                     })}
                   />
+                </Grid>
+                <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                  <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Commission Setting</Typography>
+                  {categories.map((cat, index) => (
+                    <Grid item xs={12} key={index}>
+                      <Typography variant="subtitle2">{cat.name}</Typography>
+                      <InputField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        step="any"
+                        label="Commission"
+                       register={register1(`categories.${index}.commission_value`, {
+                          onChange: (e) => {
+                            const newCategories = [...categories];
+                            newCategories[index].commission_value = e.target.value;
+                            console.log(newCategories);
+                            
+                            setCategories(newCategories);
+                          },
+                        })}
+                        value={cat.commission_value}
+                      />
+                    </Grid>
+                  ))}
+
                 </Grid>
 
                 <Grid container justifyContent={'flex-end'}>

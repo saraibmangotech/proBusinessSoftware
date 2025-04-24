@@ -106,6 +106,7 @@ const [loading, setLoading] = useState(false)
 const [emailVerify, setEmailVerify] = useState(false)
 const [isUploading, setIsUploading] = useState(false);
 const [loader, setLoader] = useState(false)
+const [categories, setCategories] = useState([])
 const [fieldsDisabled, setFieldsDisabled] = useState({
   monthlyVisaServiceCharges: false,
   vipMedical: false,
@@ -196,6 +197,11 @@ const submitForm = async (formData) => {
 
 const submitForm1 = async (formData) => {
   console.log(formData);
+  console.log(formData);
+  const simplifiedCategories = categories.map(({ id, commission_value }) => ({
+    category_id:id,
+    commission_value,
+  }));
   try {
     let obj = {
       id:id,
@@ -214,6 +220,7 @@ const submitForm1 = async (formData) => {
       general_notes: formData?.notes,
       email: formData?.email,
       address: formData?.address,
+      commission_settings:simplifiedCategories
 
 
     };
@@ -280,6 +287,7 @@ const getData = async () => {
     const { data } = await CustomerServices.getCustomerDetail(params);
     let detail = data?.customer
     console.log(detail);
+    setCategories(detail?.commission_settings)
 
     setValue1('name', detail?.name)
     setValue1('email', detail?.email)
@@ -350,7 +358,7 @@ return (
 
         <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', p: 3, alignItems: 'flex-end' }}>
-              <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Create Customer</Typography>
+              <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update Customer</Typography>
 
             </Box>
 
@@ -562,7 +570,32 @@ return (
                     })}
                   />
                 </Grid>
+  <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                  <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Commission Setting</Typography>
+                  {categories.map((cat, index) => (
+                    <Grid item xs={12} key={index}>
+                      <Typography variant="subtitle2">{cat.name}</Typography>
+                      <InputField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        step="any"
+                        label="Commission"
+                       register={register1(`categories.${index}.commission_value`, {
+                          onChange: (e) => {
+                            const newCategories = [...categories];
+                            newCategories[index].commission_value = e.target.value;
+                            console.log(newCategories);
+                            
+                            setCategories(newCategories);
+                          },
+                        })}
+                        value={cat.commission_value}
+                      />
+                    </Grid>
+                  ))}
 
+                </Grid>
                 <Grid container justifyContent={'flex-end'}>
                   <PrimaryButton
                     disabled={holdState}

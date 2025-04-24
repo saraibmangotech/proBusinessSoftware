@@ -130,6 +130,10 @@ const CustomerServices = {
     const data = await get(routes.getCards, params);
     return data;
   },
+  getServiceCategories: async (params) => {
+    const data = await get(routes.getServiceCategories, params);
+    return data;
+  },
   getReceiptDetail: async (params) => {
     const data = await get(routes.getReceiptDetail, params);
     return data;
