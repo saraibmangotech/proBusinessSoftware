@@ -886,7 +886,7 @@ function UpdatePreSale() {
                                             <TableCell>
                                                 <InputField
                                                     size="small"
-                                                    disabled={detail?.is_paid}
+                                                    disabled={detail?.is_paid || !serviceItem?.govt_fee_enable}
                                                     placeholder="Govt fee"
 
                                                     register={register("govt_fee", { required: "Govt fee is required" })}
@@ -896,7 +896,7 @@ function UpdatePreSale() {
                                             <TableCell>
                                                 <InputField
                                                     size="small"
-                                                    disabled={detail?.is_paid}
+                                                    disabled={detail?.is_paid || !serviceItem?.center_fee_enable}
                                                     placeholder="Center Fee"
 
                                                     register={register("center_fee", { required: "Center fee is required" })}
@@ -906,7 +906,7 @@ function UpdatePreSale() {
                                             <TableCell>
                                                 <InputField
                                                     size="small"
-                                                    disabled={detail?.is_paid}
+                                                    disabled={detail?.is_paid || !serviceItem?.bank_charges_enable}
                                                     placeholder="Bank Charges"
 
                                                     register={register("bank_charge", { required: "Bank charges are required" })}

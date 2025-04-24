@@ -353,13 +353,7 @@ function SalesReciept() {
       setButtonDisabled(false);
     }
   };
-  // useEffect(() => {
-  //   if (invoiceData) {
-  //     generatePDF()
-  //   }
 
-
-  // }, [invoiceData])
 
 
   // *For Get Account
@@ -1035,7 +1029,7 @@ function SalesReciept() {
                   <TableCell>
                     <InputField
                       size="small"
-                      disabled={detail?.is_paid}
+                      disabled={!serviceItem?.govt_fee_enable}
                       placeholder="Govt fee"
 
 
@@ -1046,10 +1040,8 @@ function SalesReciept() {
                   <TableCell>
                     <InputField
                       size="small"
-                      disabled={detail?.is_paid}
+                      disabled={!serviceItem?.center_fee_enable}
                       placeholder="Center Fee"
-
-
                       register={register("center_fee", { required: "Center fee is required" })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -1057,7 +1049,7 @@ function SalesReciept() {
                   <TableCell>
                     <InputField
                       size="small"
-                      disabled={detail?.is_paid}
+                      disabled={!serviceItem?.bank_charges_enable}
                       placeholder="Bank Charges"
 
                       register={register("bank_charge", { required: "Bank charges are required" })}

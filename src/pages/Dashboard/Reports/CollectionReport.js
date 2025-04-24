@@ -298,28 +298,28 @@ function CollectionReport() {
     {
       header: "Receipt Date",
       accessorKey: "invoice_date",
-      accessorFn: (row) => moment(row?.receipt?.invoice_date).format("DD/MM/YYYY"),
+      accessorFn: (row) => moment(row?.created_at).format("DD/MM/YYYY"),
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY")}
+          {moment(row?.original?.created_at).format("DD/MM/YYYY")}
         </Box>
       ),
     },
     {
       header: "Receipt Time",
       accessorKey: "invoice_date",
-      accessorFn: (row) => moment(row?.receipt?.invoice_date).format("hh:mm A"),
+      accessorFn: (row) => moment(row?.created_at).format("hh:mm A"),
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {moment(row?.original?.receipt?.invoice_date).format("hh:mm A")}
+          {moment(row?.original?.created_at).format("hh:mm A")}
         </Box>
       ),
     },

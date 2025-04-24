@@ -58,13 +58,19 @@ function CreateFundTransferVoucher() {
     try {
       let params = {
         page: 1,
-        limit: 50,
+        limit: 5000,
+        sub_category: 4,
         name: search
       }
-      const { data } = await FinanceServices.getAccounts(params)
-      console.log(data?.rows);
+      const { data } = await FinanceServices.getAccountsDropDown(params)
+      //console.log(data?.rows);
+
+      const updatedAccounts = data?.accounts?.rows?.map(account => ({
+        ...account,
+        name: ` ${account.account_code} ${account.name}`
+      }));
       
-      setAccounts(data?.accounts?.rows)
+      setAccounts(updatedAccounts)
     
     } catch (error) {
       ErrorToaster(error)
@@ -93,6 +99,11 @@ function CreateFundTransferVoucher() {
       else {
         cashier = false
 
+      }
+
+      if (!parseFloat(formData?.receivedAmount)) {
+        ErrorToaster('Amount cannot be empty');
+        return;
       }
       let obj = {
         from_account_id: selectedFromAccount?.id,

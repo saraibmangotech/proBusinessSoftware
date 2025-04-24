@@ -355,6 +355,11 @@ const CustomerServices = {
     return data;
   },
 
+  customerPayment: async (obj) => {
+    const data = await post(routes.CreateCustomerPayment, obj);
+    return data;
+  },
+
   getServiceReport: async (params) => {
     const data = await get(routes.getServiceReport, params);
     return data;

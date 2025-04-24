@@ -25,6 +25,7 @@ function FundTransferVoucherDetail() {
   // *For Accounts
   const [accounts, setAccounts] = useState([]);
   const [selectedFromAccount, setSelectedFromAccount] = useState(null);
+  const [voucherItem, setVoucherItem] = useState(null);
   const [selectedToAccount, setSelectedToAccount] = useState(null);
   const [cashierAccounts, setCashierAccounts] = useState([])
 
@@ -127,10 +128,14 @@ function FundTransferVoucherDetail() {
       const { data } = await FinanceServices.getFundTransferVoucherDetail(params)
       console.log(data);
       let voucher = data?.voucher
+      setVoucherItem(data?.voucher)
+      console.log("voucher",voucher)
       setDate(new Date(voucher?.createdAt))
       setValue('transferAmount',parseFloat(voucher?.from_amount).toFixed(2))
-      setValue('note',voucher?.note)
+      setValue('note',voucher?.notes)
       setValue('ref',voucher?.ref)
+      setValue('from_account',voucher?.from_account?.name)
+      setValue('to_account',voucher?.to_account?.name)
       setSelectedFromAccount(voucher?.from_account)
       setSelectedToAccount(voucher?.to_account)
 
@@ -209,6 +214,8 @@ function FundTransferVoucherDetail() {
               label={'Ref No'}
               disabled={true}
               placeholder={'Ref No'}
+              value={voucherItem?.ref_no}
+
               error={errors?.ref?.message}
               register={register("ref", {
                 required: 'please enter ref no'
@@ -221,22 +228,20 @@ function FundTransferVoucherDetail() {
               size={'small'}
               label={'Note'}
               disabled={true}
+              value={voucherItem?.notes}
               placeholder={'Note'}
               register={register("note")}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <SelectField
+          <InputField
               size={'small'}
-              label={'Fund Transfer From'}
+              label={'From Account'}
               disabled={true}
-              options={accounts}
-              selected={selectedFromAccount}
-              onSelect={(value) => setSelectedFromAccount(value)}
-              error={errors?.from?.message}
-              register={register("from", {
-                required: 'Please select from account.',
-              })}
+              value={voucherItem?.from_account?.name}
+
+              placeholder={'From Account'}
+              register={register("from_account")}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -245,6 +250,8 @@ function FundTransferVoucherDetail() {
               disabled={true}
               label={'Transfer Amount'}
               placeholder={'Amount'}
+              value={voucherItem?.to_amount}
+
               error={errors?.transferAmount?.message}
               register={register("transferAmount", {
                 required: 'Please enter transfer amount',
@@ -253,17 +260,14 @@ function FundTransferVoucherDetail() {
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <SelectField
+          <InputField
               size={'small'}
+              label={'To Account'}
               disabled={true}
-              label={'Fund Transfer To'}
-              options={accounts}
-              selected={selectedToAccount}
-              onSelect={(value) => setSelectedToAccount(value)}
-              error={errors?.to?.message}
-              register={register("to", {
-                required: 'Please select to account.',
-              })}
+              value={voucherItem?.to_account?.name}
+
+              placeholder={'To Account'}
+              register={register("to_account")}
             />
           </Grid>
 

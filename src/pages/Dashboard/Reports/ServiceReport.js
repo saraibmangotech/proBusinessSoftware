@@ -509,7 +509,7 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.receipt?.payment_status}
+          {row?.original?.receipt?.is_paid ? "Paid" : "UnPaid" }
         </Box>
       ),
     },

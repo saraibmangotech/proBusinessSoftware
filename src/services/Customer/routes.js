@@ -89,7 +89,8 @@ const routes = {
   UpdateReceipt:'/sales/reception/update',
   CreditReceipt:'/sales/receipts/credit',
   getSystemSettings:'/system/settings',
-  DeleteCustomerPayment:'payments/customer/delete'
+  DeleteCustomerPayment:'payments/customer/delete',
+  CreateCustomerPayment:'payments/customer/add'
 
 };
 

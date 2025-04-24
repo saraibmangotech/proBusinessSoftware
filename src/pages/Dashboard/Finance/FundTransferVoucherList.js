@@ -368,12 +368,12 @@ function PreSalesList() {
     },
     {
       header: "From Account",
-      accessorKey: "customer_name",
+      accessorKey: "from_account",
       accessorFn: (row) => row?.from_account?.name || ""
     },
     {
       header: "To Account",
-      accessorKey: "customer_name",
+      accessorKey: "to_account",
       accessorFn: (row) => row?.to_account?.name || ""
     },
     
@@ -425,7 +425,7 @@ function PreSalesList() {
               navigate(`/fund-transfer-voucher-detail/${row?.original?.id}`);
               localStorage.setItem("currentUrl", "/update-customer");
             }}
-            src={Images.editIcon}
+            src={Images.detailIcon}
             width={"35px"}
           ></Box>}
           <Box>

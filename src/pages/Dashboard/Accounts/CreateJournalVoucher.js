@@ -194,11 +194,11 @@ function CreateJournalVoucher() {
     try {
       let params = {
         page: 1,
-        limit: 50,
+        limit: 10000,
         name: search,
 
       }
-      const { data } = await FinanceServices.getAccounts(params)
+      const { data } = await FinanceServices.getAccountsDropDown(params)
       const updatedAccounts = data?.accounts?.rows?.map(account => ({
         ...account,
         name: ` ${account.account_code} ${account.name}`

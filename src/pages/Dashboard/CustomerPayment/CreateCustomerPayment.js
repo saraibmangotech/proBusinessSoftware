@@ -215,11 +215,11 @@ function CreateCustomerPayment() {
             setButtonDisabled(true)
             try {
                 const obj = {
-                    total_amount: detail?.total_amount,
+                    total_amount: existingTotal,
                     customer_id: selectedCustomer?.id,
                     customer_name: selectedCustomer?.name,
                     customer_account_id: selectedCustomer?.receivable_account_id,
-                    date: date,
+                    date: paidAt,
                     description: formData?.description,
                     payment_mode: paymentModesString,
                     payment_methods: payments
@@ -229,11 +229,11 @@ function CreateCustomerPayment() {
                 if (detail?.is_paid == true) {
                     ErrorToaster("Already paid")
                 } else {
-                    const promise = CustomerServices.PayReceipt(obj)
+                    const promise = CustomerServices.customerPayment(obj)
                     const response = await promise
                     showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
                     if (response?.responseCode === 200) {
-                        navigate('/paid-receipts')
+                        navigate('/customer-payment-list')
                     }
                 }
             } catch (error) {
@@ -836,6 +836,7 @@ function CreateCustomerPayment() {
         getCategories()
         getServiceItem()
         setDate(new Date())
+        setPaidAt(new Date())
         setValue1("payment", { id: "Cash", name: "Cash" })
         setSelectedMode({ id: "Cash", name: "Cash" })
         //setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
@@ -907,7 +908,7 @@ function CreateCustomerPayment() {
                                             <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <DatePicker
                                                     label={"Payment Date :*"}
-                                                    value={date}
+                                                    value={paidAt}
                                                     size={"small"}
                                                     error={errors1?.date?.message}
                                                     register={register1("paidAt")}

@@ -388,6 +388,21 @@ function CustomerPaymentList() {
             ),
         },
         {
+            id: "date",
+            header: "Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => row.date ? moment(row.date).format("MM-DD-YYYY") : moment(row.created_at).format("MM-DD-YYYY"),
+            cell: ({ row }) => (
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {row.original.date ? moment(row.original.date).format("MM-DD-YYYY") : moment(row.original.created_at).format("MM-DD-YYYY") }
+                </Box>
+            ),
+        },
+        {
             id: "created_at",
             header: "Created At",
             // Remove accessorKey and fix accessorFn to use row directly
@@ -414,7 +429,7 @@ function CustomerPaymentList() {
                             navigate(`/customer-payment-detail/${row?.original?.id}`);
                             localStorage.setItem("currentUrl", "/update-customer");
                         }}
-                        src={Images.editIcon}
+                        src={Images.detailIcon}
                         width={"35px"}
                     ></Box>}
                     <Box>
@@ -582,7 +597,7 @@ function CustomerPaymentList() {
                 </Grid>
             </Grid>
 
-            <Box>{<DataTable loading={loader} data={data} csv={true} csvName={'iftv_lists'} columns={columns} />}</Box>
+            <Box>{<DataTable loading={loader} data={data} csv={true} csvName={'customer_payments'} columns={columns} />}</Box>
 
         </Box>
     );

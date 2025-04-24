@@ -1268,7 +1268,7 @@ function CreatePaidReceipt() {
                           </Button>
                           {console.log(selectedCustomer,'selectedCustomer')
                           }
-                          {creditButton && !detail?.credited_by && selectedCustomer?.id != 11002 && <Button
+                          {creditButton && detail?.is_presale && <Button
                             onClick={() => handleCredit()}
 
                             variant="contained"
