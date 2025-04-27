@@ -40,6 +40,7 @@ const DataTable = ({
   alphabets,
   csv = false,
   csvName = "",
+  total,
 }) => {
   const [globalFilter, setGlobalFilter] = useState("")
   const [activeAlphabet, setActiveAlphabet] = useState("")
@@ -428,7 +429,7 @@ const DataTable = ({
                   ))}
 
                   {/* 🔥 Your Total Row after mapping rows */}
-                  <TableTotalRow table={table} columns={columns} />
+                  {total && <TableTotalRow table={table} columns={columns} />}
                 </>
               ) : (
                 <TableRow>
