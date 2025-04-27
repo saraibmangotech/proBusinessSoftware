@@ -480,13 +480,18 @@ function SalesReciept() {
         };
 
         const { data } = await CustomerServices.DetailServiceItem(params);
+        console.log(data?.service,'idididid');
+        
         setValue("id", data?.service?.id);
         setValue("item_code", data?.service?.item_code);
         setValue("govt_fee", data?.service?.government_fee);
         setValue("center_fee", data?.service?.center_fee);
         setValue("bank_charge", data?.service?.bank_service_charge);
         // setValue("transaction_id", data?.transaction_id);
-        setServiceItem(data?.service);
+        setServiceItem({
+          ...data?.service,
+          name: `${data?.service?.name} - ${data?.service?.name_ar}`,
+        });
         setValue("quantity", 1);
       } catch (error) {
         ErrorToaster(error);
