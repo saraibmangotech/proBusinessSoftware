@@ -508,8 +508,13 @@ function CreatePaidReceipt() {
       }
 
       const { data } = await CustomerServices.getServiceItem(params)
+      const mappedServices = data?.rows.map(item => ({
+        ...item,
+        name: `${item.name} - ${item.name_ar}`,
+      }));
 
-      setServices(data?.rows)
+      setServices(mappedServices);
+      //setServices(data?.rows)
     } catch (error) {
       ErrorToaster(error)
     } finally {
@@ -1150,7 +1155,7 @@ function CreatePaidReceipt() {
                       <TableRow key={index}>
                         <TableCell sx={{display: "none"}}>{item?.id}</TableCell>
                         <TableCell>{item?.service?.item_code}</TableCell>
-                        <TableCell>{item?.service?.name}</TableCell>
+                        <TableCell>{item?.service?.name + "-" + item?.service?.name_ar}</TableCell>
                         <TableCell>{item?.quantity}</TableCell>
                         <TableCell>{item?.govt_fee}</TableCell>
                         <TableCell>{item?.center_fee}</TableCell>
