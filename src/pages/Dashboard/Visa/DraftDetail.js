@@ -560,7 +560,7 @@ function DraftDetail() {
             console.log(data);
             setVisaDetail(data?.details);
             let docs = data?.details?.documents
-            console.log(formatPermissionData(data?.permissions))
+            console.log(formatPermissionData(data?.permissions),'permissions')
             setPermissions(formatPermissionData(data?.permissions))
             data?.permissions.forEach(e => {
                 if (e?.route && e?.identifier && e?.permitted) {

@@ -118,6 +118,10 @@ const CustomerServices = {
     const data = await get(routes.getAgents, params);
     return data;
   },
+  getSnapshotCategoryReport: async (params) => {
+    const data = await get(routes.getSnapshotCategoryReport, params);
+    return data;
+  },
   getBankDetail: async (params) => {
     const data = await get(routes.getBankDetail, params);
     return data;
@@ -132,6 +136,10 @@ const CustomerServices = {
   },
   getServiceCategories: async (params) => {
     const data = await get(routes.getServiceCategories, params);
+    return data;
+  },
+  getSnapshotOverviewReport: async (params) => {
+    const data = await get(routes.getSnapshotOverviewReport, params);
     return data;
   },
   getReceiptDetail: async (params) => {

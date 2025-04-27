@@ -307,6 +307,18 @@ const CustomerPaymentList = lazy(() =>
 const UpdateCustomerPayment = lazy(() =>
   import("pages/Dashboard/CustomerPayment/CustomerPaymentDetail")
 );
+const SnapshotCategoryReport = lazy(() =>
+  import("pages/Dashboard/Reports/SnapshotCategoryReport")
+);
+const SnapshotOverviewReport = lazy(() =>
+  import("pages/Dashboard/Reports/SnapshotOverviewReport")
+);
+const CompleteTransactionReport = lazy(() =>
+  import("pages/Dashboard/Reports/CompleteTransactionReport")
+);
+const SnapshotEmployeeServiceReport = lazy(() =>
+  import("pages/Dashboard/Reports/SnapshotEmplaoyeeServiceReport")
+);
 const AdminRoutes = [
   
   {
@@ -336,6 +348,22 @@ const AdminRoutes = [
   {
     path: "/customer-payment-list",
     component: <CustomerPaymentList />,
+  },
+  {
+    path: "/snapshot-category-report",
+    component: <SnapshotCategoryReport />,
+  },
+  {
+    path: "/snapshot-overview-report",
+    component: <SnapshotOverviewReport />,
+  },
+  {
+    path: "/complete-transaction-report",
+    component: <CompleteTransactionReport />,
+  },
+  {
+    path: "/snapshot-employee-service-report",
+    component: <SnapshotEmployeeServiceReport />,
   },
   {
     path: "/fund-transfer-voucher-detail/:id",
