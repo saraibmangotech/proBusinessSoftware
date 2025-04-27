@@ -200,7 +200,7 @@ function CreateCategory() {
         bank_service_charge: Number(formData?.bank_service_charges),
         government_fee : Number(formData?.govtFee),
         other_charge: Number(formData?.other_charge),
-        local_commission: Number(formData?.local_commission),
+        typist_commission: Number(formData?.local_commission),
         item_tax_type: tax?.name,
         editable_description: description?.id,
         sales_account_id: salesAccount?.id,
@@ -361,7 +361,7 @@ function CreateCategory() {
       setGovernmnentAccount(detail?.govt_bank_account);
       setValue1("bank_service_charges", detail?.bank_service_charge);
       setValue1("other_charge", detail?.other_charge);
-      setValue1("local_commission", detail?.local_commission);
+      setValue1("local_commission", detail?.typist_commission);
       setValue1("non_local_commission", detail?.non_local_commission);
       setValue1("commission_applicable", detail?.commission_applicable);
       setValue1("vat_bank_charge", detail?.vat_bank_charge);
@@ -504,12 +504,12 @@ function CreateCategory() {
                   </Grid>
                   <Grid item xs={2.8}>
                     <InputField
-                      label={"Local Commission:*"}
+                      label={"Typist Commission:*"}
                       size={"small"}
-                      placeholder={"Local Commission"}
+                      placeholder={"Typist Commission"}
                       error={errors1?.local_commission?.message}
                       register={register1("local_commission", {
-                        required: "Please Enter Local Commission .",
+                        required: "Please Enter Typist Commission .",
                         onChange: (e) => {
                           console.log("asdas");
                         },

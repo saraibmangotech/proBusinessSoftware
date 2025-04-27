@@ -481,6 +481,45 @@ function Header() {
             },
           ],
         },
+        {
+          id: 9,
+          name: "Reports",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 33,
+              name: "Service Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Collection Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/collection-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+
+
+          ],
+        },
       ]);
 
     }

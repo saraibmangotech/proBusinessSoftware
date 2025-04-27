@@ -642,7 +642,7 @@ function PreSalesList() {
       header: "Actions",
       cell: ({ row }) => (
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          {<Box
+          {(row?.original?.is_paid != false) && (<Box
             component={"img"}
             sx={{ cursor: "pointer" }}
             onClick={() => {
@@ -651,7 +651,7 @@ function PreSalesList() {
             }}
             src={Images.editIcon}
             width={"35px"}
-          ></Box>}
+          ></Box>)}
           <Box>
             {row?.original?.is_paid == null && (
               <Box
@@ -666,12 +666,33 @@ function PreSalesList() {
               ></Box>
             )}
           </Box>
+          {(!row?.original?.is_paid && row?.original?.credited_by != null) && (
+                        <Tooltip title="Credit Invoice">
+                            <IconButton
+                                onClick={() => {
+                                    window.open(
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
+                                        '_blank'
+                                    );
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <ReceiptIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
           {row?.original?.is_paid && (
             <Tooltip title=" Invoice">
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.invoice_id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
                     '_blank'
                   );
                 }}
@@ -693,7 +714,7 @@ function PreSalesList() {
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.invoice_id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
                     '_blank'
                   );
                 }}
@@ -715,7 +736,7 @@ function PreSalesList() {
               <IconButton
                 onClick={() => {
                   window.open(
-                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-request?id=${row?.original?.id}`,
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-request?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                     '_blank'
                   );
                 }}
@@ -738,7 +759,7 @@ function PreSalesList() {
                 <IconButton
                   onClick={() => {
                     window.open(
-                      `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.invoice_id}`,
+                      `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
                       '_blank'
                     );
                   }}

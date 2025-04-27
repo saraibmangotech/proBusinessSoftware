@@ -622,7 +622,7 @@ function PayReceipts() {
                             <IconButton
                                 onClick={() => {
                                     window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.id}`,
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                         '_blank'
                                     );
                                 }}
@@ -645,7 +645,7 @@ function PayReceipts() {
                             <IconButton
                                 onClick={() => {
                                     window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}`,
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                         '_blank'
                                     );
                                 }}
@@ -666,7 +666,7 @@ function PayReceipts() {
                             <IconButton
                                 onClick={() => {
                                     window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.id}`,
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-receipt?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                         '_blank'
                                     );
                                 }}

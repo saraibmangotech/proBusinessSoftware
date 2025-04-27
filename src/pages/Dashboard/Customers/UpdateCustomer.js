@@ -285,9 +285,25 @@ const getData = async () => {
     };
 
     const { data } = await CustomerServices.getCustomerDetail(params);
+    const ser = await CustomerServices.getServiceCategories(params);
+    let mainCategories = ser.data?.categories
     let detail = data?.customer
+
+    const updatedCategories = mainCategories.map(category => {
+      const relatedSetting = detail?.commission_settings.find(setting => setting.category_id === category.id);
+      return {
+      id: category.id,
+      name: category.name,
+      category_id: category.id,
+      commission_value: relatedSetting ? relatedSetting.commission_value : null,
+      };
+    });
+    setCategories(updatedCategories);
+    
+    //setCategories(data?.categories)
+ 
     console.log(detail);
-    setCategories(detail?.commission_settings)
+   // setCategories(detail?.commission_settings)
 
     setValue1('name', detail?.name)
     setValue1('email', detail?.email)
