@@ -350,7 +350,7 @@ function CreatePaidReceipt() {
   }
   // *For Get Account
   const getReceptionDetail = async (state) => {
-    setFieldsDisabled(true)
+   
     try {
       let params = {
         token_number: getValues1("token"),
@@ -359,9 +359,22 @@ function CreatePaidReceipt() {
         params = {
           invoice_number: getValues1("invoicenumber"),
         }
+
+        if (!params.invoice_number) {
+          ErrorToaster("Enter Something in SR Number")
+          return;
+        }
       }
+      setFieldsDisabled(true)
+
       const { data } = await CustomerServices.getReceiptDetail(params)
-      console.log(data?.receipt, "dataaa")
+      
+      if(!data?.receipt){
+        ErrorToaster("No Result Found")
+        setFieldsDisabled(false)
+          return;
+      }
+
       if (data?.receipt) {
 
         if (data?.receipt?.is_paid) {
@@ -495,8 +508,13 @@ function CreatePaidReceipt() {
       }
 
       const { data } = await CustomerServices.getServiceItem(params)
+      const mappedServices = data?.rows.map(item => ({
+        ...item,
+        name: `${item.name} - ${item.name_ar}`,
+      }));
 
-      setServices(data?.rows)
+      setServices(mappedServices);
+      //setServices(data?.rows)
     } catch (error) {
       ErrorToaster(error)
     } finally {
@@ -682,15 +700,21 @@ function CreatePaidReceipt() {
 
   // *For Get Account
   const getReceiptDetail = async (state) => {
-    setFieldsDisabled(true)
+    
     try {
       const params = {
         token_number: getValues1("token"),
         invoice_date: date,
       }
 
+      if (!params.token_number) {
+        showErrorToast("Enter Token Number First")
+        return
+      }
+      setFieldsDisabled(true)
+
       const { data } = await CustomerServices.getReceiptDetail(params)
-      console.log(data)
+   
       if (data?.receipt) {
         setHoldState(true)
         setCreditButton(true)
@@ -854,7 +878,7 @@ function CreatePaidReceipt() {
                     <Grid container gap={2} alignItems={"center"}>
                       <Grid item xs={3}>
                         <DatePicker
-                          label={"Invoice Date :*"}
+                          label={"Token Date :*"}
                           value={date}
                           size={"small"}
                           disabled={fieldsDisabled}
@@ -868,10 +892,10 @@ function CreatePaidReceipt() {
                       </Grid>
                       <Grid item md={3} sm={12} xs={12} mt={1}>
                         <InputField
-                          label="Invoice Number"
+                          label="Service Request Number"
                           size="small"
                           disabled={fieldsDisabled}
-                          placeholder="Invoice Number"
+                          placeholder="Service Request Number"
                           register={register1("invoicenumber")}
                           InputProps={{
                             endAdornment: (
@@ -1131,7 +1155,7 @@ function CreatePaidReceipt() {
                       <TableRow key={index}>
                         <TableCell sx={{display: "none"}}>{item?.id}</TableCell>
                         <TableCell>{item?.service?.item_code}</TableCell>
-                        <TableCell>{item?.service?.name}</TableCell>
+                        <TableCell>{item?.service?.name + "-" + item?.service?.name_ar}</TableCell>
                         <TableCell>{item?.quantity}</TableCell>
                         <TableCell>{item?.govt_fee}</TableCell>
                         <TableCell>{item?.center_fee}</TableCell>

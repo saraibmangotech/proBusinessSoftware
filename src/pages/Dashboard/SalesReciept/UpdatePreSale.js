@@ -401,7 +401,12 @@ function UpdatePreSale() {
 
             const { data } = await CustomerServices.getServiceItem(params);
 
-            setServices(data?.rows);
+            const mappedServices = data?.rows.map(item => ({
+                ...item,
+                name: `${item.name} - ${item.name_ar}`,
+              }));
+        
+              setServices(mappedServices);
         } catch (error) {
             ErrorToaster(error);
         } finally {
@@ -424,8 +429,11 @@ function UpdatePreSale() {
                 setValue("govt_fee", data?.service?.government_fee);
                 setValue("center_fee", data?.service?.center_fee);
                 setValue("bank_charge", data?.service?.bank_service_charge);
+
+                let serviceItem = {...data?.service}
+                serviceItem.name = data?.service?.name + "-" + data?.service?.name_ar;
                 // setValue("transaction_id", data?.transaction_id);
-                setServiceItem(data?.service);
+                setServiceItem(serviceItem);
                 setValue("quantity", 1);
             } catch (error) {
                 ErrorToaster(error);
@@ -1035,7 +1043,7 @@ function UpdatePreSale() {
                                             <TableRow key={index}>
                                                 <TableCell  sx={{ display: "none" }}>{item?.id}</TableCell>
                                                 <TableCell>{item?.service?.item_code}</TableCell>
-                                                <TableCell>{item?.service?.name}</TableCell>
+                                                <TableCell>{item?.service?.name + "-" + item?.service?.name_ar}</TableCell>
                                                 <TableCell>{item?.quantity}</TableCell>
                                                 <TableCell>{item?.govt_fee}</TableCell>
                                                 <TableCell>{item?.center_fee}</TableCell>
@@ -1060,7 +1068,7 @@ function UpdatePreSale() {
                                                         setValue("service", item?.service);
                                                         setServiceItem(item?.service);
                                                         setValue("quantity", item?.quantity);
-                                                        console.log(item?.service)
+                                                        console.log(item?.service, "tteeet")
 
                                                     }} src={Images.editIcon} width={'35px'}></Box>}
                                                     <Box>

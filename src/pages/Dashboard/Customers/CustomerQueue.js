@@ -165,7 +165,7 @@ function CustomerQueue() {
       setFilters(Filter)
       let params = {
         page: Page,
-        limit: Limit,
+        limit: Limit + 500,
         sort_order: sort,
 
       }
@@ -268,6 +268,12 @@ function CustomerQueue() {
     {
       header: "Customer",
       accessorKey: "name",
+
+
+    },
+    {
+      header: "Mobile",
+      accessorKey: "mobile",
 
 
     },

@@ -46,6 +46,7 @@ function UpdateAccount() {
       let obj = {
         id: state?.id,
         name: formData?.accountName,
+        ref_id: formData?.ref_id
       }
       const { message } = await FinanceServices.updateAccount(obj)
       SuccessToaster(message)
@@ -59,11 +60,13 @@ function UpdateAccount() {
 
   useEffect(() => {
     setValue('unit', state?.unit)
+    console.log(state,"state")
     setAccountNature(state?.primary_account_id ? 'subAccount' : 'primary')
     setValue('majorCategory', state?.cat?.name)
     setValue('subCategory', state?.sub_cat?.name)
     setValue('subCategory', state?.sub_cat?.name)
     setValue('accountCode', state?.account_code)
+    setValue('ref_id', state?.ref_id)
     setValue('accountName', state?.name)
     if (state?.primary_account_id) {
       getAccountBySubCategory(state?.sub_category)
@@ -143,6 +146,16 @@ function UpdateAccount() {
               error={errors?.accountName?.message}
               register={register("accountName", {
                 required: 'Please enter account name.',
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <InputField
+              label={'Reference ID'}
+              placeholder={'Reference ID'}
+              error={errors?.ref_id?.message}
+              register={register("ref_id", {
+                required: 'Please enter Reference ID.',
               })}
             />
           </Grid>

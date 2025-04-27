@@ -205,11 +205,12 @@ function CreateAccount() {
         type_code: typeCode,
         type_series: typeSeries,
         unit: selectedUnit?.id,
-        opening_balance: parseInt(formData?.openingBalance),
-        balance_date: balanceDate,
+        opening_balance: parseInt(formData?.openingBalance) || 0,
+        balance_date: balanceDate || null,
         nature: selectedNature?.id,
         currency: selectedCurrency?.id,
-        comments: formData?.comments
+        comments: formData?.comments || "",
+        ref_id: formData?.ref_id || "",
       }
       if (accountNature === 'subAccount') {
         obj.primary_series = primarySeries
@@ -349,7 +350,7 @@ function CreateAccount() {
           </Grid>
           <Grid item xs={12} sm={4}>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          {/* <Grid item xs={12} sm={4}>
             <InputField
               label={'Opening Balance (AED)'}
               placeholder={'Opening Balance (AED)'}
@@ -359,16 +360,16 @@ function CreateAccount() {
                 required: 'Please enter opening balance.',
               })}
             />
-          </Grid>
-          <Grid item xs={12} sm={4}>
+          </Grid> */}
+          {/* <Grid item xs={12} sm={4}>
             <DatePicker
               label={'Balance Date'}
               size={'small'}
               value={balanceDate}
               onChange={(date) => handleBalanceDate(date)}
             />
-          </Grid>
-          <Grid item xs={12} sm={2}>
+          </Grid> */}
+          <Grid item xs={12} sm={4}>
             {console.log(accountNature)}
             <SelectField
               label={'Nature'}
@@ -384,7 +385,7 @@ function CreateAccount() {
             />
           </Grid>
           
-          <Grid item xs={12} sm={4}>
+          {/* <Grid item xs={12} sm={4}>
             <InputField
               label={'Comments'}
               size={'small'}
@@ -392,6 +393,18 @@ function CreateAccount() {
               error={errors?.comments?.message}
               register={register("comments", {
                 required: 'Please enter comments.',
+              })}
+            />
+          </Grid> */}
+
+          <Grid item xs={12} sm={4}>
+            <InputField
+              label={'Reference ID'}
+              size={'small'}
+              placeholder={'Reference ID'}
+              error={errors?.comments?.message}
+              register={register("ref_id", {
+                required: 'Please enter Reference ID.',
               })}
             />
           </Grid>

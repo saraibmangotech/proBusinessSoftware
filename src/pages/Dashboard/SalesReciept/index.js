@@ -426,7 +426,12 @@ function SalesReciept() {
 
       const { data } = await CustomerServices.getServiceItem(params);
 
-      setServices(data?.rows);
+      const mappedServices = data?.rows.map(item => ({
+        ...item,
+        name: `${item.name} - ${item.name_ar}`,
+      }));
+
+      setServices(mappedServices);
     } catch (error) {
       ErrorToaster(error);
     } finally {
@@ -1179,7 +1184,7 @@ function SalesReciept() {
                   <TableRow key={index}>
                     <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
                     <TableCell>{item?.item_code}</TableCell>
-                    <TableCell>{item?.service?.name}</TableCell>
+                    <TableCell>{item?.service?.name + "-" + item?.service?.name_ar}</TableCell>
                     <TableCell>{item?.quantity}</TableCell>
                     <TableCell>{item?.govt_fee}</TableCell>
                     <TableCell>{item?.center_fee}</TableCell>

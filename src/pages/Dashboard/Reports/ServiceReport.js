@@ -485,7 +485,17 @@ function ServiceReport() {
     },
     {
       header: "Total Govt. Fee",
-      accessorKey: "govt_fee",
+      accessorKey: "total_govt_fee",
+      accessorFn: (row) => parseFloat(row?.govt_fee) + parseFloat(row?.bank_charge),
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          { parseFloat(row?.original?.govt_fee) + parseFloat(row?.original?.bank_charge)}
+        </Box>
+      ),
     },
     {
       header: "Transaction ID",
@@ -558,14 +568,14 @@ function ServiceReport() {
     {
       header: "Invoice Total",
       accessorKey: "inv_total",
-      accessorFn: (row) => row?.receipt?.total_amount,
+      accessorFn: (row) => parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat),
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {parseFloat(row?.original?.receipt?.total_amount) }
+          {parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat) }
         </Box>
       ),
     },

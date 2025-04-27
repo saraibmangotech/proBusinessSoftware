@@ -400,7 +400,6 @@ function CreateCustomer() {
                       //     </IconButton>
                       //   ),
                       // }}
-                      
                       register={register1("mobile", {
                         required: 'mobile is required',
 
@@ -531,7 +530,6 @@ function CreateCustomer() {
                     size={'small'}
                     disabled={true}
                     type={'number'}
-              
                     placeholder={"Credit Balance"}
                     error={errors1?.creditBalance?.message}
                     register={register1("creditBalance", {
