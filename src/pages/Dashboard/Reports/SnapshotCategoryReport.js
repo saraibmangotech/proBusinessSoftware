@@ -281,14 +281,14 @@ function SnapshotCategoryReport() {
     {
       header: "Category",
       accessorKey: "category",
-      accessorFn: (row) => 'Al-ADHEED',
+      accessorFn: (row) => row?.category,
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {agencyType[process.env.REACT_APP_TYPE].category}
+          {row?.original?.category}
         </Box>
       ),
     },
