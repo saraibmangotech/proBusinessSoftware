@@ -536,8 +536,8 @@ function PayReceipts() {
     }, [invoiceData2]);
     const columns = [
         {
-            header: "SR No.",
-            accessorKey: "id",
+            header: "Invoice#",
+            accessorKey: "invoice_number",
         },
         {
             header: "Customer",
