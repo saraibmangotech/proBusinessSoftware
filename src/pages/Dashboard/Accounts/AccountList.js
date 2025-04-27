@@ -101,7 +101,7 @@ function AccountList() {
 
   const { register } = useForm();
 
-  const tableHead = ['COA Code', 'COA Name',  'Nature', 'Major Category', 'Sub Category', 'Status', 'Actions']
+  const tableHead = ['COA Code','Reference Code', 'COA Name',  'Nature', 'Major Category', 'Sub Category', 'Status', 'Actions']
 
   const [loader, setLoader] = useState(false);
 
@@ -335,6 +335,7 @@ function AccountList() {
     // Extract values from objects and create an array for each row
     const rows = data.map((item, index) => [
       item?.account_code ?? '-',
+      item?.ref_id ?? '-',
       item?.name ?? '-',
       item?.unit ?? '-',
       item?.primary_account_id ? 'Sub Account' : 'Primary',
@@ -497,6 +498,9 @@ function AccountList() {
                               {item?.account_code ?? '-'}
                             </Cell>
                             <Cell className='pdf-table'>
+                              {item?.ref_id ?? '-'}
+                            </Cell>
+                            <Cell className='pdf-table'>
                               {item?.name ?? '-'}
                             </Cell>
                            
@@ -524,7 +528,7 @@ function AccountList() {
                             </Cell>
                             <Cell>
                               <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                {permissions?.update &&
+                                {true &&
                                   <Box onClick={() => navigate('/update-account', { state: item })}>
                                     <IconButton sx={{ bgcolor: Colors.bluishCyan, '&:hover': { bgcolor: Colors.bluishCyan } }}>
                                       <Edit sx={{ color: Colors.white, height: '16px !important' }} />
