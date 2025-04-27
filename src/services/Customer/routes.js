@@ -91,7 +91,9 @@ const routes = {
   getSystemSettings:'/system/settings',
   DeleteCustomerPayment:'payments/customer/delete',
   CreateCustomerPayment:'payments/customer/add',
-  getServiceCategories:'/services/categories'
+  getServiceCategories:'/services/categories',
+  getSnapshotCategoryReport:'/reports/snapshot/category',
+  getSnapshotOverviewReport:'/reports/snapshot/overview'
 
 };
 

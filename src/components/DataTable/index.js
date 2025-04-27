@@ -28,6 +28,7 @@ import {
   Button,
 } from "@mui/material"
 import { FileDownload } from "@mui/icons-material"
+import TableTotalRow from "components/TotalRow/TableTotalRow"
 
 const DataTable = ({
   data,
@@ -158,99 +159,115 @@ const DataTable = ({
 
   const exportToExcel = () => {
     // Only use the columns that are explicitly provided
-    const exportColumns = columns.filter((col) => !col.id || col.id !== "select") // Filter out checkbox column
-
+    const exportColumns = columns.filter((col) => !col.id || col.id !== "select"); // Filter out checkbox column
+  
     // Create headers from the provided columns
-    const headers = exportColumns.map((col) => col.header || (col.accessorKey ? col.accessorKey : col.id)).join(",")
-
-    const rows = filteredData
-      .map((row) => {
-        return exportColumns
-          .map((col) => {
-            let cellValue
-
-            // Extract value using the column's accessor method
-            if (col.accessorFn) {
-              cellValue = col.accessorFn(row)
-            } else if (col.accessorKey) {
-              cellValue = row[col.accessorKey]
-            } else if (col.id && col.id !== "select") {
-              cellValue = row[col.id]
+    const headers = exportColumns.map((col) => col.header || (col.accessorKey ? col.accessorKey : col.id)).join(",");
+  
+    const generateRow = (row) => {
+      return exportColumns
+        .map((col) => {
+          let cellValue;
+  
+          // Extract value using the column's accessor method
+          if (col.accessorFn) {
+            cellValue = col.accessorFn(row);
+          } else if (col.accessorKey) {
+            cellValue = row[col.accessorKey];
+          } else if (col.id && col.id !== "select") {
+            cellValue = row[col.id];
+          } else {
+            cellValue = "";
+          }
+  
+          // Handle null/undefined
+          if (cellValue === null || cellValue === undefined) {
+            return "";
+          }
+  
+          // Handle objects
+          if (typeof cellValue === "object" && cellValue !== null) {
+            if (cellValue instanceof Date) {
+              cellValue = cellValue.toISOString();
+            } else if (Array.isArray(cellValue)) {
+              cellValue = cellValue.join(", ");
             } else {
-              cellValue = ""
-            }
-
-            // Handle null/undefined
-            if (cellValue === null || cellValue === undefined) {
-              return ""
-            }
-
-            // Handle objects
-            if (typeof cellValue === "object" && cellValue !== null) {
-              // For Date objects
-              if (cellValue instanceof Date) {
-                cellValue = cellValue.toISOString()
-              }
-              // For arrays
-              else if (Array.isArray(cellValue)) {
-                cellValue = cellValue.join(", ")
-              }
-              // For other objects
-              else {
-                // Try to find a displayable property
-                const displayProps = ["name", "title", "label", "value", "id", "key", "text", "description"]
-                const foundProp = displayProps.find((prop) => cellValue[prop] !== undefined)
-
-                if (foundProp) {
-                  cellValue = cellValue[foundProp]
-                } else {
-                  // Use the cell renderer if available
-                  if (col.cell) {
-                    try {
-                      const rendered = col.cell({ row: { original: row } })
-                      if (rendered && typeof rendered !== "object") {
-                        cellValue = rendered
-                      } else {
-                        cellValue = JSON.stringify(cellValue)
-                      }
-                    } catch (e) {
-                      cellValue = JSON.stringify(cellValue)
-                    }
+              const displayProps = ["name", "title", "label", "value", "id", "key", "text", "description"];
+              const foundProp = displayProps.find((prop) => cellValue[prop] !== undefined);
+  
+              if (foundProp) {
+                cellValue = cellValue[foundProp];
+              } else if (col.cell) {
+                try {
+                  const rendered = col.cell({ row: { original: row } });
+                  if (rendered && typeof rendered !== "object") {
+                    cellValue = rendered;
                   } else {
-                    cellValue = JSON.stringify(cellValue)
+                    cellValue = JSON.stringify(cellValue);
                   }
+                } catch (e) {
+                  cellValue = JSON.stringify(cellValue);
                 }
+              } else {
+                cellValue = JSON.stringify(cellValue);
               }
             }
-
-            // Convert to string
-            cellValue = String(cellValue)
-
-            // Handle commas and quotes in the data
-            if (cellValue.includes(",") || cellValue.includes('"') || cellValue.includes("\n")) {
-              return `"${cellValue.replace(/"/g, '""')}"`
-            }
-            return cellValue
-          })
-          .join(",")
-      })
-      .join("\n")
-
-    const csvContent = `${headers}\n${rows}`
-
-    // Create a blob and download
-    const csvWithBOM = '\uFEFF' + csvContent; // prepend BOM
-
-    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;  encoding='utf-8-sig'" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.setAttribute("href", url)
-    link.setAttribute("download", csvName + ".csv")
-    link.style.visibility = "hidden"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+          }
+  
+          // Convert to string
+          cellValue = String(cellValue);
+  
+          // Handle commas and quotes
+          if (cellValue.includes(",") || cellValue.includes('"') || cellValue.includes("\n")) {
+            return `"${cellValue.replace(/"/g, '""')}"`;
+          }
+          return cellValue;
+        })
+        .join(",");
+    };
+  
+    const dataRows = filteredData.map(generateRow);
+  
+    // Now create the TOTAL ROW
+    const totalRowObj = {};
+  
+    exportColumns.forEach((col, idx) => {
+      if (idx === 0) {
+        totalRowObj[col.accessorKey || col.id] = "Total";
+      } else {
+        let total = 0;
+        filteredData.forEach((row) => {
+          let value;
+          if (col.accessorFn) {
+            value = col.accessorFn(row);
+          } else if (col.accessorKey) {
+            value = row[col.accessorKey];
+          }
+          if (!isNaN(value) && value !== "" && value !== null && value !== undefined) {
+            total += parseFloat(value);
+          }
+        });
+        totalRowObj[col.accessorKey || col.id] = total ? total.toFixed(2) : "";
+      }
+    });
+  
+    const totalRowString = generateRow(totalRowObj);
+  
+    const csvContent = `${headers}\n${dataRows.join("\n")}\n${totalRowString}`;
+  
+    const csvWithBOM = "\uFEFF" + csvContent; // prepend BOM for Excel UTF-8
+  
+    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8; encoding='utf-8-sig'" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", csvName + ".csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
 
   return (
     <div>
@@ -388,26 +405,31 @@ const DataTable = ({
 
             <TableBody>
               {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    hover={enableCheckbox}
-                    onClick={enableCheckbox ? () => row.toggleSelected() : undefined}
-                    selected={row.getIsSelected()}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        sx={{
-                          minWidth: cell.column.columnDef.id === "select" ? "60px" : "150px",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                <>
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      hover={enableCheckbox}
+                      onClick={enableCheckbox ? () => row.toggleSelected() : undefined}
+                      selected={row.getIsSelected()}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          sx={{
+                            minWidth: cell.column.columnDef.id === "select" ? "60px" : "150px",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+
+                  {/* 🔥 Your Total Row after mapping rows */}
+                  <TableTotalRow table={table} columns={columns} />
+                </>
               ) : (
                 <TableRow>
                   <TableCell colSpan={table.getAllColumns().length}>
@@ -422,6 +444,8 @@ const DataTable = ({
                 </TableRow>
               )}
             </TableBody>
+
+
           </Table>
         </TableContainer>
 
