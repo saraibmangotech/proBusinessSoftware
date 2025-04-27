@@ -190,13 +190,13 @@ function Header() {
       setOpenDropdownId(id);
     }
   };
-  
-  
-  
+
+
+
   // Handle dropdown menu close
   const handleDropdownClose = () => {
     setDropdownAnchorEl(null)
-    setOpenDropdownId(null) 
+    setOpenDropdownId(null)
   }
 
   // Handle mobile drawer toggle
@@ -207,7 +207,7 @@ function Header() {
   const handleSubmenuToggle = (id) => {
     setOpenSubmenu((prev) => (prev === id ? null : id));
   };
-  
+
 
   // Check if a route is active
   const isActive = (route) => {
@@ -1217,14 +1217,14 @@ function Header() {
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ minHeight: "64px"  ,justifyContent:"space-between"}}>
+          <Toolbar disableGutters sx={{ minHeight: "64px", justifyContent: "space-between" }}>
             {/* Logo */}
-            <Box sx={{width:"150px"}}>
-  <CardMedia image={Images.mainLogo} sx={{  height:"100px"}} />
-</Box>
-<Box sx={{width:"150px"}}>
-  <CardMedia image={agencyType[process.env.REACT_APP_TYPE]?.imageUrl} sx={{height:"90px"}} />
-</Box>
+            <Box sx={{ width: "150px" }}>
+              <CardMedia image={Images.mainLogo} sx={{ height: "100px" }} />
+            </Box>
+            <Box sx={{ width: "150px" }}>
+              <CardMedia image={agencyType[process.env.REACT_APP_TYPE]?.imageUrl} sx={{ height: "90px" }} />
+            </Box>
             {/* <Box sx={{ flexGrow: 1 }} /> */}
 
             {/* Right side - Language and User */}
@@ -1286,118 +1286,118 @@ function Header() {
       >
         <ClickAwayListener onClickAway={handleDropdownClose}>
 
-    
-        <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ minHeight: "48px" }}>
-            {/* Mobile Menu Icon */}
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                sx={{ mr: 2, color: "white" }}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
 
-            {/* Desktop Navigation */}
-            {!isMobile && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                {/* Dashboard Button */}
-                <Button
-                  onClick={() => navigate("/dashboard")}
-                  sx={{
-                    color: location.pathname === "/dashboard" ? "#bd9b4a" : "white",
-                    fontWeight: location.pathname === "/dashboard" ? "bold" : 400,
-                    textTransform: "none",
-                    fontSize: "14px",
-                    px: 2,
-                    py: 1.5,
-                    borderRadius: 0,
-                    "&:hover": {
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    },
-                  }}
-                  startIcon={navIcons["dashboard"]}
+          <Container maxWidth="xl">
+            <Toolbar disableGutters sx={{ minHeight: "48px" }}>
+              {/* Mobile Menu Icon */}
+              {isMobile && (
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, color: "white" }}
                 >
-                  DASHBOARD
-                </Button>
+                  <MenuIcon />
+                </IconButton>
+              )}
 
-                <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
+              {/* Desktop Navigation */}
+              {!isMobile && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  {/* Dashboard Button */}
+                  <Button
+                    onClick={() => navigate("/dashboard")}
+                    sx={{
+                      color: location.pathname === "/dashboard" ? "#bd9b4a" : "white",
+                      fontWeight: location.pathname === "/dashboard" ? "bold" : 400,
+                      textTransform: "none",
+                      fontSize: "14px",
+                      px: 2,
+                      py: 1.5,
+                      borderRadius: 0,
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      },
+                    }}
+                    startIcon={navIcons["dashboard"]}
+                  >
+                    DASHBOARD
+                  </Button>
 
-                {/* Navigation Items */}
-                {navigationData.map((item, index) => (
-                  <React.Fragment key={item.id}>
-                    {index > 0 && (
-                      <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
-                    )}
-                    {item.children ? (
-                      // Item with dropdown
-                      <Box>
-                        <Button
-                          onClick={(e) => handleDropdownOpen(e, item.id)}
-                          sx={{
-                            color: isChildActive(item.childRoute) ? "#bd9b4a" : "white",
-                            fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
-                            textTransform: "none",
-                            fontSize: "14px",
-                            px: 2,
-                            py: 1.5,
-                            borderRadius: 0,
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
-                            },
-                          }}
-                          startIcon={navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
-                          endIcon={<KeyboardArrowDown />}
-                        >
-                          {item.name.toUpperCase()}
-                        </Button>
-                        <Popper
-                          open={openDropdownId === item.id}
-                          anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
-                          role={undefined}
-                          placement="bottom-start"
-                          transition
-                          disablePortal={true}
-                          style={{
-                            zIndex: 111,
-                          }}
-                        >
-                          {({ TransitionProps, placement }) => (
-                            <Grow
-                              {...TransitionProps}
-                              timeout={300}
-                              style={{
-                                transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
-                              }}
-                            >
-                              <Paper
-                                elevation={2}
-                                sx={{
-                                  mt: 1,
-                                  width: 220,
-                                  borderRadius: "8px",
-                                  overflow: "hidden",
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
+
+                  {/* Navigation Items */}
+                  {navigationData.map((item, index) => (
+                    <React.Fragment key={item.id}>
+                      {index > 0 && (
+                        <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
+                      )}
+                      {item.children ? (
+                        // Item with dropdown
+                        <Box>
+                          <Button
+                            onClick={(e) => handleDropdownOpen(e, item.id)}
+                            sx={{
+                              color: isChildActive(item.childRoute) ? "#bd9b4a" : "white",
+                              fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
+                              textTransform: "none",
+                              fontSize: "14px",
+                              px: 2,
+                              py: 1.5,
+                              borderRadius: 0,
+                              "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                              },
+                            }}
+                            startIcon={navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
+                            endIcon={<KeyboardArrowDown />}
+                          >
+                            {item.name.toUpperCase()}
+                          </Button>
+                          <Popper
+                            open={openDropdownId === item.id}
+                            anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
+                            role={undefined}
+                            placement="bottom-start"
+                            transition
+                            disablePortal={true}
+                            style={{
+                              zIndex: 111,
+                            }}
+                          >
+                            {({ TransitionProps, placement }) => (
+                              <Grow
+                                {...TransitionProps}
+                                timeout={300}
+                                style={{
+                                  transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
                                 }}
                               >
-                                {/* <ClickAwayListener onClickAway={handleDropdownClose}> */}
+                                <Paper
+                                  elevation={2}
+                                  sx={{
+                                    mt: 1,
+                                    width: "fit-content", // 👈 This makes it adjust to content
+                                    minWidth: 150,         // 👈 Optional: prevent it from getting too small
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                  }}
+                                >
                                   <MenuList autoFocusItem={openDropdownId === item.id}>
                                     {item.children.map((child) => (
                                       <MenuItem
                                         key={child.id}
                                         onClick={() => {
                                           if (child.route) {
-                                            navigate(child.route)
-                                            handleDropdownClose()
+                                            navigate(child.route);
+                                            handleDropdownClose();
                                           }
                                         }}
                                         sx={{
@@ -1408,6 +1408,7 @@ function Header() {
                                           fontWeight: isActive(child.route) ? 500 : 400,
                                           fontSize: "14px",
                                           py: 1,
+                                          whiteSpace: "nowrap", // 👈 This ensures text stays in one line
                                           "&:hover": {
                                             backgroundColor: "rgba(52, 152, 219, 0.04)",
                                           },
@@ -1418,45 +1419,46 @@ function Header() {
                                       </MenuItem>
                                     ))}
                                   </MenuList>
-                              </Paper>
+                                </Paper>
+
                                 {/* </ClickAwayListener> */}
-                            </Grow>
-                          )}
-                        </Popper>
-                      </Box>
-                    ) : (
-                      // Single item
-                      <Button
-                        onClick={() => {
-                          if (item.route) {
-                            navigate(item.route)
-                          }
-                        }}
-                        sx={{
-                          color: isActive(item.route) ? "#bd9b4a" : "white",
-                          fontWeight: isActive(item.route) ? "bold" : 400,
-                          textTransform: "none",
-                          fontSize: "14px",
-                          px: 2,
-                          py: 1.5,
-                          borderRadius: 0,
-                          "&:hover": {
-                            backgroundColor: "rgba(255, 255, 255, 0.1)",
-                          },
-                        }}
-                        startIcon={navIcons[item.name.toLowerCase()] || <People fontSize="small" />}
-                      >
-                        {item.name.toUpperCase()}
-                      </Button>
-                    )}
-                  </React.Fragment>
-                ))}
+                              </Grow>
+                            )}
+                          </Popper>
+                        </Box>
+                      ) : (
+                        // Single item
+                        <Button
+                          onClick={() => {
+                            if (item.route) {
+                              navigate(item.route)
+                            }
+                          }}
+                          sx={{
+                            color: isActive(item.route) ? "#bd9b4a" : "white",
+                            fontWeight: isActive(item.route) ? "bold" : 400,
+                            textTransform: "none",
+                            fontSize: "14px",
+                            px: 2,
+                            py: 1.5,
+                            borderRadius: 0,
+                            "&:hover": {
+                              backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            },
+                          }}
+                          startIcon={navIcons[item.name.toLowerCase()] || <People fontSize="small" />}
+                        >
+                          {item.name.toUpperCase()}
+                        </Button>
+                      )}
+                    </React.Fragment>
+                  ))}
 
 
-              </Box>
-            )}
-          </Toolbar>
-        </Container>
+                </Box>
+              )}
+            </Toolbar>
+          </Container>
         </ClickAwayListener>
       </AppBar>
 
