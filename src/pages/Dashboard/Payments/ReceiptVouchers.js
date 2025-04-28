@@ -21,7 +21,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -40,9 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import DatePicker from 'components/DatePicker';
-
-
+import ReceiptIcon from '@mui/icons-material/Receipt';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -108,7 +106,7 @@ const useStyles = makeStyles({
     }
 })
 
-function SnapshotCategoryReport() {
+function ReceiptVouchers() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -127,7 +125,7 @@ function SnapshotCategoryReport() {
         reset,
     } = useForm();
 
-    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
     const [loader, setLoader] = useState(false);
@@ -136,8 +134,7 @@ function SnapshotCategoryReport() {
 
     // *For Customer Queue
     const [customerQueue, setCustomerQueue] = useState([]);
-    const [fromDate, setFromDate] = useState(new Date());
-    const [toDate, setToDate] = useState(new Date());
+
 
 
     const [totalCount, setTotalCount] = useState(0);
@@ -160,18 +157,32 @@ function SnapshotCategoryReport() {
         setLoader(true)
 
         try {
-
+            const Page = page ? page : currentPage
+            const Limit = limit ? limit : pageLimit
+            const Filter = filter ? { ...filters, ...filter } : null;
+            setCurrentPage(Page)
+            setPageLimit(Limit)
+            setFilters(Filter)
             let params = {
                 page: 1,
                 limit: 1000,
-                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
-                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+                type: 'receipt_voucher'
+
 
             }
+            params = { ...params, ...Filter }
+            const { data } = await CustomerServices.getVouchers(params)
+            setCustomerQueue(data?.vouchers?.rows)
+            setTotalCount(data?.count)
+            setPermissions(formatPermissionData(data?.permissions))
+            console.log(formatPermissionData(data?.permissions));
 
-            const { data } = await CustomerServices.getSnapshotCategoryReport(params)
-            setCustomerQueue(data?.report)
-
+            setPermissions(formatPermissionData(data?.permissions))
+            data?.permissions.forEach(e => {
+                if (e?.route && e?.identifier && e?.permitted) {
+                    dispatch(addPermission(e?.route));
+                }
+            })
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -193,33 +204,6 @@ function SnapshotCategoryReport() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
-    const handleFromDate = (newDate) => {
-        try {
-            // eslint-disable-next-line eqeqeq
-            if (newDate == 'Invalid Date') {
-                setFromDate('invalid')
-                return
-            }
-            console.log(newDate, "newDate")
-            setFromDate(new Date(newDate))
-        } catch (error) {
-            ErrorToaster(error)
-        }
-    }
-
-    const handleToDate = (newDate) => {
-        try {
-            // eslint-disable-next-line eqeqeq
-            if (newDate == 'Invalid Date') {
-                setToDate('invalid')
-                return
-            }
-            setToDate(new Date(newDate))
-        } catch (error) {
-            ErrorToaster(error)
-        }
-    }
-
 
 
     // *For Handle Filter
@@ -234,10 +218,13 @@ function SnapshotCategoryReport() {
 
 
         try {
-            let params = { reception_id: selectedData?.id }
+            let params = {
+                id: selectedData?.id,
+                type: 'receipt_voucher'
+            }
 
 
-            const { message } = await CustomerServices.deleteReception(params)
+            const { message } = await CustomerServices.DeleteVoucher(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -275,88 +262,85 @@ function SnapshotCategoryReport() {
             console.log(error);
         }
     };
-
     const columns = [
+        {
+            header: "SR No.",
+            accessorKey: "voucher_number",
+
+
+
+        },
+        {
+            header: "Amount",
+            accessorKey: "amount",
+
+
+        },
+        {
+            header: "Payment Mode",
+            accessorKey: "payment_mode",
+
+
+        },
 
         {
-            header: "Category",
-            accessorKey: "category",
-            accessorFn: (row) => row?.category,
+            header: "Creator",
+            accessorKey: "address",
             cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.category}
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    {row?.original?.creator?.name}
+
+                </Box>
+            ),
+
+
+        },
+
+
+
+        {
+            header: "Actions",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="PDF">
+                        <IconButton
+                            onClick={() => {
+                                window.open(
+                                    `www.google.com`,
+                                    '_blank'
+                                );
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 35,
+                                height: 35,
+                            }}
+                        >
+                            <ReceiptIcon color="black" fontSize="10px" />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Box>
+                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+
+                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
+                    </Box>
+
                 </Box>
             ),
         },
-        {
-            header: "Count",
-            accessorKey: "itemCount",
-        },
-        {
-            header: "Total Govt. Charges",
-            accessorKey: "customer_name",
-            accessorFn: (row) => parseFloat(row?.totalCharges || 0),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.totalCharges || 0).toFixed(2)}
-                </Box>
-            ),
-        },
-        {
-            header: "Total Service Charges",
-            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0),
-            accessorKey: "totalCenterFee",
-        },
 
-        {
-            header: "Tax",
-            accessorFn: (row) => parseFloat(row?.totalVat || 0),
-            accessorKey: "totalVat",
-        },
+    ]
 
-        {
-            header: "Typist Commission",
-            accessorFn: (row) => parseFloat(row?.typistCommission || 0),
-            accessorKey: "typistCommission",
-        },
-        {
-            header: "Customer Commission",
-            accessorFn: (row) => parseFloat(row?.proCommission || 0),
-            accessorKey: "proCommission",
-        },
-
-
-
-
-        {
-            header: "Net Service Charge",
-            accessorKey: "total",
-            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.netCharges || 0).toFixed(2)}
-                </Box>
-            ),
-        },
-
-    ];
 
 
     useEffect(() => {
-        setFromDate(new Date())
-        setToDate(new Date())
         getCustomerQueue()
     }, []);
 
@@ -431,61 +415,26 @@ function SnapshotCategoryReport() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Snapshot Category Report</Typography>
-
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Receipt Voucher List</Typography>
+                {true && <PrimaryButton
+                    bgcolor={'#bd9b4a'}
+                    title="Create"
+                    onClick={() => { navigate('/create-receipt-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    loading={loading}
+                />}
 
 
             </Box>
 
             {/* Filters */}
-
-            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
-                    <Grid container spacing={1}>
-                        <Grid item xs={5}>
-                            <DatePicker
-                                label={"From Date"}
-                                disableFuture={true}
-                                size="small"
-                                value={fromDate}
-                                onChange={(date) => handleFromDate(date)}
-                            />
-                        </Grid>
-                        <Grid item xs={5}>
-                            <DatePicker
-                                label={"To Date"}
-
-                                disableFuture={true}
-                                size="small"
-                                value={toDate}
-                                onChange={(date) => handleToDate(date)}
-                            />
-                        </Grid>
-
-                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
-                            <PrimaryButton
-                                bgcolor={"#bd9b4a"}
-                                icon={<SearchIcon />}
-                                title="Search"
-                                sx={{ marginTop: "30px" }}
-                                onClick={() => getCustomerQueue(null, null, null)}
-                                loading={loading}
-                            />
-                        </Grid>
-                    </Grid>
-                </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-
-                </Grid>
-            </Grid>
             <Box >
 
 
-                {<DataTable loading={loader} total={true} csv={true} csvName={'category_report'} data={customerQueue} columns={columns} />}
+                {<DataTable loading={loader} data={customerQueue} columns={columns} />}
             </Box>
 
         </Box>
     );
 }
 
-export default SnapshotCategoryReport;
+export default ReceiptVouchers;

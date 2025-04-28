@@ -42,6 +42,7 @@ import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
 import UserServices from 'services/User';
+import { useAuth } from 'context/UseContext';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -146,7 +147,8 @@ function SnapshotEmployeeServiceReport() {
   const [toDate, setToDate] = useState(new Date());
   const [selectedUser, setSelectedUser] = useState(null)
   const [users, setUsers] = useState([])
-
+  const { user } = useAuth();
+  const [fieldDisabled, setFieldDisabled] = useState(false)
 
   // *For Filters
   const [filters, setFilters] = useState({});
@@ -612,6 +614,14 @@ function SnapshotEmployeeServiceReport() {
     setToDate(new Date())
 
   }, []);
+     useEffect(() => {
+          if (user?.role_id != 1000) {
+              setFieldDisabled(true)
+              setSelectedUser(user)
+          
+          }
+  
+      }, [user])
 
   return (
     <Box sx={{ p: 3 }}>
@@ -701,6 +711,7 @@ function SnapshotEmployeeServiceReport() {
                                           size={"small"}
                                           label={"Select User "}
                                           options={users}
+                                          disabled={fieldDisabled}
                                           selected={selectedUser}
                                           onSelect={(value) => {
                                             setSelectedUser(value);
