@@ -319,11 +319,94 @@ const CompleteTransactionReport = lazy(() =>
 const SnapshotEmployeeServiceReport = lazy(() =>
   import("pages/Dashboard/Reports/SnapshotEmplaoyeeServiceReport")
 );
+const CreateCreditNote = lazy(() =>
+  import("pages/Dashboard/Payments/CreateCreditNotes")
+);
+const CreateDebitNote= lazy(() =>
+  import("pages/Dashboard/Payments/CreateDebitNote")
+);
+const CreatePaymentVoucher= lazy(() =>
+  import("pages/Dashboard/Payments/CreatePaymentVoucher")
+);
+const CreateReceiptVoucher= lazy(() =>
+  import("pages/Dashboard/Payments/CreateReceiptVoucher")
+);
+const CreateVendor= lazy(() =>
+  import("pages/Dashboard/Vendors/CreateVendor")
+);
+const EmployeeSalesSummary= lazy(() =>
+  import("pages/Dashboard/Reports/EmployeeSalesSummary")
+);
+const Vendors= lazy(() =>
+  import("pages/Dashboard/Vendors/Vendors")
+);
+const UpdateVendor= lazy(() =>
+  import("pages/Dashboard/Vendors/UpadteVendor")
+);
+const VendorDetail= lazy(() =>
+  import("pages/Dashboard/Vendors/VendorDetail")
+);
+const CreditNotes= lazy(() =>
+  import("pages/Dashboard/Payments/CreditNotes")
+);
+const DebitNotes= lazy(() =>
+  import("pages/Dashboard/Payments/DebitNotes")
+);
+const PaymentVouchers= lazy(() =>
+  import("pages/Dashboard/Payments/PaymentVouchers")
+);
+const ReceiptVouchers= lazy(() =>
+  import("pages/Dashboard/Payments/ReceiptVouchers")
+);
 const AdminRoutes = [
   
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
+  },
+  {
+    path: "/create-credit-note",
+    component: <CreateCreditNote />,
+  },
+  {
+    path: "/create-debit-note",
+    component: <CreateDebitNote />,
+  },
+  {
+    path: "/create-payment-voucher",
+    component: <CreatePaymentVoucher />,
+  },
+  {
+    path: "/create-receipt-voucher",
+    component: <CreateReceiptVoucher />,
+  },
+  {
+    path: "/create-vendor",
+    component: <CreateVendor />,
+  },
+  {
+    path: "/employee-sales-summary-report",
+    component: <EmployeeSalesSummary />,
+  },
+  {
+    path: "/vendor-list",
+    component: <Vendors />,
+  },
+  {
+    path: "/credit-note-list",
+    component: <CreditNotes />,
+  },
+  {
+    path: "/debit-note-list",
+    component: <DebitNotes />,
+  },
+  {
+    path: "/payment-voucher-list",
+    component: <PaymentVouchers />,
+  },
+  {
+    path: "/payment-receipt-list",
+    component: <ReceiptVouchers />,
   },
   {
     path: "/service-report",
@@ -336,6 +419,14 @@ const AdminRoutes = [
   {
     path: "/create-customer-payment",
     component: <CreateCustomerPayment />,
+  },
+  {
+    path: "/update-vendor/:id",
+    component: <UpdateVendor />,
+  },
+  {
+    path: "/vendor-detail/:id",
+    component: <VendorDetail />,
   },
   {
     path: "/create-fund-transfer",

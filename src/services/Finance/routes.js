@@ -55,7 +55,8 @@ const routes = {
   getCustomerProfitLoss:'accounts/reportsByCustomer',
   getTax:'/system/tax',
   getCustomerPaymentList:"payments/customer",
-  getCustomerPaymentDetail:'payments/customer/details'
+  getCustomerPaymentDetail:'payments/customer/details',
+  CreateVoucher:'/accounts/vouchers/add'
 
 };
 

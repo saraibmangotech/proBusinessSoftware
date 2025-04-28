@@ -42,7 +42,7 @@ const routes = {
   UpdateAddOnService:'/customers/services/update',
   getCandidateDetail:'/customers/candidates/details',
   CustomerStatus:'customers/updateStatus',
-  DeleteVoucher:'accounts/journalVouchers/delete',
+  DeleteVoucher:'/accounts/vouchers/delete',
   checkWPS:'/customers/wps/check',
   getRejectedVisa:'customers/candidates/rejected',
   UpdateCandidate:'customers/candidates/update',
@@ -93,7 +93,18 @@ const routes = {
   CreateCustomerPayment:'payments/customer/add',
   getServiceCategories:'/services/categories',
   getSnapshotCategoryReport:'/reports/snapshot/category',
-  getSnapshotOverviewReport:'/reports/snapshot/overview'
+  getSnapshotOverviewReport:'/reports/snapshot/overview',
+  getVendors:'/vendors',
+  deleteVendor:'/vendors/delete',
+  CreateVendor:'/vendors/add',
+  getVendorDetail:'/vendors/details',
+  UpdateVendor:'/vendors/update',
+  getCreditDebitToken:'/accounts/generateNumber',
+  CreateNote:'/accounts/notes/add',
+  getNotes:'/accounts/notes',
+  deleteNotes:'/accounts/notes/delete',
+  getVoucherToken:'/accounts/generateNumber',
+  getVouchers:'/accounts/vouchers'
 
 };
 

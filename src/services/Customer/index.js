@@ -6,6 +6,14 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+  CreateVendor: async (obj) => {
+    const data = await post(routes.CreateVendor, obj);
+    return data;
+  },
+  CreateNote: async (obj) => {
+    const data = await post(routes.CreateNote, obj);
+    return data;
+  },
   CreateBank: async (obj) => {
     const data = await post(routes.CreateBank, obj);
     return data;
@@ -34,8 +42,16 @@ const CustomerServices = {
     const data = await deleted(routes.DeletePreSale, obj);
     return data;
   },
+  deleteVendor: async (obj) => {
+    const data = await deleted(routes.deleteVendor, obj);
+    return data;
+  },
   DeleteBank: async (obj) => {
     const data = await deleted(routes.DeleteBank, obj);
+    return data;
+  },
+  deleteNotes: async (obj) => {
+    const data = await deleted(routes.deleteNotes, obj);
     return data;
   },
   CreateWPS: async (obj) => {
@@ -64,6 +80,10 @@ const CustomerServices = {
   },
   UpdateWPStatus: async (obj) => {
     const data = await patch(routes.UpdateWPStatus, obj);
+    return data;
+  },
+  UpdateVendor: async (obj) => {
+    const data = await patch(routes.UpdateVendor, obj);
     return data;
   },
   UpdateCard: async (obj) => {
@@ -118,6 +138,22 @@ const CustomerServices = {
     const data = await get(routes.getAgents, params);
     return data;
   },
+  getVouchers: async (params) => {
+    const data = await get(routes.getVouchers, params);
+    return data;
+  },
+  getVoucherToken: async (params) => {
+    const data = await get(routes.getVoucherToken, params);
+    return data;
+  },
+  getVendors: async (params) => {
+    const data = await get(routes.getVendors, params);
+    return data;
+  },
+  getCreditDebitToken: async (params) => {
+    const data = await get(routes.getCreditDebitToken, params);
+    return data;
+  },
   getSnapshotCategoryReport: async (params) => {
     const data = await get(routes.getSnapshotCategoryReport, params);
     return data;
@@ -130,8 +166,16 @@ const CustomerServices = {
     const data = await get(routes.getRejectedVisa, params);
     return data;
   },
+  getNotes: async (params) => {
+    const data = await get(routes.getNotes, params);
+    return data;
+  },
   getCards: async (params) => {
     const data = await get(routes.getCards, params);
+    return data;
+  },
+  getVendorDetail: async (params) => {
+    const data = await get(routes.getVendorDetail, params);
     return data;
   },
   getServiceCategories: async (params) => {

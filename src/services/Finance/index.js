@@ -124,6 +124,10 @@ const FinanceServices = {
     const data = await post(routes.PaymentVoucher, obj);
     return data;
   },
+  CreateVoucher: async (obj) => {
+    const data = await post(routes.CreateVoucher, obj);
+    return data;
+  },
   getChartOfAccount: async (params) => {
     const data = await get(routes.getChartOfAccount, params);
     return data;
