@@ -40,7 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-
+import ReceiptIcon from '@mui/icons-material/Receipt';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -166,8 +166,8 @@ function ReceiptVouchers() {
             let params = {
                 page: 1,
                 limit: 1000,
-                type:'receipt_voucher'
-                
+                type: 'receipt_voucher'
+
 
             }
             params = { ...params, ...Filter }
@@ -218,9 +218,10 @@ function ReceiptVouchers() {
 
 
         try {
-            let params = { id: selectedData?.id,
-                type:'receipt_voucher'
-             }
+            let params = {
+                id: selectedData?.id,
+                type: 'receipt_voucher'
+            }
 
 
             const { message } = await CustomerServices.DeleteVoucher(params)
@@ -265,7 +266,7 @@ function ReceiptVouchers() {
         {
             header: "SR No.",
             accessorKey: "voucher_number",
-        
+
 
 
         },
@@ -281,7 +282,7 @@ function ReceiptVouchers() {
 
 
         },
-       
+
         {
             header: "Creator",
             accessorKey: "address",
@@ -289,7 +290,7 @@ function ReceiptVouchers() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                
+
                     {row?.original?.creator?.name}
 
                 </Box>
@@ -305,8 +306,26 @@ function ReceiptVouchers() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="PDF">
+                        <IconButton
+                            onClick={() => {
+                                window.open(
+                                    `www.google.com`,
+                                    '_blank'
+                                );
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 35,
+                                height: 35,
+                            }}
+                        >
+                            <ReceiptIcon color="black" fontSize="10px" />
+                        </IconButton>
+                    </Tooltip>
 
-                
                     <Box>
                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 

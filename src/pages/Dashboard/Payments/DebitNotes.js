@@ -40,6 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -166,8 +167,8 @@ function DebitNotes() {
             let params = {
                 page: 1,
                 limit: 1000,
-                type:'debit_note'
-                
+                type: 'debit_note'
+
 
             }
             params = { ...params, ...Filter }
@@ -218,9 +219,10 @@ function DebitNotes() {
 
 
         try {
-            let params = { id: selectedData?.id,
-                type:'debit_note'
-             }
+            let params = {
+                id: selectedData?.id,
+                type: 'debit_note'
+            }
 
 
             const { message } = await CustomerServices.deleteNotes(params)
@@ -265,7 +267,7 @@ function DebitNotes() {
         {
             header: "SR No.",
             accessorKey: "note_number",
-        
+
 
 
         },
@@ -294,7 +296,7 @@ function DebitNotes() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                
+
                     {row?.original?.creator?.name}
 
                 </Box>
@@ -311,7 +313,25 @@ function DebitNotes() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                
+                    <Tooltip title="PDF">
+                        <IconButton
+                            onClick={() => {
+                                window.open(
+                                    `www.google.com`,
+                                    '_blank'
+                                );
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 35,
+                                height: 35,
+                            }}
+                        >
+                            <ReceiptIcon color="black" fontSize="10px" />
+                        </IconButton>
+                    </Tooltip>
                     <Box>
                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 

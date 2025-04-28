@@ -32,6 +32,7 @@ import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
@@ -166,8 +167,8 @@ function PaymentVouchers() {
             let params = {
                 page: 1,
                 limit: 1000,
-                type:'payment_voucher'
-                
+                type: 'payment_voucher'
+
 
             }
             params = { ...params, ...Filter }
@@ -218,9 +219,10 @@ function PaymentVouchers() {
 
 
         try {
-            let params = { id: selectedData?.id,
-                type:'payment_voucher'
-             }
+            let params = {
+                id: selectedData?.id,
+                type: 'payment_voucher'
+            }
 
 
             const { message } = await CustomerServices.DeleteVoucher(params)
@@ -265,7 +267,7 @@ function PaymentVouchers() {
         {
             header: "SR No.",
             accessorKey: "voucher_number",
-        
+
 
 
         },
@@ -281,7 +283,7 @@ function PaymentVouchers() {
 
 
         },
-       
+
         {
             header: "Creator",
             accessorKey: "address",
@@ -289,7 +291,7 @@ function PaymentVouchers() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                
+
                     {row?.original?.creator?.name}
 
                 </Box>
@@ -306,7 +308,25 @@ function PaymentVouchers() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                
+                    <Tooltip title="PDF">
+                        <IconButton
+                            onClick={() => {
+                                window.open(
+                                    `www.google.com`,
+                                    '_blank'
+                                );
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 35,
+                                height: 35,
+                            }}
+                        >
+                            <ReceiptIcon color="black" fontSize="10px" />
+                        </IconButton>
+                    </Tooltip>
                     <Box>
                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
