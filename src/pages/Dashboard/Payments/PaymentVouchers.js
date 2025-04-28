@@ -312,7 +312,7 @@ function PaymentVouchers() {
                         <IconButton
                             onClick={() => {
                                 window.open(
-                                    `www.google.com`,
+                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-voucher?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                     '_blank'
                                 );
                             }}
