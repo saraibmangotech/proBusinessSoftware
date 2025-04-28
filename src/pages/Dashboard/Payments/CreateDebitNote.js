@@ -134,7 +134,7 @@ const CreateDebitNote = () => {
                                 size="small"
                                 disabled={fieldsDisabled}
                                 placeholder="Reference Invoice Number"
-                                register={register("originalInvoiceNumber", { required: "Original Invoice Number is required" })}
+                                register={register("originalInvoiceNumber", { required: false })}
                                 error={!!errors?.originalInvoiceNumber}
                                 helperText={errors?.originalInvoiceNumber?.message}
                             />

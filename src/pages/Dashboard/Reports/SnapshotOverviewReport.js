@@ -359,11 +359,12 @@ function SnapshotOverviewReport() {
         { description: "Invoice Count", value: customerQueue.invoiceCount },
         { description: "Service Count", value: customerQueue.itemCount },
         { description: "Total Invoice Amount", value: (parseFloat(customerQueue.totalGovernmentCharges) + parseFloat(customerQueue.totalBankCharges) + parseFloat(customerQueue.totalCenterFee)).toFixed(2) },
-        { description: "Total Govt. Charges", value: parseFloat(customerQueue.totalGovernmentCharges).toFixed(2) },
+        { description: "Total Govt. Charges", value: (parseFloat(customerQueue.totalGovernmentCharges) + parseFloat(customerQueue.totalBankCharges)).toFixed(2) },
         { description: "Total Service Charges", value: parseFloat(customerQueue.totalCenterFee).toFixed(2) },
+        { description: "Total VAT", value: parseFloat(customerQueue.totalVat).toFixed(2) },
         { description: "Total PRO Commission", value: parseFloat(customerQueue.proCommission).toFixed(2) },
         { description: "Total Employee Commission", value: parseFloat(customerQueue.typistCommission).toFixed(2) },
-        { description: "Net Service Charge", value: (parseFloat(customerQueue.totalGovernmentCharges) + parseFloat(customerQueue.totalBankCharges) + parseFloat(customerQueue.totalCenterFee) - parseFloat(customerQueue.proCommission) - parseFloat(customerQueue.typistCommission)).toFixed(2) },
+        { description: "Net Service Charge", value: (parseFloat(customerQueue.totalGovernmentCharges) + parseFloat(customerQueue.totalBankCharges) + parseFloat(customerQueue.totalCenterFee) + parseFloat(customerQueue.totalVat) - parseFloat(customerQueue.proCommission) - parseFloat(customerQueue.typistCommission)).toFixed(2) },
         { description: "Cash Collection", value: parseFloat(customerQueue.totalCash).toFixed(2) },
         { description: "Credit Card Collection", value: parseFloat(customerQueue.totalCard).toFixed(2) },
         { description: "Bank Transfer Collection", value: parseFloat(customerQueue.totalBank).toFixed(2) },
@@ -594,6 +595,7 @@ function SnapshotOverviewReport() {
                                             {(
                                                 parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
+                                                parseFloat(customerQueue?.totalVat) +
                                                 parseFloat(customerQueue?.totalCenterFee)
                                             ).toFixed(2)}
                                         </Cell>
@@ -603,7 +605,8 @@ function SnapshotOverviewReport() {
                                             Total Govt. Charges
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalGovernmentCharges).toFixed(2)}
+                                                 
+                                                {(parseFloat(customerQueue?.totalGovernmentCharges)+parseFloat(customerQueue?.totalBankCharges)).toFixed(2)}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -612,6 +615,14 @@ function SnapshotOverviewReport() {
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
                                             {parseFloat(customerQueue?.totalCenterFee).toFixed(2)}
+                                        </Cell>
+                                    </Row>
+                                    <Row sx={{ border: "1px solid #EEEEEE !important" }}>
+                                        <Cell style={{ textAlign: "left" }} className="pdf-table">
+                                            Total VAT
+                                        </Cell>
+                                        <Cell style={{ textAlign: "left" }} className="pdf-table">
+                                            {parseFloat(customerQueue?.totalVat).toFixed(2)}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -636,9 +647,10 @@ function SnapshotOverviewReport() {
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
                                             {(
-                                                parseFloat(customerQueue?.totalGovernmentCharges) +
+                                                (parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
-                                                parseFloat(customerQueue?.totalCenterFee) -
+                                                parseFloat(customerQueue?.totalVat) +
+                                                parseFloat(customerQueue?.totalCenterFee)) -
                                                 parseFloat(customerQueue?.proCommission) -
                                                 parseFloat(customerQueue?.typistCommission)
                                             ).toFixed(2)}

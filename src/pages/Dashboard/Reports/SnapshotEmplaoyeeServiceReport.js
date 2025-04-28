@@ -420,7 +420,7 @@ function SnapshotEmployeeServiceReport() {
     {
       header: "Category",
       accessorKey: "category",
-      accessorFn: (row) => row?.service.category?.name,
+      accessorFn: (row) => row?.service?.category?.name,
       cell: ({ row }) => (
         <Box
           variant="contained"

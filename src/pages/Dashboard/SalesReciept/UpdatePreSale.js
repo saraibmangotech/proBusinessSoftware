@@ -433,7 +433,11 @@ function UpdatePreSale() {
                 let serviceItem = {...data?.service}
                 serviceItem.name = data?.service?.name + "-" + data?.service?.name_ar;
                 // setValue("transaction_id", data?.transaction_id);
-                setServiceItem(serviceItem);
+                setServiceItem({
+                    ...data?.service,
+                    name: `${data?.service?.name} - ${data?.service?.name_ar}`,
+                  });
+                //setServiceItem(serviceItem);
                 setValue("quantity", 1);
             } catch (error) {
                 ErrorToaster(error);

@@ -338,8 +338,8 @@ function CreatePaidReceipt() {
 
       )
       
-      setSelectedCard({id: cardsData[0]?.id, name: cardsData[0]?.name})
-      setValue1("card", {id: cardsData[0]?.id, name: cardsData[0]?.name})
+      setSelectedCard({id: cardsData[0]?.id, name: cardsData[0]?.name, account_id:cardsData[0]?.account_id})
+      setValue1("card", {id: cardsData[0]?.id, name: cardsData[0]?.name,  account_id:cardsData[0]?.account_id})
 
 
     } catch (error) {
@@ -638,6 +638,8 @@ function CreatePaidReceipt() {
       showErrorToast("Authorization code is required for Card mode");
       return;
     }
+  
+    console.log(card,"accountIDD")
     const paymentObj = {
       amount: currentAmount,
       payment_mode: mode,
@@ -646,6 +648,7 @@ function CreatePaidReceipt() {
       ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
 
     };
+    console.log(paymentObj,"payObj")
 
     setPayments((prev) => [...prev, paymentObj]);
     //setValue1('payamount', '')
