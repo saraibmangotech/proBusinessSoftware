@@ -106,6 +106,7 @@ function CreateFundTransferVoucher() {
         return;
       }
       let obj = {
+        date:vaultDate,
         from_account_id: selectedFromAccount?.id,
         to_account_id: selectedToAccount?.id,
         from_currency: selectedFromAccount?.currency,

@@ -358,6 +358,30 @@ const PaymentVouchers= lazy(() =>
 const ReceiptVouchers= lazy(() =>
   import("pages/Dashboard/Payments/ReceiptVouchers")
 );
+const Categories= lazy(() =>
+  import("pages/Dashboard/Category/Categories")
+);
+const CreateProductCategory= lazy(() =>
+  import("pages/Dashboard/Category/CreateCategory")
+);
+const UpdateProductCategory= lazy(() =>
+  import("pages/Dashboard/Category/UpdateCategory")
+);
+const ProductCategoryDetail= lazy(() =>
+  import("pages/Dashboard/Category/CategoryDetail")
+);
+const Products= lazy(() =>
+  import("pages/Dashboard/Product/Products")
+);
+const CreateProduct= lazy(() =>
+  import("pages/Dashboard/Product/CreateProduct")
+);
+const UpdateProduct= lazy(() =>
+  import("pages/Dashboard/Product/UpdateProduct")
+);
+const ProductDetail= lazy(() =>
+  import("pages/Dashboard/Product/Product-detail")
+);
 const AdminRoutes = [
   
   {
@@ -385,12 +409,28 @@ const AdminRoutes = [
     component: <CreateVendor />,
   },
   {
+    path: "/create-product-category",
+    component: <CreateProductCategory />,
+  },
+  {
     path: "/employee-sales-summary-report",
     component: <EmployeeSalesSummary />,
   },
   {
     path: "/vendor-list",
     component: <Vendors />,
+  },
+  {
+    path: "/product-list",
+    component: <Products />,
+  },
+  {
+    path: "/create-product",
+    component: <CreateProduct />,
+  },
+  {
+    path: "/product-category-list",
+    component: <Categories />,
   },
   {
     path: "/credit-note-list",
@@ -425,8 +465,24 @@ const AdminRoutes = [
     component: <UpdateVendor />,
   },
   {
+    path: "/product-category-detail/:id",
+    component: <ProductCategoryDetail />,
+  },
+  {
+    path: "/update-product/:id",
+    component: <UpdateProduct />,
+  },
+  {
+    path: "/update-product-category/:id",
+    component: <UpdateProductCategory />,
+  },
+  {
     path: "/vendor-detail/:id",
     component: <VendorDetail />,
+  },
+  {
+    path: "/product-detail/:id",
+    component: <ProductDetail />,
   },
   {
     path: "/create-fund-transfer",

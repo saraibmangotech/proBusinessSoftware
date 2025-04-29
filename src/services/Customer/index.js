@@ -10,8 +10,16 @@ const CustomerServices = {
     const data = await post(routes.CreateVendor, obj);
     return data;
   },
+  CreateProduct: async (obj) => {
+    const data = await post(routes.CreateProduct, obj);
+    return data;
+  },
   CreateNote: async (obj) => {
     const data = await post(routes.CreateNote, obj);
+    return data;
+  },
+  CreateProductCategory: async (obj) => {
+    const data = await post(routes.CreateProductCategory, obj);
     return data;
   },
   CreateBank: async (obj) => {
@@ -44,6 +52,14 @@ const CustomerServices = {
   },
   deleteVendor: async (obj) => {
     const data = await deleted(routes.deleteVendor, obj);
+    return data;
+  },
+  DeleteProduct: async (obj) => {
+    const data = await deleted(routes.DeleteProduct, obj);
+    return data;
+  },
+  DeleteProductCategory: async (obj) => {
+    const data = await deleted(routes.DeleteProductCategory, obj);
     return data;
   },
   DeleteBank: async (obj) => {
@@ -110,6 +126,14 @@ const CustomerServices = {
     const data = await patch(routes.UpdateReception, obj);
     return data;
   },
+  UpdateProductCategory: async (obj) => {
+    const data = await patch(routes.UpdateProductCategory, obj);
+    return data;
+  },
+  UpdateProduct: async (obj) => {
+    const data = await patch(routes.UpdateProduct, obj);
+    return data;
+  },
   UpdateSaleReceipt: async (obj) => {
     const data = await patch(routes.UpdateSaleReceipt, obj);
     return data;
@@ -146,8 +170,24 @@ const CustomerServices = {
     const data = await get(routes.getVoucherToken, params);
     return data;
   },
+  getProductCategory: async (params) => {
+    const data = await get(routes.getProductCategory, params);
+    return data;
+  },
   getVendors: async (params) => {
     const data = await get(routes.getVendors, params);
+    return data;
+  },
+  getProducts: async (params) => {
+    const data = await get(routes.getProducts, params);
+    return data;
+  },
+  getProductCategoryDetail: async (params) => {
+    const data = await get(routes.getProductCategoryDetail, params);
+    return data;
+  },
+  getProductDetail: async (params) => {
+    const data = await get(routes.getProductDetail, params);
     return data;
   },
   getCreditDebitToken: async (params) => {
