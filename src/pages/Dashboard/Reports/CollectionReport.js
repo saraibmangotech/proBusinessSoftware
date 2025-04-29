@@ -469,14 +469,15 @@ function CollectionReport() {
     {
       header: "Total",
       accessorKey: "total",
-      accessorFn: (row) => row?.paid_amount,
+      accessorFn: (row) => (parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat)).toFixed(2),
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.paid_amount}
+                    {(parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat)).toFixed(2)}
+
         </Box>
       ),
     },

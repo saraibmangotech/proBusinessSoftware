@@ -594,14 +594,14 @@ function SnapshotEmployeeServiceReport() {
     {
       header: "Invoice Total",
       accessorKey: "inv_total",
-      accessorFn: (row) => row?.receipt?.total_amount,
+      accessorFn: (row) => parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat),
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {parseFloat(row?.original?.receipt?.total_amount) }
+          {parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat) }
         </Box>
       ),
     },

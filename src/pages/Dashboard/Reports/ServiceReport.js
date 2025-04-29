@@ -315,7 +315,7 @@ function ServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: (row) =>  'Al-Adheed',
+      accessorFn: (row) =>  agencyType[process.env.REACT_APP_TYPE].category,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -370,7 +370,7 @@ function ServiceReport() {
     },
     {
       header: "Customer Ref",
-      accessorFn: (row) => 'Walk-In Customer',
+      accessorFn: (row) => row?.receipt?.customer?.name,
   
       cell: ({ row }) => (
         <Box
@@ -378,7 +378,7 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          Walk-In Customer
+          {row?.original?.receipt?.customer?.name}
         </Box>
       ),
     },
