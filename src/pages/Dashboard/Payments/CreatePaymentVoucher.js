@@ -292,7 +292,7 @@ function CreatePaymentVoucher() {
                 entries:rows
             }
 
-            console.log(obj);
+            console.log(obj,'objobj');
 
             const promise = FinanceServices.CreateVoucher(obj);
 

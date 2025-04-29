@@ -269,7 +269,7 @@ function CreateVendor() {
                       // }}
                       error={errors1?.mobile?.message}
                       register={register1("mobile", {
-                        required: 'mobile is required',
+                        required: false,
                      
                         onChange: (e) => {
                           console.log("asdas");
@@ -311,7 +311,7 @@ function CreateVendor() {
                       placeholder={"Email"}
                       error={errors1?.email?.message}
                       register={register1("email", {
-                        required: 'email is required',
+                        required: false,
                         pattern: {
                           value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                           message: "Please enter a valid email address."
@@ -326,7 +326,7 @@ function CreateVendor() {
                       placeholder={" Address"}
                       error={errors1?.address?.message}
                       register={register1("address", {
-                        required: 'address is required',
+                        required: false,
                       })}
                     />
                   </Grid>
@@ -337,7 +337,7 @@ function CreateVendor() {
                       placeholder={" Business Name"}
                       error={errors1?.businessName?.message}
                       register={register1("businessName", {
-                        required: 'business name is required',
+                        required:false,
                       })}
                     />
                   </Grid>
@@ -348,7 +348,7 @@ function CreateVendor() {
                       placeholder={" Additional Id"}
                       error={errors1?.additionalId?.message}
                       register={register1("additionalId", {
-                        required: 'additional id name is required',
+                        required: false,
                       })}
                     />
                   </Grid>

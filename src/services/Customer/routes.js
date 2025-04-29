@@ -43,6 +43,7 @@ const routes = {
   getCandidateDetail:'/customers/candidates/details',
   CustomerStatus:'customers/updateStatus',
   DeleteVoucher:'/accounts/vouchers/delete',
+  DeleteJournalVoucher:'/accounts/journalVouchers/delete',
   checkWPS:'/customers/wps/check',
   getRejectedVisa:'customers/candidates/rejected',
   UpdateCandidate:'customers/candidates/update',

@@ -198,7 +198,7 @@ function JournalVoucherList() {
 
             };
 
-            const promise = CustomerServices.DeleteVoucher(obj);
+            const promise = CustomerServices.DeleteJournalVoucher(obj);
             console.log(promise);
 
             showPromiseToast(

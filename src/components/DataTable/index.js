@@ -159,18 +159,21 @@ const DataTable = ({
   }
 
   const exportToExcel = () => {
-    // Only use the columns that are explicitly provided
-    const exportColumns = columns.filter((col) => !col.id || col.id !== "select"); // Filter out checkbox column
+    // Filter out selection/checkbox column
+    const exportColumns = columns.filter((col) => !col.id || col.id !== "select");
   
-    // Create headers from the provided columns
-    const headers = exportColumns.map((col) => col.header || (col.accessorKey ? col.accessorKey : col.id)).join(",");
+    // Create CSV headers
+    const headers = exportColumns
+      .map((col) => col.header || col.accessorKey || col.id)
+      .join(",");
   
+    // Generate a row from a data object
     const generateRow = (row) => {
       return exportColumns
         .map((col) => {
           let cellValue;
   
-          // Extract value using the column's accessor method
+          // Extract value from row using accessor
           if (col.accessorFn) {
             cellValue = col.accessorFn(row);
           } else if (col.accessorKey) {
@@ -215,27 +218,29 @@ const DataTable = ({
             }
           }
   
-          // Convert to string
+          // Convert value to string and escape if needed
           cellValue = String(cellValue);
-  
-          // Handle commas and quotes
           if (cellValue.includes(",") || cellValue.includes('"') || cellValue.includes("\n")) {
             return `"${cellValue.replace(/"/g, '""')}"`;
           }
+  
           return cellValue;
         })
         .join(",");
     };
   
+    // Generate data rows
     const dataRows = filteredData.map(generateRow);
   
-    // Now create the TOTAL ROW
+    // Generate total row
     const totalRowObj = {};
-  
     exportColumns.forEach((col, idx) => {
+      const key = col.accessorKey || col.id;
+      const shouldTotal = col.total !== false;
+  
       if (idx === 0) {
-        totalRowObj[col.accessorKey || col.id] = "Total";
-      } else {
+        totalRowObj[key] = "Total";
+      } else if (shouldTotal) {
         let total = 0;
         filteredData.forEach((row) => {
           let value;
@@ -248,17 +253,20 @@ const DataTable = ({
             total += parseFloat(value);
           }
         });
-        totalRowObj[col.accessorKey || col.id] = total ? total.toFixed(2) : "";
+        totalRowObj[key] = total ? total.toFixed(2) : "";
+      } else {
+        totalRowObj[key] = "";
       }
     });
   
     const totalRowString = generateRow(totalRowObj);
   
+    // Combine all parts into CSV content
     const csvContent = `${headers}\n${dataRows.join("\n")}\n${totalRowString}`;
+    const csvWithBOM = "\uFEFF" + csvContent; // Excel needs BOM for UTF-8
   
-    const csvWithBOM = "\uFEFF" + csvContent; // prepend BOM for Excel UTF-8
-  
-    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8; encoding='utf-8-sig'" });
+    // Trigger download
+    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -268,6 +276,8 @@ const DataTable = ({
     link.click();
     document.body.removeChild(link);
   };
+  
+  
   
 
   return (

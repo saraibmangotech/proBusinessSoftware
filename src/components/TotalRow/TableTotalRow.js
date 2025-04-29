@@ -4,19 +4,17 @@ const TableTotalRow = ({ table, columns }) => {
   const rows = table.getRowModel().rows;
 
   if (rows.length === 0) return null;
-console.log(columns);
 
   const totals = columns.map((col) => {
+    // If the column has total explicitly set to false, return null
+    if (col.total === false) return null;
+
     let total = 0;
-
-
     rows.forEach((row) => {
       let value;
 
       if (col.accessorFn) {
         value = col.accessorFn(row.original);
-
-        // Force value to be number if accessorFn returns string (because of .toFixed or other issues)
         if (typeof value === "string") {
           value = parseFloat(value);
         }
@@ -31,12 +29,16 @@ console.log(columns);
 
     return total;
   });
-  console.log(totals,'totals');
+
   return (
     <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
       {columns.map((col, index) => (
         <TableCell key={col.accessorKey || index} sx={{ fontWeight: "bold" }}>
-          {index === 0 ? "Total" : totals[index]?.toFixed(2)}
+          {index === 0
+            ? "Total"
+            : col.total === false || totals[index] === null
+            ? ""
+            : totals[index]?.toFixed(2)}
         </TableCell>
       ))}
     </TableRow>

@@ -219,7 +219,7 @@ function UpdateUser() {
               error={errors?.phone?.message}
               register={register("phone", {
                 required:
-                  "Please enter phone.",
+                  false,
                 pattern: {
                   value: /^05[0-9]{8}$/,
                   message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."

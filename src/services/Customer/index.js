@@ -50,6 +50,10 @@ const CustomerServices = {
     const data = await deleted(routes.DeleteVoucher, obj);
     return data;
   },
+  DeleteJournalVoucher: async (obj) => {
+    const data = await deleted(routes.DeleteJournalVoucher, obj);
+    return data;
+  },
   DeletePreSale: async (obj) => {
     const data = await deleted(routes.DeletePreSale, obj);
     return data;

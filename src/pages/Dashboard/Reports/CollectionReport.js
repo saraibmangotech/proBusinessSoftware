@@ -284,7 +284,8 @@ function CollectionReport() {
     {
       header: "Category",
       accessorKey: "category",
-      accessorFn: (row) => 'Al-ADHEED',
+      total:false,
+      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE].category,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -298,34 +299,37 @@ function CollectionReport() {
     {
       header: "Receipt Date",
       accessorKey: "invoice_date",
-      accessorFn: (row) => moment(row?.created_at).format("DD/MM/YYYY"),
+      total:false,
+      accessorFn: (row) => row?.created_at ?  moment(row?.created_at).format("DD/MM/YYYY") : '',
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {moment(row?.original?.created_at).format("DD/MM/YYYY")}
+          {row?.original?.created_at ? moment(row?.original?.created_at).format("DD/MM/YYYY") :""}
         </Box>
       ),
     },
     {
       header: "Receipt Time",
       accessorKey: "invoice_date",
-      accessorFn: (row) => moment(row?.created_at).format("hh:mm A"),
+      total:false,
+      accessorFn: (row) => row?.created_at ? moment(row?.created_at).format("hh:mm A") : '',
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {moment(row?.original?.created_at).format("hh:mm A")}
+          {row?.original?.created_at ? moment(row?.original?.created_at).format("hh:mm A") : ''}
         </Box>
       ),
     },
     {
       header: "Receipt No.",
       accessorKey: "id",
+      total:false,
       accessorFn: (row) => "RC"+row?.id,
       cell: ({ row }) => (
         <Box
@@ -340,6 +344,7 @@ function CollectionReport() {
     {
       header: "Inv No.",
       accessorKey: "invoice_number",
+      total:false,
       accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
         <Box
@@ -355,6 +360,7 @@ function CollectionReport() {
     {
       header: "Customer Name",
       accessorKey: "customer_name",
+      total:false,
       accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
         <Box
@@ -369,6 +375,7 @@ function CollectionReport() {
     {
       header: "Card No.",
       accessorKey: "remarks",
+      total:false,
       accessorFn: (row) => row?.remarks ,
       cell: ({ row }) => (
         <Box
@@ -383,6 +390,7 @@ function CollectionReport() {
     {
       header: "Cashier",
       accessorKey: "cashier",
+      total:false,
       accessorFn: (row) => row?.payment_creator?.name,
       cell: ({ row }) => (
         <Box
@@ -397,6 +405,7 @@ function CollectionReport() {
     {
       header: "Pay. Method",
       accessorKey: "pay_method",
+      total:false,
       accessorFn: (row) => row?.payment_mode,
       cell: ({ row }) => (
         <Box
@@ -410,8 +419,9 @@ function CollectionReport() {
     },
     {
       header: "Gross",
-      accessorKey: "gross",
       accessorFn: (row) => row?.receipt?.total_amount,
+      accessorKey: "total_amount",
+      
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -468,7 +478,7 @@ function CollectionReport() {
     
     {
       header: "Total",
-      accessorKey: "total",
+      accessorKey: "paid_amount",
       accessorFn: (row) => row?.paid_amount,
       cell: ({ row }) => (
         <Box
@@ -611,7 +621,7 @@ function CollectionReport() {
       <Box >
 
 
-        {<DataTable loading={loader} csv={true} csvName={'collection_report'} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} total={true} csv={true} csvName={'collection_report'} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>
