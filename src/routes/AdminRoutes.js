@@ -382,6 +382,15 @@ const UpdateProduct= lazy(() =>
 const ProductDetail= lazy(() =>
   import("pages/Dashboard/Product/Product-detail")
 );
+const CreatePurchaseInvoice= lazy(() =>
+  import("pages/Dashboard/Invoice/CreatePurchaseInvoice")
+);
+const PurchaseInvoices= lazy(() =>
+  import("pages/Dashboard/Invoice/PurchaseInvoices")
+);
+const UpdatePurchaseInvoice= lazy(() =>
+  import("pages/Dashboard/Invoice/UpdatePurchaseInvoice")
+);
 const AdminRoutes = [
   
   {
@@ -429,6 +438,14 @@ const AdminRoutes = [
     component: <CreateProduct />,
   },
   {
+    path: "/create-purchase-invoice",
+    component: <CreatePurchaseInvoice />,
+  },
+  {
+    path: "/purchase-invoices",
+    component: <PurchaseInvoices />,
+  },
+  {
     path: "/product-category-list",
     component: <Categories />,
   },
@@ -463,6 +480,10 @@ const AdminRoutes = [
   {
     path: "/update-vendor/:id",
     component: <UpdateVendor />,
+  },
+  {
+    path: "/update-purchase-invoice/:id",
+    component: <UpdatePurchaseInvoice />,
   },
   {
     path: "/product-category-detail/:id",

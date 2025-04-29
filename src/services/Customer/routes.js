@@ -114,7 +114,11 @@ const routes = {
   CreateProduct:'/products/add',
   DeleteProduct:'/products/delete',
   getProductDetail:'/products/details',
-  UpdateProduct:'/products/update'
+  UpdateProduct:'/products/update',
+  CreatePurchaseInvoice:'/purchases/invoice/add',
+  getPurchaseInvoices:'/purchases/invoice',
+  getPurchaseInvoiceDetail:'/purchases/invoice/details',
+  UpdatePurchaseInvoice:'/services/update'
 
 };
 
