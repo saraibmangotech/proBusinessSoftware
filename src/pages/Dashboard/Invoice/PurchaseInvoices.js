@@ -166,15 +166,15 @@ function PurchaseInvoices() {
             let params = {
                 page: 1,
                 limit: 1000,
-                
+
 
             }
-     
+
             const { data } = await CustomerServices.getPurchaseInvoices(params)
             console.log(data);
-            
+
             setCustomerQueue(data?.rows)
-        
+
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -253,21 +253,49 @@ function PurchaseInvoices() {
     };
     const columns = [
         {
-            header: "SR No.",
+            header: "Invoice #",
             accessorKey: "id",
 
 
         },
         {
-            header: "Name",
+            header: " Date",
+
+
+            accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',
+            cell: ({ row }) => (
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {row?.original?.purchase_date ? moment(row?.original?.purchase_date).format("DD/MM/YYYY") : ''}
+                </Box>
+            ),
+            total: false,
+        },
+        {
+            header: "Vendor Name",
             accessorKey: "name",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  {row?.original?.vendor?.name}
+                    {row?.original?.vendor?.name}
 
                 </Box>
             ),
+
+
+        },
+        {
+            header: "Total Charges",
+            accessorKey: "total_charges",
+
+
+        },
+        {
+            header: "Tax",
+            accessorKey: "tax",
 
 
         },
@@ -277,13 +305,27 @@ function PurchaseInvoices() {
 
 
         },
+
         {
             header: "Balance",
             accessorKey: "total_amount",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  {parseFloat(row?.original?.total_amount)-parseFloat(row?.original?.paid_amount)}
+                    {parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)}
+
+                </Box>
+            ),
+
+
+        },
+        {
+            header: "Payment Status",
+            accessorKey: "total_amount",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" :'Unpaid' }
 
                 </Box>
             ),
@@ -292,13 +334,12 @@ function PurchaseInvoices() {
         },
 
 
-
         {
             header: "Actions",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  
+
                     {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     <Box>
                         {/* {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>} */}
