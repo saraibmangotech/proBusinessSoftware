@@ -269,7 +269,7 @@ function CreateVendor() {
                       // }}
                       error={errors1?.mobile?.message}
                       register={register1("mobile", {
-                        required: 'mobile is required',
+                        required: false,
                      
                         onChange: (e) => {
                           console.log("asdas");
@@ -337,7 +337,7 @@ function CreateVendor() {
                       placeholder={" Business Name"}
                       error={errors1?.businessName?.message}
                       register={register1("businessName", {
-                        required: false,
+                        required:false,
                       })}
                     />
                   </Grid>

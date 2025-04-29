@@ -283,10 +283,12 @@ function ServiceReport() {
     {
       header: "SR No.",
       accessorKey: "id",
+
     },
     {
       header: "Inv No.",
       accessorKey: "invoice_number",
+      total:false,
       accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
         <Box
@@ -300,17 +302,19 @@ function ServiceReport() {
     },
     {
       header: "Inv Date",
-      accessorKey: "invoice_date",
-      accessorFn: (row) => moment(row?.receipt?.invoice_date).format("DD/MM/YYYY"),
+      
+   
+      accessorFn: (row) => row?.receipt?.invoice_date ? moment(row?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY")}
+          {row?.original?.receipt?.invoice_date ? moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY") : ''}
         </Box>
       ),
+      total:false,
     },
     {
       header: "Department",
@@ -329,6 +333,7 @@ function ServiceReport() {
     {
       header: "Stock ID",
       accessorKey: "stock_id",
+      total:false,
       accessorFn: (row) => row?.service?.item_code,
       cell: ({ row }) => (
         <Box
@@ -343,6 +348,7 @@ function ServiceReport() {
     {
       header: "Service Name",
       accessorKey: "service_name",
+      total:false,
       accessorFn: (row) => row?.service?.name,
       cell: ({ row }) => (
         <Box
@@ -357,6 +363,7 @@ function ServiceReport() {
     {
       header: "Category",
       accessorKey: "category",
+      total:false,
       accessorFn: (row) => row?.service?.category?.name,
       cell: ({ row }) => (
         <Box
@@ -370,7 +377,8 @@ function ServiceReport() {
     },
     {
       header: "Customer Ref",
-      accessorFn: (row) => row?.receipt?.customer?.name,
+      total:false,
+      accessorFn: (row) => row?.receipt?.customer_name,
   
       cell: ({ row }) => (
         <Box
@@ -378,13 +386,14 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.receipt?.customer?.name}
+          Walk-In Customer
         </Box>
       ),
     },
     {
       header: "Display Customer",
       accessorKey: "customer_name",
+      total:false,
       accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
         <Box
@@ -399,6 +408,7 @@ function ServiceReport() {
     {
       header: "Customer Mobile",
       accessorKey: "customer_mobile",
+      total:false,
       accessorFn: (row) => row?.receipt?.customer_mobile,
       cell: ({ row }) => (
         <Box
@@ -413,6 +423,7 @@ function ServiceReport() {
     {
       header: "Customer Email",
       accessorKey: "customer_email",
+      total:false,
       accessorFn: (row) => row?.receipt?.customer_email,
       cell: ({ row }) => (
         <Box
@@ -500,18 +511,22 @@ function ServiceReport() {
     {
       header: "Transaction ID",
       accessorKey: "transaction_id",
+      total:false,
     },
     {
       header: "Application/Case ID",
       accessorKey: "application_id",
+      total:false,
     },
     {
       header: "Ref Name",
       accessorKey: "ref_no",
+      total:false,
     },
     {
       header: "Payment Status",
       accessorKey: "payment_status",
+      total:false,
       accessorFn: (row) => row?.receipt?.payment_status,
       cell: ({ row }) => (
         <Box
@@ -526,6 +541,7 @@ function ServiceReport() {
     {
       header: "Employee ID",
       accessorKey: "employee_id",
+      total:false,
       accessorFn: (row) => row?.receipt?.creator?.employee_id,
       cell: ({ row }) => (
         <Box
@@ -539,6 +555,7 @@ function ServiceReport() {
     },
     {
       header: "Employee Name",
+      total:false,
       accessorKey: "employee_name",
       accessorFn: (row) => row?.receipt?.creator?.name,
       cell: ({ row }) => (
@@ -553,6 +570,7 @@ function ServiceReport() {
     },
     {
       header: "Line Total",
+      
       accessorKey: "total",
       accessorFn: (row) => parseFloat(row?.total) + ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05),
       cell: ({ row }) => (
@@ -567,7 +585,7 @@ function ServiceReport() {
     },
     {
       header: "Invoice Total",
-      accessorKey: "inv_total",
+      accessorKey: "receipt?.total_amount",
       accessorFn: (row) => parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat),
       cell: ({ row }) => (
         <Box
@@ -712,7 +730,7 @@ function ServiceReport() {
       <Box >
 
 
-        {<DataTable loading={loader} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} total={true} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>

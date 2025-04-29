@@ -1322,7 +1322,7 @@ function UpdatePurchaseInvoice() {
                                                                     <TableCell colSpan={10} align="right">
                                                                         <Grid container gap={2} justifyContent={"center"}>
                                                                             <Button
-                                                                                onClick={() => setPayButton(true)}
+                                                                              type={'submit'}
                                                                                 disabled={rows?.length == 0}
                                                                                 variant="contained"
                                                                                 sx={{
@@ -1334,7 +1334,7 @@ function UpdatePurchaseInvoice() {
                                                                                     },
                                                                                 }}
                                                                             >
-                                                                                Pay
+                                                                                Update
                                                                             </Button>
                                                                             {console.log(selectedCustomer, 'selectedCustomer')
                                                                             }
@@ -1353,20 +1353,7 @@ function UpdatePurchaseInvoice() {
                                                                             >
                                                                                 Mark As Unpaid
                                                                             </Button>} */}
-                                                                            <Button
-                                                                                onClick={() => {setPayButton(false); setPayments([])}}
-                                                                                variant="contained"
-                                                                                sx={{
-                                                                                    textTransform: "capitalize",
-                                                                                    backgroundColor: "#bd9b4a",
-                                                                                    width: "200px",
-                                                                                    ":hover": {
-                                                                                        backgroundColor: "rgb(189 155 74)",
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                Cancel
-                                                                            </Button>
+                                                                        
                                                                         </Grid>
                                                                     </TableCell>
                                                                 </TableRow>

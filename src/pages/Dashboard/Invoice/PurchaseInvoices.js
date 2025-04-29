@@ -261,6 +261,13 @@ function PurchaseInvoices() {
         {
             header: "Name",
             accessorKey: "name",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {row?.original?.vendor?.name}
+
+                </Box>
+            ),
 
 
         },

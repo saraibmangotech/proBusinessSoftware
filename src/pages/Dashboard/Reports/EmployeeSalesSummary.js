@@ -330,7 +330,7 @@ function EmployeeSalesSummary() {
         },
         {
             header: "Total Govt. Charges",
-            accessorKey: "customer_name",
+            accessorKey: "totalCharges",
             accessorFn: (row) => parseFloat(row?.totalCharges || 0),
             cell: ({ row }) => (
                 <Box
@@ -370,7 +370,7 @@ function EmployeeSalesSummary() {
 
         {
             header: "Net Service Charge",
-            accessorKey: "total",
+            accessorKey: "netCharges",
             accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
             cell: ({ row }) => (
                 <Box

@@ -355,7 +355,36 @@ function Header() {
 
           ],
         },
+        {
+          id: 9,
+          name: "Reports",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
 
+            {
+              id: 33,
+              name: "Service Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            
+            
+           
+            
+           
+          ],
+        },
 
         {
           id: 13,
@@ -670,6 +699,17 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
+            {
+              id: 1502,
+              name: "Purchase  Invoice",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
           ],
           childRoute: [
             "/purchase-orders",
@@ -712,7 +752,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Snapshot Category Report",
+              name: " Category Report",
               icon: "customer",
               parent_id: 9,
               api: null,
@@ -734,7 +774,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Snapshot Overview Report",
+              name: " Overview Report",
               icon: "customer",
               parent_id: 9,
               api: null,
@@ -756,7 +796,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Snapshot Employee Service Report",
+              name: " Employee Service Report",
               icon: "customer",
               parent_id: 9,
               api: null,
