@@ -666,17 +666,7 @@ function Header() {
               navigation: true,
               order_by: 1,
             },
-            {
-              id: 1502,
-              name: "Purchase Receipt",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/suppliers",
-              route: "/create-purchase-receipt",
-              identifier: null,
-              navigation: true,
-              order_by: 2,
-            },
+           
             {
               id: 1502,
               name: "Products Management",
