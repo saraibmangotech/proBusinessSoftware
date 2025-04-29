@@ -14,6 +14,10 @@ const CustomerServices = {
     const data = await post(routes.CreateProduct, obj);
     return data;
   },
+  CreatePurchaseInvoice: async (obj) => {
+    const data = await post(routes.CreatePurchaseInvoice, obj);
+    return data;
+  },
   CreateNote: async (obj) => {
     const data = await post(routes.CreateNote, obj);
     return data;
@@ -142,6 +146,10 @@ const CustomerServices = {
     const data = await patch(routes.UpdateAddOnService, obj);
     return data;
   },
+  UpdatePurchaseInvoice: async (obj) => {
+    const data = await patch(routes.UpdatePurchaseInvoice, obj);
+    return data;
+  },
   UpdateCandidate: async (obj) => {
     const data = await patch(routes.UpdateCandidate, obj);
     return data;
@@ -178,8 +186,16 @@ const CustomerServices = {
     const data = await get(routes.getVendors, params);
     return data;
   },
+  getPurchaseInvoices: async (params) => {
+    const data = await get(routes.getPurchaseInvoices, params);
+    return data;
+  },
   getProducts: async (params) => {
     const data = await get(routes.getProducts, params);
+    return data;
+  },
+  getPurchaseInvoiceDetail: async (params) => {
+    const data = await get(routes.getPurchaseInvoiceDetail, params);
     return data;
   },
   getProductCategoryDetail: async (params) => {
