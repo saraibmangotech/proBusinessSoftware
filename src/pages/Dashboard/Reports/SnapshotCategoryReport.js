@@ -298,15 +298,15 @@ function SnapshotCategoryReport() {
         },
         {
             header: "Total Govt. Charges",
-            accessorKey: "customer_name",
-            accessorFn: (row) => parseFloat(row?.totalCharges || 0),
+            accessorKey: "totalGovernmentCharges",
+            accessorFn: (row) => parseFloat(row?.totalGovernmentCharges || 0),
             cell: ({ row }) => (
                 <Box
                     variant="contained"
                     color="primary"
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
-                    {parseFloat(row?.original?.totalCharges || 0).toFixed(2)}
+                    {parseFloat(row?.original?.totalGovernmentCharges || 0).toFixed(2)}
                 </Box>
             ),
         },
@@ -338,7 +338,7 @@ function SnapshotCategoryReport() {
 
         {
             header: "Net Service Charge",
-            accessorKey: "total",
+            accessorKey: "netCharges",
             accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
             cell: ({ row }) => (
                 <Box

@@ -31,7 +31,7 @@ const CreateDebitNote = () => {
                 customer_id: null, //Customer id in case of Credit Note
                 vendor_id: selectedCustomer?.id, // vendor ID in case of Debit NOte
                 related_invoice_id: formData?.originalInvoiceNumber,
-                date: formData?.date,
+                date: date,
                 reason: formData?.notes,
                 amount: formData?.totalCreditAmount,
                 tax_amount: formData?.Vat,
