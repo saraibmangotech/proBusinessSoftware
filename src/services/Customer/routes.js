@@ -104,7 +104,17 @@ const routes = {
   getNotes:'/accounts/notes',
   deleteNotes:'/accounts/notes/delete',
   getVoucherToken:'/accounts/generateNumber',
-  getVouchers:'/accounts/vouchers'
+  getVouchers:'/accounts/vouchers',
+  getProductCategory:'/products/categories',
+  CreateProductCategory:'/products/categories/add',
+  DeleteProductCategory:'/products/categories/delete',
+  getProductCategoryDetail:'/products/categories/details',
+  UpdateProductCategory:'/products/categories/update',
+  getProducts:'/products',
+  CreateProduct:'/products/add',
+  DeleteProduct:'/products/delete',
+  getProductDetail:'/products/details',
+  UpdateProduct:'/products/update'
 
 };
 
