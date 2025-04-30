@@ -119,7 +119,10 @@ const routes = {
   CreatePurchaseInvoice:'/purchases/invoice/add',
   getPurchaseInvoices:'/purchases/invoice',
   getPurchaseInvoiceDetail:'/purchases/invoice/details',
-  UpdatePurchaseInvoice:'/services/update'
+  UpdatePurchaseInvoice:'/services/update',
+  getPaymentInvoices:'/purchases/invoice/payments',
+  getInvoicesPayments:'/purchases/invoice/specific/payments',
+  getInvoiceNumberToken:'/purchases/invoice/number'
 
 };
 

@@ -18,6 +18,7 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
 import CustomerServices from "services/Customer";
+import DeleteIcon from '@mui/icons-material/Delete';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,

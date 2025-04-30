@@ -32,6 +32,7 @@ import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
@@ -40,7 +41,6 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import ReceiptIcon from '@mui/icons-material/Receipt';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -107,7 +107,7 @@ const useStyles = makeStyles({
     }
 })
 
-function CreditNotes() {
+function PaymentInvoices() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -158,32 +158,18 @@ function CreditNotes() {
         setLoader(true)
 
         try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
+            
             let params = {
                 page: 1,
                 limit: 1000,
-                type: 'credit_note'
+               
 
 
             }
-            params = { ...params, ...Filter }
-            const { data } = await CustomerServices.getNotes(params)
-            setCustomerQueue(data?.notes?.rows)
-            setTotalCount(data?.count)
-            setPermissions(formatPermissionData(data?.permissions))
-            console.log(formatPermissionData(data?.permissions));
-
-            setPermissions(formatPermissionData(data?.permissions))
-            data?.permissions.forEach(e => {
-                if (e?.route && e?.identifier && e?.permitted) {
-                    dispatch(addPermission(e?.route));
-                }
-            })
+           
+            const { data } = await CustomerServices.getPaymentInvoices(params)
+            setCustomerQueue(data?.rows)
+            
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -221,11 +207,11 @@ function CreditNotes() {
         try {
             let params = {
                 id: selectedData?.id,
-                type: 'credit_note'
+                type: 'payment_voucher'
             }
 
 
-            const { message } = await CustomerServices.deleteNotes(params)
+            const { message } = await CustomerServices.DeleteVoucher(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -266,50 +252,53 @@ function CreditNotes() {
     const columns = [
         {
             header: "SR No.",
-            accessorKey: "note_number",
+            accessorKey: "id",
 
 
 
         },
         {
             header: "Amount",
-            accessorKey: "amount",
+            accessorKey: "total_paid_amount",
 
 
         },
         {
-            header: "Vat",
-            accessorKey: "tax_amount",
+            header: "Payment Mode",
+            accessorKey: "payment_mode",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
 
 
-        },
-        {
-            header: "Total Amount",
-            accessorKey: "total_amount",
+                    {row?.original?.payment?.payment_mode}
 
-
-        },
-        {
-            header: "Date",
-            accessorKey: 'date', // optional, used for column ID purposes
-            accessorFn: (row) => {
-              const dateValue = row?.date || row?.created_at;
-              return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
-            },
-            cell: ({ row }) => {
-              const dateValue = row?.original?.date || row?.original?.created_at;
-              return (
-                <Box
-                  variant="contained"
-                  color="primary"
-                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                  {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
                 </Box>
-              );
-            },
-          }
-          ,
+            ),
+
+
+        },
+         {
+                  header: "Date",
+                  accessorKey: 'date', // optional, used for column ID purposes
+                  accessorFn: (row) => {
+                    const dateValue = row?.date || row?.created_at;
+                    return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+                  },
+                  cell: ({ row }) => {
+                    const dateValue = row?.original?.date || row?.original?.created_at;
+                    return (
+                      <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                      >
+                        {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+                      </Box>
+                    );
+                  },
+                },
+
         {
             header: "Creator",
             accessorKey: "address",
@@ -333,11 +322,12 @@ function CreditNotes() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+
                     <Tooltip title="PDF">
                         <IconButton
                             onClick={() => {
                                 window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-note?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                    `www.google.com`,
                                     '_blank'
                                 );
                             }}
@@ -352,11 +342,7 @@ function CreditNotes() {
                             <ReceiptIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
-                    <Box>
-                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
-
-                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
-                    </Box>
+               
 
                 </Box>
             ),
@@ -441,11 +427,11 @@ function CreditNotes() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Credit Note List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Invoice List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"
-                    onClick={() => { navigate('/create-credit-note'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
                 />}
 
@@ -463,4 +449,4 @@ function CreditNotes() {
     );
 }
 
-export default CreditNotes;
+export default PaymentInvoices;

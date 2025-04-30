@@ -32,6 +32,7 @@ import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
@@ -40,7 +41,6 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import ReceiptIcon from '@mui/icons-material/Receipt';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -107,9 +107,10 @@ const useStyles = makeStyles({
     }
 })
 
-function CreditNotes() {
+function PurchaseInvoicePaymentList() {
 
     const navigate = useNavigate();
+    const { register: register2, getValues: getValues2 } = useForm();
     const classes = useStyles();
     const dispatch = useDispatch();
     const contentRef = useRef(null);
@@ -154,36 +155,23 @@ function CreditNotes() {
     const [sort, setSort] = useState('desc')
 
     // *For Get Customer Queue
-    const getCustomerQueue = async (page, limit, filter) => {
+    const getCustomerQueue = async (id) => {
         setLoader(true)
 
         try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
+
             let params = {
                 page: 1,
                 limit: 1000,
-                type: 'credit_note'
+                id: getValues2('invoiceNumber')
+
 
 
             }
-            params = { ...params, ...Filter }
-            const { data } = await CustomerServices.getNotes(params)
-            setCustomerQueue(data?.notes?.rows)
-            setTotalCount(data?.count)
-            setPermissions(formatPermissionData(data?.permissions))
-            console.log(formatPermissionData(data?.permissions));
 
-            setPermissions(formatPermissionData(data?.permissions))
-            data?.permissions.forEach(e => {
-                if (e?.route && e?.identifier && e?.permitted) {
-                    dispatch(addPermission(e?.route));
-                }
-            })
+            const { data } = await CustomerServices.getInvoicesPayments(params)
+            setCustomerQueue(data?.rows)
+
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -221,11 +209,11 @@ function CreditNotes() {
         try {
             let params = {
                 id: selectedData?.id,
-                type: 'credit_note'
+                type: 'payment_voucher'
             }
 
 
-            const { message } = await CustomerServices.deleteNotes(params)
+            const { message } = await CustomerServices.DeleteVoucher(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -266,26 +254,64 @@ function CreditNotes() {
     const columns = [
         {
             header: "SR No.",
-            accessorKey: "note_number",
+            accessorKey: "id",
 
 
 
         },
         {
-            header: "Amount",
-            accessorKey: "amount",
+            header: "Receipt Id",
+            accessorKey: "total_paid_amount",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    {row?.original?.payment?.id}
+
+                </Box>
+            ),
 
 
         },
         {
-            header: "Vat",
-            accessorKey: "tax_amount",
+            header: "Invoice Amount",
+            accessorKey: "invoice_amount",
 
 
         },
         {
-            header: "Total Amount",
-            accessorKey: "total_amount",
+            header: "Paid Amount",
+            accessorKey: "paid_amount",
+
+
+        },
+        {
+            header: "Receive Amount",
+            accessorKey: "received_amount",
+
+
+
+        },
+        {
+            header: "Balance",
+            accessorKey: "address",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    {parseFloat(row?.original?.invoice_amount) - parseFloat(row?.original?.paid_amount)}
+
+                </Box>
+            ),
+
+
+        },
+        {
+            header: "Payment Mode",
+            accessorKey: "payment_mode",
+         
 
 
         },
@@ -293,38 +319,24 @@ function CreditNotes() {
             header: "Date",
             accessorKey: 'date', // optional, used for column ID purposes
             accessorFn: (row) => {
-              const dateValue = row?.date || row?.created_at;
-              return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+                const dateValue = row?.date || row?.created_at;
+                return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
             },
             cell: ({ row }) => {
-              const dateValue = row?.original?.date || row?.original?.created_at;
-              return (
-                <Box
-                  variant="contained"
-                  color="primary"
-                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                  {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
-                </Box>
-              );
+                const dateValue = row?.original?.date || row?.original?.created_at;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+                    </Box>
+                );
             },
-          }
-          ,
-        {
-            header: "Creator",
-            accessorKey: "address",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-
-
-                    {row?.original?.creator?.name}
-
-                </Box>
-            ),
-
-
         },
+
+
 
 
 
@@ -333,11 +345,12 @@ function CreditNotes() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+
                     <Tooltip title="PDF">
                         <IconButton
                             onClick={() => {
                                 window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-note?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                    `www.google.com`,
                                     '_blank'
                                 );
                             }}
@@ -352,11 +365,7 @@ function CreditNotes() {
                             <ReceiptIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
-                    <Box>
-                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
-                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
-                    </Box>
 
                 </Box>
             ),
@@ -366,9 +375,6 @@ function CreditNotes() {
 
 
 
-    useEffect(() => {
-        getCustomerQueue()
-    }, []);
 
     return (
         <Box sx={{ p: 3 }}>
@@ -441,11 +447,11 @@ function CreditNotes() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Credit Note List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Payment Invoice List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"
-                    onClick={() => { navigate('/create-credit-note'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
                 />}
 
@@ -454,7 +460,30 @@ function CreditNotes() {
 
             {/* Filters */}
             <Box >
+                <Grid container spacing={1}>
 
+                    <Grid item xs={12} sm={3}>
+                        <InputField
+                            size={'small'}
+                            label={'Invoice No.'}
+                            placeholder={'Invoice No'}
+                            register={register2('invoiceNumber', {
+
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={2} sm={3} sx={{ marginTop: "30px" }}>
+                        <PrimaryButton
+                            bgcolor={"#bd9b4a"}
+
+                            icon={<SearchIcon />}
+                            title="Search"
+                            sx={{ marginTop: "30px" }}
+                            onClick={() => getCustomerQueue()}
+                            loading={loading}
+                        />
+                    </Grid>
+                </Grid>
 
                 {<DataTable loading={loader} data={customerQueue} columns={columns} />}
             </Box>
@@ -463,4 +492,4 @@ function CreditNotes() {
     );
 }
 
-export default CreditNotes;
+export default PurchaseInvoicePaymentList;

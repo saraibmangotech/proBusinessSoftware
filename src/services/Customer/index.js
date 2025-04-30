@@ -182,6 +182,14 @@ const CustomerServices = {
     const data = await get(routes.getVoucherToken, params);
     return data;
   },
+  getInvoicesPayments: async (params) => {
+    const data = await get(routes.getInvoicesPayments, params);
+    return data;
+  },
+  getInvoiceNumberToken: async (params) => {
+    const data = await get(routes.getInvoiceNumberToken, params);
+    return data;
+  },
   getProductCategory: async (params) => {
     const data = await get(routes.getProductCategory, params);
     return data;
@@ -200,6 +208,10 @@ const CustomerServices = {
   },
   getPurchaseInvoiceDetail: async (params) => {
     const data = await get(routes.getPurchaseInvoiceDetail, params);
+    return data;
+  },
+  getPaymentInvoices: async (params) => {
+    const data = await get(routes.getPaymentInvoices, params);
     return data;
   },
   getProductCategoryDetail: async (params) => {

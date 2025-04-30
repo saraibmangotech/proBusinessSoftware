@@ -58,7 +58,8 @@ const routes = {
   deleteRole:'/roles/delete',
   UpdateRole:'/roles/update',
   uploadCVSDraft:"visas/processing/upload",
-  getStats:'system/stats'
+  getStats:'system/stats',
+  getSettings:'/system/settings'
   
 };
 

@@ -33,6 +33,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import { addMonths } from 'date-fns';
 import { useAuth } from 'context/UseContext';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import FinanceServices from 'services/Finance';
 
 
 function CreateProduct() {
@@ -41,6 +42,8 @@ function CreateProduct() {
     const navigate = useNavigate()
     const [formChange, setFormChange] = useState(false)
     const [submit, setSubmit] = useState(false)
+    const [accounts, setAccounts] = useState([])
+    const [selectedAccount, setSelectedAccount] = useState(null)
 
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
@@ -144,6 +147,7 @@ function CreateProduct() {
                 sku: formData?.sku,
                 unit: formData?.unit,
                 description: formData?.description,
+                impact_account_id:selectedAccount?.id
 
 
             };
@@ -214,7 +218,52 @@ function CreateProduct() {
             // setLoader(false)
         }
     };
+    // *For Get Account
+        const getAccounts = async (search, accountId) => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 10000,
+                    name: search,
+    
+                }
+                const { data } = await FinanceServices.getAccountsDropDown(params)
+                const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                    ...account,
+                    name: ` ${account.account_code} ${account.name}`
+                }));
+                console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+    
+                setAccounts(updatedAccounts)
+                getSettings(updatedAccounts)
+            } catch (error) {
+                showErrorToast(error)
+            }
+        }
+
+        const getSettings = async (accountsArray) => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 10000,
+                  
+    
+                }
+                const { data } = await SystemServices.getSettings(params)
+                console.log(data,'datadata');
+                const filtered = accountsArray?.find(item => item?.id === data?.settings?.inventory);
+                console.log(filtered, 'filtered results');
+                setSelectedAccount(filtered)
+                
+                
+               
+            } catch (error) {
+                showErrorToast(error)
+            }
+        }
     useEffect(() => {
+       
+        getAccounts()
         getCategories()
     }, [])
 
@@ -264,7 +313,20 @@ function CreateProduct() {
                                             error={errors?.category?.message}
                                         />
                                     </Grid>
-
+                                    <Grid item xs={3}>
+                                        <SelectField
+                                            size="small"
+                                            label="Select Impact Account"
+                                            options={accounts}
+                                            selected={selectedAccount}
+                                            onSelect={(value) => {
+                                                setSelectedAccount(value)
+                                               
+                                            }}
+                                            register={register("account", { required: "account is required" })}
+                                            error={errors?.account?.message}
+                                        />
+                                    </Grid>
                                     <Grid item xs={3}>
                                         <InputField
                                             label={" Price :*"}
@@ -284,7 +346,7 @@ function CreateProduct() {
                                             placeholder={" SKU"}
                                             error={errors1?.sku?.message}
                                             register={register1("sku", {
-                                                required: 'sku is required',
+                                                required: false
                                             })}
                                         />
                                     </Grid>
@@ -308,7 +370,7 @@ function CreateProduct() {
                                             placeholder={" Description"}
                                             error={errors1?.description?.message}
                                             register={register1("description", {
-                                                required: 'description is required',
+                                                required: false,
                                             })}
                                         />
                                     </Grid>
