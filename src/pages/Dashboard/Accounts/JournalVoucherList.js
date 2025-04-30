@@ -130,7 +130,7 @@ function JournalVoucherList() {
     const [confirmationDialog, setConfirmationDialog] = useState(false)
 
 
-    const tableHead = [{ name: 'Date', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'Created At', key: '' },{ name: 'Impact Date', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
 
 
 
@@ -480,6 +480,11 @@ function JournalVoucherList() {
                                                                     {moment(item?.created_at).format(
                                                                         "MM-DD-YYYY"
                                                                     )}
+                                                                </Cell >
+                                                                <Cell className='pdf-table' >
+                                                                    {item?.date ? moment(item?.date).format(
+                                                                        "MM-DD-YYYY"
+                                                                    ):'N/A'}
                                                                 </Cell >
                                                                 <Cell className='pdf-table'>
                                                                     JV-{item?.id ?? '-'}
