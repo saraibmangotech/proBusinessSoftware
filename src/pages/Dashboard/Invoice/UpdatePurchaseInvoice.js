@@ -213,7 +213,7 @@ function UpdatePurchaseInvoice() {
         });
 
         setPayments([])
-        reset();
+     
         setServiceItem("");
     };
 
