@@ -381,6 +381,46 @@ function PreSalesList() {
       header: "Transfer Amount",
       accessorKey: "to_amount",
     },
+    {
+      header: "Created At",
+      accessorKey: 'date', // optional, used for column ID purposes
+      accessorFn: (row) => {
+          const dateValue = row?.createdAt;
+          return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+      },
+      cell: ({ row }) => {
+          const dateValue = row?.original?.createdAt;
+          return (
+              <Box
+                  variant="contained"
+                  color="primary"
+                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+              >
+                  {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+              </Box>
+          );
+      },
+  },
+  {
+      header: "Impact Date",
+      accessorKey: 'date', // optional, used for column ID purposes
+      accessorFn: (row) => {
+          const dateValue = row?.date;
+          return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+      },
+      cell: ({ row }) => {
+          const dateValue = row?.original?.date ;
+          return (
+              <Box
+                  variant="contained"
+                  color="primary"
+                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+              >
+                  {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+              </Box>
+          );
+      },
+  },
    
     
 
@@ -398,21 +438,7 @@ function PreSalesList() {
         </Box>
       ),
     },
-    {
-      id: "created_at",
-      header: "Created At",
-      // Remove accessorKey and fix accessorFn to use row directly
-      accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {moment(row.original.created_at).format("MM-DD-YYYY")}
-        </Box>
-      ),
-    },
+  
 
     {
       header: "Actions",

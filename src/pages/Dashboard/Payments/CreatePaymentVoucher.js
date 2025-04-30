@@ -188,7 +188,7 @@ function CreatePaymentVoucher() {
     const getAccountBySubCategory = async (id) => {
         try {
             let params = {
-                sub_category: id,
+                sub_category: 4,
             }
             const { data } = await FinanceServices.getAccountBySubCategory(params)
             setParentAccounts(data?.accounts?.rows)
@@ -287,13 +287,13 @@ function CreatePaymentVoucher() {
 
                 amount: total,
                 payment_mode: selectedMode?.id,   // or "cash"
-                account_id: selectedMode?.id === "Bank" ? selectedBank?.account_id : selectedMode?.id === "Card" ? selectedCard?.account_id : selectedMode?.id === "Cash" ? 700117 : 700171,
+                account_id: selectedParentAccount?.id,
                 description: formData?.note,
-                authorization_code:formData?.remarks,
-                entries:rows
+                authorization_code: formData?.remarks,
+                entries: rows
             }
 
-            console.log(obj,'objobj');
+            console.log(obj, 'objobj');
 
             const promise = FinanceServices.CreateVoucher(obj);
 
@@ -334,7 +334,7 @@ function CreatePaymentVoucher() {
     };
     useEffect(() => {
         getTokenNumber()
-
+        getAccountBySubCategory()
     }, []);
     const addItem = (description, amount) => {
         // Basic Validations
@@ -353,7 +353,7 @@ function CreatePaymentVoucher() {
             return;
         }
 
-        let data = { description: description.trim(), amount: parseFloat(amount),debit: parseFloat(amount),credit:0 };
+        let data = { description: description.trim(), amount: parseFloat(amount), debit: parseFloat(amount), credit: 0 };
 
         const newRow = {
             ...data,
@@ -641,8 +641,28 @@ function CreatePaymentVoucher() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Grid container mt={2} p={2}>
+                <Grid item xs={4}>
+                    <SelectField
+                        size="small"
+                        label={'Payment Method'}
+                        options={parentAccounts}
 
-            <Grid container mt={2} spacing={2}>
+                        selected={selectedParentAccount}
+                        onSelect={(value) => {
+                            setSelectedParentAccount(value)
+                            console.log(value);
+                            setValue('parentAccount', value)
+
+                        }}
+                        //  error={errors?.service?.message}
+                        register={register("parentAccount", {
+                            required: "Please select a parentAccount.",
+                        })}
+                    />
+                </Grid>
+            </Grid>
+            {/* <Grid container mt={2} spacing={2}>
                 <Grid item md={3} sm={12} xs={12}>
                     <SelectField
                         label="Payment Mode"
@@ -709,8 +729,8 @@ function CreatePaymentVoucher() {
                         error={errors1?.remarks?.message}
                     />
                 </Grid>}
-            </Grid>
-            <Grid container spacing={2} mt={2} >
+            </Grid> */}
+            <Grid container spacing={2} mt={2} p={2} >
 
                 <Grid item xs={12} sm={4}>
                     <InputField
