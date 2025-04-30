@@ -33,11 +33,12 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import { addMonths } from 'date-fns';
 import { useAuth } from 'context/UseContext';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import FinanceServices from 'services/Finance';
 
 
 function UpdateProduct() {
     const theme = useTheme();
-    const {id}=useParams()
+    const { id } = useParams()
     const { user } = useAuth()
     const navigate = useNavigate()
     const [formChange, setFormChange] = useState(false)
@@ -113,7 +114,9 @@ function UpdateProduct() {
     const [balanceType, setBalanceType] = useState(null)
     const [fieldsDisabled, setFieldsDisabled] = useState(false)
     const [holdState, setHoldState] = useState(true)
- 
+    const [accounts, setAccounts] = useState([])
+    const [selectedAccount, setSelectedAccount] = useState(null)
+    const [ApiDetail, setApiDetail] = useState(null)
     const [selectedCategory, setSelectedCategory] = useState(null)
     //documents array
 
@@ -139,13 +142,14 @@ function UpdateProduct() {
 
         try {
             let obj = {
-                id:id,
-                category_id:selectedCategory?.id,
+                id: id,
+                category_id: selectedCategory?.id,
                 name: formData?.name,
                 price: formData?.price,
                 sku: formData?.sku,
                 unit: formData?.unit,
                 description: formData?.description,
+                impact_account_id:selectedAccount?.id
 
 
             };
@@ -216,34 +220,65 @@ function UpdateProduct() {
             // setLoader(false)
         }
     };
-     const getData = async () => {
-            try {
-                let params = {
-                    id: id
-                };
-    
-                const { data } = await CustomerServices.getProductDetail(params);
-    
-                let detail = data?.product
-    
-    
-                //setCategories(data?.categories)
-    
-                console.log(detail);
-                // setCategories(detail?.commission_settings)
-    
-                setValue1('name', detail?.name)
-                setValue1('description', detail?.description)
-                setSelectedCategory(detail?.category)
-                setValue1('sku', detail?.sku)
-                setValue1('unit', detail?.unit)
-                setValue1('price', detail?.price)
-    
-            } catch (error) {
-                console.error("Error fetching location:", error);
+    const getData = async () => {
+        try {
+            let params = {
+                id: id
+            };
+
+            const { data } = await CustomerServices.getProductDetail(params);
+
+            let detail = data?.product
+            setApiDetail(detail)
+
+            //setCategories(data?.categories)
+
+            console.log(detail);
+            // setCategories(detail?.commission_settings)
+
+            setValue1('name', detail?.name)
+            setValue1('description', detail?.description)
+            setSelectedCategory(detail?.category)
+            setValue1('sku', detail?.sku)
+            setValue1('unit', detail?.unit)
+            setValue1('price', detail?.price)
+
+        } catch (error) {
+            console.error("Error fetching location:", error);
+        }
+    };
+
+    // *For Get Account
+    const getAccounts = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+
             }
-        };
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts(updatedAccounts)
+
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
     useEffect(() => {
+        if(ApiDetail){
+            setSelectedAccount(accounts?.find(item=> item?.id == ApiDetail?.impact_account_id))
+        }
+     
+    }, [accounts,ApiDetail])
+    
+    useEffect(() => {
+        getAccounts()
         getData()
         getCategories()
     }, [])
@@ -288,13 +323,26 @@ function UpdateProduct() {
                                             selected={selectedCategory}
                                             onSelect={(value) => {
                                                 setSelectedCategory(value)
-                                               
+
                                             }}
                                             register={register("category", { required: "category is required" })}
                                             error={errors?.category?.message}
                                         />
                                     </Grid>
+                                    <Grid item xs={3}>
+                                        <SelectField
+                                            size="small"
+                                            label="Select Impact Account"
+                                            options={accounts}
+                                            selected={selectedAccount}
+                                            onSelect={(value) => {
+                                                setSelectedAccount(value)
 
+                                            }}
+                                            register={register("account", { required: "account is required" })}
+                                            error={errors?.account?.message}
+                                        />
+                                    </Grid>
                                     <Grid item xs={3}>
                                         <InputField
                                             label={" Price :*"}
@@ -314,7 +362,7 @@ function UpdateProduct() {
                                             placeholder={" SKU"}
                                             error={errors1?.sku?.message}
                                             register={register1("sku", {
-                                                required: 'sku is required',
+                                                required: false
                                             })}
                                         />
                                     </Grid>
@@ -338,7 +386,7 @@ function UpdateProduct() {
                                             placeholder={" Description"}
                                             error={errors1?.description?.message}
                                             register={register1("description", {
-                                                required: 'description is required',
+                                                required: false,
                                             })}
                                         />
                                     </Grid>
@@ -351,7 +399,7 @@ function UpdateProduct() {
                                     <PrimaryButton
 
                                         bgcolor={'#bd9b4a'}
-                                        title="Update"
+                                        title="Submit"
                                         type={'submit'}
 
 

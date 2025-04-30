@@ -12,59 +12,60 @@ import { QRCodeCanvas } from 'qrcode.react';
 import FinanceServices from 'services/Finance';
 import { useReactToPrint } from 'react-to-print';
 import { PDFExport } from '@progress/kendo-react-pdf';
+import moment from 'moment';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
-    border: 0,
-  
-  }));
-  
-  const Cell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-        border: '1px solid #EEEEEE',
-        padding: '15px',
-        textAlign: 'left',
-        whiteSpace: 'nowrap',
-        color: '#434343',
-        paddingRight: '50px',
-        background: 'transparent',
-        fontWeight: 'bold'
-  
+  border: 0,
+
+}));
+
+const Cell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+    border: '1px solid #EEEEEE',
+    padding: '15px',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    color: '#434343',
+    paddingRight: '50px',
+    background: 'transparent',
+    fontWeight: 'bold'
+
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+
+    textWrap: 'nowrap',
+    padding: '5px !important',
+    paddingLeft: '15px !important',
+    '.MuiBox-root': {
+      display: 'flex',
+      gap: '6px',
+      alignItems: 'center',
+      justifyContent: 'center',
+      '.MuiBox-root': {
+        cursor: 'pointer'
+      }
     },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-  
-        textWrap: 'nowrap',
-        padding: '5px !important',
-        paddingLeft: '15px !important',
-        '.MuiBox-root': {
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '.MuiBox-root': {
-                cursor: 'pointer'
-            }
-        },
-        'svg': {
-            width: 'auto',
-            height: '24px',
-        },
-        '.MuiTypography-root': {
-            textTransform: 'capitalize',
-            fontFamily: FontFamily.NunitoRegular,
-            textWrap: 'nowrap',
-        },
-        '.MuiButtonBase-root': {
-            padding: '8px',
-            width: '28px',
-            height: '28px',
-        }
+    'svg': {
+      width: 'auto',
+      height: '24px',
     },
-  }));
+    '.MuiTypography-root': {
+      textTransform: 'capitalize',
+      fontFamily: FontFamily.NunitoRegular,
+      textWrap: 'nowrap',
+    },
+    '.MuiButtonBase-root': {
+      padding: '8px',
+      width: '28px',
+      height: '28px',
+    }
+  },
+}));
 
 const useStyle = makeStyles({
   headingBg: {
@@ -131,6 +132,16 @@ function JournalVoucherDetail() {
 
   return (
     <Container>
+      <Box display={'flex'} gap={2}>
+        <Box display={'flex'} gap={1}>
+          <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Date : </Typography>
+          <Typography sx={{ fontSize: '14px',mt:0.7}}>{moment(voucherDetail?.created_at).format('MM-DD-YYYY')} </Typography>
+        </Box>
+        <Box display={'flex'} alignItems={'center'} gap={1}>
+          <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>JV No : </Typography>
+          <Typography sx={{ fontSize: '14px', mt:0.5 }}>JV-{voucherDetail?.entry_id} </Typography>
+        </Box>
+      </Box>
       {/* {!loader && (
         <Box sx={{ textAlign: "right", p: 3 }}>
           <PrimaryButton
@@ -148,13 +159,13 @@ function JournalVoucherDetail() {
         <Box
           sx={{
             width: "100%",
-            p:3,
-          
+            p: 3,
+
           }}
         >
           {!loader ? (
             <Box >
-             
+
               <Box sx={{ mx: 1 }}>
                 <Grid container spacing={0} justifyContent={"space-between"}>
                   <Grid item xs={12} sm={11} md={12}>
@@ -215,11 +226,11 @@ function JournalVoucherDetail() {
                       </Table>
                     </TableContainer>
                   </Grid>
-                
+
                 </Grid>
               </Box>
-              
-             
+
+
             </Box>
           ) : (
             <Box sx={{ textAlign: "center", py: 3 }}>

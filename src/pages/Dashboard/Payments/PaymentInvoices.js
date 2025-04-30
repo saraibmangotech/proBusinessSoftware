@@ -107,7 +107,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PaymentVouchers() {
+function PaymentInvoices() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -158,32 +158,18 @@ function PaymentVouchers() {
         setLoader(true)
 
         try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
+            
             let params = {
                 page: 1,
                 limit: 1000,
-                type: 'payment_voucher'
+               
 
 
             }
-            params = { ...params, ...Filter }
-            const { data } = await CustomerServices.getVouchers(params)
-            setCustomerQueue(data?.vouchers?.rows)
-            setTotalCount(data?.count)
-            setPermissions(formatPermissionData(data?.permissions))
-            console.log(formatPermissionData(data?.permissions));
-
-            setPermissions(formatPermissionData(data?.permissions))
-            data?.permissions.forEach(e => {
-                if (e?.route && e?.identifier && e?.permitted) {
-                    dispatch(addPermission(e?.route));
-                }
-            })
+           
+            const { data } = await CustomerServices.getPaymentInvoices(params)
+            setCustomerQueue(data?.rows)
+            
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -266,20 +252,29 @@ function PaymentVouchers() {
     const columns = [
         {
             header: "SR No.",
-            accessorKey: "voucher_number",
+            accessorKey: "id",
 
 
 
         },
         {
             header: "Amount",
-            accessorKey: "amount",
+            accessorKey: "total_paid_amount",
 
 
         },
         {
             header: "Payment Mode",
             accessorKey: "payment_mode",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    {row?.original?.payment?.payment_mode}
+
+                </Box>
+            ),
 
 
         },
@@ -347,11 +342,7 @@ function PaymentVouchers() {
                             <ReceiptIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
-                    <Box>
-                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
-
-                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
-                    </Box>
+               
 
                 </Box>
             ),
@@ -436,7 +427,7 @@ function PaymentVouchers() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Voucher List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Invoice List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"
@@ -458,4 +449,4 @@ function PaymentVouchers() {
     );
 }
 
-export default PaymentVouchers;
+export default PaymentInvoices;

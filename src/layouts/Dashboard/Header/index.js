@@ -369,15 +369,27 @@ function Header() {
 
             {
               id: 33,
-              name: "Service Report",
+              name: " Employee Service Report",
               icon: "customer",
               parent_id: 9,
               api: null,
-              route: "/service-report",
+              route: "/snapshot-employee-service-report",
               identifier: null,
               navigation: true,
               order_by: 33,
             },
+            {
+              id: 33,
+              name: "Employee Sales Summary Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/employee-sales-summary-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
             
             
            

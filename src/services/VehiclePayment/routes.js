@@ -8,6 +8,7 @@ const routes = {
   getPaymentList: 'vehicleBookings/payments',
   getPaymentDetails: 'vehicleBookings/payment/detailed',
   getPaymentPreview: 'vehicleBookings/payment/preview',
+  CreatePaymentInvoice:'/purchases/invoice/pay'
 };
 
 export default routes

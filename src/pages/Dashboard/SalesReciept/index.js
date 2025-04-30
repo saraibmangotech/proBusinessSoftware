@@ -313,7 +313,7 @@ function SalesReciept() {
 
       if (response?.responseCode === 200) {
         navigate("/pre-sales");
-    }
+      }
 
       // Now you can use the response data
       if (response?.responseCode === 200) {
@@ -367,7 +367,7 @@ function SalesReciept() {
           : { mobile: getValues1("mobileValue") };
 
       const { data } = await CustomerServices.getReceptionDetail(params);
-      if(!data.token){
+      if (!data.token) {
         ErrorToaster("Token might be expired or invalid");
         return;
 
@@ -457,11 +457,11 @@ function SalesReciept() {
     try {
       const { data } = await CustomerServices.getSystemSettings();
 
-      console.log(data,"settings");
+      console.log(data, "settings");
       setSettings(data?.settings)
       setValue1("cost_center", { id: data?.settings?.cost_center, name: data?.settings?.cost_center })
 
-     // setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
+      // setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
     } catch (error) {
       ErrorToaster(error);
     } finally {
@@ -480,8 +480,8 @@ function SalesReciept() {
         };
 
         const { data } = await CustomerServices.DetailServiceItem(params);
-        console.log(data?.service,'idididid');
-        
+        console.log(data?.service, 'idididid');
+
         setValue("id", data?.service?.id);
         setValue("item_code", data?.service?.item_code);
         setValue("govt_fee", data?.service?.government_fee);
@@ -757,7 +757,7 @@ function SalesReciept() {
                             ),
                           }}
                           register={register1("mobileValue", {
-                            required: false, 
+                            required: false,
 
                             onChange: (e) => {
                               console.log("asdas");
@@ -884,7 +884,7 @@ function SalesReciept() {
                         size="small"
                         placeholder="Mobile No"
                         register={register1("mobile", {
-                          required: "please enter mobile .",pattern: {
+                          required: "please enter mobile .", pattern: {
                             value: /^05[0-9]{8}$/,
                             message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
                           },
@@ -993,7 +993,7 @@ function SalesReciept() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {<TableRow>
+                <TableRow>
                   <TableCell sx={{ display: "none" }}>
                     <InputField
                       size="small"
@@ -1010,7 +1010,7 @@ function SalesReciept() {
                       placeholder="Item code"
                       register={register("item_code", { required: "Item code is required" })}
                     />
-                    {errors.id && <span>{errors.id.message}</span>}
+                    {errors.item_code && <span>{errors.item_code.message}</span>}
                   </TableCell>
                   <TableCell>
                     <SelectField
@@ -1019,7 +1019,6 @@ function SalesReciept() {
                       disabled={detail?.is_paid || editState}
                       selected={serviceItem}
                       onSelect={handleServiceSelect}
-                      //  error={errors?.service?.message}
                       register={register("service", {
                         required: "Please select a service.",
                       })}
@@ -1031,8 +1030,20 @@ function SalesReciept() {
                       size="small"
                       disabled={detail?.is_paid}
                       placeholder="Quantity"
-                      type="number"
-                      register={register("quantity", { required: "Quantity is required" })}
+                      type="text"
+                      inputMode="decimal"
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      register={register("quantity", {
+                        required: "Quantity is required",
+                        pattern: {
+                          value: /^\d+(\.\d{0,1})?$/,
+                          message: "Only one decimal place is allowed",
+                        },
+                      })}
                     />
                     {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
                   </TableCell>
@@ -1041,9 +1052,20 @@ function SalesReciept() {
                       size="small"
                       disabled={!serviceItem?.govt_fee_enable}
                       placeholder="Govt fee"
-
-
-                      register={register("govt_fee", { required: "Govt fee is required" })}
+                      type="text"
+                      inputMode="decimal"
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      register={register("govt_fee", {
+                        required: "Govt fee is required",
+                        pattern: {
+                          value: /^\d+(\.\d{0,1})?$/,
+                          message: "Only one decimal place is allowed",
+                        },
+                      })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
                   </TableCell>
@@ -1052,7 +1074,20 @@ function SalesReciept() {
                       size="small"
                       disabled={!serviceItem?.center_fee_enable}
                       placeholder="Center Fee"
-                      register={register("center_fee", { required: "Center fee is required" })}
+                      type="text"
+                      inputMode="decimal"
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      register={register("center_fee", {
+                        required: "Center fee is required",
+                        pattern: {
+                          value: /^\d+(\.\d{0,1})?$/,
+                          message: "Only one decimal place is allowed",
+                        },
+                      })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
                   </TableCell>
@@ -1061,57 +1096,53 @@ function SalesReciept() {
                       size="small"
                       disabled={!serviceItem?.bank_charges_enable}
                       placeholder="Bank Charges"
-
-                      register={register("bank_charge", { required: "Bank charges are required" })}
-
+                      type="text"
+                      inputMode="decimal"
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      register={register("bank_charge", {
+                        required: "Bank charges are required",
+                        pattern: {
+                          value: /^\d+(\.\d{0,1})?$/,
+                          message: "Only one decimal place is allowed",
+                        },
+                      })}
                     />
                     {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
-
                   </TableCell>
                   <TableCell>
                     <InputField
                       size="small"
                       placeholder="Transaction Id"
-
-                      register={register("transaction_id", { 
-                        required: settings?.required_trans_id ? 'Transaction id is required' : false,
+                      register={register("transaction_id", {
+                        required: settings?.required_trans_id ? "Transaction id is required" : false,
                       })}
-
                     />
                     {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
-
                   </TableCell>
                   <TableCell>
                     <InputField
                       size="small"
                       placeholder="Application Id"
-
                       register={register("application_id", {
-                        required: settings?.required_app_id ? 'Application id is required' : false,
+                        required: settings?.required_app_id ? "Application id is required" : false,
                       })}
                     />
-                    {errors.application_id && (
-                      <span style={{ color: "red" }}>
-                        {errors.application_id.message}
-                      </span>
-                    )}
+                    {errors.application_id && <span style={{ color: "red" }}>{errors.application_id.message}</span>}
                   </TableCell>
                   <TableCell>
                     <InputField
                       size="small"
-                      placeholder=" Ref No"
-
+                      placeholder="Ref No"
                       register={register("ref_no", {
-                        required: settings?.required_ref_no ? 'Reference no is required' : false,
+                        required: settings?.required_ref_no ? "Reference no is required" : false,
                       })}
                     />
-                    {errors.ref_no && (
-                      <span style={{ color: "red" }}>
-                        {errors.ref_no.message}
-                      </span>
-                    )}
+                    {errors.ref_no && <span style={{ color: "red" }}>{errors.ref_no.message}</span>}
                   </TableCell>
-
                   <TableCell>
                     <InputField
                       disabled={true}
@@ -1122,57 +1153,13 @@ function SalesReciept() {
                     />
                   </TableCell>
                   <TableCell>
-                    {(!editState && !detail?.is_paid) && <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      sx={{
-                        textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
-                        fontSize: "12px",
-                        ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
-                        },
-                      }}
-                    >
-                      <AddIcon />
-                    </Button>}
-                    {editState && <> <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      sx={{
-                        textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
-                        fontSize: "12px",
-                        ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
-                        },
-                      }}
-                    >
-                      Update
-                    </Button>
+                    {!editState && !detail?.is_paid && (
                       <Button
                         variant="contained"
                         color="primary"
-
-                        onClick={() => {
-                          setEditState(false)
-
-                          setValue("id", '');
-                          setValue("item_code", '');
-                          setValue("govt_fee", '');
-                          setValue("center_fee", '');
-                          setValue("bank_charge", '');
-                          setValue("transaction_id", '');
-                          setValue("application_id", '');
-                          setValue("ref_no", '');
-                          setServiceItem(null);
-                          setValue("quantity", '');
-                        }}
+                        type="submit"
                         sx={{
-                          mt: 2,
-                          textTransform: 'capitalize',
+                          textTransform: "capitalize",
                           backgroundColor: "rgb(189 155 74)",
                           fontSize: "12px",
                           ":hover": {
@@ -1180,10 +1167,60 @@ function SalesReciept() {
                           },
                         }}
                       >
-                        Cancel
-                      </Button></>}
+                        <AddIcon />
+                      </Button>
+                    )}
+                    {editState && (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                          sx={{
+                            textTransform: "capitalize",
+                            backgroundColor: "rgb(189 155 74)",
+                            fontSize: "12px",
+                            ":hover": {
+                              backgroundColor: "rgb(189 155 74)",
+                            },
+                          }}
+                        >
+                          Update
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => {
+                            setEditState(false);
+                            setValue("id", "");
+                            setValue("item_code", "");
+                            setValue("govt_fee", "");
+                            setValue("center_fee", "");
+                            setValue("bank_charge", "");
+                            setValue("transaction_id", "");
+                            setValue("application_id", "");
+                            setValue("ref_no", "");
+                            setServiceItem(null);
+                            setValue("quantity", "");
+                          }}
+                          sx={{
+                            mt: 2,
+                            textTransform: "capitalize",
+                            backgroundColor: "rgb(189 155 74)",
+                            fontSize: "12px",
+                            ":hover": {
+                              backgroundColor: "rgb(189 155 74)",
+                            },
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    )}
                   </TableCell>
-                </TableRow>}
+                </TableRow>
+
+
 
                 {rows?.length > 0 && rows?.map((item, index) => (
                   <TableRow key={index}>

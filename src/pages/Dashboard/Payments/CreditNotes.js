@@ -290,6 +290,27 @@ function CreditNotes() {
 
         },
         {
+            header: "Date",
+            accessorKey: 'date', // optional, used for column ID purposes
+            accessorFn: (row) => {
+              const dateValue = row?.date || row?.created_at;
+              return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+            },
+            cell: ({ row }) => {
+              const dateValue = row?.original?.date || row?.original?.created_at;
+              return (
+                <Box
+                  variant="contained"
+                  color="primary"
+                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                  {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+                </Box>
+              );
+            },
+          }
+          ,
+        {
             header: "Creator",
             accessorKey: "address",
             cell: ({ row }) => (

@@ -198,6 +198,10 @@ const SystemServices = {
     const data = await get(routes.getServiceProviders, params);
     return data;
   },
+  getSettings: async (params) => {
+    const data = await get(routes.getSettings, params);
+    return data;
+  },
   createServiceProvider: async (obj) => {
     const data = await post(routes.createServiceProvider, obj);
     return data;

@@ -883,6 +883,7 @@ function UpdatePurchaseInvoice() {
             setRows(updatedItems)
             setSelectedVendor(detail?.vendor)
             setValue1('vendor',detail?.vendor)
+            setValue1('invoiceNumber',detail?.invoice_number)
             console.log(detail?.vendor?.name);
             
             setValue1('name', detail?.vendor?.name)
@@ -964,24 +965,13 @@ function UpdatePurchaseInvoice() {
                                         })}
                                     />
                                 </Grid>
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="Invoice Prefix"
-                                        size="small"
-                                        placeholder="Invoice Prefix"
-
-                                        register={register1("invoicePrefix", {
-                                            required: 'invoice Prefix is required'
-                                        })}
-                                        error={errors1?.invoicePrefix?.message}
-                                    />
-                                </Grid>
+                             
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="Invoice Number"
                                         size="small"
                                         placeholder="Invoice Number"
-
+                                        disabled={true}
                                         register={register1("invoiceNumber", {
                                             required: 'invoice Number is required'
                                         })}

@@ -173,17 +173,33 @@ function CreatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
-
     const addItem = (item, quantity, charges, description, ref, total) => {
+        console.log(item?.impact_account_id);
+
         // Validation
         if (!item || !quantity || !charges || !description || !ref || !total) {
             showErrorToast("All fields are required!");
             return;
         }
 
+        // Check if a different impact_account_id is being added
+        if (rows.length > 0) {
+            const firstImpactAccountId = rows[0].item?.impact_account_id;
+            if (item?.impact_account_id !== firstImpactAccountId) {
+                showErrorToast("You cannot add items with a different impact account.");
+                return;
+            }
+        }
+
+        // Check for duplicate product
+        const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
+        if (isDuplicate) {
+            showErrorToast("This product has already been added.");
+            return;
+        }
+
         // Create a new row with the serviceItem included
         const newRow = {
-
             product_id: serviceItem?.id,
             item,
             quantity,
@@ -203,8 +219,7 @@ function CreatePurchaseInvoice() {
                 (sum, row) => sum + parseFloat(row.total || 0),
                 0
             );
-            console.log(newSubTotal, 'newSubTotalnewSubTotal');
-
+            console.log(newSubTotal, 'newSubTotal');
 
             // Round to 2 decimal places
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
@@ -212,10 +227,22 @@ function CreatePurchaseInvoice() {
             return updatedRows;
         });
 
-        setPayments([])
+        setPayments([]);
         reset();
         setServiceItem("");
     };
+    const getTokenNumber = async () => {
+        try {
+          
+    
+          const { data } = await CustomerServices.getInvoiceNumberToken();
+          console.log(data);
+          setValue1('invoiceNumber', "PI-"+data?.next_invoice_number)
+    
+        } catch (error) {
+          showErrorToast(error);
+        }
+      };
 
 
     const [activeStep, setActiveStep] = React.useState(1);
@@ -813,6 +840,7 @@ function CreatePurchaseInvoice() {
         }
     }
     useEffect(() => {
+        getTokenNumber()
         getProducts()
         getCards()
         getBanks()
@@ -823,7 +851,7 @@ function CreatePurchaseInvoice() {
         getCategories();
         getSystemSettings();
         // getServiceItem();
-        getInvoiceNumber();
+        
         setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
         setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
         setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
@@ -915,24 +943,13 @@ function CreatePurchaseInvoice() {
                                         })}
                                     />
                                 </Grid>
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="Invoice Prefix"
-                                        size="small"
-                                        placeholder="Invoice Prefix"
-
-                                        register={register1("invoicePrefix", {
-                                            required: 'invoice Prefix is required'
-                                        })}
-                                        error={errors1?.invoicePrefix?.message}
-                                    />
-                                </Grid>
+                       
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="Invoice Number"
                                         size="small"
                                         placeholder="Invoice Number"
-
+                                        disabled={true}
                                         register={register1("invoiceNumber", {
                                             required: 'invoice Number is required'
                                         })}
@@ -960,12 +977,9 @@ function CreatePurchaseInvoice() {
                                         placeholder="Mobile No"
                                         disabled={true}
                                         register={register1("mobile", {
-                                            pattern: {
-                                                value: /^05[0-9]{8}$/,
-                                                message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                            },
+                                          
                                         })}
-                                        error={errors1?.mobile?.message}
+                                   
                                     />
                                 </Grid>
 
@@ -1305,7 +1319,7 @@ function CreatePurchaseInvoice() {
                                                 Mark As Unpaid
                                             </Button>}
                                             <Button
-                                                onClick={() => {setPayButton(false); setPayments([])}}
+                                                onClick={() => { setPayButton(false); setPayments([]) }}
                                                 variant="contained"
                                                 sx={{
                                                     textTransform: "capitalize",
