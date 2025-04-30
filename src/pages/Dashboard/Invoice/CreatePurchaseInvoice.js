@@ -228,7 +228,8 @@ function CreatePurchaseInvoice() {
         });
 
         setPayments([]);
-        reset();
+    
+        
         setServiceItem("");
     };
     const getTokenNumber = async () => {
@@ -237,7 +238,7 @@ function CreatePurchaseInvoice() {
     
           const { data } = await CustomerServices.getInvoiceNumberToken();
           console.log(data);
-          setValue1('invoiceNumber', "PI-"+data?.next_invoice_number)
+          setValue1('invoiceNumber', "PI-"+data?.number)
     
         } catch (error) {
           showErrorToast(error);
@@ -373,6 +374,7 @@ function CreatePurchaseInvoice() {
             try {
                 const obj = {
                     vendor_id: selectedVendor?.id,
+                    vendor_account_id: selectedVendor?.account_id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     items: rows,
