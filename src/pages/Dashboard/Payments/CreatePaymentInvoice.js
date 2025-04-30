@@ -212,7 +212,8 @@ console.log(errors,'watchwatchwatch');
                 page: 1,
                 limit: 1000,
                 vendor_id: selectedVendor?.id,
-                invoice_number: getValues2('invoiceNumber')
+                invoice_number: getValues2('invoiceNumber'),
+                is_paid:true
 
             }
 
@@ -875,7 +876,7 @@ console.log(errors,'watchwatchwatch');
                                             error={errors?.total?.message}
                                         />
                                     </Grid>
-                                    <Grid item md={3} sm={12} xs={12}>
+                                    {/* <Grid item md={3} sm={12} xs={12}>
                                         <InputField
                                             label="Additional Percentage"
                                             size="small"
@@ -913,7 +914,7 @@ console.log(errors,'watchwatchwatch');
                                             })}
                                             error={errors?.additionalCharges?.message}
                                         />
-                                    </Grid>
+                                    </Grid> */}
                                     <Grid item md={3} sm={12} xs={12}>
                                         <InputField
                                             label="Final Total"

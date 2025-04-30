@@ -177,8 +177,8 @@ function CreatePurchaseInvoice() {
         console.log(item?.impact_account_id);
 
         // Validation
-        if (!item || !quantity || !charges || !description || !ref || !total) {
-            showErrorToast("All fields are required!");
+        if (!item || !quantity || !charges) {
+            showErrorToast("Item, quantity, and charges are required!");
             return;
         }
 
@@ -1354,7 +1354,7 @@ function CreatePurchaseInvoice() {
                                     error={errors1?.total?.message}
                                 />
                             </Grid>
-                            <Grid item md={3} sm={12} xs={12}>
+                            {/* <Grid item md={3} sm={12} xs={12}>
                                 <InputField
                                     label="Additional Percentage"
                                     size="small"
@@ -1392,7 +1392,7 @@ function CreatePurchaseInvoice() {
                                     })}
                                     error={errors1?.additionalCharges?.message}
                                 />
-                            </Grid>
+                            </Grid> */}
                             <Grid item md={3} sm={12} xs={12}>
                                 <InputField
                                     label="Final Total"
