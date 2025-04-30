@@ -531,20 +531,21 @@ console.log(errors,'watchwatchwatch');
 
     useEffect(() => {
         if (selectedInvoice.length > 0) {
-            const exRateDefault = selectedInvoice[0]?.currency === 'usd' ? usdExchangeRate : cadExchangeRate
+           
             let totalAmount = 0.00
             selectedInvoice.forEach(e => {
                 if (e?.receiveAmount) {
+                    console.log(e?.receiveAmount);
+                    
                     totalAmount += parseFloat(e?.receiveAmount)
                 }
             })
-            const totalAed = totalAmount * exchangeRate
-            const totalExchangeLoss = (totalAmount * exRateDefault) - totalAed
+             console.log(totalAmount,'totalAmount');
+             
             setValue('total', totalAmount)
             setValue('finalTotal', totalAmount)
             setTotalAmount(totalAmount)
-            setAedTotalAmount(totalAed)
-            setExchangeLoss(totalExchangeLoss)
+
         }
     }, [selectedInvoice]);
 
@@ -799,7 +800,7 @@ console.log(errors,'watchwatchwatch');
                                                                     },
                                                                     onChange: e => {
                                                                         trigger(`receiving${item?.id}`)
-                                                                        if (Number(e.target.value) < (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))) {
+                                                                        if (Number(e.target.value) <= (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))) {
                                                                             handleReceive(e.target.value, item?.id, item?.balance)
                                                                         }
 
