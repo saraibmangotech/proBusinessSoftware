@@ -175,15 +175,32 @@ function UpdatePurchaseInvoice() {
     }, [payments]);
 
     const addItem = (item, quantity, charges, description, ref, total) => {
+        console.log(item?.impact_account_id);
+
         // Validation
-        if (!item || !quantity || !charges || !description || !ref || !total) {
-            showErrorToast("All fields are required!");
+        if (!item || !quantity || !charges) {
+            showErrorToast("Item, quantity, and charges are required!");
+            return;
+        }
+
+        // Check if a different impact_account_id is being added
+        if (rows.length > 0) {
+            const firstImpactAccountId = rows[0].item?.impact_account_id;
+            if (item?.impact_account_id !== firstImpactAccountId) {
+                showErrorToast("You cannot add items with a different impact account.");
+                return;
+            }
+        }
+
+        // Check for duplicate product
+        const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
+        if (isDuplicate) {
+            showErrorToast("This product has already been added.");
             return;
         }
 
         // Create a new row with the serviceItem included
         const newRow = {
-
             product_id: serviceItem?.id,
             item,
             quantity,
@@ -199,12 +216,11 @@ function UpdatePurchaseInvoice() {
             const updatedRows = [...prevRows, newRow];
 
             // Ensure all totals are treated as floats
-            const newSubTotal = updatedRows?.reduce(
+            const newSubTotal = updatedRows.reduce(
                 (sum, row) => sum + parseFloat(row.total || 0),
                 0
             );
-            console.log(newSubTotal, 'newSubTotalnewSubTotal');
-
+            console.log(newSubTotal, 'newSubTotal');
 
             // Round to 2 decimal places
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
@@ -212,8 +228,9 @@ function UpdatePurchaseInvoice() {
             return updatedRows;
         });
 
-        setPayments([])
-     
+        setPayments([]);
+
+
         setServiceItem("");
     };
 
@@ -345,7 +362,7 @@ function UpdatePurchaseInvoice() {
             setButtonDisabled(true)
             try {
                 const obj = {
-                    id:id,
+                    id: id,
                     vendor_id: selectedVendor?.id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
@@ -872,27 +889,27 @@ function UpdatePurchaseInvoice() {
                 ...item,
                 selectedService: item.product,
                 total: parseFloat(item.charge) * parseInt(item.quantity)
-              }));
-              const grandTotal = updatedItems.reduce((sum, item) => {
+            }));
+            const grandTotal = updatedItems.reduce((sum, item) => {
                 return sum + (parseFloat(item.total) || 0);
-              }, 0);
-              
-              console.log("Grand Total:", grandTotal.toFixed(2));
-              setSubTotal(grandTotal.toFixed(2))
+            }, 0);
+
+            console.log("Grand Total:", grandTotal.toFixed(2));
+            setSubTotal(grandTotal.toFixed(2))
             console.log(updatedItems);
             setRows(updatedItems)
             setSelectedVendor(detail?.vendor)
-            setValue1('vendor',detail?.vendor)
-            setValue1('invoiceNumber',detail?.invoice_number)
+            setValue1('vendor', detail?.vendor)
+            setValue1('invoiceNumber', detail?.invoice_number)
             console.log(detail?.vendor?.name);
-            
+
             setValue1('name', detail?.vendor?.name)
             setValue1('mobile', detail?.vendor?.phone)
             setValue1('email', detail?.vendor?.email)
             setValue1('address', detail?.vendor?.address)
             // setCategories(detail?.commission_settings)
 
- 
+
 
 
         } catch (error) {
@@ -934,6 +951,7 @@ function UpdatePurchaseInvoice() {
                                         label={"Purchase Date "}
                                         value={date}
                                         size={"small"}
+                                        disabled={true}
                                         error={errors1?.paidAt?.message}
                                         register={register1("paidAt", {
                                             required: date ? false : 'Date is required'
@@ -949,7 +967,7 @@ function UpdatePurchaseInvoice() {
                                     <SelectField
                                         size={"small"}
                                         label={"Select Vendor "}
-
+                                        disabled={true}
                                         options={vendors}
                                         selected={selectedVendor}
                                         onSelect={(value) => {
@@ -961,11 +979,11 @@ function UpdatePurchaseInvoice() {
                                         }}
                                         error={errors1?.vendor?.message}
                                         register={register1("vendor", {
-                                            required: 'Vendor is required'
+                                            required: selectedVendor ? false  : 'Vendor is required'
                                         })}
                                     />
                                 </Grid>
-                             
+
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="Invoice Number"
@@ -973,7 +991,7 @@ function UpdatePurchaseInvoice() {
                                         placeholder="Invoice Number"
                                         disabled={true}
                                         register={register1("invoiceNumber", {
-                                            required: 'invoice Number is required'
+                                            required: false
                                         })}
                                         error={errors1?.invoiceNumber?.message}
                                     />
@@ -1308,27 +1326,27 @@ function UpdatePurchaseInvoice() {
                                         </Typography> {/* This can be the same as Sub-total */}
                                     </TableCell>
                                 </TableRow>
-                                  <TableRow>
-                                                                    <TableCell colSpan={10} align="right">
-                                                                        <Grid container gap={2} justifyContent={"center"}>
-                                                                            <Button
-                                                                              type={'submit'}
-                                                                                disabled={rows?.length == 0}
-                                                                                variant="contained"
-                                                                                sx={{
-                                                                                    textTransform: "capitalize",
-                                                                                    backgroundColor: "#bd9b4a",
-                                                                                    width: "200px",
-                                                                                    ":hover": {
-                                                                                        backgroundColor: "rgb(189 155 74)",
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                Update
-                                                                            </Button>
-                                                                            {console.log(selectedCustomer, 'selectedCustomer')
-                                                                            }
-                                                                            {/* {!payButton && <Button
+                                <TableRow>
+                                    <TableCell colSpan={10} align="right">
+                                        <Grid container gap={2} justifyContent={"center"}>
+                                            <Button
+                                                type={'submit'}
+                                                disabled={rows?.length == 0}
+                                                variant="contained"
+                                                sx={{
+                                                    textTransform: "capitalize",
+                                                    backgroundColor: "#bd9b4a",
+                                                    width: "200px",
+                                                    ":hover": {
+                                                        backgroundColor: "rgb(189 155 74)",
+                                                    },
+                                                }}
+                                            >
+                                                Update
+                                            </Button>
+                                            {console.log(selectedCustomer, 'selectedCustomer')
+                                            }
+                                            {/* {!payButton && <Button
                                                                                 disabled={rows?.length == 0}
                                                                                 type="submit"
                                                                                 variant="contained"
@@ -1343,10 +1361,10 @@ function UpdatePurchaseInvoice() {
                                                                             >
                                                                                 Mark As Unpaid
                                                                             </Button>} */}
-                                                                        
-                                                                        </Grid>
-                                                                    </TableCell>
-                                                                </TableRow>
+
+                                        </Grid>
+                                    </TableCell>
+                                </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>

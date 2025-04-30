@@ -251,7 +251,7 @@ function PaymentInvoices() {
     };
     const columns = [
         {
-            header: "SR No.",
+            header: "Receipt No.",
             accessorKey: "id",
 
 
@@ -271,7 +271,7 @@ function PaymentInvoices() {
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
 
-                    {row?.original?.payment?.payment_mode}
+                    {row?.original?.payment_mode}
 
                 </Box>
             ),
@@ -427,14 +427,8 @@ function PaymentInvoices() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Invoice List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#bd9b4a'}
-                    title="Create"
-                    onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
-
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Receipts</Typography>
+              
 
             </Box>
 

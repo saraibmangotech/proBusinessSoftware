@@ -311,6 +311,18 @@ function PurchaseInvoicePaymentList() {
         {
             header: "Payment Mode",
             accessorKey: "payment_mode",
+            cell: ({ row }) => {
+                
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {row?.original?.payment?.payment_mode}
+                    </Box>
+                );
+            },
          
 
 
@@ -447,7 +459,7 @@ function PurchaseInvoicePaymentList() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Payment Invoice List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>  Invoice History</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#bd9b4a'}
                     title="Create"
