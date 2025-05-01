@@ -176,14 +176,25 @@ function UpdatePurchaseInvoice() {
 
     const addItem = (item, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
-
-        // Validation
-        if (!item || !quantity || !charges) {
+    
+        // Parse numeric inputs
+        const parsedQuantity = parseFloat(quantity);
+        const parsedCharges = parseFloat(charges);
+        const parsedTotal = parseFloat(total);
+    
+        // Basic required field validation
+        if (!item || quantity === "" || charges === "") {
             showErrorToast("Item, quantity, and charges are required!");
             return;
         }
-
-        // Check if a different impact_account_id is being added
+    
+        // Check for negative values
+        if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
+            showErrorToast("Quantity, charges, and total must be 0 or greater!");
+            return;
+        }
+    
+        // Check for consistent impact account ID
         if (rows.length > 0) {
             const firstImpactAccountId = rows[0].item?.impact_account_id;
             if (item?.impact_account_id !== firstImpactAccountId) {
@@ -191,48 +202,42 @@ function UpdatePurchaseInvoice() {
                 return;
             }
         }
-
+    
         // Check for duplicate product
         const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
         if (isDuplicate) {
             showErrorToast("This product has already been added.");
             return;
         }
-
-        // Create a new row with the serviceItem included
+    
+        // Create a new row
         const newRow = {
             product_id: serviceItem?.id,
             item,
-            quantity,
-            charge: charges,
+            quantity: parsedQuantity,
+            charge: parsedCharges,
             description,
             ref,
-            total,
+            total: parsedTotal,
             selectedService: serviceItem
         };
         console.log(newRow);
-
+    
+        // Update rows and subtotal
         setRows((prevRows) => {
             const updatedRows = [...prevRows, newRow];
-
-            // Ensure all totals are treated as floats
             const newSubTotal = updatedRows.reduce(
                 (sum, row) => sum + parseFloat(row.total || 0),
                 0
             );
-            console.log(newSubTotal, 'newSubTotal');
-
-            // Round to 2 decimal places
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-
             return updatedRows;
         });
-
+    
         setPayments([]);
-
-
         setServiceItem("");
     };
+    
 
     const { id } = useParams()
     const [activeStep, setActiveStep] = React.useState(1);
@@ -691,8 +696,8 @@ function UpdatePurchaseInvoice() {
         console.log("Current serviceItem:", serviceItem);
 
         // Validation
-        if (!item2 || !quantity || !charges || !description || !ref || !total) {
-            showErrorToast("All fields are required!");
+        if (!item2 || !quantity || !charges) {
+            showErrorToast("Item, quantity, and charges are required!");
             return;
         }
 
@@ -727,7 +732,7 @@ function UpdatePurchaseInvoice() {
             console.log("Rows after update:", updatedRows);
 
             // Calculate new subtotal
-            const newSubTotal = updatedRows?.reduce((sum, row) => {
+            const newSubTotal = updatedRows.reduce((sum, row) => {
                 const rowTotal = parseFloat(row.total || 0);
                 return sum + (isNaN(rowTotal) ? 0 : rowTotal);
             }, 0);
@@ -979,7 +984,7 @@ function UpdatePurchaseInvoice() {
                                         }}
                                         error={errors1?.vendor?.message}
                                         register={register1("vendor", {
-                                            required: selectedVendor ? false  : 'Vendor is required'
+                                            required: selectedVendor ? false : 'Vendor is required'
                                         })}
                                     />
                                 </Grid>

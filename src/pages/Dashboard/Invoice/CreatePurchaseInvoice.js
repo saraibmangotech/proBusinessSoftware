@@ -175,14 +175,25 @@ function CreatePurchaseInvoice() {
     }, [payments]);
     const addItem = (item, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
-
-        // Validation
-        if (!item || !quantity || !charges) {
+    
+        // Parse numeric inputs
+        const parsedQuantity = parseFloat(quantity);
+        const parsedCharges = parseFloat(charges);
+        const parsedTotal = parseFloat(total);
+    
+        // Basic required field validation
+        if (!item || quantity === "" || charges === "") {
             showErrorToast("Item, quantity, and charges are required!");
             return;
         }
-
-        // Check if a different impact_account_id is being added
+    
+        // Check for negative values
+        if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
+            showErrorToast("Quantity, charges, and total must be 0 or greater!");
+            return;
+        }
+    
+        // Check for consistent impact account ID
         if (rows.length > 0) {
             const firstImpactAccountId = rows[0].item?.impact_account_id;
             if (item?.impact_account_id !== firstImpactAccountId) {
@@ -190,48 +201,42 @@ function CreatePurchaseInvoice() {
                 return;
             }
         }
-
+    
         // Check for duplicate product
         const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
         if (isDuplicate) {
             showErrorToast("This product has already been added.");
             return;
         }
-
-        // Create a new row with the serviceItem included
+    
+        // Create a new row
         const newRow = {
             product_id: serviceItem?.id,
             item,
-            quantity,
-            charge: charges,
+            quantity: parsedQuantity,
+            charge: parsedCharges,
             description,
             ref,
-            total,
+            total: parsedTotal,
             selectedService: serviceItem
         };
         console.log(newRow);
-
+    
+        // Update rows and subtotal
         setRows((prevRows) => {
             const updatedRows = [...prevRows, newRow];
-
-            // Ensure all totals are treated as floats
             const newSubTotal = updatedRows.reduce(
                 (sum, row) => sum + parseFloat(row.total || 0),
                 0
             );
-            console.log(newSubTotal, 'newSubTotal');
-
-            // Round to 2 decimal places
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-
             return updatedRows;
         });
-
-        setPayments([]);
     
-        
+        setPayments([]);
         setServiceItem("");
     };
+    
     const getTokenNumber = async () => {
         try {
           
@@ -466,6 +471,7 @@ function CreatePurchaseInvoice() {
             account_id: mode === "Bank" ? bank?.account_id : mode === "Card" ? card?.account_id : mode === "Cash" ? 700117 : 700171,
             ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
             ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
+            auth_code:code
 
         };
 
@@ -698,61 +704,71 @@ function CreatePurchaseInvoice() {
         }
     };
     const updateItem = (item2, quantity, charges, description, ref, total) => {
-
         console.log("Current serviceItem:", serviceItem);
-
+    
+        // Parse numeric values
+        const parsedQuantity = parseFloat(quantity);
+        const parsedCharges = parseFloat(charges);
+        const parsedTotal = parseFloat(total);
+    
         // Validation
-        if (!item2 || !quantity || !charges || !description || !ref || !total) {
-            showErrorToast("All fields are required!");
+        if (!item2 || quantity === "" || charges === "") {
+            showErrorToast("Item, quantity, and charges are required!");
             return;
         }
-
+    
+        // Negative value validation
+        if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
+            showErrorToast("Quantity, charges, and total must be 0 or greater!");
+            return;
+        }
+    
         if (!item2?.id) {
             console.warn("No valid ID found in item2. Skipping update.");
             return;
         }
-
+    
         // Updated item using current form data and serviceItem
         const updatedItem = {
-
             id: item2.id, // Ensure ID is retained
             item: item2.item || '',
-            quantity,
-            charge: charges,
+            quantity: parsedQuantity,
+            charge: parsedCharges,
             description,
             ref,
-            total,
+            total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2
         };
-
+    
         console.log("Updated item to be saved:", updatedItem);
-
+    
         setRows((prevItems) => {
             console.log("Previous rows:", prevItems);
-
+    
             const updatedRows = prevItems.map((item) =>
                 item.product_id === item2.id ? updatedItem : item
             );
-
+    
             console.log("Rows after update:", updatedRows);
-
+    
             // Calculate new subtotal
             const newSubTotal = updatedRows.reduce((sum, row) => {
                 const rowTotal = parseFloat(row.total || 0);
                 return sum + (isNaN(rowTotal) ? 0 : rowTotal);
             }, 0);
-
+    
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-
+    
             return updatedRows;
         });
-
+    
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
         setEditState(false);
     };
+    
 
 
     const getVendors = async (page, limit, filter) => {
