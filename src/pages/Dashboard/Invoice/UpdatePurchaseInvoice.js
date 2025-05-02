@@ -185,7 +185,11 @@ function UpdatePurchaseInvoice() {
 
         // Check if a different impact_account_id is being added
         if (rows.length > 0) {
-            const firstImpactAccountId = rows[0].item?.impact_account_id;
+            let firstImpactAccountId = rows[0].item?.impact_account_id;
+            if (!firstImpactAccountId) {
+                firstImpactAccountId = rows[0].product?.impact_account_id
+            }
+            console.log("🚀 ~ addItem ~ firstImpactAccountId:", rows)
             if (item?.impact_account_id !== firstImpactAccountId) {
                 showErrorToast("You cannot add items with a different impact account.");
                 return;
@@ -896,7 +900,7 @@ function UpdatePurchaseInvoice() {
 
             console.log("Grand Total:", grandTotal.toFixed(2));
             setSubTotal(grandTotal.toFixed(2))
-            console.log(updatedItems);
+            console.log(updatedItems,"updatedItems");
             setRows(updatedItems)
             setSelectedVendor(detail?.vendor)
             setValue1('vendor', detail?.vendor)

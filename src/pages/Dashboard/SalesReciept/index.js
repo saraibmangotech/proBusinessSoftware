@@ -1039,10 +1039,7 @@ function SalesReciept() {
                       }}
                       register={register("quantity", {
                         required: "Quantity is required",
-                        pattern: {
-                          value: /^\d+(\.\d{0,1})?$/,
-                          message: "Only one decimal place is allowed",
-                        },
+                        
                       })}
                     />
                     {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
@@ -1061,10 +1058,7 @@ function SalesReciept() {
                       }}
                       register={register("govt_fee", {
                         required: "Govt fee is required",
-                        pattern: {
-                          value: /^\d+(\.\d{0,1})?$/,
-                          message: "Only one decimal place is allowed",
-                        },
+                        
                       })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -1083,10 +1077,7 @@ function SalesReciept() {
                       }}
                       register={register("center_fee", {
                         required: "Center fee is required",
-                        pattern: {
-                          value: /^\d+(\.\d{0,1})?$/,
-                          message: "Only one decimal place is allowed",
-                        },
+                       
                       })}
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
@@ -1105,10 +1096,7 @@ function SalesReciept() {
                       }}
                       register={register("bank_charge", {
                         required: "Bank charges are required",
-                        pattern: {
-                          value: /^\d+(\.\d{0,1})?$/,
-                          message: "Only one decimal place is allowed",
-                        },
+                       
                       })}
                     />
                     {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}

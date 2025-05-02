@@ -36,7 +36,6 @@ export const Images = {
 	logoDark: require("./Images/LogoDark.png"),
 	logoDarkCircle: require("./Images/LogoDarkCircle.png"),
 	whiteLogo: require("./Images/whiteLogo.jpeg"),
-	backgroundLayer: require("./Images/dashboardBackgroundCustomer.png"),
 	gifLogo: require("./Gif/logo.gif"),
 	logo: require("./Images/galaxy-world-wide.webp"),
 	usedCarLogo: require("./Images/galaxy-used-car-logo.jpg"),

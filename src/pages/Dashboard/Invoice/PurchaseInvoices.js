@@ -29,6 +29,8 @@ import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
 import { PrimaryButton } from 'components/Buttons';
 import SelectField from 'components/Select';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
@@ -312,7 +314,7 @@ function PurchaseInvoices() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)}
+                    {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
 
                 </Box>
             ),
@@ -346,6 +348,26 @@ function PurchaseInvoices() {
 
                         {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
                     </Box>
+
+                    <Tooltip title="Invoice">
+                        <IconButton
+                            onClick={() => {
+                                window.open(
+                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                    '_blank'
+                                );
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 35,
+                                height: 35,
+                            }}
+                        >
+                            <ReceiptIcon color="black" fontSize="10px" />
+                        </IconButton>
+                    </Tooltip>
 
                 </Box>
             ),

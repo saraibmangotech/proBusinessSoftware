@@ -358,11 +358,11 @@ function PurchaseInvoicePaymentList() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                    <Tooltip title="PDF">
+                    <Tooltip title="Invoice">
                         <IconButton
                             onClick={() => {
                                 window.open(
-                                    `www.google.com`,
+                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-invoice?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
                                     '_blank'
                                 );
                             }}

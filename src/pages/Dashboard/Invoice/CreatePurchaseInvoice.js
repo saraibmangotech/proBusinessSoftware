@@ -386,7 +386,11 @@ function CreatePurchaseInvoice() {
                     paid_amount: existingTotal,
                     total_amount: getValues1('finalTotal'),
                     payment_mode: paymentModesString,
-                    payment_status: existingTotal == newTotal ? 'Paid' : 'Partial',
+                    payment_status: parseFloat(existingTotal) === 0
+                    ? 'Unpaid'
+                    : parseFloat(existingTotal) === parseFloat(newTotal)
+                    ? 'Paid'
+                    : 'Partial',
                     is_paid: existingTotal == newTotal ? true : false,
                     payment_methods: payments
                 }
