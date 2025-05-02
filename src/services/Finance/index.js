@@ -14,12 +14,20 @@ const FinanceServices = {
     const data = await get(routes.getCustomerPaymentDetail,params);
     return data;
   },
+  getVendorPaymentDetail: async (params) => {
+    const data = await get(routes.getVendorPaymentDetail,params);
+    return data;
+  },
   getReceipts: async (params) => {
     const data = await get(routes.getReceipts,params);
     return data;
   },
   getCustomerPaymentList: async (params) => {
     const data = await get(routes.getCustomerPaymentList,params);
+    return data;
+  },
+  getVendorPaymentList: async (params) => {
+    const data = await get(routes.getVendorPaymentList,params);
     return data;
   },
   getTax: async (params) => {

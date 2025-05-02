@@ -217,9 +217,9 @@ function CreateVendorPayment() {
             try {
                 const obj = {
                     total_amount: existingTotal,
-                    vendor: selectedCustomer?.id,
+                    vendor_id: selectedCustomer?.id,
                     vendor_name: selectedCustomer?.name,
-                    customer_account_id: selectedCustomer?.receivable_account_id,
+                    vendor_account_id: selectedCustomer?.account_id,
                     date: paidAt,
                     description: formData?.description,
                     payment_mode: paymentModesString,
@@ -227,16 +227,16 @@ function CreateVendorPayment() {
                 }
 
                 console.log(obj, "objobj")
-                // if (detail?.is_paid == true) {
-                //     ErrorToaster("Already paid")
-                // } else {
-                //     const promise = CustomerServices.customerPayment(obj)
-                //     const response = await promise
-                //     showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
-                //     if (response?.responseCode === 200) {
-                //         navigate('/customer-payment-list')
-                //     }
-                // }
+                if (detail?.is_paid == true) {
+                    ErrorToaster("Already paid")
+                } else {
+                    const promise = CustomerServices.vendorPayment(obj)
+                    const response = await promise
+                    showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
+                    if (response?.responseCode === 200) {
+                        navigate('/vendor-payment-list')
+                    }
+                }
             } catch (error) {
                 ErrorToaster(error)
             } finally {

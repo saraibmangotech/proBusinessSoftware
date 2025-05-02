@@ -834,13 +834,13 @@ function UpdateVendorPayment() {
             let params = {
                 id: id
             }
-            const { data } = await FinanceServices.getCustomerPaymentDetail(params)
+            const { data } = await FinanceServices.getVendorPaymentDetail(params)
             console.log(data);
             let payment = data?.payment
             setValue1('description', payment?.description)
             setValue1('total', payment?.total_amount)
-            setDate(new Date(payment?.created_at))
-            setSelectedCustomer(payment?.customer)
+            setDate(new Date(payment?.date))
+            setSelectedCustomer(payment?.vendor)
             setPayments(payment?.entries)
 
 
@@ -880,7 +880,7 @@ function UpdateVendorPayment() {
                                     alignItems: "flex-end",
                                 }}
                             >
-                                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Customer Payment</Typography>
+                                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Vendor Payment Details</Typography>
                             </Box>
 
                             <Box sx={{ p: 3 }}>

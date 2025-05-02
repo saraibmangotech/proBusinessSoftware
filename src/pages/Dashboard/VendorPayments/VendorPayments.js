@@ -161,7 +161,7 @@ function VendorPaymentList() {
 
     const tableHead = [
         { name: "SR No.", key: "" },
-        { name: "Customer ", key: "name" },
+        { name: "Vendor ", key: "name" },
         { name: "Registration Date", key: "visa_eligibility" },
         { name: "Deposit Amount", key: "deposit_total" },
         { name: "Status", key: "" },
@@ -216,7 +216,7 @@ function VendorPaymentList() {
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
             };
 
-            const { data } = await FinanceServices.getCustomerPaymentList(params);
+            const { data } = await FinanceServices.getVendorPaymentList(params);
             setData(data?.rows);
         } catch (error) {
             showErrorToast(error);
@@ -308,7 +308,7 @@ function VendorPaymentList() {
                 id: selectedData?.id,
             };
 
-            const { message } = await CustomerServices.DeleteCustomerPayment(params);
+            const { message } = await CustomerServices.DeleteVendorPayment(params);
 
             SuccessToaster(message);
             getVouchers();
@@ -356,9 +356,9 @@ function VendorPaymentList() {
             accessorFn: (row) => row?.prefix +'-'+ row?.id 
         },
         {
-            header: "Customer",
-            accessorKey: "customer_name",
-            accessorFn: (row) => row?.customer?.name || ""
+            header: "Vendor",
+            accessorKey: "vendor_name",
+            accessorFn: (row) => row?.vendor?.name || ""
         },
         {
             header: "Payment Mode",

@@ -390,6 +390,10 @@ const CustomerServices = {
     const data = await deleted(routes.DeleteCustomerPayment, params);
     return data;
   },
+  DeleteVendorPayment: async (params) => {
+    const data = await deleted(routes.DeleteVendorPayment, params);
+    return data;
+  },
   DeleteCategory: async (params) => {
     const data = await deleted(routes.DeleteCategory, params);
     return data;
@@ -485,6 +489,10 @@ const CustomerServices = {
 
   customerPayment: async (obj) => {
     const data = await post(routes.CreateCustomerPayment, obj);
+    return data;
+  },
+  vendorPayment: async (obj) => {
+    const data = await post(routes.CreateVendorPayment, obj);
     return data;
   },
 

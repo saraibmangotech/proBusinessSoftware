@@ -348,6 +348,9 @@ function CreatePaidReceipt() {
       setLoader(false)
     }
   }
+
+  const round = (num) => Math.round(num * 100) / 100;
+
   // *For Get Account
   const getReceptionDetail = async (state) => {
    
@@ -1262,15 +1265,16 @@ function CreatePaidReceipt() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                          {(
-                            Number.parseFloat(subTotal) +
-                            rows?.reduce((total, item) => {
-                              const fee = Number.parseFloat(item?.center_fee ?? 0)
-                              const qty = Number.parseFloat(item?.quantity ?? 1)
-                              return total + fee * qty
-                            }, 0) *
-                            0.05
-                          ).toFixed(2)}
+                          {round(
+  Number.parseFloat(subTotal) +
+    round(
+      rows?.reduce((total, item) => {
+        const fee = Number.parseFloat(item?.center_fee ?? 0);
+        const qty = Number.parseFloat(item?.quantity ?? 1);
+        return total + round(fee * qty);
+      }, 0) * 0.05
+    )
+).toFixed(2)}
                         </Typography>{" "}
                         {/* This can be the same as Sub-total */}
                       </TableCell>
