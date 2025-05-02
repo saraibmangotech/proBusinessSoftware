@@ -400,6 +400,21 @@ const PaymentInvoices= lazy(() =>
 const PurchaseInvoicePaymentList= lazy(() =>
   import("pages/Dashboard/Payments/PurchaseInvoicePaymentList")
 );
+const CreateVendorPayment= lazy(() =>
+  import("pages/Dashboard/VendorPayments/CreateVendorPayment")
+);
+const UpdateVendorPayment= lazy(() =>
+  import("pages/Dashboard/VendorPayments/VendorPaymentDetail")
+);
+const VendorPaymentList= lazy(() =>
+  import("pages/Dashboard/VendorPayments/VendorPayments")
+);
+const CustomerLedgers= lazy(() =>
+  import("pages/Dashboard/Accounts/CustomerLedgers")
+);
+const SupplierLedgers= lazy(() =>
+  import("pages/Dashboard/Accounts/SupplierLedgers")
+);
 const AdminRoutes = [
   
   {
@@ -449,6 +464,18 @@ const AdminRoutes = [
   {
     path: "/product-list",
     component: <Products />,
+  },
+  {
+    path: "/vendor-payment-list",
+    component: <VendorPaymentList />,
+  },
+  {
+    path: "/customer-ledgers",
+    component: <CustomerLedgers />,
+  },
+  {
+    path: "/supplier-ledgers",
+    component: <SupplierLedgers />,
   },
   {
     path: "/create-product",
@@ -539,6 +566,10 @@ const AdminRoutes = [
     component: <CustomerPaymentList />,
   },
   {
+    path: "/create-vendor-payment",
+    component: <CreateVendorPayment />,
+  },
+  {
     path: "/snapshot-category-report",
     component: <SnapshotCategoryReport />,
   },
@@ -561,6 +592,10 @@ const AdminRoutes = [
   {
     path: "/customer-payment-detail/:id",
     component: <UpdateCustomerPayment />,
+  },
+  {
+    path: "/vendor-payment-detail/:id",
+    component: <UpdateVendorPayment />,
   },
   {
     path: "/create-card",

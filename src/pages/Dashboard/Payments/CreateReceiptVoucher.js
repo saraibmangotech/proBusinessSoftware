@@ -289,7 +289,8 @@ function CreateReceiptVoucher() {
                 account_id: selectedParentAccount?.id,
                 description: formData?.note,
                 authorization_code:formData?.remarks,
-                entries:rows
+                entries:rows,
+                payment_method :'Account'
             }
 
             console.log(obj);

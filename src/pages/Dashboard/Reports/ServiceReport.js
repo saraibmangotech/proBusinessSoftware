@@ -379,7 +379,7 @@ function ServiceReport() {
     {
       header: "Customer Ref",
       total:false,
-      accessorFn: (row) => row?.receipt?.customer_name,
+      accessorFn: (row) => row?.receipt?.customer?.name,
   
       cell: ({ row }) => (
         <Box
@@ -387,7 +387,7 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.receipt?.customer_name}
+          {row?.original?.receipt?.customer?.name}
         </Box>
       ),
     },
