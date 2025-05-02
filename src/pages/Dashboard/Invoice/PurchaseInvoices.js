@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -327,7 +328,7 @@ function PurchaseInvoices() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" :'Unpaid' }
+                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
 
                 </Box>
             ),
@@ -340,13 +341,24 @@ function PurchaseInvoices() {
             header: "Actions",
             cell: ({ row }) => (
 
-                <Box sx={{ display: 'flex', gap: 1 }}>
-
-                    {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '200px' }}>
                     <Box>
-                        {/* {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>} */}
+                        {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                    </Box>
 
-                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
+                    <Box>
+                        <PrimaryButton
+                            bgcolor={'#bd9b4a'}
+                            title="View Receipts"
+                            onClick={() => {
+                                localStorage.setItem("currentUrl", '/create-customer');
+                                navigate('/purchase-payment-invoice-list', {
+                                    state: { id: row?.original?.id }, // Replace 123 with your actual ID
+                                });
+                            }}
+                            loading={loading}
+                        />
+
                     </Box>
 
                     <Tooltip title="Invoice">

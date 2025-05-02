@@ -32,6 +32,7 @@ import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong"; // for invoice
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
@@ -339,7 +340,7 @@ function PaymentInvoices() {
                                 height: 35,
                             }}
                         >
-                            <ReceiptIcon color="black" fontSize="10px" />
+                            <ReceiptLongIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
                

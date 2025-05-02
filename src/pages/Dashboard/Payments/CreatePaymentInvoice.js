@@ -81,7 +81,7 @@ function CreatePaymentInvoice() {
 
     const tableHead = ['Select', 'Date', 'Invoice ID', 'Vendor Name', ' Charges', ' Vat', 'Total Amount', 'Paid', 'Balance', 'Payment Status', 'Receiving']
 
-    const { register, formState: { errors }, handleSubmit, setValue, getValues, trigger,watch } = useForm();
+    const { register, formState: { errors }, handleSubmit, setValue, getValues, trigger, watch } = useForm();
     const { register: register2, getValues: getValues2 } = useForm();
     const { register: register3, handleSubmit: handleSubmit3 } = useForm();
     const [loader, setLoader] = useState(false);
@@ -89,7 +89,7 @@ function CreatePaymentInvoice() {
     const [payments, setPayments] = useState([])
     const [chargesDisabled, setChargesDisabled] = useState(false)
     const [buttonDisabled, setButtonDisabled] = useState(false)
-console.log(errors,'watchwatchwatch');
+    console.log(errors, 'watchwatchwatch');
 
     // *For Customer Booking
     const [customers, setCustomers] = useState([]);
@@ -213,7 +213,7 @@ console.log(errors,'watchwatchwatch');
                 limit: 1000,
                 vendor_id: selectedVendor?.id,
                 invoice_number: getValues2('invoiceNumber'),
-                is_paid:true
+                is_paid: true
 
             }
 
@@ -403,14 +403,14 @@ console.log(errors,'watchwatchwatch');
             };
             console.log(obj);
 
-          
+
             const promise = VehiclePaymentServices.CreatePaymentInvoice(obj)
             const response = await promise
             showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
             if (response?.responseCode === 200) {
                 navigate('/payment-invoice-list')
             }
-            
+
 
         } catch (error) {
             ErrorToaster(error);
@@ -531,17 +531,17 @@ console.log(errors,'watchwatchwatch');
 
     useEffect(() => {
         if (selectedInvoice.length > 0) {
-           
+
             let totalAmount = 0.00
             selectedInvoice.forEach(e => {
                 if (e?.receiveAmount) {
                     console.log(e?.receiveAmount);
-                    
+
                     totalAmount += parseFloat(e?.receiveAmount)
                 }
             })
-             console.log(totalAmount,'totalAmount');
-             
+            console.log(totalAmount, 'totalAmount');
+
             setValue('total', totalAmount)
             setValue('finalTotal', totalAmount)
             setTotalAmount(totalAmount)
@@ -790,23 +790,30 @@ console.log(errors,'watchwatchwatch');
                                                                         selectedInvoice.findIndex(e => e.invoiceId === item?.id) === -1
                                                                             ? false
                                                                             : 'Please enter receive amount',
-                                                                    validate:  selectedInvoice.findIndex(e => e.invoiceId === item?.id) === -1 ? false : value => {
-                                                                        console.log(Number(value));
-
-                                                                        if (Number(value) > (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))) {
-                                                                            return 'Amount cannot be greater than balance amount';
-                                                                        }
-                                                                        return true;
-                                                                    },
+                                                                    validate:
+                                                                        selectedInvoice.findIndex(e => e.invoiceId === item?.id) === -1
+                                                                            ? false
+                                                                            : value => {
+                                                                                const num = Number(value);
+                                                                                if (num < 0) return 'Amount cannot be negative';
+                                                                                if (num > (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))) {
+                                                                                    return 'Amount cannot be greater than balance amount';
+                                                                                }
+                                                                                return true;
+                                                                            },
                                                                     onChange: e => {
-                                                                        trigger(`receiving${item?.id}`)
-                                                                        if (Number(e.target.value) <= (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))) {
-                                                                            handleReceive(e.target.value, item?.id, item?.balance)
+                                                                        const num = Number(e.target.value);
+                                                                        trigger(`receiving${item?.id}`);
+                                                                        if (
+                                                                            num >= 0 &&
+                                                                            num <= (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))
+                                                                        ) {
+                                                                            handleReceive(num, item?.id, item?.balance);
                                                                         }
-
-                                                                    }
+                                                                    },
                                                                 })}
                                                             />
+
 
 
                                                         </Box>

@@ -11,12 +11,13 @@ import {
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Colors from 'assets/Style/Colors';
 import { CircleLoading } from 'components/Loaders';
 import { ErrorToaster, SuccessToaster } from 'components/Toaster';
 import FinanceStatusDialog from 'components/Dialog/FinanceStatusDialog';
 import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong"; // for invoice
 import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
@@ -108,9 +109,9 @@ const useStyles = makeStyles({
 })
 
 function PurchaseInvoicePaymentList() {
-
+    const { state } = useLocation()
     const navigate = useNavigate();
-    const { register: register2, getValues: getValues2 } = useForm();
+    const { register: register2, getValues: getValues2,setValue:setValue2 } = useForm();
     const classes = useStyles();
     const dispatch = useDispatch();
     const contentRef = useRef(null);
@@ -179,6 +180,13 @@ function PurchaseInvoicePaymentList() {
         }
     }
 
+    useEffect(() => {
+        if(state){
+            setValue2('invoiceNumber',state?.id)
+            getCustomerQueue()
+        }
+
+    }, [])
 
 
 
@@ -312,7 +320,7 @@ function PurchaseInvoicePaymentList() {
             header: "Payment Mode",
             accessorKey: "payment_mode",
             cell: ({ row }) => {
-                
+
                 return (
                     <Box
                         variant="contained"
@@ -323,7 +331,7 @@ function PurchaseInvoicePaymentList() {
                     </Box>
                 );
             },
-         
+
 
 
         },
@@ -374,7 +382,7 @@ function PurchaseInvoicePaymentList() {
                                 height: 35,
                             }}
                         >
-                            <ReceiptIcon color="black" fontSize="10px" />
+                            <ReceiptLongIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
 

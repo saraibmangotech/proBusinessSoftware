@@ -999,19 +999,25 @@ function SalesReciept() {
                       size="small"
                       disabled={true}
                       placeholder="Item id"
-                      register={register("id", { required: "Item id is required" })}
+                      register={register("id", {
+                        validate: value => value !== "" || "Item id is required",
+                      })}
                     />
                     {errors.id && <span>{errors.id.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
                       disabled={true}
                       placeholder="Item code"
-                      register={register("item_code", { required: "Item code is required" })}
+                      register={register("item_code", {
+                        validate: value => value !== "" || "Item code is required",
+                      })}
                     />
                     {errors.item_code && <span>{errors.item_code.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <SelectField
                       size="small"
@@ -1020,11 +1026,12 @@ function SalesReciept() {
                       selected={serviceItem}
                       onSelect={handleServiceSelect}
                       register={register("service", {
-                        required: "Please select a service.",
+                        validate: value => value !== "" || "Please select a service.",
                       })}
                     />
                     {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
@@ -1044,6 +1051,7 @@ function SalesReciept() {
                     />
                     {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
@@ -1063,6 +1071,7 @@ function SalesReciept() {
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
@@ -1082,6 +1091,7 @@ function SalesReciept() {
                     />
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
@@ -1101,36 +1111,40 @@ function SalesReciept() {
                     />
                     {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
                       placeholder="Transaction Id"
                       register={register("transaction_id", {
-                        required: settings?.required_trans_id ? "Transaction id is required" : false,
+                        validate: value => !settings?.required_trans_id || value !== "" || "Transaction id is required",
                       })}
                     />
                     {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
                       placeholder="Application Id"
                       register={register("application_id", {
-                        required: settings?.required_app_id ? "Application id is required" : false,
+                        validate: value => !settings?.required_app_id || value !== "" || "Application id is required",
                       })}
                     />
                     {errors.application_id && <span style={{ color: "red" }}>{errors.application_id.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       size="small"
                       placeholder="Ref No"
                       register={register("ref_no", {
-                        required: settings?.required_ref_no ? "Reference no is required" : false,
+                        validate: value => !settings?.required_ref_no || value !== "" || "Reference no is required",
                       })}
                     />
                     {errors.ref_no && <span style={{ color: "red" }}>{errors.ref_no.message}</span>}
                   </TableCell>
+
                   <TableCell>
                     <InputField
                       disabled={true}
@@ -1140,6 +1154,7 @@ function SalesReciept() {
                       register={register("total")}
                     />
                   </TableCell>
+
                   <TableCell>
                     {!editState && !detail?.is_paid && (
                       <Button
@@ -1207,6 +1222,7 @@ function SalesReciept() {
                     )}
                   </TableCell>
                 </TableRow>
+
 
 
 

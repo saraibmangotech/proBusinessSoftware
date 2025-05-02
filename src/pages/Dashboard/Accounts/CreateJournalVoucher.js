@@ -312,34 +312,32 @@ function CreateJournalVoucher() {
       showErrorToast('Either Debit or Credit must be greater than 0');
       return;
     }
-    // Create a new row with the serviceItem included
-    const newRow = { ...data, account_id: selectedAccount?.id, name: selectedAccount?.name };
-    let findElement=rows?.find(item => item?.account_id == newRow?.account_id)
-    if(findElement){
-      showErrorToast('Account Already Added')
-    }
-    else{
-
-      setRows((prevRows) => {
-        const updatedRows = [...prevRows, newRow];
   
-        // Ensure all totals are treated as floats
-        const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
-        const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
+    setRows((prevRows) => {
+      const newRow = {
+        ...data,
+        unique_id: Date.now() + Math.random(), // Ensure unique key
+        account_id: selectedAccount?.id,
+        name: selectedAccount?.name,
+      };
   
-        setTotalCredit(newTotalCredit)
-        setTotalDebit(newTotalDebit)
-        console.log(updatedRows);
-        setIsCreditDisabled(false)
-        setIsDebitDisabled(false)
+      const updatedRows = [...prevRows, newRow];
   
-        return updatedRows;
-      });
-      setSelectedAccount(null)
-      reset();
-    }
-
+      const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
+      const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
+  
+      setTotalCredit(newTotalCredit);
+      setTotalDebit(newTotalDebit);
+      setIsCreditDisabled(false);
+      setIsDebitDisabled(false);
+  
+      return updatedRows;
+    });
+  
+    setSelectedAccount(null);
+    reset();
   };
+  
 
   useEffect(() => {
     getAccounts()
@@ -515,8 +513,9 @@ function CreateJournalVoucher() {
                         let selectedID = item?.id
                         console.log(item?.id);
 
-                        setRows(rows?.filter(item2 => item2?.account_id != item?.account_id))
-                        let filteredData = rows?.filter(item2 => item2?.account_id != item?.account_id)
+                        setRows(rows?.filter(item2 => item2?.unique_id !== item?.unique_id))
+
+                        let filteredData = rows?.filter(item2 => item2?.unique_id !== item?.unique_id)
 
                         const newTotalCredit = filteredData.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
                         const newTotalDebit = filteredData.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
