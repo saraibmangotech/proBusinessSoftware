@@ -1040,13 +1040,13 @@ function SalesReciept() {
                       type="text"
                       inputMode="decimal"
                       onKeyDown={(e) => {
-                        if (["e", "E", "+", "-"].includes(e.key)) {
+                        if (["e", "E", "+", "-",".",","].includes(e.key)) {
                           e.preventDefault();
                         }
                       }}
                       register={register("quantity", {
                         required: "Quantity is required",
-                        
+
                       })}
                     />
                     {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
@@ -1060,13 +1060,13 @@ function SalesReciept() {
                       type="text"
                       inputMode="decimal"
                       onKeyDown={(e) => {
-                        if (["e", "E", "+", "-"].includes(e.key)) {
+                        if (["e", "E", "+", "-",","].includes(e.key)) {
                           e.preventDefault();
                         }
                       }}
                       register={register("govt_fee", {
                         required: "Govt fee is required",
-                        
+
                       })}
                     />
                     {errors.govt_fee && <span style={{ color: "red" }}>{errors.govt_fee.message}</span>}
@@ -1080,15 +1080,22 @@ function SalesReciept() {
                       type="text"
                       inputMode="decimal"
                       onKeyDown={(e) => {
-                        if (["e", "E", "+", "-"].includes(e.key)) {
+                        
+                        if (["e", "E", "+", "-", ","].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onPaste={(e) => {
+                        const paste = e.clipboardData.getData("text");
+                        if (paste.includes(",")) {
                           e.preventDefault();
                         }
                       }}
                       register={register("center_fee", {
                         required: "Center fee is required",
-                       
                       })}
                     />
+
                     {errors.center_fee && <span style={{ color: "red" }}>{errors.center_fee.message}</span>}
                   </TableCell>
 
@@ -1100,13 +1107,13 @@ function SalesReciept() {
                       type="text"
                       inputMode="decimal"
                       onKeyDown={(e) => {
-                        if (["e", "E", "+", "-"].includes(e.key)) {
+                        if (["e", "E", "+", "-",","].includes(e.key)) {
                           e.preventDefault();
                         }
                       }}
                       register={register("bank_charge", {
                         required: "Bank charges are required",
-                       
+
                       })}
                     />
                     {errors.bank_charge && <span style={{ color: "red" }}>{errors.bank_charge.message}</span>}

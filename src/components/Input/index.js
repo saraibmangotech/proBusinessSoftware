@@ -23,6 +23,7 @@ function InputField(props) {
 		disabled,
 		inputProps,
 		onInput,
+		onKeyDown,
 		onBlur,
 		helperText,
 		style,
@@ -89,6 +90,7 @@ function InputField(props) {
 
 					inputProps={{step:step,...inputProps}} // *For Input Attributes
 					onInput={onInput}
+					onKeyDown={onKeyDown}
 					helperText={helperText}
 					{...register}
 					sx={{

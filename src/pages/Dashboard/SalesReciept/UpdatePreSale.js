@@ -891,6 +891,11 @@ function UpdatePreSale() {
                                                     disabled={detail?.is_paid}
                                                     placeholder="Quantity"
                                                     type="number"
+                                                    onKeyDown={(e) => {
+                                                        if (["e", "E", "+", "-",",","."].includes(e.key)) {
+                                                          e.preventDefault();
+                                                        }
+                                                      }}
                                                     register={register("quantity", { required: "Quantity is required" })}
                                                 />
                                                 {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
@@ -900,6 +905,11 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid || !serviceItem?.govt_fee_enable}
                                                     placeholder="Govt fee"
+                                                    onKeyDown={(e) => {
+                                                        if (["e", "E", "+", "-",","].includes(e.key)) {
+                                                          e.preventDefault();
+                                                        }
+                                                      }}
 
                                                     register={register("govt_fee", { required: "Govt fee is required" })}
                                                 />
@@ -910,6 +920,11 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid || !serviceItem?.center_fee_enable}
                                                     placeholder="Center Fee"
+                                                    onKeyDown={(e) => {
+                                                        if (["e", "E", "+", "-",","].includes(e.key)) {
+                                                          e.preventDefault();
+                                                        }
+                                                      }}
 
                                                     register={register("center_fee", { required: "Center fee is required" })}
                                                 />
@@ -920,6 +935,11 @@ function UpdatePreSale() {
                                                     size="small"
                                                     disabled={detail?.is_paid || !serviceItem?.bank_charges_enable}
                                                     placeholder="Bank Charges"
+                                                    onKeyDown={(e) => {
+                                                        if (["e", "E", "+", "-",","].includes(e.key)) {
+                                                          e.preventDefault();
+                                                        }
+                                                      }}
 
                                                     register={register("bank_charge", { required: "Bank charges are required" })}
 
