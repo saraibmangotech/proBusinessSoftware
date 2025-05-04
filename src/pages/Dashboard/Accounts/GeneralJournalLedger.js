@@ -104,7 +104,7 @@ function GeneralJournalLedger() {
 	const { register, handleSubmit, getValues, setValue } = useForm();
 
 
-	const tableHead = ['JV#', 'Date', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments']
+	const tableHead = ['JV#', 'Date', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments','Actions']
 
 	const [visibleColumns, setVisibleColumns] = useState([...Array(tableHead?.length).keys()]);
 
@@ -288,7 +288,7 @@ function GeneralJournalLedger() {
 					: "-";
 			case 1:
 				return moment(item?.created_at).format(
-					"MM-DD-YYYY"
+					"DD/MM/YYYY"
 				) ?? "-";
 
 			case 2:
@@ -362,29 +362,27 @@ function GeneralJournalLedger() {
 						</Box>
 					</Box>
 				)
-			// case 10:
-			// 	return <Box component={'div'} className='pdf-hide'
-			// 		onClick={page ? () =>
-			// 			navigate(`/${page}/${item?.entry?.reference_id}`)
-			// 			: () => {
-			// 				setValue('search', item?.series_id + item?.journal_id);
-			// 				handleFilter({ search: item?.series_id + item?.journal_id })
-			// 			}}
-			// 	>
-			// 		<IconButton
-			// 			sx={{
-			// 				bgcolor:
-			// 					Colors.primary,
-			// 				"&:hover": {
-			// 					bgcolor:
-			// 						Colors.primary,
-			// 				},
-			// 			}}
-			// 		>
-			// 			<EyeIcon />
-			// 		</IconButton>
+			case 10:
+				return <Box component={'div'} className='pdf-hide'
+					onClick={  () => {
+							setValue('search', item?.series_id + item?.journal_id);
+							handleFilter({ search: item?.series_id + item?.journal_id })
+						}}
+				>
+					<IconButton
+						sx={{
+							bgcolor:
+								Colors.primary,
+							"&:hover": {
+								bgcolor:
+									Colors.primary,
+							},
+						}}
+					>
+						<EyeIcon />
+					</IconButton>
 
-			// 	</Box>;
+				</Box>;
 
 			default:
 				return "-";

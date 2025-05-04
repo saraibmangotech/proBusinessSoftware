@@ -457,7 +457,7 @@ function JournalVoucherList() {
                                         <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}>
                                             Booked Container
                                         </Typography>
-                                        <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('MM-DD-YYYY')}</Box>
+                                        <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('DD/MM/YYYY')}</Box>
                                     </Box>
                                 </Box>
                                 {/* ========== Table ========== */}
@@ -478,12 +478,12 @@ function JournalVoucherList() {
                                                             <Row key={index} sx={{ bgcolor: index % 2 !== 0 && '#EEFBEE' }}>
                                                                 <Cell className='pdf-table' >
                                                                     {moment(item?.created_at).format(
-                                                                        "MM-DD-YYYY"
+                                                                        "DD/MM/YYYY"
                                                                     )}
                                                                 </Cell >
                                                                 <Cell className='pdf-table' >
                                                                     {item?.date ? moment(item?.date).format(
-                                                                        "MM-DD-YYYY"
+                                                                        "DD/MM/YYYY"
                                                                     ):'N/A'}
                                                                 </Cell >
                                                                 <Cell className='pdf-table'>

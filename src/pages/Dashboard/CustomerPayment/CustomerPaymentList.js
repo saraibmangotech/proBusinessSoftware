@@ -391,14 +391,14 @@ function CustomerPaymentList() {
             id: "date",
             header: "Date",
             // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => row.date ? moment(row.date).format("MM-DD-YYYY") : moment(row.created_at).format("MM-DD-YYYY"),
+            accessorFn: (row) => row.date ? moment(row.date).format("DD/MM/YYYY") : moment(row.created_at).format("DD/MM/YYYY"),
             cell: ({ row }) => (
                 <Box
                     variant="contained"
                     color="primary"
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
-                    {row.original.date ? moment(row.original.date).format("MM-DD-YYYY") : moment(row.original.created_at).format("MM-DD-YYYY") }
+                    {row.original.date ? moment(row.original.date).format("DD/MM/YYYY") : moment(row.original.created_at).format("DD/MM/YYYY") }
                 </Box>
             ),
         },
@@ -406,14 +406,14 @@ function CustomerPaymentList() {
             id: "created_at",
             header: "Created At",
             // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
+            accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
             cell: ({ row }) => (
                 <Box
                     variant="contained"
                     color="primary"
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
-                    {moment(row.original.created_at).format("MM-DD-YYYY")}
+                    {moment(row.original.created_at).format("DD/MM/YYYY")}
                 </Box>
             ),
         },

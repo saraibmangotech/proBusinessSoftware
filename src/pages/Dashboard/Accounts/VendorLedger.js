@@ -260,7 +260,7 @@ function VendorLedger() {
                         return (
                           <Row key={index} sx={{ bgcolor: index % 2 !== 0 && '#EEFBEE' }}>
                             <Cell>
-                              {item?.created_at ? moment(item?.created_at).format('MM-DD-YYYY') : '-'}
+                              {item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '-'}
                             </Cell>
                             <Cell>
                               {item?.journal_id ? item?.series_id + item?.journal_id : '-'}

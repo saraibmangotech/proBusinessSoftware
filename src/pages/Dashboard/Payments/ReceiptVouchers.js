@@ -287,7 +287,7 @@ function ReceiptVouchers() {
                    accessorKey: 'date', // optional, used for column ID purposes
                    accessorFn: (row) => {
                        const dateValue = row?.created_at;
-                       return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+                       return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
                    },
                    cell: ({ row }) => {
                        const dateValue = row?.original?.created_at;
@@ -297,7 +297,7 @@ function ReceiptVouchers() {
                                color="primary"
                                sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                            >
-                               {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+                               {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
                            </Box>
                        );
                    },
@@ -307,7 +307,7 @@ function ReceiptVouchers() {
                    accessorKey: 'date', // optional, used for column ID purposes
                    accessorFn: (row) => {
                        const dateValue = row?.date;
-                       return dateValue ? moment(dateValue).format("MM-DD-YYYY") : "";
+                       return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
                    },
                    cell: ({ row }) => {
                        const dateValue = row?.original?.date ;
@@ -317,7 +317,7 @@ function ReceiptVouchers() {
                                color="primary"
                                sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                            >
-                               {dateValue ? moment(dateValue).format("MM-DD-YYYY") : "N/A"}
+                               {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
                            </Box>
                        );
                    },

@@ -287,10 +287,10 @@ function CreateReceiptVoucher() {
                 amount: total,
                 payment_mode: selectedMode?.id,   // or "cash"
                 account_id: selectedParentAccount?.id,
-                description: formData?.note,
-                authorization_code:formData?.remarks,
-                entries:rows,
-                payment_method :'Account'
+                description: getValues('note'),
+                authorization_code: formData?.remarks,
+                entries: rows,
+                payment_method: 'Account'
             }
 
             console.log(obj);
@@ -354,7 +354,7 @@ function CreateReceiptVoucher() {
             return;
         }
 
-        let data = { description: description.trim(), amount: parseFloat(amount),debit: 0,credit:parseFloat(amount) };
+        let data = { description: description.trim(), amount: parseFloat(amount), debit: 0, credit: parseFloat(amount) };
 
         const newRow = {
             ...data,

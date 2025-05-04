@@ -822,7 +822,7 @@ function CustomerLedgers() {
                               >
                                 <Cell className="pdf-table">
                                   {item?.created_at
-                                    ? moment(item?.created_at).format("MM-DD-YYYY")
+                                    ? moment(item?.created_at).format("DD/MM/YYYY")
                                     : "-"}
                                 </Cell>
                                 <Cell className="pdf-table">

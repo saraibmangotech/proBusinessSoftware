@@ -277,6 +277,7 @@ function CreatePaymentVoucher() {
     }
     // *For Create Journal Voucher
     const CreatePaymentVoucher = async (formData) => {
+        console.log(formData);
 
         setLoading(true)
         try {
@@ -288,10 +289,10 @@ function CreatePaymentVoucher() {
                 amount: total,
                 payment_mode: selectedMode?.id,   // or "cash"
                 account_id: selectedParentAccount?.id,
-                description: formData?.note,
+                description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
-                payment_method :'Account'
+                payment_method: 'Account'
             }
 
             console.log(obj, 'objobj');
@@ -440,7 +441,7 @@ function CreatePaymentVoucher() {
             )
 
             setSelectedCard({ id: cardsData[0]?.id, name: cardsData[0]?.name, account_id: cardsData[0]?.account_id })
-            setValue1("card", { id: cardsData[0]?.id, name: cardsData[0]?.name , account_id: cardsData[0]?.account_id})
+            setValue1("card", { id: cardsData[0]?.id, name: cardsData[0]?.name, account_id: cardsData[0]?.account_id })
 
 
         } catch (error) {

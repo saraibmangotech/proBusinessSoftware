@@ -285,14 +285,14 @@ function CollectionReport() {
       header: "Category",
       accessorKey: "category",
       total:false,
-      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE].category,
+      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE]?.category,
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {agencyType[process.env.REACT_APP_TYPE].category}
+          {agencyType[process.env.REACT_APP_TYPE]?.category}
         </Box>
       ),
     },

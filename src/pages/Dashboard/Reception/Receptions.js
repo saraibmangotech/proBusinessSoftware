@@ -289,10 +289,10 @@ function ReceptionList() {
         id: "created_at",
         header: "Registration Date",
         // Remove accessorKey and fix accessorFn to use row directly
-        accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
+        accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
         cell: ({ row }) => (
           <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-            {moment(row.original.created_at).format("MM-DD-YYYY")}
+            {moment(row.original.created_at).format("DD/MM/YYYY")}
           </Box>
         ),
       },
