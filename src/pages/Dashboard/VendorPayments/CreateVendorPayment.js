@@ -316,8 +316,8 @@ function CreateVendorPayment() {
 
             )
 
-            setSelectedCard({ id: cardsData[0]?.id, name: cardsData[0]?.name })
-            setValue1("card", { id: cardsData[0]?.id, name: cardsData[0]?.name })
+            setSelectedCard({ id: cardsData[0]?.id, name: cardsData[0]?.name,account_id: cardsData[0]?.account_id })
+            setValue1("card", { id: cardsData[0]?.id, name: cardsData[0]?.name,account_id: cardsData[0]?.account_id  })
 
 
         } catch (error) {

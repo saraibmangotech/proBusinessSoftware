@@ -404,6 +404,16 @@ function CreatePaidReceipt() {
         setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
         setValue1("customer", { id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
         setSubTotal(data?.receipt?.total_amount)
+
+        let taxable = 0;
+        for (let i = 0; i < data?.receipt?.sale_receipt_items.length; i++) {
+          const element = data?.receipt?.sale_receipt_items[i];
+          taxable += round(parseFloat(element.center_fee) * element.quantity)
+        }
+        let tax = round(taxable * 0.05)
+        console.log("taxable",taxable,tax)
+        let total = round(parseFloat(data?.receipt?.total_amount) + tax)
+        console.log("taxable",total)
         setTotalDepositVal((
           Number.parseFloat(data?.receipt?.total_amount) +
           data?.receipt?.sale_receipt_items?.reduce((total, item) => {
@@ -418,18 +428,7 @@ function CreatePaidReceipt() {
         ))
         setValue1(
           "total",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setValue1(
           "percentage",
@@ -441,51 +440,15 @@ function CreatePaidReceipt() {
         )
         setValue1(
           "finalTotal",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setValue1(
           "balance",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setValue1(
           "payamount",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setSelectedCostCenter({ id: data?.receipt?.customer_id, name: data?.receipt?.customer_name })
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
@@ -747,6 +710,17 @@ function CreatePaidReceipt() {
         // setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
         // setValue1("customer", { id: 11002, name: "Walk-in Customer" })
         setSubTotal(data?.receipt?.total_amount)
+
+       
+        let taxable = 0;
+        for (let i = 0; i < data?.receipt?.sale_receipt_items.length; i++) {
+          const element = data?.receipt?.sale_receipt_items[i];
+          taxable += round(parseFloat(element.center_fee) * element.quantity)
+        }
+        let tax = round(taxable * 0.05)
+        console.log("taxable",taxable,tax)
+        let total = round(parseFloat(data?.receipt?.total_amount) + tax)
+        console.log("taxable",total)
         setTotalDepositVal((
           Number.parseFloat(data?.receipt?.total_amount) +
           data?.receipt?.sale_receipt_items?.reduce((total, item) => {
@@ -758,22 +732,10 @@ function CreatePaidReceipt() {
             return total + fee * qty
           }, 0) *
           0.05
-        ))
+        )) //yaha kaam
         setValue1(
           "total",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setValue1(
           "percentage",
@@ -785,51 +747,15 @@ function CreatePaidReceipt() {
         )
         setValue1(
           "finalTotal",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setValue1(
           "balance",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setValue1(
           "payamount",
-          (
-            Number.parseFloat(data?.receipt?.total_amount) +
-            data?.receipt?.sale_receipt_items?.reduce((total, item) => {
-              const fee = Number.parseFloat(item?.center_fee ?? 0)
-              const qty = Number.parseFloat(item?.quantity ?? 1)
-              console.log(fee);
-              console.log(qty);
-              console.log(total);
-              return total + fee * qty
-
-            }, 0) *
-            0.05
-          ).toFixed(2),
+          total,
         )
         setSelectedCostCenter({ id: data?.receipt?.cost_center, name: data?.receipt?.cost_center })
         setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name })
@@ -1365,9 +1291,9 @@ function CreatePaidReceipt() {
                           console.log("Additional Charges:", additionalCharges.toFixed(2));
 
                           setValue1("additionalCharges", additionalCharges.toFixed(2));
-                          setValue1('finalTotal', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
-                          setValue1('balance', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
-                          setValue1('payamount', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
+                          setValue1('finalTotal', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges.toFixed(2))).toFixed(2))
+                          setValue1('balance', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges.toFixed(2))).toFixed(2))
+                          setValue1('payamount', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges.toFixed(2))).toFixed(2))
                         },
                       })}
                       error={errors1?.percentage?.message}
