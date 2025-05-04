@@ -385,6 +385,7 @@ function CreatePurchaseInvoice() {
                     items: rows,
                     purchase_date: date || new Date(),
                     invoice_number: formData?.invoiceNumber,
+                    ref_invoice_number: formData?.refInvoiceNumber,
                     invoice_prefix: formData?.invoicePrefix,
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
@@ -968,7 +969,7 @@ function CreatePurchaseInvoice() {
                        
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
-                                        label="Invoice Number"
+                                        label="System Invoice Number"
                                         size="small"
                                         placeholder="Invoice Number"
                                         disabled={true}
@@ -978,6 +979,19 @@ function CreatePurchaseInvoice() {
                                         error={errors1?.invoiceNumber?.message}
                                     />
                                 </Grid>
+                                <Grid item md={3} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="Ref Invoice Number"
+                                        size="small"
+                                        placeholder="Invoice Number"
+                                        
+                                        register={register1("refInvoiceNumber", {
+                                            required: 'Ref Invoice Number is required'
+                                        })}
+                                        error={errors1?.refInvoiceNumber?.message}
+                                    />
+                                </Grid>
+
 
                             </Grid>
                             <Grid container spacing={2} p={2}>

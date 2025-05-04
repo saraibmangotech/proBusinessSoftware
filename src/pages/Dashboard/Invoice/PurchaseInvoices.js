@@ -256,8 +256,14 @@ function PurchaseInvoices() {
     };
     const columns = [
         {
-            header: "Invoice #",
-            accessorKey: "id",
+            header: "System #",
+            accessorKey: "invoice_number",
+
+
+        },
+        {
+            header: "Invoice Number",
+            accessorKey: "ref_invoice_number",
 
 
         },
