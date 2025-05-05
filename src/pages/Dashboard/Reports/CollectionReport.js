@@ -8,6 +8,7 @@ import {
   Tooltip,
   Checkbox,
   InputAdornment,
+  Input, Drawer,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -127,7 +128,7 @@ function CollectionReport() {
     reset,
   } = useForm();
 
-  const tableHead = [{ name: 'SR No.', key: '' },{ name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
   const [loader, setLoader] = useState(false);
@@ -143,6 +144,7 @@ function CollectionReport() {
   const [totalCount, setTotalCount] = useState(0);
   const [pageLimit, setPageLimit] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
+  const [data, setData] = useState(null)
 
 
 
@@ -160,18 +162,19 @@ function CollectionReport() {
     setLoader(true)
 
     try {
-   
+
       let params = {
         page: 1,
         limit: 1000,
         from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-     
+
       }
-     
+
       const { data } = await CustomerServices.getCollectionReport(params)
       setCustomerQueue(data?.rows)
-     
+      setData(data?.totals)
+
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -194,31 +197,31 @@ function CollectionReport() {
   }
 
   const handleFromDate = (newDate) => {
-        try {
-          // eslint-disable-next-line eqeqeq
-          if (newDate == 'Invalid Date') {
-            setFromDate('invalid')
-            return
-          }
-          console.log(newDate, "newDate")
-          setFromDate(new Date(newDate))
-        } catch (error) {
-          ErrorToaster(error)
-        }
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setFromDate('invalid')
+        return
       }
-    
-      const handleToDate = (newDate) => {
-        try {
-          // eslint-disable-next-line eqeqeq
-          if (newDate == 'Invalid Date') {
-            setToDate('invalid')
-            return
-          }
-          setToDate(new Date(newDate))
-        } catch (error) {
-          ErrorToaster(error)
-        }
+      console.log(newDate, "newDate")
+      setFromDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+
+  const handleToDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setToDate('invalid')
+        return
       }
+      setToDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
 
 
 
@@ -231,22 +234,22 @@ function CollectionReport() {
     Debounce(() => getCustomerQueue(1, '', data));
   }
   const handleDelete = async (item) => {
- 
+
 
     try {
-        let params = { reception_id: selectedData?.id }
+      let params = { reception_id: selectedData?.id }
 
 
-        const { message } = await CustomerServices.deleteReception(params)
+      const { message } = await CustomerServices.deleteReception(params)
 
-        SuccessToaster(message);
-        getCustomerQueue()
+      SuccessToaster(message);
+      getCustomerQueue()
     } catch (error) {
-        showErrorToast(error)
+      showErrorToast(error)
     } finally {
-        // setLoader(false)
+      // setLoader(false)
     }
-}
+  }
   const UpdateStatus = async () => {
     try {
       let obj = {
@@ -284,7 +287,7 @@ function CollectionReport() {
     {
       header: "Category",
       accessorKey: "category",
-      total:false,
+      total: false,
       accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE]?.category,
       cell: ({ row }) => (
         <Box
@@ -299,22 +302,22 @@ function CollectionReport() {
     {
       header: "Receipt Date",
       accessorKey: "invoice_date",
-      total:false,
-      accessorFn: (row) => row?.created_at ?  moment(row?.created_at).format("DD/MM/YYYY") : '',
+      total: false,
+      accessorFn: (row) => row?.created_at ? moment(row?.created_at).format("DD/MM/YYYY") : '',
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.created_at ? moment(row?.original?.created_at).format("DD/MM/YYYY") :""}
+          {row?.original?.created_at ? moment(row?.original?.created_at).format("DD/MM/YYYY") : ""}
         </Box>
       ),
     },
     {
       header: "Receipt Time",
       accessorKey: "invoice_date",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.created_at ? moment(row?.created_at).format("hh:mm A") : '',
       cell: ({ row }) => (
         <Box
@@ -329,22 +332,22 @@ function CollectionReport() {
     {
       header: "Receipt No.",
       accessorKey: "id",
-      total:false,
-      accessorFn: (row) => "RC"+row?.id,
+      total: false,
+      accessorFn: (row) => "RC" + row?.id,
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {"RC"+row?.original?.id}
+          {"RC" + row?.original?.id}
         </Box>
       ),
     },
     {
       header: "Inv No.",
       accessorKey: "invoice_number",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
         <Box
@@ -360,7 +363,7 @@ function CollectionReport() {
     {
       header: "Customer Name",
       accessorKey: "customer_name",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
         <Box
@@ -375,8 +378,8 @@ function CollectionReport() {
     {
       header: "Card No.",
       accessorKey: "remarks",
-      total:false,
-      accessorFn: (row) => row?.remarks ,
+      total: false,
+      accessorFn: (row) => row?.remarks,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -390,7 +393,7 @@ function CollectionReport() {
     {
       header: "Cashier",
       accessorKey: "cashier",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.payment_creator?.name,
       cell: ({ row }) => (
         <Box
@@ -405,7 +408,7 @@ function CollectionReport() {
     {
       header: "Pay. Method",
       accessorKey: "pay_method",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.payment_mode,
       cell: ({ row }) => (
         <Box
@@ -421,7 +424,7 @@ function CollectionReport() {
       header: "Gross",
       accessorFn: (row) => row?.receipt?.total_amount,
       accessorKey: "total_amount",
-      
+
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -475,7 +478,7 @@ function CollectionReport() {
         </Box>
       ),
     },
-    
+
     {
       header: "Total",
       accessorKey: "total",
@@ -486,12 +489,12 @@ function CollectionReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-                    {(parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat)).toFixed(2)}
+          {(parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat)).toFixed(2)}
 
         </Box>
       ),
     },
-    
+
   ];
 
 
@@ -573,56 +576,93 @@ function CollectionReport() {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Collection Report</Typography>
-        
+
 
 
       </Box>
 
       {/* Filters */}
-      
-                      <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                              <Grid item xs={8}>
-                                <Grid container spacing={1}>
-                                  <Grid item xs={5}>
-                                    <DatePicker
-                                      label={"From Date"}
-                                      disableFuture={true}
-                                      size="small"
-                                      value={fromDate}
-                                      onChange={(date) => handleFromDate(date)}
-                                    />
-                                  </Grid>
-                                  <Grid item xs={5}>
-                                    <DatePicker
-                                      label={"To Date"}
-                      
-                                      disableFuture={true}
-                                      size="small"
-                                      value={toDate}
-                                      onChange={(date) => handleToDate(date)}
-                                    />
-                                  </Grid>
-                      
-                                  <Grid item xs={2} sx={{ marginTop: "30px" }}>
-                                    <PrimaryButton
-                                      bgcolor={"#bd9b4a"}
-                                      icon={<SearchIcon />}
-                                      title="Search"
-                                      sx={{ marginTop: "30px" }}
-                                      onClick={() => getCustomerQueue(null, null, null)}
-                                      loading={loading}
-                                    />
-                                  </Grid>
-                                </Grid>
-                              </Grid>
-                              <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                              
-                              </Grid>
-                            </Grid>
+
+      <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+        <Grid item xs={8}>
+          <Grid container spacing={1}>
+            <Grid item xs={5}>
+              <DatePicker
+                label={"From Date"}
+                disableFuture={true}
+                size="small"
+                value={fromDate}
+                onChange={(date) => handleFromDate(date)}
+              />
+            </Grid>
+            <Grid item xs={5}>
+              <DatePicker
+                label={"To Date"}
+
+                disableFuture={true}
+                size="small"
+                value={toDate}
+                onChange={(date) => handleToDate(date)}
+              />
+            </Grid>
+
+            <Grid item xs={2} sx={{ marginTop: "30px" }}>
+              <PrimaryButton
+                bgcolor={"#bd9b4a"}
+                icon={<SearchIcon />}
+                title="Search"
+                sx={{ marginTop: "30px" }}
+                onClick={() => getCustomerQueue(null, null, null)}
+                loading={loading}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+
+        </Grid>
+      </Grid>
       <Box >
 
 
         {<DataTable loading={loader} total={true} csv={true} csvName={'collection_report'} data={customerQueue} columns={columns} />}
+        <Grid container spacing={2} mt={1}>
+      <Grid item xs={4}>
+        <Input
+          fullWidth
+          disabled
+          value={`Total Cash: ${parseFloat(data.totalCash).toFixed(2)}`}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <Input
+          fullWidth
+          disabled
+          value={`Total Network: ${parseFloat(data.totalNetwork).toFixed(2)}`}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <Input
+          fullWidth
+          disabled
+          value={`Total Bank: ${parseFloat(data.totalBank).toFixed(2)}`}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <Input
+          fullWidth
+          disabled
+          value={`Total Card: ${parseFloat(data.totalCard).toFixed(2)}`}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <Input
+          fullWidth
+          disabled
+          value={`Total Amount: ${parseFloat(data.totalAmount).toFixed(2)}`}
+        />
+      </Grid>
+    </Grid>
       </Box>
 
     </Box>
