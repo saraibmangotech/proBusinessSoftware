@@ -33,6 +33,7 @@ const routes = {
   getReceipts: 'accounts/receiptVouchers',
   getReceiptDetail: 'accounts/receiptVouchers/details',
   createJournalVoucher: 'accounts/journalVouchers/add',
+  UpdateJournalVoucher: 'accounts/journalVouchers/update',
   getJournalVouchers: 'accounts/journalVouchers',
   deleteJournalVoucher: 'accounts/journalVouchers/delete',
   getJournalVoucherDetail: 'accounts/journalVouchers/details',
@@ -58,7 +59,8 @@ const routes = {
   getVendorPaymentList:"payments/vendor",
   getCustomerPaymentDetail:'payments/customer/details',
   getVendorPaymentDetail:'payments/vendor/details',
-  CreateVoucher:'/accounts/vouchers/add'
+  CreateVoucher:'/accounts/vouchers/add',
+getNewAccountLedgers:'accounts/ledger/primary'
 
 };
 

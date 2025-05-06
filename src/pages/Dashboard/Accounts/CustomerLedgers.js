@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -19,6 +20,7 @@ import FinanceStatusDialog from 'components/Dialog/FinanceStatusDialog';
 import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
 import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
+import { FileDownload } from "@mui/icons-material"
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
 import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
@@ -44,6 +46,7 @@ import DatePicker from 'components/DatePicker';
 import UserServices from 'services/User';
 import { useAuth } from 'context/UseContext';
 import FinanceServices from 'services/Finance';
+import { CSVLink } from 'react-csv';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -128,20 +131,23 @@ function CustomerLedgers() {
         getValues,
         reset,
     } = useForm();
-      const [TotalBalance, setTotalBalance] = useState(0);
+    const [TotalBalance, setTotalBalance] = useState(0);
     let Balance = TotalBalance;
     const tableHead = [
         "Date",
+
         "JV#",
+        "Account Name",
         "Particular#",
         "Type",
         "Description",
-        "Comments",
+
         "Debit (AED)",
         "Credit (AED)",
-        "Balance (AED)",
-       
-      ];
+
+
+    ];
+
 
 
     const [loader, setLoader] = useState(false);
@@ -172,9 +178,52 @@ function CustomerLedgers() {
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
 
+    const prepareCSVData = (data) => {
+        // Map each entry into the desired CSV format
+        const csvRows = data.map((item) => ({
+            Reference: item.entry.reference_no || "",
+            Date: item?.created_at || '',
+            JV: `JV-${item.id} ` || "",
+            Description: item.description || "",
+            Type: item.type?.type_name || "",
+            Account: item.account?.name || "",
+            Debit: parseFloat(item.debit || 0).toFixed(2),
+            Credit: parseFloat(item.credit || 0).toFixed(2),
+        }));
+
+        // Calculate totals
+        const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
+        const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
+
+        // Append totals row
+        csvRows.push({
+            JV: "",
+            Date: "",
+            Reference: "",
+            Description: "",
+            Type: "",
+            Account: "Total",
+            Debit: totalDebit.toFixed(2),
+            Credit: totalCredit.toFixed(2),
+        });
+
+        return csvRows;
+    };
+    const headers = [
+        { label: "Date", key: "Date" },
+        { label: "JV #", key: "JV" },
+        { label: "Account", key: "Account" },
+        { label: "Reference", key: "Reference" },
+        { label: "Description", key: "Description" },
+        { label: "Type", key: "Type" },
+
+        { label: "Debit", key: "Debit" },
+        { label: "Credit", key: "Credit" },
+    ];
+
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
-        if (selectedUser?.id) {
+        if (true) {
             setLoader(true)
 
             try {
@@ -184,11 +233,12 @@ function CustomerLedgers() {
                     limit: 1000,
                     from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                     to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-                    account_id: selectedUser?.receivable_account_id
+                    account_id: selectedUser?.receivable_account_id,
+                    is_customer: true
 
                 }
 
-                const { data } = await FinanceServices.getAccountLedgers(params)
+                const { data } = await FinanceServices.getNewAccountLedgers(params)
                 setCustomerQueue(data?.statement?.rows);
                 setTotalCount(data?.statement?.count);
                 setTotalBalance(data?.statement?.opening_balance_aed);
@@ -390,7 +440,7 @@ function CustomerLedgers() {
                 </Box>
             ),
         },
-      
+
         {
             header: "Stock ID",
             accessorKey: "stock_id",
@@ -614,6 +664,7 @@ function CustomerLedgers() {
         getUsers()
         setFromDate(new Date())
         setToDate(new Date())
+        getCustomerQueue()
 
     }, []);
     useEffect(() => {
@@ -765,107 +816,134 @@ function CustomerLedgers() {
 
             <Box >
 
-            {customerQueue?.length > 0 && (
-          <Fragment>
-            <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
-              fileName="General Ledger"
-            >
-              <Box className='pdf-show' sx={{ display: 'none' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}>
-                    Vehicle Sales Agreement Reversals
-                  </Typography>
-                  <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('MM-DD-YYYY')}</Box>
-                </Box>
-              </Box>
-              {/* ========== Table ========== */}
-              <TableContainer
-                component={Paper}
-                sx={{
-                  boxShadow: "0px 8px 18px 0px #9B9B9B1A",
-                  borderRadius: 2,
-                  maxHeight: "calc(100vh - 330px)",
-                }}
-                className="table-box"
-              >
-                <Table stickyHeader sx={{ minWidth: 500 }}>
-                  <TableHead>
-                    <TableRow>
-                      {tableHead.map((item, index) => (
-                        <Cell className="pdf-table" key={index}>{item}</Cell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {!loader ? (
-                      customerQueue?.length > 0 ? (
-                        <Fragment>
-                          {customerQueue.map((item, index) => {
+               <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
+                <CSVLink
+                    data={prepareCSVData(customerQueue)}
+                    headers={headers}
+                    filename="journal_entries.csv"
+                >
+                <Button
+
+                    startIcon={<FileDownload />}
                    
-                            const balance =
-                              selectedUser?.nature === "debit"
-                                ? (
-                                  parseFloat(item?.debit) -
-                                  parseFloat(item?.credit)
-                                ).toFixed(2)
-                                : (
-                                  parseFloat(item?.credit) -
-                                  parseFloat(item?.debit)
-                                ).toFixed(2);
-                            Balance += parseFloat(balance);
-                            return (
-                              <Row
-                                key={index}
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                        padding: '10px',
+                        textTransform: 'capitalize !important',
+                        backgroundColor: "#bd9b4a !important",
+                        fontSize: "12px",
+                        ":hover": {
+                            backgroundColor: "#bd9b4a !important",
+                        },
+                    }}
+                >
+                    Export to Excel
+                </Button>
+                </CSVLink>
+                </Box>
+                {customerQueue?.length > 0 && (
+                    <Fragment>
+                        <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
+                            fileName="General Ledger"
+                        >
+                            <Box className='pdf-show' sx={{ display: 'none' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}>
+                                        Vehicle Sales Agreement Reversals
+                                    </Typography>
+                                    <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('MM-DD-YYYY')}</Box>
+                                </Box>
+                            </Box>
+                            {/* ========== Table ========== */}
+                            <TableContainer
+                                component={Paper}
                                 sx={{
-                                  bgcolor: index % 2 !== 0 && "#EFF8E7",
+                                    boxShadow: "0px 8px 18px 0px #9B9B9B1A",
+                                    borderRadius: 2,
+                                    maxHeight: "calc(100vh - 330px)",
                                 }}
-                              >
-                                <Cell className="pdf-table">
-                                  {item?.created_at
-                                    ? moment(item?.created_at).format("DD/MM/YYYY")
-                                    : "-"}
-                                </Cell>
-                                <Cell className="pdf-table">
-                                  {item?.journal_id
-                                    ? item?.series_id + item?.journal_id
-                                    : "-"}
-                                </Cell>
-                                <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
-                                <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
-                                <Cell className="pdf-table">
-                                  <Tooltip
-                                    className="pdf-hide"
-                                    title={item?.description ?? '-'}
-                                    arrow
-                                    placement="top"
-                                    slotProps={{
-                                      popper: {
-                                        modifiers: [
-                                          {
-                                            name: "offset",
-                                            options: {
-                                              offset: [10, -2],
-                                            },
-                                          },
-                                        ],
-                                      },
-                                    }}
-                                  >
-                                    {item?.description?.length > 24 ? item?.description?.slice(0, 18) : item?.description}
-                                  </Tooltip>
-                                  <Box
-                                    component={"div"}
-                                    className='pdf-show'
-                                    sx={{ display: "none !important" }}
-                                  >
-                                    {item?.description ?? '-'}
-                                  </Box>
-                                </Cell>
-                                <Cell className="pdf-table">{item?.comment ?? "-"}</Cell>
-                                <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
-                                <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
-                                <Cell className="pdf-table">{Balance?.toFixed(2)}</Cell>
-                                {/* <Cell><Box className="pdf-hide"
+                                className="table-box"
+                            >
+                                <Table stickyHeader sx={{ minWidth: 500 }}>
+                                    <TableHead>
+                                        <TableRow>
+                                            {tableHead.map((item, index) => (
+                                                <Cell className="pdf-table" key={index}>{item}</Cell>
+                                            ))}
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {!loader ? (
+                                            customerQueue?.length > 0 ? (
+                                                <Fragment>
+                                                    {customerQueue.map((item, index) => {
+
+                                                        const balance =
+                                                            selectedUser?.nature === "debit"
+                                                                ? (
+                                                                    parseFloat(item?.debit) -
+                                                                    parseFloat(item?.credit)
+                                                                ).toFixed(2)
+                                                                : (
+                                                                    parseFloat(item?.credit) -
+                                                                    parseFloat(item?.debit)
+                                                                ).toFixed(2);
+                                                        Balance += parseFloat(balance);
+                                                        return (
+                                                            <Row
+                                                                key={index}
+                                                                sx={{
+                                                                    bgcolor: index % 2 !== 0 && "#EFF8E7",
+                                                                }}
+                                                            >
+                                                                <Cell className="pdf-table">
+                                                                    {item?.created_at
+                                                                        ? moment(item?.created_at).format("DD/MM/YYYY")
+                                                                        : "-"}
+                                                                </Cell>
+                                                                <Cell className="pdf-table">
+                                                                    {item?.journal_id
+                                                                        ? item?.series_id + item?.journal_id
+                                                                        : "-"}
+                                                                </Cell>
+                                                                <Cell className="pdf-table">{item?.account?.name ?? "-"}</Cell>
+                                                                <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
+                                                                <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
+                                                                <Cell className="pdf-table">
+                                                                    <Tooltip
+                                                                        className="pdf-hide"
+                                                                        title={item?.description ?? '-'}
+                                                                        arrow
+                                                                        placement="top"
+                                                                        slotProps={{
+                                                                            popper: {
+                                                                                modifiers: [
+                                                                                    {
+                                                                                        name: "offset",
+                                                                                        options: {
+                                                                                            offset: [10, -2],
+                                                                                        },
+                                                                                    },
+                                                                                ],
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        {item?.description}
+                                                                    </Tooltip>
+                                                                    <Box
+                                                                        component={"div"}
+                                                                        className='pdf-show'
+                                                                        sx={{ display: "none !important" }}
+                                                                    >
+                                                                        {item?.description ?? '-'}
+                                                                    </Box>
+                                                                </Cell>
+
+                                                                <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
+                                                                <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
+
+                                                                {/* <Cell><Box className="pdf-hide"
                                   onClick={page ? () =>
                                     navigate(`/${page}/${item?.journal_id}`)
                                     : () => {
@@ -886,51 +964,51 @@ function CustomerLedgers() {
                                   </IconButton>
 
                                 </Box></Cell> */}
-                              </Row>
-                            );
-                          })}
-                        </Fragment>
-                      ) : (
-                        <Row>
-                          <Cell
-                            colSpan={tableHead.length + 1}
-                            align="center"
-                            sx={{ fontWeight: 600 }}
-                          >
-                            No Data Found
-                          </Cell>
-                        </Row>
-                      )
-                    ) : (
-                      <Row>
-                        <Cell
-                          colSpan={tableHead.length + 2}
-                          align="center"
-                          sx={{ fontWeight: 600 }}
-                        >
-                          <Box className={classes.loaderWrap}>
-                            <CircularProgress />
-                          </Box>
-                        </Cell>
-                      </Row>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </PDFExport>
-            {/* ========== Pagination ========== */}
-            <Pagination
-              currentPage={currentPage}
-              pageSize={pageLimit}
-              onPageSizeChange={(size) => getCustomerQueue(1, size.target.value)}
-              tableCount={customerQueue?.length}
-              totalCount={totalCount}
-              onPageChange={(page) => getCustomerQueue(page, "")}
-            />
-          </Fragment>
-        )}
+                                                            </Row>
+                                                        );
+                                                    })}
+                                                </Fragment>
+                                            ) : (
+                                                <Row>
+                                                    <Cell
+                                                        colSpan={tableHead.length + 1}
+                                                        align="center"
+                                                        sx={{ fontWeight: 600 }}
+                                                    >
+                                                        No Data Found
+                                                    </Cell>
+                                                </Row>
+                                            )
+                                        ) : (
+                                            <Row>
+                                                <Cell
+                                                    colSpan={tableHead.length + 2}
+                                                    align="center"
+                                                    sx={{ fontWeight: 600 }}
+                                                >
+                                                    <Box className={classes.loaderWrap}>
+                                                        <CircularProgress />
+                                                    </Box>
+                                                </Cell>
+                                            </Row>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </PDFExport>
+                        {/* ========== Pagination ========== */}
+                        <Pagination
+                            currentPage={currentPage}
+                            pageSize={pageLimit}
+                            onPageSizeChange={(size) => getCustomerQueue(1, size.target.value)}
+                            tableCount={customerQueue?.length}
+                            totalCount={totalCount}
+                            onPageChange={(page) => getCustomerQueue(page, "")}
+                        />
+                    </Fragment>
+                )}
 
-        {loader && <CircleLoading />}
+                {loader && <CircleLoading />}
                 {/* {<DataTable loading={loader} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />} */}
             </Box>
 

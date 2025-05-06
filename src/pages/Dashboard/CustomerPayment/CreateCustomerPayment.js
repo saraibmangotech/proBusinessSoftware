@@ -31,6 +31,7 @@ import { useAuth } from "context/UseContext"
 import FinanceServices from "services/Finance"
 import SearchIcon from "@mui/icons-material/Search"
 import DeleteIcon from '@mui/icons-material/Delete';
+import { agencyType } from "utils"
 // import { TableBody, TableHead } from "mui-datatables";
 
 function CreateCustomerPayment() {
@@ -586,33 +587,25 @@ function CreateCustomerPayment() {
         }
     }
 
-    const addPayments = (amount, mode, bank, card, code, submit = null) => {
+    const addPayments = (amount, mode, bank, card, code, percentage = null, additionalCharges = null, submit = null) => {
         const total = parseFloat(getValues1("total")) || 0;
-
-
-        // Convert amount to number for calculation
         const currentAmount = parseFloat(amount) || 0;
-
-        // Calculate current total of payments
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
 
-        // Check if new total will exceed
         if (existingTotal + currentAmount > total) {
             showErrorToast("Total payment exceeds the required amount.");
             return;
         }
 
-        // Validation
         if (!amount) {
             showErrorToast("Amount is required");
             return;
         }
 
-        if (parseFloat(amount) == 0) {
+        if (parseFloat(amount) === 0) {
             showErrorToast("Amount is 0");
             return;
         }
-
 
         if (!mode) {
             showErrorToast("Payment mode is required");
@@ -628,28 +621,50 @@ function CreateCustomerPayment() {
             showErrorToast("Card is required for Card mode");
             return;
         }
+
         if (mode === "Card" && !code) {
             showErrorToast("Authorization code is required for Card mode");
             return;
         }
+
+        if ((mode === "Bank" || mode === "Card") && (!percentage || isNaN(percentage))) {
+            showErrorToast("Percentage is required for Bank/Card mode");
+            return;
+        }
+
         const paymentObj = {
             amount: currentAmount,
             payment_mode: mode,
-            account_id: mode === "Bank" ? bank?.account_id : mode === "Card" ? card?.account_id : mode === "Cash" ? 700117 : 700171,
+            account_id:
+                mode === "Bank"
+                    ? bank?.account_id
+                    : mode === "Card"
+                        ? card?.account_id
+                        : mode === "Cash"
+                            ? 700117
+                            : 700171,
             ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
             ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
-
+            auth_code: mode === "Card" ? code : null,
+            additional_charges_percentage: mode === "Bank" || mode === "Card" ? parseFloat(percentage) : null,
+            additional_charges_value: mode === "Bank" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
         };
 
         setPayments((prev) => [...prev, paymentObj]);
-        //setValue1('payamount', '')
 
-        setSelectedBank(null)
-        setSelectedCard(null)
-        setValue1('authCode', '')
-        // setValue1("payment", { id: "Cash", name: "Cash" })
-        // setSelectedMode({ id: "Cash", name: "Cash" })
+        // Reset form fields
+        setSelectedBank(null);
+        setSelectedCard(null);
+        setValue1("payamount", "");
+        setValue1("percentage", "");
+        setValue1("additionalCharges", "");
+        setValue1("remarks", "");
+        setValue1("authCode", "");
+        // Optionally reset payment mode
+        // setValue1("payment", { id: "Cash", name: "Cash" });
+        // setSelectedMode({ id: "Cash", name: "Cash" });
     };
+
     useEffect(() => {
         console.log(payments, 'paymentspayments');
 
@@ -982,13 +997,19 @@ function CreateCustomerPayment() {
                                         </Grid>
                                         <Grid container spacing={3}>
                                             <Grid item md={3.8} sm={12} xs={12}>
-                                                <InputField
+                                            <InputField
                                                     label="Amount"
                                                     size="small"
-
                                                     placeholder="Amount"
+                                                    type="number"
                                                     register={register1("payamount", {
                                                         required: false,
+                                                        onChange: (e) => {
+                                                            const amount = parseFloat(e.target.value || 0);
+                                                            const percentage = parseFloat(getValues1("percentage") || 0);
+                                                            const additionalCharge = ((percentage / 100) * amount).toFixed(2);
+                                                            setValue1("additionalCharges", additionalCharge);
+                                                        },
                                                     })}
                                                     error={errors1?.payamount?.message}
                                                 />
@@ -1007,6 +1028,17 @@ function CreateCustomerPayment() {
                                                     onSelect={(value) => {
                                                         setValue1("payment", value)
                                                         setSelectedMode(value)
+                                                        if ((agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ||
+                                                            agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED")
+                                                            && value?.id === 'Card') {
+                                                            console.log(value?.id, 'value?.id');
+
+                                                            setValue1('percentage', 1);
+
+                                                        } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
+                                                            value?.id === 'Payment Link') {
+                                                            setValue1('percentage', 1.35);
+                                                        }
                                                     }}
                                                     register={register1("payment", {
                                                         required: "Please select payment mode",
@@ -1059,9 +1091,55 @@ function CreateCustomerPayment() {
                                                     error={errors1?.remarks?.message}
                                                 />
                                             </Grid>}
+                                            {(selectedMode?.id === "Bank" || selectedMode?.id === "Payment Link") && (
+                                                <>
+                                                    <Grid item md={3.8} sm={12} xs={12}>
+                                                        <InputField
+                                                            label="Percentage"
+                                                            size="small"
+                                                            placeholder="Enter percentage"
+                                                            type="number"
+                                                            register={register1("percentage", {
+                                                                required: "Please enter percentage",
+                                                                min: { value: 0, message: "Minimum 0%" },
+                                                                max: { value: 100, message: "Maximum 100%" },
+                                                                onChange: (e) => {
+                                                                    const percentageValue = parseFloat(e.target.value || 0);
+                                                                    const amount = parseFloat(getValues1("payamount") || 0);
+                                                                    const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
+
+                                                                    setValue1("additionalCharges", additionalCharge);
+                                                                },
+                                                            })}
+                                                            error={errors1?.percentage?.message}
+                                                        />
+                                                    </Grid>
+
+
+                                                    <Grid item md={3.8} sm={12} xs={12}>
+                                                        <InputField
+                                                            label="Additional Charges"
+                                                            size="small"
+                                                            placeholder="Auto calculated"
+                                                            disabled
+                                                            value={watch1("additionalCharges")}
+                                                            register={register1("additionalCharges")}
+                                                            error={errors1?.additionalCharges?.message}
+                                                        />
+                                                    </Grid>
+                                                </>
+                                            )}
                                             <Grid item md={12} sm={12} xs={12}>
                                                 <Button
-                                                    onClick={() => addPayments(getValues1('payamount'), selectedMode?.id, selectedBank, selectedCard, getValues1('remarks'))}
+                                                    onClick={() => addPayments(
+                                                        getValues1("payamount"),
+                                                        selectedMode?.id,
+                                                        selectedBank,
+                                                        selectedCard,
+                                                        getValues1("remarks"),
+                                                        getValues1("percentage"),
+                                                        getValues1("additionalCharges")
+                                                    )}
 
                                                     variant="contained"
                                                     sx={{
@@ -1089,18 +1167,18 @@ function CreateCustomerPayment() {
                                                         <Box
                                                             key={index}
                                                             sx={{
-                                                                border: '1px solid #ccc',
+                                                                border: "1px solid #ccc",
                                                                 borderRadius: 2,
-                                                                width: '30%',
+                                                                width: "30%",
                                                                 p: 2,
                                                                 mb: 1,
-                                                                backgroundColor: '#f9f9f9',
-                                                                position: 'relative',
+                                                                backgroundColor: "#f9f9f9",
+                                                                position: "relative",
                                                             }}
                                                         >
                                                             <IconButton
                                                                 size="small"
-                                                                sx={{ position: 'absolute', top: 8, right: 8 }}
+                                                                sx={{ position: "absolute", top: 8, right: 8 }}
                                                                 onClick={() => {
                                                                     const updatedPayments = payments.filter((_, i) => i !== index);
                                                                     setPayments(updatedPayments);
@@ -1109,13 +1187,34 @@ function CreateCustomerPayment() {
                                                                 <DeleteIcon color="error" fontSize="small" />
                                                             </IconButton>
 
-                                                            <Typography variant="body1"><strong>Amount:</strong> {payment.amount}</Typography>
-                                                            <Typography variant="body1"><strong>Mode:</strong> {payment.payment_mode}</Typography>
-                                                            {payment.mode === 'Bank' && (
-                                                                <Typography variant="body1"><strong>Bank:</strong> {payment.bank?.name || payment.bank}</Typography>
+                                                            <Typography variant="body1">
+                                                                <strong>Amount:</strong> {payment.amount}
+                                                            </Typography>
+                                                            <Typography variant="body1">
+                                                                <strong>Mode:</strong> {payment.payment_mode}
+                                                            </Typography>
+                                                            {payment.mode === "Bank" && (
+                                                                <Typography variant="body1">
+                                                                    <strong>Bank:</strong>{" "}
+                                                                    {payment.bank?.name || payment.bank}
+                                                                </Typography>
                                                             )}
-                                                            {payment.mode === 'Card' && (
-                                                                <Typography variant="body1"><strong>Card:</strong> {payment.card?.name || payment.card}</Typography>
+                                                            {payment.mode === "Card" && (
+                                                                <Typography variant="body1">
+                                                                    <strong>Card:</strong>{" "}
+                                                                    {payment.card?.name || payment.card}
+                                                                </Typography>
+                                                            )}
+                                                            {payment.additional_charges_percentage && (
+                                                                <Typography variant="body1">
+                                                                    <strong>Additional Percent:</strong> {payment.additional_charges_percentage}%
+                                                                </Typography>
+                                                            )}
+                                                            {payment.additional_charges_percentage && (
+                                                                <Typography variant="body1">
+                                                                    <strong>Additional Charges:</strong>{" "}
+                                                                    {payment.additional_charges_value}
+                                                                </Typography>
                                                             )}
                                                         </Box>
                                                     ))}

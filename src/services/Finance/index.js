@@ -75,6 +75,10 @@ const FinanceServices = {
     const data = await get(routes.getVoucherDetails, params);
     return data;
   },
+  getNewAccountLedgers: async (params) => {
+    const data = await get(routes.getNewAccountLedgers, params);
+    return data;
+  },
   deleteVoucher: async (params) => {
     const data = await deleted(routes.deleteVoucher, params);
     return data;
@@ -202,6 +206,10 @@ const FinanceServices = {
   },
   createJournalVoucher: async (obj) => {
     const data = await post(routes.createJournalVoucher, obj);
+    return data;
+  },
+  UpdateJournalVoucher: async (obj) => {
+    const data = await patch(routes.UpdateJournalVoucher, obj);
     return data;
   },
   getJournalVouchers: async (params) => {

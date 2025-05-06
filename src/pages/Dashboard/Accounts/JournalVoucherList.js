@@ -580,6 +580,7 @@ function JournalVoucherList() {
                                                                                 <Box component={'img'} src={Images.detailIcon} onClick={() => navigate(`/journal-voucher-detail/${item?.id}`)} width={'35px'}></Box>
                                                                             </IconButton>
                                                                         </Box>
+                                                                          { <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${item?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                                                                         <Box>
                                                                         <IconButton
                                                                             sx={{

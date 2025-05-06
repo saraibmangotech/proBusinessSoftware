@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -44,6 +45,8 @@ import DatePicker from 'components/DatePicker';
 import UserServices from 'services/User';
 import { useAuth } from 'context/UseContext';
 import FinanceServices from 'services/Finance';
+import { CSVLink } from 'react-csv';
+import { FileDownload } from "@mui/icons-material"
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -132,16 +135,60 @@ function SupplierLedgers() {
     let Balance = TotalBalance;
     const tableHead = [
         "Date",
+      
         "JV#",
+        "Account Name",
         "Particular#",
         "Type",
         "Description",
-        "Comments",
+   
         "Debit (AED)",
         "Credit (AED)",
-        "Balance (AED)",
+     
        
       ];
+      const prepareCSVData = (data) => {
+        // Map each entry into the desired CSV format
+        const csvRows = data.map((item) => ({
+            Reference: item.entry.reference_no || "",
+            Date: item?.created_at || '',
+            JV: `JV-${item.id} ` || "",
+            Description: item.description || "",
+            Type: item.type?.type_name || "",
+            Account: item.account?.name || "",
+            Debit: parseFloat(item.debit || 0).toFixed(2),
+            Credit: parseFloat(item.credit || 0).toFixed(2),
+        }));
+
+        // Calculate totals
+        const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
+        const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
+
+        // Append totals row
+        csvRows.push({
+            JV: "",
+            Date: "",
+            Reference: "",
+            Description: "",
+            Type: "",
+            Account: "Total",
+            Debit: totalDebit.toFixed(2),
+            Credit: totalCredit.toFixed(2),
+        });
+
+        return csvRows;
+    };
+    const headers = [
+        { label: "Date", key: "Date" },
+        { label: "JV #", key: "JV" },
+        { label: "Account", key: "Account" },
+        { label: "Reference", key: "Reference" },
+        { label: "Description", key: "Description" },
+        { label: "Type", key: "Type" },
+
+        { label: "Debit", key: "Debit" },
+        { label: "Credit", key: "Credit" },
+    ];
 
 
     const [loader, setLoader] = useState(false);
@@ -186,6 +233,7 @@ function SupplierLedgers() {
                     to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                     account_id: selectedUser?.account_id ?? null,
                     is_supplier: selectedUser?.account_id ? true : false,
+                    is_vendor:true
 
                 }
 
@@ -485,7 +533,32 @@ function SupplierLedgers() {
 
 
             <Box >
+<Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
+                <CSVLink
+                    data={prepareCSVData(customerQueue)}
+                    headers={headers}
+                    filename="journal_entries.csv"
+                >
+                <Button
 
+                    startIcon={<FileDownload />}
+                   
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                        padding: '10px',
+                        textTransform: 'capitalize !important',
+                        backgroundColor: "#bd9b4a !important",
+                        fontSize: "12px",
+                        ":hover": {
+                            backgroundColor: "#bd9b4a !important",
+                        },
+                    }}
+                >
+                    Export to Excel
+                </Button>
+                </CSVLink>
+                </Box>
             {customerQueue?.length > 0 && (
           <Fragment>
             <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
@@ -551,9 +624,10 @@ function SupplierLedgers() {
                                     ? item?.series_id + item?.journal_id
                                     : "-"}
                                 </Cell>
+                                <Cell className="pdf-table">{item?.account?.name ?? "-"}</Cell>
                                 <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
                                 <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
-                                <Cell className="pdf-table">
+                                <Cell className="pdf-table" sx={{width:'250px'}}>
                                   <Tooltip
                                     className="pdf-hide"
                                     title={item?.description ?? '-'}
@@ -572,7 +646,7 @@ function SupplierLedgers() {
                                       },
                                     }}
                                   >
-                                    {item?.description?.length > 24 ? item?.description?.slice(0, 18) : item?.description}
+                                    { item?.description}
                                   </Tooltip>
                                   <Box
                                     component={"div"}
@@ -582,10 +656,10 @@ function SupplierLedgers() {
                                     {item?.description ?? '-'}
                                   </Box>
                                 </Cell>
-                                <Cell className="pdf-table">{item?.comment ?? "-"}</Cell>
+                               
                                 <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
                                 <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
-                                <Cell className="pdf-table">{Balance?.toFixed(2)}</Cell>
+                              
                                 {/* <Cell><Box className="pdf-hide"
                                   onClick={page ? () =>
                                     navigate(`/${page}/${item?.journal_id}`)

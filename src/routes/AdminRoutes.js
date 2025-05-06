@@ -415,6 +415,9 @@ const CustomerLedgers= lazy(() =>
 const SupplierLedgers= lazy(() =>
   import("pages/Dashboard/Accounts/SupplierLedgers")
 );
+const UpdateJournalVoucher= lazy(() =>
+  import("pages/Dashboard/Accounts/UpdateJournalVoucher")
+);
 const AdminRoutes = [
   
   {
@@ -954,6 +957,10 @@ const AdminRoutes = [
   {
     path: "/create-journal-voucher",
     component: <CreateJournalVoucher />,
+  },
+  {
+    path: "/update-journal-voucher/:id",
+    component: <UpdateJournalVoucher />,
   },
   {
     path: "/journal-voucher-list",

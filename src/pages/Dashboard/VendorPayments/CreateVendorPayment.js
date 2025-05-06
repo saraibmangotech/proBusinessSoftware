@@ -316,8 +316,8 @@ function CreateVendorPayment() {
 
             )
 
-            setSelectedCard({ id: cardsData[0]?.id, name: cardsData[0]?.name,account_id: cardsData[0]?.account_id })
-            setValue1("card", { id: cardsData[0]?.id, name: cardsData[0]?.name,account_id: cardsData[0]?.account_id  })
+            setSelectedCard({ id: cardsData[0]?.id, name: cardsData[0]?.name, account_id: cardsData[0]?.account_id })
+            setValue1("card", { id: cardsData[0]?.id, name: cardsData[0]?.name, account_id: cardsData[0]?.account_id })
 
 
         } catch (error) {
@@ -961,24 +961,24 @@ function CreateVendorPayment() {
 
                                         </Grid>
                                         <Grid container spacing={3}>
-                                        <Grid item md={3.8} sm={12} xs={12}>
-  <InputField
-    label="Amount"
-    size="small"
-    placeholder="Amount"
-    type="number"
-    register={register1("payamount", {
-      required: false,
-      onChange: (e) => {
-        const amount = parseFloat(e.target.value || 0);
-        const percentage = parseFloat(getValues1("percentage") || 0);
-        const additionalCharge = ((percentage / 100) * amount).toFixed(2);
-        setValue1("additionalCharges", additionalCharge);
-      },
-    })}
-    error={errors1?.payamount?.message}
-  />
-</Grid>
+                                            <Grid item md={3.8} sm={12} xs={12}>
+                                                <InputField
+                                                    label="Amount"
+                                                    size="small"
+                                                    placeholder="Amount"
+                                                    type="number"
+                                                    register={register1("payamount", {
+                                                        required: false,
+                                                        onChange: (e) => {
+                                                            const amount = parseFloat(e.target.value || 0);
+                                                            const percentage = parseFloat(getValues1("percentage") || 0);
+                                                            const additionalCharge = ((percentage / 100) * amount).toFixed(2);
+                                                            setValue1("additionalCharges", additionalCharge);
+                                                        },
+                                                    })}
+                                                    error={errors1?.payamount?.message}
+                                                />
+                                            </Grid>
 
 
                                             <Grid item md={3.8} sm={12} xs={12}>
@@ -995,21 +995,19 @@ function CreateVendorPayment() {
                                                     onSelect={(value) => {
                                                         setValue1("payment", value);
                                                         setSelectedMode(value);
-                                                        
+
                                                         if ((agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ||
-                                                            agencyType[process.env.REACT_APP_TYPE]?.category === "ALDHEED")
-                                                           && value?.id === 'Card') {
-                                                         setValue1('percentage', 1);
-                                                       } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "ALDHEED" &&
-                                                                  value?.id === 'Bank') {
-                                                         setValue1('percentage', 1.35); 
-                                                       } else {
-                                                         setValue1('percentage', 1.35);
-                                                       }
-                                                       
+                                                            agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED")
+                                                            && value?.id === 'Card') {
+                                                            setValue1('percentage', 1);
+                                                        } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
+                                                            value?.id === 'Payment Link') {
+                                                            setValue1('percentage', 1.35);
+                                                        }
 
 
-                                                        
+
+
 
 
                                                     }}
@@ -1070,7 +1068,7 @@ function CreateVendorPayment() {
                                                 </Grid>
                                             )}
 
-                                            {(selectedMode?.id === "Bank" || selectedMode?.id === "Card") && (
+                                            {(selectedMode?.id === "Bank" || selectedMode?.id === "Payment Link") && (
                                                 <>
                                                     <Grid item md={3.8} sm={12} xs={12}>
                                                         <InputField
