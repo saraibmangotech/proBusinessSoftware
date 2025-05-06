@@ -32,10 +32,10 @@ import { PDFExport } from '@progress/kendo-react-pdf';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
 	border: 0,
-  
-  }));
-  
-  const Cell = styled(TableCell)(({ theme }) => ({
+
+}));
+
+const Cell = styled(TableCell)(({ theme }) => ({
 	[`&.${tableCellClasses.head}`]: {
 		fontSize: 14,
 		fontFamily: 'Public Sans',
@@ -47,16 +47,16 @@ const Row = styled(TableRow)(({ theme }) => ({
 		paddingRight: '50px',
 		background: 'transparent',
 		fontWeight: 'bold'
-  
+
 	},
 	[`&.${tableCellClasses.body}`]: {
 		fontSize: 14,
 		fontFamily: 'Public Sans',
-  
+
 		textWrap: 'nowrap',
 		padding: '5px !important',
 		paddingLeft: '15px !important',
-  
+
 		'.MuiBox-root': {
 			display: 'flex',
 			gap: '6px',
@@ -81,7 +81,7 @@ const Row = styled(TableRow)(({ theme }) => ({
 			height: '28px',
 		}
 	},
-  }));
+}));
 
 const useStyles = makeStyles({
 	loaderWrap: {
@@ -104,7 +104,7 @@ function GeneralJournalLedger() {
 	const { register, handleSubmit, getValues, setValue } = useForm();
 
 
-	const tableHead = ['JV#', 'Date', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments','Actions']
+	const tableHead = ['JV#', 'Date', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments', 'Actions']
 
 	const [visibleColumns, setVisibleColumns] = useState([...Array(tableHead?.length).keys()]);
 
@@ -364,10 +364,10 @@ function GeneralJournalLedger() {
 				)
 			case 10:
 				return <Box component={'div'} className='pdf-hide'
-					onClick={  () => {
-							setValue('search', item?.series_id + item?.journal_id);
-							handleFilter({ search: item?.series_id + item?.journal_id })
-						}}
+					onClick={() => {
+						setValue('search', item?.series_id + item?.journal_id);
+						handleFilter({ search: item?.journal_id })
+					}}
 				>
 					<IconButton
 						sx={{
@@ -393,36 +393,57 @@ function GeneralJournalLedger() {
 		// Define headers and data separately
 		const headers = tableHead.filter((item) => item !== "Action");
 		const data = generalJournalAccounts;
+	  
+		let totalDebit = 0;
+		let totalCredit = 0;
+	  
 		// Extract values from objects and create an array for each row
-		const rows = data.map((item, index) => [
+		const rows = data.map((item, index) => {
+		  const debit = parseFloat(item?.debit || 0);
+		  const credit = parseFloat(item?.credit || 0);
+		  totalDebit += debit;
+		  totalCredit += credit;
+	  
+		  return [
 			item?.journal_id ? item?.series_id + item?.journal_id : "-",
 			moment(item?.created_at).format("MM-DD-YYYY") ?? "-",
-			item.entry?.reference_no,
+			item.entry?.reference_no ?? "-",
 			item?.type?.type_name ?? "-",
 			item?.account?.account_code ?? "-",
 			item?.account?.name ?? "-",
-			parseFloat(item?.debit).toFixed(2) ?? "0.00",
-			parseFloat(item?.credit).toFixed(2) ?? "0.00",
+			debit.toFixed(2),
+			credit.toFixed(2),
 			item?.description ?? "-",
 			item?.comment ?? "-"
-		]);
-
-		// Create a workbook with a worksheet
+		  ];
+		});
+	  
+		// Add totals row (place "Total" label in the appropriate column)
+		const totalRow = [
+		  "Total", "", "", "", "", "",
+		  totalDebit.toFixed(2),
+		  totalCredit.toFixed(2),
+		  "", ""
+		];
+		rows.push(totalRow);
+	  
+		// Create the worksheet and workbook
 		const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
 		const wb = XLSX.utils.book_new();
 		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
+	  
 		// Convert the workbook to an array buffer
 		const buf = XLSX.write(wb, {
-			bookType: "xlsx",
-			type: "array",
-			mimeType:
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		  bookType: "xlsx",
+		  type: "array",
+		  mimeType:
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		});
-
-		// Save the file using FileSaver.js
+	  
+		// Save the file
 		saveAs(new Blob([buf]), "data.xlsx");
-	};
+	  };
+	  
 
 	useEffect(() => {
 		getGeneralJournalLedgers()
@@ -453,6 +474,18 @@ function GeneralJournalLedger() {
 				>
 					General Journal Entries
 				</Typography>
+				{generalJournalAccounts?.length > 0 && (
+					<Box sx={{
+						textAlign: "right", p: 4, display: "flex", gap: 2
+
+					}}>
+
+						<PrimaryButton
+							title={"Download Excel"}
+							onClick={() => downloadExcel()}
+						/>
+					</Box>
+				)}
 				{/* {generalJournalAccounts?.length > 0 && (
 					<Box sx={{
 						textAlign: "right", p: 4, display: "flex", gap: 2

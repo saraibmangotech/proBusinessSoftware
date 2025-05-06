@@ -817,7 +817,7 @@ function CustomerLedgers() {
             <Box >
 
                <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
-                <CSVLink
+               {customerQueue?.length > 0 &&  <CSVLink
                     data={prepareCSVData(customerQueue)}
                     headers={headers}
                     filename="journal_entries.csv"
@@ -840,7 +840,7 @@ function CustomerLedgers() {
                 >
                     Export to Excel
                 </Button>
-                </CSVLink>
+                </CSVLink>}
                 </Box>
                 {customerQueue?.length > 0 && (
                     <Fragment>

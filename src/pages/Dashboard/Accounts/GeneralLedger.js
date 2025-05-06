@@ -255,40 +255,57 @@ function GeneralLedger() {
   };
 
   const downloadExcel = () => {
-    // Define headers and data separately
     const headers = tableHead.filter((item) => item !== "Action");
     const data = accountLedgers;
-    // Extract values from objects and create an array for each row
+  
+    let totalDebit = 0;
+    let totalCredit = 0;
+    let totalBalance = 0;
+  
     const rows = data.map((item, index) => {
+      const debit = parseFloat(item?.debit || 0);
+      const credit = parseFloat(item?.credit || 0);
+      const balance = Balance || 0; // Assuming `Balance` is a global or calculated value
+  
+      totalDebit += debit;
+      totalCredit += credit;
+      totalBalance += balance;
+  
       return [
         item?.created_at ? moment(item?.created_at).format("MM-DD-YYYY") : "-",
         item?.journal_id ? item?.series_id + item?.journal_id : "-",
         item?.entry?.reference_no ?? "-",
         item?.type?.type_name ?? "-",
-        item?.description ?? '-',
+        item?.description ?? "-",
         item?.comment ?? "-",
-        parseFloat(item?.debit).toFixed(2),
-        parseFloat(item?.credit).toFixed(2),
-        Balance?.toFixed(2)
-      ]
+        debit.toFixed(2),
+        credit.toFixed(2),
+        balance.toFixed(2)
+      ];
     });
-
-    // Create a workbook with a worksheet
+  
+    // Append totals row
+    const totalRow = [
+      "Total", "", "", "", "", "", 
+      totalDebit.toFixed(2),
+      totalCredit.toFixed(2),
+      totalBalance.toFixed(2)
+    ];
+    rows.push(totalRow);
+  
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-    // Convert the workbook to an array buffer
+  
     const buf = XLSX.write(wb, {
       bookType: "xlsx",
       type: "array",
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-
-    // Save the file using FileSaver.js
+  
     saveAs(new Blob([buf]), "data.xlsx");
   };
+  
 
   useEffect(() => {
     getAccountsDropDown();
@@ -319,12 +336,7 @@ function GeneralLedger() {
             textAlign: "right", p: 4, display: "flex", gap: 2
 
           }}>
-            <PrimaryButton
-              title="Download PDF"
-              type="button"
-              style={{ backgroundColor: Colors.bluishCyan }}
-              onClick={() => handleExportWithComponent(contentRef)}
-            />
+          
             <PrimaryButton
               title={"Download Excel"}
               onClick={() => downloadExcel()}
