@@ -951,7 +951,7 @@ function UpdatePreSale() {
                                                 <InputField
                                                     size="small"
                                                     placeholder="Transaction Id"
-
+                                                    disabled={!!getValues("transaction_id")}
                                                     register={register("transaction_id", { 
                                                         required: settings?.required_trans_id ? 'Transaction id is required' : false,
                                                       })}

@@ -1098,6 +1098,7 @@ function CreatePaidReceipt() {
                           <TextField
                             size="small"
                             placeholder="Transaction Id"
+                            disabled={item.transaction_id ? true : false}
                             type="number"
                             value={item.transaction_id || ""}
                             onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
