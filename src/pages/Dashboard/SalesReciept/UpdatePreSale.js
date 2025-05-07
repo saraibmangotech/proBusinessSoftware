@@ -148,8 +148,8 @@ function UpdatePreSale() {
         setRows((prevRows) => {
           // If not the first row, enforce that all sales_ids must match
           if (prevRows.length > 0) {
-            const existingSalesId = prevRows[0].sales_id;
-      
+            const existingSalesId = prevRows[0].sales_id ?  prevRows[0].sales_id  : prevRows[0].service.sales_account_id;
+            console.log(prevRows,"prev")
             if (existingSalesId !== newSalesId) {
               showErrorToast("Only items with the same sales account ID can be added.");
               return prevRows; // Don't add if sales_id is different
@@ -190,8 +190,8 @@ function UpdatePreSale() {
           console.log("Previous rows:", prevItems);
       
           // Get the existing sales_id from the list (any one is enough)
-          const existingSalesId = prevItems.length > 0 ? prevItems[0].sales_id : null;
-      
+          const existingSalesId = prevItems.length > 0 ?  prevItems[0].service.sales_id ? prevItems[0].service.sales_id  : prevItems[0].service.sales_account_id : null;
+            console.log(existingSalesId,"existing")
           // Check if the updated item has a different sales_id
           if (existingSalesId && existingSalesId !== updatedSalesId) {
             showErrorToast("You can only update with the same sales account ID.");
@@ -217,6 +217,7 @@ function UpdatePreSale() {
           setSubTotal(parseFloat(newSubTotal.toFixed(2)));
           return updatedRows;
         });
+       
       
         console.log("Resetting form and states...");
         reset();
