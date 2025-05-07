@@ -188,7 +188,9 @@ function UpadateJournalVoucher() {
       setVoucherDetail(data.voucher)
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
-        name: ` ${account?.account?.account_code} ${account?.account?.name}`
+        name: ` ${account?.account?.account_code} ${account?.account?.name}`,
+        unique_id: Date.now() + Math.random(), // Ensure unique key
+
       }));
       console.log(updatedAccounts,'updatedAccounts');
       

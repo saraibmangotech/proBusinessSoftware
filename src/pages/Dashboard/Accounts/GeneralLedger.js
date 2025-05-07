@@ -40,6 +40,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { PDFExport } from "@progress/kendo-react-pdf";
 import { showErrorToast } from "components/NewToaster";
+import { logDOM } from "@testing-library/react";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -263,13 +264,15 @@ function GeneralLedger() {
     let totalBalance = 0;
   
     const rows = data.map((item, index) => {
+      console.log(item,'itemitem');
+      
       const debit = parseFloat(item?.debit || 0);
       const credit = parseFloat(item?.credit || 0);
-      const balance = Balance || 0; // Assuming `Balance` is a global or calculated value
+      const balance = item?.account?.nature == 'debit' ? parseFloat(item?.debit || 0) - parseFloat(item?.credit || 0) : parseFloat(item?.credit || 0) - parseFloat(item?.debit || 0)   || 0; // Assuming `Balance` is a global or calculated value
   
       totalDebit += debit;
       totalCredit += credit;
-      totalBalance += balance;
+     
   
       return [
         item?.created_at ? moment(item?.created_at).format("MM-DD-YYYY") : "-",
@@ -289,7 +292,7 @@ function GeneralLedger() {
       "Total", "", "", "", "", "", 
       totalDebit.toFixed(2),
       totalCredit.toFixed(2),
-      totalBalance.toFixed(2)
+     
     ];
     rows.push(totalRow);
   
