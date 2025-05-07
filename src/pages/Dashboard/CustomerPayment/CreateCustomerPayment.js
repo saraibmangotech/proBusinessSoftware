@@ -208,6 +208,8 @@ function CreateCustomerPayment() {
         console.log(formData, "objobjj")
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
         const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
+        console.log(payments, 'paymentspayments');
+
         const totalAdditionalCharges = payments.reduce((sum, p) => sum + parseFloat(p.additional_charges_value || 0), 0);
         console.log(paymentModesString); // Output: "Cash, Bank, Card"
         getValues1('total')
@@ -628,7 +630,7 @@ function CreateCustomerPayment() {
             return;
         }
 
-        if ((mode === "Bank" || mode === "Card") && (!percentage || isNaN(percentage))) {
+        if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
             showErrorToast("Percentage is required for Bank/Card mode");
             return;
         }
@@ -647,8 +649,8 @@ function CreateCustomerPayment() {
             ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
             ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
             auth_code: mode === "Card" ? code : null,
-            additional_charges_percentage: mode === "Bank" || mode === "Card" ? parseFloat(percentage) : null,
-            additional_charges_value: mode === "Bank" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
+            additional_charges_percentage: mode === "Payment Link" || mode === "Card" ? parseFloat(percentage) : null,
+            additional_charges_value: mode === "Payment Link" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
         };
 
         setPayments((prev) => [...prev, paymentObj]);
@@ -998,7 +1000,7 @@ function CreateCustomerPayment() {
                                         </Grid>
                                         <Grid container spacing={3}>
                                             <Grid item md={3.8} sm={12} xs={12}>
-                                            <InputField
+                                                <InputField
                                                     label="Amount"
                                                     size="small"
                                                     placeholder="Amount"
@@ -1035,10 +1037,10 @@ function CreateCustomerPayment() {
                                                             console.log(value?.id, 'value?.id');
 
                                                             setValue1('percentage', 1);
-                                                            const percentageValue = parseFloat( 1|| 0);
+                                                            const percentageValue = parseFloat(1 || 0);
                                                             const amount = parseFloat(getValues1("payamount") || 0);
                                                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
-                                
+
                                                             setValue1("additionalCharges", additionalCharge);
 
                                                         } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
@@ -1047,7 +1049,7 @@ function CreateCustomerPayment() {
                                                             const percentageValue = parseFloat(1.35 || 0);
                                                             const amount = parseFloat(getValues1("payamount") || 0);
                                                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
-                                
+
                                                             setValue1("additionalCharges", additionalCharge);
                                                         }
                                                     }}
@@ -1174,7 +1176,7 @@ function CreateCustomerPayment() {
 
                                             <Grid container mt={2} p={2}>
                                                 <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2, width: '100%' }}>
-                                                    {payments.map((payment, index) => (
+                                                    {payments?.map((payment, index) => (
                                                         <Box
                                                             key={index}
                                                             sx={{

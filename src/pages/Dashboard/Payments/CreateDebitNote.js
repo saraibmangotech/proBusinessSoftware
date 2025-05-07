@@ -17,6 +17,8 @@ const CreateDebitNote = () => {
     // *For Customer Booking
     const [customers, setCustomers] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     const navigate = useNavigate()
     const getReceptionDetail = (isSearchClicked) => {
         console.log("Reception detail clicked:", isSearchClicked);
@@ -35,7 +37,8 @@ const CreateDebitNote = () => {
                 reason: formData?.notes,
                 amount: formData?.totalCreditAmount,
                 tax_amount: formData?.Vat,
-                total_amount: formData?.totalAmount
+                total_amount: formData?.totalAmount,
+                cost_center:selectedCostCenter?.name
             }
 
             const promise = CustomerServices.CreateNote(obj);
@@ -74,24 +77,38 @@ const CreateDebitNote = () => {
 
     const getTokenNumber = async () => {
         try {
+            let params = {
+                page: 1,
+                limit: 1000,
+                type: 'debit_note'
+            };
+
+            const { data } = await CustomerServices.getCreditDebitToken(params);
+            console.log(data);
+            setValue('creditNoteNumber', data?.voucherNumber)
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+    const getCostCenters = async () => {
+        try {
           let params = {
             page: 1,
             limit: 1000,
-            type: 'debit_note'
           };
     
-          const { data } = await CustomerServices.getCreditDebitToken(params);
-          console.log(data);
-          setValue('creditNoteNumber', data?.voucherNumber)
-    
+          const { data } = await CustomerServices.getCostCenters(params);
+          setCostCenters(data?.cost_centers);
         } catch (error) {
           showErrorToast(error);
         }
       };
-      useEffect(() => {
+    useEffect(() => {
         getTokenNumber()
         getCustomerQueue();
-      }, []);
+        getCostCenters()
+    }, []);
 
     return (
         <Box p={3} component={'form'} onSubmit={handleSubmit(onSubmit)}>
@@ -145,7 +162,7 @@ const CreateDebitNote = () => {
                 {/* Customer Information */}
                 <Grid item xs={12} md={6}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                        <Grid item xs={6}>
                             <SelectField
                                 size="small"
                                 label="Select Vendor"
@@ -161,7 +178,20 @@ const CreateDebitNote = () => {
                                 error={errors?.vendor?.message}
                             />
                         </Grid>
+                        <Grid item xs={6}>
+                            <SelectField
+                                size="small"
+                                label="Select Cost Center"
+                                options={costCenters}
+                                selected={selectedCostCenter}
+                                onSelect={(value) => {
+                                    setSelectedCostCenter(value)
 
+                                }}
+                                register={register("costcenter", { required: "costcenter is required" })}
+                                error={errors?.costcenter?.message}
+                            />
+                        </Grid>
                         <Grid item xs={12} md={4}>
                             <InputField
                                 label="Name"

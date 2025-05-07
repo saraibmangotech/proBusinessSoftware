@@ -221,7 +221,7 @@ function CreatePaidReceipt() {
           items: rows,
           paid_date: paidAt || new Date(),
           paid_amount: detail?.amount,
-  
+
           remarks: formData?.remarks,
           narration: formData?.narration,
           payment_mode: paymentModesString,
@@ -229,7 +229,7 @@ function CreatePaidReceipt() {
           charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.center_fee || 0), 0),
           govt_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.govt_fee || 0), 0),
           bank_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.bank_charge || 0), 0),
-          additional_charges_value:totalAdditionalCharges,
+          additional_charges_value: totalAdditionalCharges,
 
           customer_id: detail?.customer_id,
           invoice_prefix: detail?.invoice_prefix,
@@ -600,7 +600,7 @@ function CreatePaidReceipt() {
       return;
     }
 
-    if ((mode === "Bank" || mode === "Card") && (!percentage || isNaN(percentage))) {
+    if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
       showErrorToast("Percentage is required for Bank/Card mode");
       return;
     }
@@ -619,8 +619,8 @@ function CreatePaidReceipt() {
       ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
       ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
       auth_code: mode === "Card" ? code : null,
-      additional_charges_percentage: mode === "Bank" || mode === "Card" ? parseFloat(percentage) : null,
-      additional_charges_value: mode === "Bank" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
+      additional_charges_percentage: mode === "Payment Link" || mode === "Card" ? parseFloat(percentage) : null,
+      additional_charges_value: mode === "Payment Link" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
     };
 
     setPayments((prev) => [...prev, paymentObj]);
@@ -1385,7 +1385,7 @@ function CreatePaidReceipt() {
                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                             setValue1("additionalCharges", additionalCharge);
-                            
+
                           } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
                             value?.id === 'Payment Link') {
                             setValue1('percentage', 1.35);
@@ -1488,7 +1488,7 @@ function CreatePaidReceipt() {
 
                     <Grid item md={12} sm={12} xs={12}>
                       <Button
-                        onClick={() =>   addPayments(
+                        onClick={() => addPayments(
                           getValues1("payamount"),
                           selectedMode?.id,
                           selectedBank,
@@ -1496,7 +1496,7 @@ function CreatePaidReceipt() {
                           getValues1("remarks"),
                           getValues1("percentage"),
                           getValues1("additionalCharges")
-                      )}
+                        )}
 
                         variant="contained"
                         sx={{

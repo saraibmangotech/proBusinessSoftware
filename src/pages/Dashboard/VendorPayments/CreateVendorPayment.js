@@ -592,7 +592,7 @@ function CreateVendorPayment() {
             return;
         }
 
-        if ((mode === "Bank" || mode === "Card") && (!percentage || isNaN(percentage))) {
+        if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
             showErrorToast("Percentage is required for Bank/Card mode");
             return;
         }

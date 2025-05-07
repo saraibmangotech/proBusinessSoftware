@@ -174,6 +174,10 @@ const CustomerServices = {
     const data = await get(routes.getAgents, params);
     return data;
   },
+  getCostCenters: async (params) => {
+    const data = await get(routes.getCostCenters, params);
+    return data;
+  },
   getVouchers: async (params) => {
     const data = await get(routes.getVouchers, params);
     return data;

@@ -13,6 +13,8 @@ const CreateCreditNote = () => {
   const { register, setValue, formState: { errors }, handleSubmit } = useForm();
   const [fieldsDisabled, setFieldsDisabled] = useState(false);
   const [date, setDate] = useState(null);
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const navigate = useNavigate()
   // *For Customer Booking
   const [customers, setCustomers] = useState([]);
@@ -35,7 +37,8 @@ const CreateCreditNote = () => {
         reason: formData?.notes,
         amount: formData?.totalCreditAmount,
         tax_amount: formData?.Vat,
-        total_amount: formData?.totalAmount
+        total_amount: formData?.totalAmount,
+        cost_center:selectedCostCenter?.name
       }
 
       const promise = CustomerServices.CreateNote(obj);
@@ -71,6 +74,20 @@ const CreateCreditNote = () => {
       showErrorToast(error);
     }
   };
+
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters(data?.cost_centers);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
   const getTokenNumber = async () => {
     try {
       let params = {
@@ -90,6 +107,7 @@ const CreateCreditNote = () => {
   useEffect(() => {
     getTokenNumber()
     getCustomerQueue();
+    getCostCenters()
   }, []);
 
   return (
@@ -144,7 +162,7 @@ const CreateCreditNote = () => {
         {/* Customer Information */}
         <Grid item xs={12} md={6}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <SelectField
                 size="small"
                 label="Select Customer"
@@ -160,7 +178,20 @@ const CreateCreditNote = () => {
                 error={errors?.customer?.message}
               />
             </Grid>
-
+            <Grid item xs={6}>
+              <SelectField
+                size="small"
+                label="Select Cost Center"
+                options={costCenters}
+                selected={selectedCostCenter}
+                onSelect={(value) => {
+                  setSelectedCostCenter(value)
+                  
+                }}
+                register={register("costcenter", { required: "costcenter is required" })}
+                error={errors?.costcenter?.message}
+              />
+            </Grid>
             <Grid item xs={12} md={4}>
               <InputField
                 label="Name"

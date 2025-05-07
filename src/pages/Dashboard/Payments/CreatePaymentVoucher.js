@@ -132,6 +132,8 @@ function CreatePaymentVoucher() {
     const [selectedCard, setSelectedCard] = useState(null)
     const [banks, setBanks] = useState([])
     const [selectedBank, setSelectedBank] = useState(null)
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
     // *For Total of Credit & Debit
     let TotalDebit = 0
@@ -164,6 +166,19 @@ function CreatePaymentVoucher() {
             showErrorToast(error);
         }
     };
+    const getCostCenters = async () => {
+        try {
+          let params = {
+            page: 1,
+            limit: 1000,
+          };
+    
+          const { data } = await CustomerServices.getCostCenters(params);
+          setCostCenters(data?.cost_centers);
+        } catch (error) {
+          showErrorToast(error);
+        }
+      };
 
     // *For Get Sub Categories
     const getSubCategories = async (id) => {
@@ -292,7 +307,8 @@ function CreatePaymentVoucher() {
                 description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
-                payment_method: 'Account'
+                payment_method: 'Account',
+                cost_center:selectedCostCenter?.name
             }
 
             console.log(obj, 'objobj');
@@ -337,6 +353,7 @@ function CreatePaymentVoucher() {
     useEffect(() => {
         getTokenNumber()
         getAccountBySubCategory()
+        getCostCenters()
     }, []);
     const addItem = (description, amount) => {
         // Basic Validations
@@ -487,6 +504,21 @@ function CreatePaymentVoucher() {
                             register={register1("Voucher")}
                         />
                     </Grid>
+                    <Grid item xs={3}>
+                        <SelectField
+                            size="small"
+                            label="Select Cost Center"
+                            options={costCenters}
+                            selected={selectedCostCenter}
+                            onSelect={(value) => {
+                                setSelectedCostCenter(value)
+
+                            }}
+                            register={register("costcenter", { required: "costcenter is required" })}
+                            error={errors?.costcenter?.message}
+                        />
+                    </Grid>
+
                 </Grid>
 
 

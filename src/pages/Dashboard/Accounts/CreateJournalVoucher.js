@@ -17,6 +17,7 @@ import { getYearMonthDateFormate } from "utils";
 import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
+import CustomerServices from "services/Customer";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -125,6 +126,9 @@ function CreateJournalVoucher() {
   const [totalCredit, setTotalCredit] = useState(0)
   const [totalDebit, setTotalDebit] = useState(0)
 
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+
   // *For Total of Credit & Debit
   let TotalDebit = 0
   let TotalCredit = 0
@@ -188,7 +192,19 @@ function CreateJournalVoucher() {
       showErrorToast(error)
     }
   }
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
 
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters(data?.cost_centers);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
   // *For Get Account
   const getAccounts = async (search, accountId) => {
     try {
@@ -223,6 +239,7 @@ function CreateJournalVoucher() {
         credit: formData?.credit ? formData?.credit : 0,
         description: formData?.description,
         currency: selectedAccount?.currency,
+        cost_center:selectedCostCenter?.name
 
       }
       voucherCopy.push(obj)
@@ -345,6 +362,7 @@ function CreateJournalVoucher() {
     getSubCategories()
     setFromDate(new Date())
     getJournalVouchers()
+    getCostCenters()
   }, []);
 
   return (
@@ -375,6 +393,20 @@ function CreateJournalVoucher() {
               register={register1("Journal")}
             />
           </Grid>
+          <Grid item xs={3}>
+              <SelectField
+                size="small"
+                label="Select Cost Center"
+                options={costCenters}
+                selected={selectedCostCenter}
+                onSelect={(value) => {
+                  setSelectedCostCenter(value)
+                  
+                }}
+                register={register1("costcenter", { required: "costcenter is required" })}
+                error={errors?.costcenter?.message}
+              />
+            </Grid>
         </Grid>
 
 

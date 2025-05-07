@@ -124,7 +124,8 @@ const routes = {
   UpdatePurchaseInvoice:'/purchases/invoice/update',
   getPaymentInvoices:'/purchases/invoice/payments',
   getInvoicesPayments:'/purchases/invoice/specific/payments',
-  getInvoiceNumberToken:'/purchases/invoice/number'
+  getInvoiceNumberToken:'/purchases/invoice/number',
+  getCostCenters:'system/costCenters'
 
 };
 

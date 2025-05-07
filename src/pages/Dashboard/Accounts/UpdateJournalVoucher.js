@@ -17,6 +17,7 @@ import { getYearMonthDateFormate } from "utils";
 import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
+import CustomerServices from "services/Customer";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -73,7 +74,7 @@ const Cell = styled(TableCell)(({ theme }) => ({
 
 
 function UpadateJournalVoucher() {
-    const {id}=useParams()
+  const { id } = useParams()
   const [handleBlockedNavigation] =
     useCallbackPrompt(false)
   const navigate = useNavigate();
@@ -126,6 +127,8 @@ function UpadateJournalVoucher() {
   const [totalCredit, setTotalCredit] = useState(0)
   const [totalDebit, setTotalDebit] = useState(0)
   const [voucherDetail, setVoucherDetail] = useState(null)
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
   // *For Total of Credit & Debit
   let TotalDebit = 0
@@ -153,7 +156,7 @@ function UpadateJournalVoucher() {
       const { data } = await FinanceServices.getJournalVouchers(params);
       console.log(data);
       setJournalData(data)
-     
+
     } catch (error) {
       showErrorToast(error);
     }
@@ -177,8 +180,8 @@ function UpadateJournalVoucher() {
       showErrorToast(error)
     }
   }
-   // *For Get Journal Voucher Detail
-   const getJournalVoucherDetail = async () => {
+  // *For Get Journal Voucher Detail
+  const getJournalVoucherDetail = async () => {
 
     try {
       let params = {
@@ -192,14 +195,14 @@ function UpadateJournalVoucher() {
         unique_id: Date.now() + Math.random(), // Ensure unique key
 
       }));
-      console.log(updatedAccounts,'updatedAccounts');
-      
+      console.log(updatedAccounts, 'updatedAccounts');
+
       setRows(updatedAccounts)
-       setValue1('Journal', `JV-${data?.voucher?.entries[0]?.jv_id}`)
-       setValue('note',data?.voucher?.notes)
+      setValue1('Journal', `JV-${data?.voucher?.entries[0]?.jv_id}`)
+      setValue('note', data?.voucher?.notes)
       const newTotalCredit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
       const newTotalDebit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
-  
+
       setTotalCredit(newTotalCredit);
       setTotalDebit(newTotalDebit);
     } catch (error) {
@@ -249,6 +252,19 @@ function UpadateJournalVoucher() {
       showErrorToast(error)
     }
   }
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters(data?.cost_centers);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
 
   // *For Add Single Journal Voucher
   const addVoucher = async (formData) => {
@@ -310,9 +326,9 @@ function UpadateJournalVoucher() {
   const UpadateJournalVoucher = async (formData) => {
     setLoading(true)
     try {
-     
+
       let obj = {
-        id:id,
+        id: id,
         total: totalDebit,
         notes: getValues('note'),
         entries: rows,
@@ -346,13 +362,13 @@ function UpadateJournalVoucher() {
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
-  
+
     // Check if both debit and credit are 0
     if (debit === 0 && credit === 0) {
       showErrorToast('Either Debit or Credit must be greater than 0');
       return;
     }
-  
+
     setRows((prevRows) => {
       const newRow = {
         ...data,
@@ -360,24 +376,24 @@ function UpadateJournalVoucher() {
         account_id: selectedAccount?.id,
         name: selectedAccount?.name,
       };
-  
+
       const updatedRows = [...prevRows, newRow];
-  
+
       const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
       const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
-  
+
       setTotalCredit(newTotalCredit);
       setTotalDebit(newTotalDebit);
       setIsCreditDisabled(false);
       setIsDebitDisabled(false);
-  
+
       return updatedRows;
     });
-  
+
     setSelectedAccount(null);
     reset();
   };
-  
+
 
   useEffect(() => {
     getAccounts()
@@ -385,6 +401,7 @@ function UpadateJournalVoucher() {
     getSubCategories()
     setFromDate(new Date())
     getJournalVouchers()
+    getCostCenters()
   }, []);
 
   return (
@@ -415,11 +432,25 @@ function UpadateJournalVoucher() {
               register={register1("Journal")}
             />
           </Grid>
+          <Grid item xs={3}>
+            <SelectField
+              size="small"
+              label="Select Cost Center"
+              options={costCenters}
+              selected={selectedCostCenter}
+              onSelect={(value) => {
+                setSelectedCostCenter(value)
+
+              }}
+              register={register1("costcenter", { required: "costcenter is required" })}
+              error={errors?.costcenter?.message}
+            />
+          </Grid>
         </Grid>
 
 
 
-      
+
       </Box>
 
 
@@ -487,7 +518,7 @@ function UpadateJournalVoucher() {
                     size="small"
                     placeholder="Credit"
                     type="number"
-                       step='any'
+                    step='any'
                     disabled={isCreditDisabled}
                     register={register("credit", {
                       required: "Credit is required",
