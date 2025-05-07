@@ -219,7 +219,7 @@ function CreatePaidReceipt() {
           id: getValues1("invoicenumber"),
           total_amount: detail?.total_amount,
           items: rows,
-          paid_date: paidAt || new Date(),
+          paid_date: moment(paidAt).format('MM-DD-YYYY'),
           paid_amount: detail?.amount,
 
           remarks: formData?.remarks,
@@ -686,7 +686,7 @@ function CreatePaidReceipt() {
     try {
       const params = {
         token_number: getValues1("token"),
-        invoice_date: date,
+        invoice_date: moment(date).format('MM-DD-YYYY'),
       }
 
       if (!params.token_number) {

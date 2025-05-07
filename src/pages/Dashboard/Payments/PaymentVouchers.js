@@ -278,6 +278,13 @@ function PaymentVouchers() {
 
         },
         {
+            header: "Cost Center",
+            accessorKey: "cost_center",
+
+
+
+        },
+        {
             header: "Payment Mode",
             accessorKey: "payment_mode",
 

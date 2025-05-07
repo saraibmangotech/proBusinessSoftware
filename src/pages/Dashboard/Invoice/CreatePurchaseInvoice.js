@@ -383,7 +383,7 @@ function CreatePurchaseInvoice() {
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     items: rows,
-                    purchase_date: date || new Date(),
+                    purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
                     invoice_prefix: formData?.invoicePrefix,

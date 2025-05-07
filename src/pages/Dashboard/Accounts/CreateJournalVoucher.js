@@ -18,6 +18,7 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
 import CustomerServices from "services/Customer";
+import moment from "moment";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -293,7 +294,7 @@ function CreateJournalVoucher() {
         total: totalDebit,
         notes: getValues('note'),
         entries: rows,
-        created_at: getYearMonthDateFormate(fromDate)
+        created_at: moment(fromDate).format('MM-DD-YYYY')
       }
 
 
@@ -404,7 +405,7 @@ function CreateJournalVoucher() {
                   
                 }}
                 register={register1("costcenter", { required: "costcenter is required" })}
-                error={errors?.costcenter?.message}
+                error={errors1?.costcenter?.message}
               />
             </Grid>
         </Grid>

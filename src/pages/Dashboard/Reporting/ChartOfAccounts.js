@@ -11,11 +11,15 @@ import { useForm } from 'react-hook-form';
 import FinanceServices from 'services/Finance';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { PrimaryButton } from 'components/Buttons';
+import SearchIcon from "@mui/icons-material/Search";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { handleExportWithComponent } from 'utils';
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
+import SelectField from 'components/Select';
+import CustomerServices from 'services/Customer';
+import { showErrorToast } from 'components/NewToaster';
 
 // *For Table Style
 // *For Table Style
@@ -94,7 +98,7 @@ function ChartOfAccount() {
     const navigate = useNavigate();
     const contentRef = useRef(null);
     const [childFilter, setChildFilter] = useState('');
-   
+
     const { register } = useForm();
 
     const tableHead = ['Code', 'Name', 'Major Category', 'Sub Category', 'Balance (AED)', 'Actions']
@@ -104,6 +108,9 @@ function ChartOfAccount() {
     // *For Chart of Account
     const [chartOfAccount, setChartOfAccount] = useState();
     const [filteredCOA, setFilteredCOA] = useState();
+
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
     // *For Filters
     const [filters, setFilters] = useState('all');
@@ -117,8 +124,11 @@ function ChartOfAccount() {
     // *For Get Chart Account
     const getChartOfAccount = async (filter) => {
         try {
-              const { data } = await FinanceServices.getChartOfAccount()
-              console.log(data);
+            let params={
+                cost_center:selectedCostCenter?.name
+            }
+            const { data } = await FinanceServices.getChartOfAccount(params)
+            console.log(data);
             setChartOfAccount(data?.COA)
             setFilteredCOA(data?.COA)
 
@@ -136,6 +146,20 @@ function ChartOfAccount() {
 
         }
     }
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 1000,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
 
     // *For Handle Filter
     const handleFilter = (event, newValue, child) => {
@@ -360,7 +384,7 @@ function ChartOfAccount() {
 
     useEffect(() => {
         getChartOfAccount()
-
+        getCostCenters()
     }, []);
 
     return (
@@ -379,7 +403,36 @@ function ChartOfAccount() {
                 </Typography>
 
             </Box>
+            <Grid container spacing={2}> 
 
+
+                <Grid item xs={3}>
+                    <SelectField
+                        size="small"
+                        label="Select Cost Center"
+                        options={costCenters}
+                        selected={selectedCostCenter}
+                        onSelect={(value) => {
+                            setSelectedCostCenter(value)
+
+                        }}
+                        register={register("costcenter", { required: "costcenter is required" })}
+
+                    />
+                </Grid>
+                <Grid item xs={3} mt={'30px'}>
+
+                    <PrimaryButton
+                        bgcolor={"#bd9b4a"}
+                        icon={<SearchIcon />}
+                        title="Search"
+                        sx={{ marginTop: "30px" }}
+                        onClick={() => getChartOfAccount(null, null, null)}
+                    
+                    />
+
+                </Grid>
+            </Grid>
             {/* Filters */}
             {/* <Grid container spacing={1}>
         <Grid item xs={12} sm={3}>

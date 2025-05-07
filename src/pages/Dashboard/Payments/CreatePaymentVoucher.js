@@ -19,6 +19,7 @@ import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
 import CustomerServices from "services/Customer";
 import DeleteIcon from '@mui/icons-material/Delete';
+import moment from "moment";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -298,7 +299,7 @@ function CreatePaymentVoucher() {
         try {
 
             let obj = {
-                date: fromDate,
+                date: moment(fromDate).format('MM-DD-YYYY'),
                 type: "payment_voucher",    // or "receipt_voucher"
 
                 amount: total,

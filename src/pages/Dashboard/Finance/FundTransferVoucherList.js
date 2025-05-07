@@ -367,6 +367,13 @@ function PreSalesList() {
       accessorKey: "id",
     },
     {
+      header: "Cost Center",
+      accessorKey: "cost_center",
+
+
+
+  },
+    {
       header: "From Account",
       accessorKey: "from_account",
       accessorFn: (row) => row?.from_account?.name || ""

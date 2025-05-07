@@ -278,6 +278,7 @@ function UpadateJournalVoucher() {
         credit: formData?.credit ? formData?.credit : 0,
         description: formData?.description,
         currency: selectedAccount?.currency,
+        cost_center:selectedCostCenter?.name
 
       }
       voucherCopy.push(obj)
@@ -443,7 +444,7 @@ function UpadateJournalVoucher() {
 
               }}
               register={register1("costcenter", { required: "costcenter is required" })}
-              error={errors?.costcenter?.message}
+              error={errors1?.costcenter?.message}
             />
           </Grid>
         </Grid>

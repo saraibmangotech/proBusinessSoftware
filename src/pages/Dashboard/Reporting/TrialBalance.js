@@ -25,6 +25,7 @@ import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import SearchIcon from "@mui/icons-material/Search";
 import FinanceServices from "services/Finance";
 import Highlighter from "react-highlight-words";
 import InputField from "components/Input";
@@ -35,6 +36,10 @@ import { saveAs } from "file-saver";
 import { CommaSeparator, handleExportWithComponent } from "utils";
 import { PDFExport } from "@progress/kendo-react-pdf";
 import moment from "moment";
+import SelectField from "components/Select";
+import DatePicker from "components/DatePicker";
+import CustomerServices from "services/Customer";
+import { showErrorToast } from "components/NewToaster";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -127,6 +132,9 @@ function TrialBalance() {
 
     const [textValue, setTextValue] = useState("");
 
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+
     // *For Filters
     const [filters, setFilters] = useState("all");
     const [filterData, setFilterData] = useState();
@@ -135,15 +143,25 @@ function TrialBalance() {
     const [allDebit, setAllDebit] = useState(0)
     const [allCredit, setAllCredit] = useState(0)
 
+    const [fromDate, setFromDate] = useState(null)
+    const [toDate, setToDate] = useState(null)
+
     // *For Collapse
     const [expand, setExpand] = useState([]);
+
+
 
     let TotalEquity = 0;
 
     // *For Get Balance Sheet
     const getBalanceSheet = async (filter) => {
         try {
-            const { data } = await FinanceServices.getAccountReports();
+            let params={
+                cost_center:selectedCostCenter?.name,
+                from_date:moment(fromDate).format('MM-DD-YYYY'),
+                to_date:moment(toDate).format('MM-DD-YYYY'),
+            }
+            const { data } = await FinanceServices.getAccountReports(params);
             setBalanceSheet(data?.detail);
             setFilteredBalanceSheet(data?.detail);
             console.log(data?.detail, "data?.detail");
@@ -166,10 +184,10 @@ function TrialBalance() {
                         const credit = parseFloat(account.total_credit) || 0;
                         const debit = parseFloat(account.total_debit) || 0;
 
-                        if (account.nature === 'debit' ) {
+                        if (account.nature === 'debit') {
                             totalDebit += debit - credit;
 
-                        } else if(account.nature === 'credit') {
+                        } else if (account.nature === 'credit') {
                             totalCredit += credit - debit;
                         }
 
@@ -437,13 +455,104 @@ function TrialBalance() {
 
         saveAs(new Blob([buf]), "data.xlsx");
     };
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+        const getCostCenters = async () => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 1000,
+                };
+    
+                const { data } = await CustomerServices.getCostCenters(params);
+                setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+
+            } catch (error) {
+                showErrorToast(error);
+            }
+        };
+    
 
     useEffect(() => {
+        getCostCenters()
         getBalanceSheet();
     }, []);
 
     return (
         <Box sx={{ m: 4, mb: 2 }}>
+            <Grid container spacing={2}>
+
+
+                <Grid item xs={3}>
+                    <SelectField
+                        size="small"
+                        label="Select Cost Center"
+                        options={costCenters}
+                        selected={selectedCostCenter}
+                        onSelect={(value) => {
+                            setSelectedCostCenter(value)
+
+                        }}
+                        register={register("costcenter", { required: "costcenter is required" })}
+
+                    />
+                </Grid>
+                <Grid item xs={3}>
+                    <DatePicker
+                        label={"From Date"}
+                        disableFuture={true}
+                        size="small"
+                        value={fromDate}
+                        onChange={(date) => handleFromDate(date)}
+                    />
+                </Grid>
+                <Grid item xs={3}>
+                    <DatePicker
+                        label={"To Date"}
+
+                        disableFuture={true}
+                        size="small"
+                        value={toDate}
+                        onChange={(date) => handleToDate(date)}
+                    />
+                </Grid>
+                <Grid item xs={3} mt={'30px'}>
+
+                    <PrimaryButton
+                        bgcolor={"#bd9b4a"}
+                        icon={<SearchIcon />}
+                        title="Search"
+                        sx={{ marginTop: "30px" }}
+                        onClick={() => getBalanceSheet(null, null, null)}
+
+                    />
+
+                </Grid>
+            </Grid>
             <Grid container spacing={1}>
                 <Grid item xs={3}>
                     <div class="container">
@@ -709,13 +818,13 @@ function TrialBalance() {
                                                                                                                 },
                                                                                                                 initialValue
                                                                                                             );
-                                                                                                            console.log( account?.nature , 'result');
+                                                                                                        console.log(account?.nature, 'result');
                                                                                                         console.log(result, 'result');
 
                                                                                                         childTotal =
                                                                                                             account?.nature === "credit"
                                                                                                                 ?
-                                                                                                                 parseFloat(
+                                                                                                                parseFloat(
                                                                                                                     result?.credit
                                                                                                                 ) -
                                                                                                                 parseFloat(
@@ -737,31 +846,31 @@ function TrialBalance() {
                                                                                                     } else {
                                                                                                         childTotal =
                                                                                                             account?.nature === "credit"
-                                                                                                                ?  parseFloat(
+                                                                                                                ? parseFloat(
                                                                                                                     account?.total_credit
                                                                                                                 ) - parseFloat(
                                                                                                                     account?.total_debit
                                                                                                                 ) : parseFloat(0)
 
                                                                                                         childTotal2 =
-                                                                                                        account?.nature === "debit"
-                                                                                                        ?
-                                                                                                            parseFloat(
+                                                                                                            account?.nature === "debit"
+                                                                                                                ?
+                                                                                                                parseFloat(
                                                                                                                     account?.total_debit
                                                                                                                 ) -
                                                                                                                 parseFloat(
                                                                                                                     account?.total_credit
-                                                                                                                )  : 0
-                                                                                                                
+                                                                                                                ) : 0
+
 
                                                                                                     }
-                                                                                                 
-                                                                                                    console.log(account,childTotal2,'childTotal2');
+
+                                                                                                    console.log(account, childTotal2, 'childTotal2');
                                                                                                     Total += parseFloat(childTotal);
                                                                                                     Total2 +=
                                                                                                         parseFloat(childTotal2);
-                                                                                                        console.log(Total2,'childTotal2Total');
-                                                                                                        
+                                                                                                    console.log(Total2, 'childTotal2Total');
+
                                                                                                     GrandTotal +=
                                                                                                         parseFloat(childTotal);
                                                                                                     GrandTotal2 +=

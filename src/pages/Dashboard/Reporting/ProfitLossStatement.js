@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import FinanceServices from 'services/Finance';
 import DatePicker from 'components/DatePicker';
+import SearchIcon from "@mui/icons-material/Search";
 import moment from 'moment';
 import { CommaSeparator, Debounce, handleExportWithComponent } from 'utils';
 import ExportFinanceServices from 'services/ExportFinance';
@@ -18,59 +19,62 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { PrimaryButton } from 'components/Buttons';
 import { PDFExport } from '@progress/kendo-react-pdf';
+import SelectField from 'components/Select';
+import CustomerServices from 'services/Customer';
+import { showErrorToast } from 'components/NewToaster';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
-    border: 0,
+  border: 0,
 
 }));
 
 const Cell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-        border: '1px solid #EEEEEE',
-        padding: '15px',
-        textAlign: 'left',
-        whiteSpace: 'nowrap',
-        color: '#434343',
-        paddingRight: '50px',
-        background: 'transparent',
-        fontWeight: 'bold'
+  [`&.${tableCellClasses.head}`]: {
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+    border: '1px solid #EEEEEE',
+    padding: '15px',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    color: '#434343',
+    paddingRight: '50px',
+    background: 'transparent',
+    fontWeight: 'bold'
 
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+
+    textWrap: 'nowrap',
+    padding: '5px !important',
+    paddingLeft: '15px !important',
+
+    '.MuiBox-root': {
+      display: 'flex',
+      gap: '6px',
+      alignItems: 'center',
+      justifyContent: 'center',
+      '.MuiBox-root': {
+        cursor: 'pointer'
+      }
     },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-
-        textWrap: 'nowrap',
-        padding: '5px !important',
-        paddingLeft: '15px !important',
-
-        '.MuiBox-root': {
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '.MuiBox-root': {
-                cursor: 'pointer'
-            }
-        },
-        'svg': {
-            width: 'auto',
-            height: '24px',
-        },
-        '.MuiTypography-root': {
-            textTransform: 'capitalize',
-            fontFamily: FontFamily.NunitoRegular,
-            textWrap: 'nowrap',
-        },
-        '.MuiButtonBase-root': {
-            padding: '8px',
-            width: '28px',
-            height: '28px',
-        }
+    'svg': {
+      width: 'auto',
+      height: '24px',
     },
+    '.MuiTypography-root': {
+      textTransform: 'capitalize',
+      fontFamily: FontFamily.NunitoRegular,
+      textWrap: 'nowrap',
+    },
+    '.MuiButtonBase-root': {
+      padding: '8px',
+      width: '28px',
+      height: '28px',
+    }
+  },
 }));
 
 const useStyles = makeStyles({
@@ -114,6 +118,8 @@ function ProfitLossStatement() {
   const [totalExpenses, setTotalExpenses] = useState(0)
   const [totalCost, setTotalCost] = useState(0)
   const [totalAdminExpenses, setTotalAdminExpenses] = useState(0)
+  const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
   // *For Collapse
   const [expand, setExpand] = useState([]);
@@ -127,7 +133,7 @@ function ProfitLossStatement() {
         return
       }
       setFromDate(new Date(newDate))
-      handleFilter({ fromDate: moment(new Date(newDate)).format('MM-DD-YYYY') })
+
     } catch (error) {
       ErrorToaster(error)
     }
@@ -141,7 +147,7 @@ function ProfitLossStatement() {
         return
       }
       setToDate(new Date(newDate))
-      handleFilter({ toDate: moment(new Date(newDate)).format('MM-DD-YYYY') })
+     
     } catch (error) {
       ErrorToaster(error)
     }
@@ -154,10 +160,13 @@ function ProfitLossStatement() {
       const Filter = { ...dateFilter, ...filter }
       setDateFilter(Filter)
       let params = {
+        cost_center:selectedCostCenter?.name,
+        to_date:moment(toDate).format('MM-DD-YYYY'),
+        from_date:moment(fromDate).format('MM-DD-YYYY'),
         ...Filter
       }
       const { data } = await FinanceServices.getAccountReports(params)
-    setProfitLossStatement(data?.detail.slice(3))
+      setProfitLossStatement(data?.detail.slice(3))
       setFilteredProfitLossStatement(data?.detail.slice(3))
       let myData = data?.detail.slice(3)
 
@@ -541,9 +550,24 @@ function ProfitLossStatement() {
 
     saveAs(new Blob([buf]), "data.xlsx");
   };
+  const getCostCenters = async () => {
+    try {
+        let params = {
+            page: 1,
+            limit: 1000,
+        };
+
+        const { data } = await CustomerServices.getCostCenters(params);
+        setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+
+    } catch (error) {
+        showErrorToast(error);
+    }
+};
 
   useEffect(() => {
     getProfitLossStatement()
+    getCostCenters()
   }, []);
 
   return (
@@ -560,6 +584,7 @@ function ProfitLossStatement() {
         <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, }}>
           Profit OR Loss Statement
         </Typography>
+     
         {/* {profitLossStatement?.length > 0 && (
           <Box sx={{
             textAlign: "right", p: 4, display: "flex", gap: 2
@@ -578,7 +603,55 @@ function ProfitLossStatement() {
           </Box>
         )} */}
       </Box>
+      <Grid container spacing={2}>
 
+
+<Grid item xs={3}>
+  <SelectField
+    size="small"
+    label="Select Cost Center"
+    options={costCenters}
+    selected={selectedCostCenter}
+    onSelect={(value) => {
+      setSelectedCostCenter(value)
+
+    }}
+    
+
+  />
+</Grid>
+<Grid item xs={3}>
+  <DatePicker
+    label={"From Date"}
+    disableFuture={true}
+    size="small"
+    value={fromDate}
+    onChange={(date) => handleFromDate(date)}
+  />
+</Grid>
+<Grid item xs={3}>
+  <DatePicker
+    label={"To Date"}
+
+    disableFuture={true}
+    size="small"
+    value={toDate}
+    onChange={(date) => handleToDate(date)}
+  />
+</Grid>
+<Grid item xs={3} mt={'30px'}>
+
+  <PrimaryButton
+    bgcolor={"#bd9b4a"}
+    icon={<SearchIcon />}
+    title="Search"
+    sx={{ marginTop: "30px" }}
+    onClick={() => getProfitLossStatement(null, null, null)}
+
+  />
+
+</Grid>
+</Grid>
       {/* Filters */}
       <Grid container spacing={1}>
         {/* <Grid item xs={12} sm={3}>
@@ -591,26 +664,7 @@ function ProfitLossStatement() {
             })}
           />
         </Grid> */}
-        <Grid item xs={12} sm={3}>
-          <DatePicker
-            disableFuture={true}
-            size='small'
-            label={'From Date'}
-            value={fromDate}
-            onChange={(date) => handleFromDate(date)}
-          />
-        </Grid>
-        <Grid item xs={12} sm={3}>
-          <DatePicker
-            disabled={fromDate ? false : true}
-            disableFuture={true}
-            size='small'
-            minDate={fromDate}
-            label={'To Date'}
-            value={toDate}
-            onChange={(date) => handleToDate(date)}
-          />
-        </Grid>
+        
       </Grid>
       <Grid container spacing={1} sx={{ mb: 2 }}>
         <Grid item xs={12} sm={12}>
@@ -862,12 +916,12 @@ function ProfitLossStatement() {
                                           </Typography>
                                         </Cell>
                                         <Cell>
-                                        {console.log(totalRevenue,'asdasd')}
-                                         { console.log(totalExpenses,'asdasd')}
-                                         { console.log(parseFloat(parseFloat(totalRevenue) - parseFloat(totalExpenses)).toFixed(2),'asdasd')}
-                                          
+                                          {console.log(totalRevenue, 'asdasd')}
+                                          {console.log(totalExpenses, 'asdasd')}
+                                          {console.log(parseFloat(parseFloat(totalRevenue) - parseFloat(totalExpenses)).toFixed(2), 'asdasd')}
+
                                           <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
-                                            {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost))- parseFloat(totalExpenses)).toFixed(2))}
+                                            {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses)).toFixed(2))}
                                           </Typography>
                                         </Cell>
                                       </Row>

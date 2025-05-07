@@ -8,6 +8,7 @@ import SelectField from "components/Select";
 import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import CustomerServices from "services/Customer";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const CreateCreditNote = () => {
   const { register, setValue, formState: { errors }, handleSubmit } = useForm();
@@ -33,7 +34,7 @@ const CreateCreditNote = () => {
         customer_id: selectedCustomer?.id, //Customer id in case of Credit Note
         vendor_id: null, // vendor ID in case of Debit NOte
         related_invoice_id: formData?.originalInvoiceNumber,
-        date: date,
+        date: moment(date).format('MM-DD-YYYY'),
         reason: formData?.notes,
         amount: formData?.totalCreditAmount,
         tax_amount: formData?.Vat,

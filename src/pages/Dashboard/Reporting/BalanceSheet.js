@@ -15,60 +15,65 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { CommaSeparator, handleExportWithComponent } from 'utils';
 import { PDFExport } from '@progress/kendo-react-pdf';
+import SearchIcon from "@mui/icons-material/Search";
 import moment from 'moment';
+import CustomerServices from 'services/Customer';
+import { showErrorToast } from 'components/NewToaster';
+import DatePicker from 'components/DatePicker';
+import SelectField from 'components/Select';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
-    border: 0,
+  border: 0,
 
 }));
 
 const Cell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-        border: '1px solid #EEEEEE',
-        padding: '15px',
-        textAlign: 'left',
-        whiteSpace: 'nowrap',
-        color: '#434343',
-        paddingRight: '50px',
-        background: 'transparent',
-        fontWeight: 'bold'
+  [`&.${tableCellClasses.head}`]: {
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+    border: '1px solid #EEEEEE',
+    padding: '15px',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    color: '#434343',
+    paddingRight: '50px',
+    background: 'transparent',
+    fontWeight: 'bold'
 
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+
+    textWrap: 'nowrap',
+    padding: '5px !important',
+    paddingLeft: '15px !important',
+
+    '.MuiBox-root': {
+      display: 'flex',
+      gap: '6px',
+      alignItems: 'center',
+      justifyContent: 'center',
+      '.MuiBox-root': {
+        cursor: 'pointer'
+      }
     },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-
-        textWrap: 'nowrap',
-        padding: '5px !important',
-        paddingLeft: '15px !important',
-
-        '.MuiBox-root': {
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '.MuiBox-root': {
-                cursor: 'pointer'
-            }
-        },
-        'svg': {
-            width: 'auto',
-            height: '24px',
-        },
-        '.MuiTypography-root': {
-            textTransform: 'capitalize',
-            fontFamily: FontFamily.NunitoRegular,
-            textWrap: 'nowrap',
-        },
-        '.MuiButtonBase-root': {
-            padding: '8px',
-            width: '28px',
-            height: '28px',
-        }
+    'svg': {
+      width: 'auto',
+      height: '24px',
     },
+    '.MuiTypography-root': {
+      textTransform: 'capitalize',
+      fontFamily: FontFamily.NunitoRegular,
+      textWrap: 'nowrap',
+    },
+    '.MuiButtonBase-root': {
+      padding: '8px',
+      width: '28px',
+      height: '28px',
+    }
+  },
 }));
 
 const useStyles = makeStyles({
@@ -105,8 +110,10 @@ function BalanceSheet() {
   const [filteredBalanceSheet, setFilteredBalanceSheet] = useState([]);
   console.log("🚀 ~ BalanceSheet ~ filteredBalanceSheet:", filteredBalanceSheet)
 
-  const [childTabs, setChildTabs] = useState([])
 
+  const [childTabs, setChildTabs] = useState([])
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
   const [capitalTotal, setCapitalTotal] = useState(0)
   const [libalTotal, setLibalTotal] = useState(0)
@@ -116,13 +123,64 @@ function BalanceSheet() {
 
   // *For Collapse
   const [expand, setExpand] = useState([]);
+  const [fromDate, setFromDate] = useState();
+  const [toDate, setToDate] = useState();
 
   let TotalEquity = 0
+
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
+  // *For Handle Date
+  const handleFromDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setFromDate('invalid')
+        return
+      }
+      setFromDate(new Date(newDate))
+
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+
+  const handleToDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setToDate('invalid')
+        return
+      }
+      setToDate(new Date(newDate))
+
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
 
   // *For Get Balance Sheet
   const getBalanceSheet = async (filter) => {
     try {
-      const { data } = await FinanceServices.getAccountReports()
+      let params = {
+        cost_center: selectedCostCenter?.name,
+        to_date: moment(toDate).format('MM-DD-YYYY'),
+        from_date: moment(fromDate).format('MM-DD-YYYY'),
+      }
+      const { data } = await FinanceServices.getAccountReports(params)
       let myData = data?.detail
       setBalanceSheet(data?.detail?.slice(0, -2))
       setFilteredBalanceSheet(data?.detail?.slice(0, -2))
@@ -364,6 +422,7 @@ function BalanceSheet() {
 
   useEffect(() => {
     getBalanceSheet()
+    getCostCenters()
   }, []);
 
   return (
@@ -398,7 +457,55 @@ function BalanceSheet() {
           </Box>
         )} */}
       </Box>
+      <Grid container spacing={2}>
 
+
+        <Grid item xs={3}>
+          <SelectField
+            size="small"
+            label="Select Cost Center"
+            options={costCenters}
+            selected={selectedCostCenter}
+            onSelect={(value) => {
+              setSelectedCostCenter(value)
+
+            }}
+
+
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <DatePicker
+            label={"From Date"}
+            disableFuture={true}
+            size="small"
+            value={fromDate}
+            onChange={(date) => handleFromDate(date)}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <DatePicker
+            label={"To Date"}
+
+            disableFuture={true}
+            size="small"
+            value={toDate}
+            onChange={(date) => handleToDate(date)}
+          />
+        </Grid>
+        <Grid item xs={3} mt={'30px'}>
+
+          <PrimaryButton
+            bgcolor={"#bd9b4a"}
+            icon={<SearchIcon />}
+            title="Search"
+            sx={{ marginTop: "30px" }}
+            onClick={() => getBalanceSheet(null, null, null)}
+
+          />
+
+        </Grid>
+      </Grid>
       {/* Filters */}
       {/* <Grid container spacing={1}>
         <Grid item xs={12} sm={3}>

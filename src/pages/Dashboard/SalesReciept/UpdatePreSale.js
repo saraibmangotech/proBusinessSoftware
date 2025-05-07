@@ -140,68 +140,89 @@ function UpdatePreSale() {
     }, [govtFee, centerFee, bankCharges, qty]);
 
     const addItem = (data) => {
-        console.log(serviceItem);
-
-        // Create a new row with the serviceItem included
-        const newRow = { ...data, service: serviceItem, service_id: serviceItem?.id };
-
+        console.log(data, 'datadata');
+      
+        const newSalesId = serviceItem?.sales_account_id;
+        const newRow = { ...data, service: serviceItem, sales_id: newSalesId };
+      
         setRows((prevRows) => {
-            const updatedRows = [...prevRows, newRow];
-            const newSubTotal = updatedRows.reduce((sum, row) => parseFloat(sum) + parseFloat(row.total), 0);
-            setSubTotal(newSubTotal);
-            return updatedRows;
+          // If not the first row, enforce that all sales_ids must match
+          if (prevRows.length > 0) {
+            const existingSalesId = prevRows[0].sales_id;
+      
+            if (existingSalesId !== newSalesId) {
+              showErrorToast("Only items with the same sales account ID can be added.");
+              return prevRows; // Don't add if sales_id is different
+            }
+          }
+      
+          // Add the item since it's the first one or has the same sales_id
+          const updatedRows = [...prevRows, newRow];
+      
+          const newSubTotal = updatedRows.reduce(
+            (sum, row) => sum + parseFloat(row.total || 0),
+            0
+          );
+          setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+      
+          return updatedRows;
         });
-
+      
         reset();
         setServiceItem("");
-    };
+      };
 
 
-    const updateItem = (data) => {
+      const updateItem = (data) => {
         console.log("Raw data passed to updateItem:", data);
         console.log("Current serviceItem:", serviceItem);
-
+      
         if (!data?.id) {
-            console.warn("No valid ID found in data. Skipping update.");
-            return;
+          console.warn("No valid ID found in data. Skipping update.");
+          return;
         }
-
-        const updatedItem = { ...data, service: serviceItem, service_id: serviceItem?.id };
+      
+        const updatedSalesId = serviceItem?.sales_account_id;
+        const updatedItem = { ...data, service: serviceItem, sales_id: updatedSalesId };
         console.log("Updated item to be saved:", updatedItem);
-
+      
         setRows(prevItems => {
-            console.log("Previous rows:", prevItems);
-
-            const updatedRows = prevItems.map(item => {
-                if (item.id === data.id) {
-                    console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
-                    return updatedItem;
-                } else {
-                    return item;
-                }
-            });
-
-            console.log("Rows after update:", updatedRows);
-
-            // 👇 Calculate total after updating rows
-            const total = updatedRows.reduce((sum, item) => {
-                // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
-                return parseFloat(sum) + (parseFloat(item.total) || 0);
-            }, 0);
-
-            console.log("New total after update:", total);
-
-            // You can update a state for total if you have one:
-            setSubTotal(total); // <-- Make sure to declare this with useState
-
-            return updatedRows;
+          console.log("Previous rows:", prevItems);
+      
+          // Get the existing sales_id from the list (any one is enough)
+          const existingSalesId = prevItems.length > 0 ? prevItems[0].sales_id : null;
+      
+          // Check if the updated item has a different sales_id
+          if (existingSalesId && existingSalesId !== updatedSalesId) {
+            showErrorToast("You can only update with the same sales account ID.");
+            return prevItems; // Don't update
+          }
+      
+          const updatedRows = prevItems.map(item => {
+            if (item.id === data.id) {
+              console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
+              return updatedItem;
+            }
+            return item;
+          });
+      
+          console.log("Rows after update:", updatedRows);
+      
+          // Calculate new subtotal
+          const newSubTotal = updatedRows.reduce((sum, row) => {
+            const total = parseFloat(row.total || 0);
+            return sum + (isNaN(total) ? 0 : total);
+          }, 0);
+      
+          setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+          return updatedRows;
         });
-
+      
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
         setEditState(false);
-    };
+      };
 
 
     const getInvoiceNumber = async () => {
@@ -326,7 +347,7 @@ function UpdatePreSale() {
             let obj = {
                 id: detail?.id,
                 token_number: formData?.token,
-                token_date: date,
+                token_date: moment(date).format('MM-DD-YYYY'),
                 invoice_prefix: "DED",
                 trn: formData?.trn,
                 case_no: formData?.caseno,

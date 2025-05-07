@@ -272,6 +272,13 @@ function DebitNotes() {
 
         },
         {
+            header: "Cost Center",
+            accessorKey: "cost_center",
+
+
+
+        },
+        {
             header: "Amount",
             accessorKey: "amount",
 

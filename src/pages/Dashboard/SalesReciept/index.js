@@ -297,7 +297,7 @@ function SalesReciept() {
     try {
       let obj = {
         token_number: formData?.token,
-        token_date: date,
+        token_date: moment(date).format('MM-DD-YYYY'),
         invoice_prefix: "DED",
         trn: formData?.trn,
         case_no: formData?.caseno,

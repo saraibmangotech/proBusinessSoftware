@@ -11,6 +11,9 @@ import InputField from "components/Input";
 import FinanceServices from "services/Finance";
 import DatePicker from "components/DatePicker";
 import { useSelector } from "react-redux";
+import CustomerServices from "services/Customer";
+import { showErrorToast } from "components/NewToaster";
+import moment from "moment";
 
 function CreateFundTransferVoucher() {
 
@@ -26,6 +29,8 @@ function CreateFundTransferVoucher() {
   const [selectedFromAccount, setSelectedFromAccount] = useState(null);
   const [selectedToAccount, setSelectedToAccount] = useState(null);
   const [cashierAccounts, setCashierAccounts] = useState([])
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
   // *For Handle Date
   const [vaultDate, setVaultDate] = useState(new Date());
@@ -106,7 +111,7 @@ function CreateFundTransferVoucher() {
         return;
       }
       let obj = {
-        date:vaultDate,
+        date: moment(vaultDate).format('MM-DD-YYYY'),
         from_account_id: selectedFromAccount?.id,
         to_account_id: selectedToAccount?.id,
         from_currency: selectedFromAccount?.currency,
@@ -117,7 +122,8 @@ function CreateFundTransferVoucher() {
         exchange_loss: formData.exchangeLoss,
         ref_no: formData.ref,
         notes: formData.note,
-        cashier: cashier
+        cashier: cashier,
+        cost_center:selectedCostCenter?.name
       }
 
       const { message } = await FinanceServices.createFundTransferVoucher(obj)
@@ -130,8 +136,23 @@ function CreateFundTransferVoucher() {
     }
   }
 
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters(data?.cost_centers);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
   useEffect(() => {
     getPaymentAccounts()
+    getCostCenters()
   }, []);
 
   useEffect(() => {
@@ -251,7 +272,20 @@ function CreateFundTransferVoucher() {
               })}
             />
           </Grid>
-          
+          <Grid item xs={4}>
+              <SelectField
+                size="small"
+                label="Select Cost Center"
+                options={costCenters}
+                selected={selectedCostCenter}
+                onSelect={(value) => {
+                  setSelectedCostCenter(value)
+                  
+                }}
+                register={register("costcenter", { required: "costcenter is required" })}
+                error={errors?.costcenter?.message}
+              />
+            </Grid>
          
           <Grid item xs={12} sm={12} sx={{ mt: 2, textAlign: 'right' }}>
             <PrimaryButton
