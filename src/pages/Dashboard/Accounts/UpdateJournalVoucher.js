@@ -196,7 +196,7 @@ function UpadateJournalVoucher() {
       
       setRows(updatedAccounts)
        setValue1('Journal', `JV-${data?.voucher?.entries[0]?.jv_id}`)
-       
+       setValue('note',data?.voucher?.notes)
       const newTotalCredit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
       const newTotalDebit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
   
@@ -391,7 +391,7 @@ function UpadateJournalVoucher() {
     <Box sx={{ p: 3, borderRadius: 3 }}>
 
       <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
-        Create Journal Voucher
+        Update Journal Voucher
       </Typography>
 
       <Box component="form" onSubmit={handleSubmit1(addVoucher)} >
