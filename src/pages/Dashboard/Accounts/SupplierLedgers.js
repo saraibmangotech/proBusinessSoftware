@@ -232,13 +232,13 @@ function SupplierLedgers() {
         from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
         account_id: selectedUser?.account_id ?? null,
-        is_supplier: selectedUser?.account_id ? true : false,
+        is_supplier: selectedUser?.account_id ? false : true,
         is_vendor: true
 
       }
 
       console.log("test")
-      const { data } = await FinanceServices.getAccountLedgers(params)
+      const { data } = await FinanceServices.getNewAccountLedgers(params)
       setCustomerQueue(data?.statement?.rows);
       setTotalCount(data?.statement?.count);
       setTotalBalance(data?.statement?.opening_balance_aed);
