@@ -208,7 +208,7 @@ function CreateCustomerPayment() {
         console.log(formData, "objobjj")
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
         const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
-
+        const totalAdditionalCharges = payments.reduce((sum, p) => sum + parseFloat(p.additional_charges_value || 0), 0);
         console.log(paymentModesString); // Output: "Cash, Bank, Card"
         getValues1('total')
         if (existingTotal == getValues1('total')) {
@@ -223,6 +223,7 @@ function CreateCustomerPayment() {
                     date: paidAt,
                     description: formData?.description,
                     payment_mode: paymentModesString,
+                    additional_charges_value:totalAdditionalCharges,
                     payment_methods: payments
                 }
 

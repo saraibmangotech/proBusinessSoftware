@@ -208,7 +208,7 @@ function CreatePaidReceipt() {
     console.log(formData, "objobjj")
     const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
     const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
-
+    const totalAdditionalCharges = payments.reduce((sum, p) => sum + parseFloat(p.additional_charges_value || 0), 0);
     console.log(paymentModesString); // Output: "Cash, Bank, Card"
     getValues1('total')
     if (existingTotal == getValues1('finalTotal')) {
@@ -221,8 +221,7 @@ function CreatePaidReceipt() {
           items: rows,
           paid_date: paidAt || new Date(),
           paid_amount: detail?.amount,
-          additional_charges_percentage: formData?.percentage,
-          additional_charges_value: formData?.additionalCharges,
+  
           remarks: formData?.remarks,
           narration: formData?.narration,
           payment_mode: paymentModesString,
@@ -230,12 +229,13 @@ function CreatePaidReceipt() {
           charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.center_fee || 0), 0),
           govt_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.govt_fee || 0), 0),
           bank_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.bank_charge || 0), 0),
-
+          additional_charges_value:totalAdditionalCharges,
 
           customer_id: detail?.customer_id,
           invoice_prefix: detail?.invoice_prefix,
           category_id: detail?.sale_receipt_items[0]?.service?.category_id,
-          payment_methods: payments
+          payment_methods: payments,
+
         }
 
         console.log(obj, "objobj")
