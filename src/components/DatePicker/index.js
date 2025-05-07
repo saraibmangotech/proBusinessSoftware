@@ -28,27 +28,14 @@ function DatePicker({
 
   return (
     <Fragment>
-      <Typography 
-        variant="body1" 
-        sx={{ 
-          textTransform: 'capitalize', 
-          color: Colors.gray,
-          fontWeight: 700 
-        }}
-      >
+      <Typography variant="body1" sx={{ textTransform: 'capitalize', color: Colors.gray ,fontWeight:700}}>
         {label}
       </Typography>
-      <FormControl 
-        variant="standard" 
-        fullWidth 
-        sx={{ 
-          mb: 1, 
-          '.MuiStack-root': { overflow: 'hidden' } 
-        }}
-      >
+      <FormControl variant="standard" fullWidth sx={{ mb: 1, '.MuiStack-root': { overflow: 'hidden' } }}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DemoContainer components={['DesktopDatePicker']}>
             <DesktopDatePicker
+              
               openTo={openTo}
               className="custom-file"
               views={views}
@@ -58,36 +45,34 @@ function DatePicker({
               value={value}
               minDate={minDate}
               maxDate={maxDate}
-              format="dd/MM/yyyy" // Updated format here
-              sx={{ 
-                width: 1,
+              format="MM-dd-yyyy" // Set the date format here
+              sx={{ width: 1,
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    border: `2px solid ${Colors.DarkBlue} !important`,
-                    borderRadius: '10px'
+                  '& fieldset' : {
+                    border:`2px solid ${Colors.DarkBlue} !important`,
+                    borderRadius:'10px'
                   }
                 }
-              }}
+               }}
               onChange={(newValue) => {
                 if (isValidDate(newValue)) {
-                  const formattedDate = formatDate(newValue, 'dd/MM/yyyy'); // Updated format here
+                  const formattedDate = formatDate(newValue, 'MM-dd-yyyy');
+                  console.log(newValue,);
+                  
                   onChange(formattedDate);
                 } else {
-                  onChange(null);
+                  onChange(null); // or some other value to indicate invalid date
                 }
               }}
               slotProps={{ textField: { size: size }, field: { clearable: true } }}
               renderInput={(params) => (
-                <TextField {...params} {...register} error={error} />
+                <TextField   {...params} {...register} error={error} />
               )}
             />
           </DemoContainer>
         </LocalizationProvider>
         {error && (
-          <Typography 
-            color="error" 
-            sx={{ fontSize: 12, textAlign: 'left' }}
-          >
+          <Typography color="error" sx={{ fontSize: 12, textAlign: 'left' }}>
             {error}
           </Typography>
         )}
