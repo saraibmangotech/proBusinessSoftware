@@ -1380,10 +1380,20 @@ function CreatePaidReceipt() {
                             console.log(value?.id, 'value?.id');
 
                             setValue1('percentage', 1);
+                            const percentageValue = parseFloat(1 || 0);
+                            const amount = parseFloat(getValues1("payamount") || 0);
+                            const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
+
+                            setValue1("additionalCharges", additionalCharge);
                             
                           } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
                             value?.id === 'Payment Link') {
                             setValue1('percentage', 1.35);
+                            const percentageValue = parseFloat(1.35 || 0);
+                            const amount = parseFloat(getValues1("payamount") || 0);
+                            const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
+
+                            setValue1("additionalCharges", additionalCharge);
                           }
                         }}
                         register={register1("payment", {
@@ -1437,9 +1447,9 @@ function CreatePaidReceipt() {
                         error={errors1?.remarks?.message}
                       />
                     </Grid>}
-                    {(selectedMode?.id === "Bank" || selectedMode?.id === "Payment Link") && (
+                    {(selectedMode?.id === "Card" || selectedMode?.id === "Payment Link") && (
                       <>
-                        <Grid item md={3.8} sm={12} xs={12}>
+                        <Grid item md={3} sm={12} xs={12}>
                           <InputField
                             label="Percentage"
                             size="small"
@@ -1462,7 +1472,7 @@ function CreatePaidReceipt() {
                         </Grid>
 
 
-                        <Grid item md={3.8} sm={12} xs={12}>
+                        <Grid item md={3} sm={12} xs={12}>
                           <InputField
                             label="Additional Charges"
                             size="small"
