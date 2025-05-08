@@ -473,23 +473,18 @@ function ChartOfAccount() {
 
                 </Grid>
                 <Grid item xs={4} sm={4}>
-                    {/* {chartOfAccount?.length > 0 && (
+                    {chartOfAccount?.length > 0 && (
                         <Box sx={{
                               display: "flex", gap: 2,justifyContent:'flex-end'
 
                         }}>
+                          
                             <PrimaryButton
-                                title="Print"
-                                type="button"
-                                style={{ backgroundColor: Colors.primary }}
-                                onClick={() => handleExportWithComponent(contentRef)}
-                            />
-                            <PrimaryButton
-                                title={"Excel"}
+                                title={"Export To Excel"}
                                 onClick={() => downloadExcel()}
                             />
                         </Box>
-                    )} */}
+                    )}
                 </Grid>
             </Grid>
 

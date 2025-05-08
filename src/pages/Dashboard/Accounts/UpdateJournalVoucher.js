@@ -80,6 +80,8 @@ function UpadateJournalVoucher() {
   const navigate = useNavigate();
   const [isDebitDisabled, setIsDebitDisabled] = useState(false);
   const [isCreditDisabled, setIsCreditDisabled] = useState(false);
+  const [editState, setEditState] = useState(false)
+
 
   const { usdExchangeRate, cadExchangeRate } = useSelector((state) => state.navigationReducer);
 
@@ -192,6 +194,8 @@ function UpadateJournalVoucher() {
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
         name: ` ${account?.account?.account_code} ${account?.account?.name}`,
+        selectedAccount: { id: account?.account?.id, name: ` ${account?.account?.account_code} ${account?.account?.name}` },
+
         unique_id: Date.now() + Math.random(), // Ensure unique key
 
       }));
@@ -278,7 +282,7 @@ function UpadateJournalVoucher() {
         credit: formData?.credit ? formData?.credit : 0,
         description: formData?.description,
         currency: selectedAccount?.currency,
-        cost_center:selectedCostCenter?.name
+        cost_center: selectedCostCenter?.name
 
       }
       voucherCopy.push(obj)
@@ -376,6 +380,7 @@ function UpadateJournalVoucher() {
         unique_id: Date.now() + Math.random(), // Ensure unique key
         account_id: selectedAccount?.id,
         name: selectedAccount?.name,
+        selectedAccount: selectedAccount
       };
 
       const updatedRows = [...prevRows, newRow];
@@ -392,6 +397,48 @@ function UpadateJournalVoucher() {
     });
 
     setSelectedAccount(null);
+    reset();
+  };
+
+  const updateItem = (data) => {
+    if (!selectedRow) {
+      showErrorToast('No row selected to update');
+      return;
+    }
+
+    const debit = parseFloat(data?.debit || 0);
+    const credit = parseFloat(data?.credit || 0);
+
+    if (debit === 0 && credit === 0) {
+      showErrorToast('Either Debit or Credit must be greater than 0');
+      return;
+    }
+
+    setRows((prevRows) => {
+      const updatedRows = prevRows.map((row) =>
+        row.unique_id === selectedRow
+          ? {
+            ...row,
+            ...data,
+            account_id: selectedAccount?.id,
+            name: selectedAccount?.name,
+          }
+          : row
+      );
+
+      const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
+      const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
+
+      setTotalCredit(newTotalCredit);
+      setTotalDebit(newTotalDebit);
+      setIsCreditDisabled(false);
+      setIsDebitDisabled(false);
+
+      return updatedRows;
+    });
+
+    setSelectedAccount(null);
+    setSelectedRow(null);
     reset();
   };
 
@@ -455,7 +502,7 @@ function UpadateJournalVoucher() {
       </Box>
 
 
-      <form onSubmit={handleSubmit(addItem)}>
+      <form onSubmit={handleSubmit(editState ? updateItem : addItem)}>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -476,7 +523,7 @@ function UpadateJournalVoucher() {
                   <SelectField
                     size="small"
                     options={accounts}
-
+                    disabled={editState}
                     selected={selectedAccount}
                     onSelect={(value) => {
                       setSelectedAccount(value)
@@ -549,21 +596,59 @@ function UpadateJournalVoucher() {
                 </TableCell>
 
                 <TableCell>
-                  {<Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    sx={{
-                      textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
-                      fontSize: "12px",
-                      ":hover": {
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    {!editState && <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{
+                        textTransform: 'capitalize',
                         backgroundColor: "rgb(189 155 74)",
-                      },
-                    }}
-                  >
-                    <AddIcon />
-                  </Button>}
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "rgb(189 155 74)",
+                        },
+                      }}
+                    >
+                      <AddIcon />
+                    </Button>}
+                    {editState && <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{
+                        textTransform: 'capitalize',
+                        backgroundColor: "rgb(189 155 74)",
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "rgb(189 155 74)",
+                        },
+                      }}
+                    >
+                      Update
+                    </Button>}
+                    {editState && <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        setSelectedAccount(null)
+                        setValue('debit', '')
+                        setValue('credit', '')
+                        setValue('description', '')
+                        setEditState(false)
+                      }}
+                      sx={{
+                        textTransform: 'capitalize',
+                        backgroundColor: "rgb(189 155 74)",
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "rgb(189 155 74)",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>}
+                  </Box>
 
                 </TableCell>
               </TableRow>}
@@ -579,7 +664,18 @@ function UpadateJournalVoucher() {
                   <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
 
-                    <Box>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
+                        setSelectedRow(item?.unique_id)
+                        setEditState(true)
+                        console.log(item);
+
+                        setSelectedAccount(item?.selectedAccount)
+                        setValue('service', item?.account?.account?.account_code + item?.account?.name)
+                        setValue('debit', item?.debit)
+                        setValue('credit', item?.credit)
+                        setValue('description', item?.description)
+                      }} src={Images.editIcon} width={'35px'}></Box>}
                       {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
                         let selectedID = item?.id
