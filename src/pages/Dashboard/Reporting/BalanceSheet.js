@@ -335,89 +335,106 @@ function BalanceSheet() {
   const downloadExcel = () => {
     const headers = tableHead;
     const rows = [];
-    let GrandTotal = 0; // Initialize GrandTotal here
-    let TotalEquity = 0; // Initialize TotalEquity here
-
+    let GrandTotal = 0;
+    let TotalEquity = 0;
+  
     filteredBalanceSheet?.forEach((item, index) => {
+      let sectionTotal = 0;
+  
       item?.sub?.forEach(subItem => {
-        let Total = 0;
+        let subTotal = 0;
+  
         subItem?.accounts?.forEach(account => {
-          let childFinalTotal = 0;
-          let childTotal = 0; // Initialize childTotal here
-          const credit = isNaN(account?.total_credit) ? 0 : parseFloat(account?.total_credit);
-          const debit = isNaN(account?.total_debit) ? 0 : parseFloat(account?.total_debit);
-          childTotal = account?.nature === 'credit' ? credit - debit : debit - credit;
-
-          if (account?.childAccounts?.length > 0) {
-            const initialValue = { "credit": 0, "debit": 0 };
-            const result = account?.childAccounts?.reduce((accumulator, transaction) => {
-              const credit = isNaN(transaction?.total_credit) ? 0 : parseFloat(transaction?.total_credit);
-              const debit = isNaN(transaction?.total_debit) ? 0 : parseFloat(transaction?.total_debit);
-              return {
-                "credit": accumulator.credit + credit,
-                "debit": accumulator.debit + debit,
-              };
-            }, initialValue);
-            childTotal = account?.nature === 'debit' ? result.debit - result.credit : result.credit - result.debit;
-
+          let accountTotal = 0;
+  
+          // Calculate base account values
+          const credit = parseFloat(account?.total_credit) || 0;
+          const debit = parseFloat(account?.total_debit) || 0;
+  
+          if (Array.isArray(account?.childAccounts) && account.childAccounts.length > 0) {
+            // Calculate child accounts total
+            let childCredit = 0;
+            let childDebit = 0;
+  
+            account.childAccounts.forEach(child => {
+              const cc = parseFloat(child?.total_credit) || 0;
+              const cd = parseFloat(child?.total_debit) || 0;
+  
+              childCredit += cc;
+              childDebit += cd;
+  
+              const childNatureTotal = child?.nature === 'debit'
+                ? cd - cc
+                : cc - cd;
+  
+              rows.push([
+                child?.account_code ?? '-',
+                child?.account_name ?? '-',
+                child?.account_category ?? '-',
+                child?.account_subcategory ?? '-',
+                '',
+                parseFloat(childNatureTotal.toFixed(2)),
+              ]);
+            });
+  
+            // Account total from children
+            accountTotal = account?.nature === 'debit'
+              ? childDebit - childCredit
+              : childCredit - childDebit;
+          } else {
+            // Account without children
+            accountTotal = account?.nature === 'debit'
+              ? debit - credit
+              : credit - debit;
           }
-
-          Total += childTotal;
-          GrandTotal += childTotal;
-          if (index !== 0) {
-            TotalEquity += childTotal;
+  
+          // Add to section, total, and conditionally equity
+          subTotal += accountTotal;
+          sectionTotal += accountTotal;
+          GrandTotal += accountTotal;
+  
+          if (item?.name?.toLowerCase().includes('equity') || item?.name?.toLowerCase().includes('liabilities')) {
+            TotalEquity += accountTotal;
           }
-
+  
           rows.push([
             account?.account_code ?? '-',
             account?.account_name ?? '-',
             account?.account_category ?? '-',
             account?.account_subcategory ?? '-',
-            parseFloat(childTotal.toFixed(2))
+            '',
+            parseFloat(accountTotal.toFixed(2))
           ]);
-
-          account?.childAccounts?.forEach(child => {
-            const childCredit = isNaN(child?.total_credit) ? 0 : parseFloat(child?.total_credit);
-            const childDebit = isNaN(child?.total_debit) ? 0 : parseFloat(child?.total_debit);
-            let subTotal = child?.nature === 'debit' ? childDebit - childCredit : childCredit - childDebit;
-
-            childFinalTotal += subTotal;
-            rows.push([
-              child?.account_code ?? '-',
-              child?.account_name ?? '-',
-              child?.account_category ?? '-',
-              child?.account_subcategory ?? '-',
-              parseFloat(subTotal.toFixed(2))
-            ]);
-          });
         });
-
+  
         if (subItem?.accounts?.length > 0) {
-          rows.push([
-            '', '', '', '',
-            `Total of ${subItem?.accounts[0]?.type_code}`,
-            parseFloat(Total.toFixed(2))
-          ]);
+          rows.push(['', '', '', '','', `Subtotal of ${subItem?.accounts[0]?.type_code}`, parseFloat(subTotal.toFixed(2))]);
         }
       });
-
+  
+      // Section total (Assets / Liabilities / Equity)
       if (item?.sub?.length > 0) {
-        rows.push(['', '', '', '', `Totals ${item?.name}`, parseFloat(GrandTotal.toFixed(2))]);
+        rows.push(['', '', '', '','', `Total ${item?.name}`, parseFloat(sectionTotal.toFixed(2))]);
       }
     });
-
+  
+    // Optional: Add Grand Totals if needed
+    rows.push(['', '', '', '','', '	Owner Capital + Liabilities', CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)).toFixed(2))]);
+    
+  
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
+  
     const buf = XLSX.write(wb, {
       bookType: "xlsx",
       type: "array",
       mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-
-    saveAs(new Blob([buf]), "data.xlsx");
+  
+    saveAs(new Blob([buf]), "Balance_Sheet.xlsx");
   };
+  
 
 
   useEffect(() => {
@@ -439,23 +456,23 @@ function BalanceSheet() {
         <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
           Balance Sheet
         </Typography>
-        {/* {balanceSheet?.length > 0 && (
+        {balanceSheet?.length > 0 && (
           <Box sx={{
             textAlign: "right", p: 4, display: "flex", gap: 2
 
           }}>
-            <PrimaryButton
+            {/* <PrimaryButton
               title="Download PDF"
               type="button"
               style={{ backgroundColor: Colors.bluishCyan }}
               onClick={() => handleExportWithComponent(contentRef)}
-            />
+            /> */}
             <PrimaryButton
-              title={"Download Excel"}
+              title={"Export To Excel"}
               onClick={() => downloadExcel()}
             />
           </Box>
-        )} */}
+        )}
       </Box>
       <Grid container spacing={2}>
 

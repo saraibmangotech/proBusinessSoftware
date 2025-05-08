@@ -532,7 +532,7 @@ function ProfitLossStatement() {
         "Net Profit",
         "",
         "",
-        parseFloat(parseFloat(totalRevenue) - parseFloat(totalExpenses)).toFixed(2)
+        CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses)).toFixed(2))
       ])
     )
 
@@ -548,7 +548,7 @@ function ProfitLossStatement() {
       mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
-    saveAs(new Blob([buf]), "data.xlsx");
+    saveAs(new Blob([buf]), "Profit_Loss_Statement.xlsx");
   };
   const getCostCenters = async () => {
     try {
@@ -585,23 +585,23 @@ function ProfitLossStatement() {
           Profit OR Loss Statement
         </Typography>
      
-        {/* {profitLossStatement?.length > 0 && (
+        {profitLossStatement?.length > 0 && (
           <Box sx={{
             textAlign: "right", p: 4, display: "flex", gap: 2
 
           }}>
-            <PrimaryButton
+            {/* <PrimaryButton
               title="Download PDF"
               type="button"
               style={{ backgroundColor: Colors.bluishCyan }}
               onClick={() => handleExportWithComponent(contentRef)}
-            />
+            /> */}
             <PrimaryButton
-              title={"Download Excel"}
+              title={"Export To Excel"}
               onClick={() => downloadExcel()}
             />
           </Box>
-        )} */}
+        )}
       </Box>
       <Grid container spacing={2}>
 

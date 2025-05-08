@@ -373,7 +373,7 @@ function ChartOfAccount() {
         });
 
         // Save the file using FileSaver.js
-        saveAs(new Blob([buf]), "data.xlsx");
+        saveAs(new Blob([buf]), "Chart_Of_Accounts.xlsx");
     };
 
     const tabStyle = (selected) => ({

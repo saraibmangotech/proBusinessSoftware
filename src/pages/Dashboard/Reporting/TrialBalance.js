@@ -326,8 +326,8 @@ function TrialBalance() {
                             if (
                                 acc.account_name
                                     ?.toLowerCase()
-                                    .includes(search?.toLowerCase()) ||
-                                acc.account_code?.toLowerCase().includes(search?.toLowerCase())
+                                    ?.includes(search?.toLowerCase()) ||
+                                acc.account_code?.toLowerCase()?.includes(search?.toLowerCase())
                             ) {
                                 result.push(item);
                             } else {
@@ -336,10 +336,10 @@ function TrialBalance() {
                                         if (
                                             subAcc.account_name
                                                 ?.toLowerCase()
-                                                .includes(search?.toLowerCase()) ||
+                                                ?.includes(search?.toLowerCase()) ||
                                             subAcc.account_code
                                                 ?.toLowerCase()
-                                                .includes(search?.toLowerCase())
+                                                ?.includes(search?.toLowerCase())
                                         ) {
                                             result.push(item);
                                         }
@@ -358,103 +358,142 @@ function TrialBalance() {
     const downloadExcel = () => {
         const headers = tableHead.filter(item => item !== "Action");
         const rows = [];
-        let TotalEquity = 0; // Initialize TotalEquity here
-
+        let TotalEquity = 0;
+    
+        // Track totals per category
+        let TotalAssets = 0;
+        let TotalLiabilities = 0;
+        let TotalRevenue = 0;
+        let TotalExpenses = 0;
+    
         filteredBalanceSheet?.forEach((item, index) => {
-            let GrandTotal = 0;
-            let GrandTotal2 = 0;
             item?.sub?.forEach(subItem => {
-                let Total = 0;
-                let Total2 = 0;
-
+                let TotalDebit = 0;
+                let TotalCredit = 0;
+    
                 subItem?.accounts?.forEach(account => {
-                    let childFinalTotal = 0;
-                    let childTotal = 0; // Initialize childTotal here
-                    let childTotal2 = 0; // Initialize childTotal here
-
+                    let credit = 0;
+                    let debit = 0;
+    
                     if (account?.childAccounts?.length > 0) {
-                        const initialValue = { credit: 0, debit: 0 };
-                        const result = account?.childAccounts?.reduce((accumulator, transaction) => {
-                            const credit = isNaN(transaction?.total_credit) ? 0 : parseFloat(transaction?.total_credit);
-                            const debit = isNaN(transaction?.total_debit) ? 0 : parseFloat(transaction?.total_debit);
-                            return {
-                                credit: accumulator.credit + credit,
-                                debit: accumulator.debit + debit,
-                            };
-                        }, initialValue);
-                        childTotal = account?.nature === "debit"
-                            ? parseFloat(result?.debit) - parseFloat(result?.credit)
-                            : parseFloat(result?.credit) - parseFloat(result?.debit);
-                        childTotal2 = account?.nature === "debit" || account?.nature === null
-                            ? parseFloat(result?.debit) - parseFloat(result?.credit)
-                            : parseFloat(0); // Remove .toFixed(2)
+                        const result = account.childAccounts.reduce(
+                            (acc, child) => {
+                                const c = isNaN(child?.total_credit) ? 0 : parseFloat(child.total_credit);
+                                const d = isNaN(child?.total_debit) ? 0 : parseFloat(child.total_debit);
+                                return {
+                                    credit: acc.credit + c,
+                                    debit: acc.debit + d,
+                                };
+                            },
+                            { credit: 0, debit: 0 }
+                        );
+    
+                        credit = result.credit;
+                        debit = result.debit;
                     } else {
-                        childTotal = account?.nature === "debit"
-                            ? parseFloat(account?.total_debit) - parseFloat(account?.total_credit)
-                            : parseFloat(account?.total_credit) - parseFloat(account?.total_debit);
-                        childTotal2 = account?.nature === "debit" || account?.nature === null
-                            ? parseFloat(account?.total_debit) - parseFloat(account?.total_credit)
-                            : parseFloat(account?.total_credit) - parseFloat(account?.total_debit); // Remove .toFixed(2)
+                        credit = isNaN(account?.total_credit) ? 0 : parseFloat(account.total_credit);
+                        debit = isNaN(account?.total_debit) ? 0 : parseFloat(account.total_debit);
                     }
-
-                    Total += childTotal;
-                    Total2 += childTotal2;
-                    GrandTotal += childTotal;
-                    GrandTotal2 += childTotal2;
+    
+                    let amount = account?.nature === "debit"
+                        ? debit - credit
+                        : credit - debit;
+    
+                    if (account?.nature === "debit") {
+                        TotalDebit += amount;
+                    } else {
+                        TotalCredit += amount;
+                    }
+    
                     if (index !== 0) {
-                        TotalEquity += childTotal;
+                        TotalEquity += amount;
                     }
-
+    
+                    // Track totals by category
+                    const cat = account?.account_category?.toLowerCase();
+                    if (cat?.includes("asset")) {
+                        TotalAssets += amount;
+                    } else if (cat?.includes("liability")) {
+                        TotalLiabilities += amount;
+                    } else if (cat?.includes("revenue") || cat?.includes("income")) {
+                        TotalRevenue += amount;
+                    } else if (cat?.includes("expense")) {
+                        TotalExpenses += amount;
+                    }
+    
                     rows.push([
                         account?.account_code ?? '-',
                         account?.account_name ?? '-',
                         account?.account_category ?? '-',
                         account?.account_subcategory ?? '-',
-                        parseFloat(childTotal2.toFixed(2)), // Convert to number before calling .toFixed
-                        parseFloat(childTotal.toFixed(2)), // Convert to number before calling .toFixed
+                        account?.nature === "debit" ? parseFloat(amount.toFixed(2)) : "0.00",
+                        account?.nature === "credit" ? parseFloat(amount.toFixed(2)) : "0.00",
                     ]);
-
+    
+                    // Handle child accounts
                     account?.childAccounts?.forEach(child => {
-                        const credit = isNaN(child?.total_credit) ? 0 : child?.total_credit;
-                        const debit = isNaN(child?.total_debit) ? 0 : child?.total_debit;
-                        let subTotal = child?.nature === "debit"
-                            ? (parseFloat(debit) - parseFloat(credit)).toFixed(2)
-                            : (parseFloat(credit) - parseFloat(debit)).toFixed(2);
-                        childFinalTotal += parseFloat(subTotal);
+                        const c = isNaN(child?.total_credit) ? 0 : parseFloat(child.total_credit);
+                        const d = isNaN(child?.total_debit) ? 0 : parseFloat(child.total_debit);
+                        const subAmount = account?.nature === "debit"
+                            ? d - c
+                            : c - d;
+    
                         rows.push([
                             child?.account_code ?? '-',
                             child?.account_name ?? '-',
                             child?.account_category ?? '-',
                             child?.account_subcategory ?? '-',
-                            parseFloat(subTotal) // Convert to number before calling .toFixed
+                            account?.nature === "debit" ? parseFloat(subAmount.toFixed(2)) : "0.00",
+                            account?.nature === "credit" ? parseFloat(subAmount.toFixed(2)) : "0.00",
                         ]);
                     });
                 });
-
+    
                 if (subItem?.accounts?.length > 0) {
                     rows.push([
                         `Total of ${subItem?.accounts[0]?.type_code}`,
-                        "", `Total ${subItem.name}`, "",
-                        parseFloat(Total2.toFixed(2)),
-                        parseFloat(Total.toFixed(2)),
+                        "",
+                        `Total ${subItem.name}`,
+                        "",
+                        parseFloat(TotalDebit.toFixed(2)),
+                        parseFloat(TotalCredit.toFixed(2)),
                     ]);
                 }
+    
+                
+                
+               
+               
             });
-
+            rows.push([
+                `Total`,
+                "",
+                ``,
+                "",
+              
+                CommaSeparator(parseFloat(allDebit).toFixed(2)),
+                CommaSeparator(parseFloat(allCredit).toFixed(2)),
+            ]);
         });
-
+    
         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
+    
         const buf = XLSX.write(wb, {
             bookType: "xlsx",
             type: "array",
             mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
-
-        saveAs(new Blob([buf]), "data.xlsx");
+    
+        saveAs(new Blob([buf]), "Trial_Balance.xlsx");
     };
+    
+    
+    
+    
+    
+    
     const handleFromDate = (newDate) => {
         try {
             // eslint-disable-next-line eqeqeq
@@ -588,23 +627,23 @@ function TrialBalance() {
                 >
                     Trial Balance
                 </Typography>
-                {/* {balanceSheet?.length > 0 && (
+                {balanceSheet?.length > 0 && (
                     <Box sx={{
                         textAlign: "right", p: 4, display: "flex", gap: 2
 
                     }}>
-                        <PrimaryButton
+                        {/* <PrimaryButton
                             title="Download PDF"
                             type="button"
                             style={{ backgroundColor: Colors.bluishCyan }}
                             onClick={() => handleExportWithComponent(contentRef)}
-                        />
+                        /> */}
                         <PrimaryButton
-                            title={"Download Excel"}
+                            title={"Export To Excel"}
                             onClick={() => downloadExcel()}
                         />
                     </Box>
-                )} */}
+                )}
             </Box>
 
             {/* Filters */}
