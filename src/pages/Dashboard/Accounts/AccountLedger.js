@@ -15,6 +15,9 @@ import DatePicker from 'components/DatePicker';
 import { PrimaryButton } from 'components/Buttons';
 import moment from 'moment';
 import FinanceServices from 'services/Finance';
+import CustomerServices from 'services/Customer';
+import { showErrorToast } from 'components/NewToaster';
+import SelectField from 'components/Select';
 
 // *For Table Style
 // *For Table Style
@@ -25,49 +28,49 @@ const Row = styled(TableRow)(({ theme }) => ({
 
 const Cell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-      fontSize: 14,
-      fontFamily: 'Public Sans',
-      border: '1px solid #EEEEEE',
-      padding: '15px',
-      textAlign: 'left',
-      whiteSpace: 'nowrap',
-      color: '#434343',
-      paddingRight: '50px',
-      background: 'transparent',
-      fontWeight: 'bold'
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+    border: '1px solid #EEEEEE',
+    padding: '15px',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    color: '#434343',
+    paddingRight: '50px',
+    background: 'transparent',
+    fontWeight: 'bold'
 
   },
   [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      fontFamily: 'Public Sans',
+    fontSize: 14,
+    fontFamily: 'Public Sans',
 
-      textWrap: 'nowrap',
-      padding: '5px !important',
-      paddingLeft: '15px !important',
+    textWrap: 'nowrap',
+    padding: '5px !important',
+    paddingLeft: '15px !important',
 
+    '.MuiBox-root': {
+      display: 'flex',
+      gap: '6px',
+      alignItems: 'center',
+      justifyContent: 'center',
       '.MuiBox-root': {
-          display: 'flex',
-          gap: '6px',
-          alignItems: 'center',
-          justifyContent: 'center',
-          '.MuiBox-root': {
-              cursor: 'pointer'
-          }
-      },
-      'svg': {
-          width: 'auto',
-          height: '24px',
-      },
-      '.MuiTypography-root': {
-          textTransform: 'capitalize',
-          fontFamily: FontFamily.NunitoRegular,
-          textWrap: 'nowrap',
-      },
-      '.MuiButtonBase-root': {
-          padding: '8px',
-          width: '28px',
-          height: '28px',
+        cursor: 'pointer'
       }
+    },
+    'svg': {
+      width: 'auto',
+      height: '24px',
+    },
+    '.MuiTypography-root': {
+      textTransform: 'capitalize',
+      fontFamily: FontFamily.NunitoRegular,
+      textWrap: 'nowrap',
+    },
+    '.MuiButtonBase-root': {
+      padding: '8px',
+      width: '28px',
+      height: '28px',
+    }
   },
 }));
 
@@ -95,7 +98,7 @@ function AccountLedger() {
 
   const { register, handleSubmit, setValue } = useForm();
 
-  const tableHead = ['Date', 'JV#', 'Particular#', 'Type', 'Description', 'Comments', 'Debit (AED)', 'Credit (AED)', 'Balance (AED)']
+  const tableHead = ['Date', 'JV#', 'Particular#', 'Cost Center', 'Type', 'Description', 'Comments', 'Debit (AED)', 'Credit (AED)', 'Balance (AED)']
 
   const [loader, setLoader] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -108,6 +111,9 @@ function AccountLedger() {
   const [totalCount, setTotalCount] = useState(0);
   const [pageLimit, setPageLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
 
   // *For Filters
   const [filters, setFilters] = useState({});
@@ -155,7 +161,8 @@ function AccountLedger() {
       let params = {
         page: Page,
         limit: Limit,
-        account_id: id
+        account_id: id,
+        cost_center: selectedCostCenter?.name
       }
       params = { ...params, ...Filter }
       const { data } = await FinanceServices.getAccountLedgers(params)
@@ -173,19 +180,50 @@ function AccountLedger() {
   const handleFilter = () => {
     let data = {
       from_date: fromDate ? moment(new Date(fromDate)).format('MM-DD-YYYY') : '',
-      to_date: toDate ? moment(new Date(toDate)).format('MM-DD-YYYY') : ''
+      to_date: toDate ? moment(new Date(toDate)).format('MM-DD-YYYY') : '',
+      cost_center: selectedCostCenter?.name
     }
     getAccountLedgers(1, '', data)
     // Debounce(() => getAccountLedgers(1, '', data));
   }
+
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
 
   const handleFilterSearch = (data) => {
     Debounce(() => getAccountLedgers(1, '', data));
   }
 
   useEffect(() => {
+    getCostCenters()
     getAccountLedgers()
   }, []);
+  useEffect(() => {
+  
+    getAccountLedgers()
+  }, [selectedCostCenter]);
+  useEffect(() => {
+    if (state?.cost_center) {
+      setSelectedCostCenter(state?.cost_center)
+    }
+
+  }, [state])
+
+  console.log(state, 'statestate');
+
+
 
   return (
     <Box sx={{ m: 4, mb: 2 }}>
@@ -197,7 +235,7 @@ function AccountLedger() {
       {/* Filters */}
       <Box component={'form'} onSubmit={handleSubmit(handleFilter)}>
         <Grid container spacing={1} >
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={2.5}>
             <InputField
               size={'small'}
               label={'Search'}
@@ -207,7 +245,20 @@ function AccountLedger() {
               })}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={2.5}>
+            <SelectField
+
+              size={"small"}
+              label={"Cost Center"}
+              options={costCenters}
+              selected={selectedCostCenter}
+              onSelect={(value) => {
+                setSelectedCostCenter(value);
+              }}
+              register={register("costCenter")}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2.5}>
             <DatePicker
               disableFuture={true}
               size='small'
@@ -216,7 +267,7 @@ function AccountLedger() {
               onChange={(date) => handleFromDate(date)}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={2.5}>
             <DatePicker
               disableFuture={true}
               size='small'
@@ -274,6 +325,9 @@ function AccountLedger() {
                             </Cell>
                             <Cell>
                               {item?.entry?.reference_no ?? '-'}
+                            </Cell>
+                            <Cell>
+                              {item?.cost_center ?? '-'}
                             </Cell>
                             <Cell>
                               {item?.type?.type_name ?? '-'}

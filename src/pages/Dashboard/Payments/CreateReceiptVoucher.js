@@ -206,7 +206,7 @@ function CreateReceiptVoucher() {
                 page: 1,
                 limit: 10000,
                 name: search,
-
+                is_disabled:false
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
             const updatedAccounts = data?.accounts?.rows?.map(account => ({
@@ -504,7 +504,7 @@ function CreateReceiptVoucher() {
                             register={register1("Voucher")}
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={3}>
                         <SelectField
                             size="small"
                             label="Select Cost Center"
@@ -514,8 +514,8 @@ function CreateReceiptVoucher() {
                                 setSelectedCostCenter(value)
 
                             }}
-                            register={register("costcenter", { required: "costcenter is required" })}
-                            error={errors?.costcenter?.message}
+                            register={register1("costcenter", { required: "costcenter is required" })}
+                            error={errors1?.costcenter?.message}
                         />
                     </Grid>
                 </Grid>
@@ -685,13 +685,14 @@ function CreateReceiptVoucher() {
                         onSelect={(value) => {
                             setSelectedParentAccount(value)
                             console.log(value);
-                            setValue('parentAccount', value)
+                            setValue1('parentAccount', value)
 
                         }}
                         //  error={errors?.service?.message}
-                        register={register("parentAccount", {
+                        register={register1("parentAccount", {
                             required: "Please select a parentAccount.",
                         })}
+                        error={errors1?.parentAccount?.message}
                     />
                 </Grid>
             </Grid>

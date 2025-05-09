@@ -124,8 +124,8 @@ function ChartOfAccount() {
     // *For Get Chart Account
     const getChartOfAccount = async (filter) => {
         try {
-            let params={
-                cost_center:selectedCostCenter?.name
+            let params = {
+                cost_center: selectedCostCenter?.name
             }
             const { data } = await FinanceServices.getChartOfAccount(params)
             console.log(data);
@@ -155,6 +155,7 @@ function ChartOfAccount() {
 
             const { data } = await CustomerServices.getCostCenters(params);
             setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+            setSelectedCostCenter({ id: 'All', name: 'All' })
 
         } catch (error) {
             showErrorToast(error);
@@ -359,21 +360,12 @@ function ChartOfAccount() {
             })
         })
 
-        // Create a workbook with a worksheet
         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        const csv = XLSX.utils.sheet_to_csv(ws);
 
-        // Convert the workbook to an array buffer
-        const buf = XLSX.write(wb, {
-            bookType: "xlsx",
-            type: "array",
-            mimeType:
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        saveAs(blob, 'Chart_Of_Accounts.csv');
 
-        // Save the file using FileSaver.js
-        saveAs(new Blob([buf]), "Chart_Of_Accounts.xlsx");
     };
 
     const tabStyle = (selected) => ({
@@ -403,7 +395,7 @@ function ChartOfAccount() {
                 </Typography>
 
             </Box>
-            <Grid container spacing={2}> 
+            <Grid container spacing={2}>
 
 
                 <Grid item xs={3}>
@@ -428,7 +420,7 @@ function ChartOfAccount() {
                         title="Search"
                         sx={{ marginTop: "30px" }}
                         onClick={() => getChartOfAccount(null, null, null)}
-                    
+
                     />
 
                 </Grid>
@@ -475,10 +467,10 @@ function ChartOfAccount() {
                 <Grid item xs={4} sm={4}>
                     {chartOfAccount?.length > 0 && (
                         <Box sx={{
-                              display: "flex", gap: 2,justifyContent:'flex-end'
+                            display: "flex", gap: 2, justifyContent: 'flex-end'
 
                         }}>
-                          
+
                             <PrimaryButton
                                 title={"Export To Excel"}
                                 onClick={() => downloadExcel()}
@@ -594,7 +586,7 @@ function ChartOfAccount() {
                                                                                                     <Cell>
                                                                                                         {!account?.childAccounts &&
                                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                                <Box onClick={() => navigate(`/account-ledger/${account?.id}`, { state: { accountName: account?.account_name, nature: account?.nature } })}>
+                                                                                                                <Box onClick={() => navigate(`/account-ledger/${account?.id}`, { state: { accountName: account?.account_name, nature: account?.nature ,  cost_center:selectedCostCenter} })}>
                                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                                     </IconButton>
@@ -635,7 +627,7 @@ function ChartOfAccount() {
                                                                                                                         </Cell>
                                                                                                                         <Cell>
                                                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                                                <Box onClick={() => navigate(`/account-ledger/${child?.id}`, { state: { accountName: child?.account_name, nature: child?.nature } })}>
+                                                                                                                                <Box onClick={() => navigate(`/account-ledger/${child?.id}`, { state: { accountName: child?.account_name, nature: child?.nature,  cost_center:selectedCostCenter } })}>
                                                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                                                     </IconButton>
@@ -717,7 +709,7 @@ function ChartOfAccount() {
                                                                                     <Cell>
                                                                                         {!account?.childAccounts &&
                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                <Box onClick={() => navigate(`/account-ledger/${account?.id}`, { state: { accountName: account?.account_name, nature: account?.nature } })}>
+                                                                                                <Box onClick={() => navigate(`/account-ledger/${account?.id}`, { state: { accountName: account?.account_name, nature: account?.nature ,  cost_center:selectedCostCenter} })}>
                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                     </IconButton>
@@ -758,7 +750,7 @@ function ChartOfAccount() {
                                                                                                         </Cell>
                                                                                                         <Cell>
                                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                                <Box onClick={() => navigate(`/account-ledger/${child?.id}`, { state: { accountName: child?.account_name, nature: child?.nature } })}>
+                                                                                                                <Box onClick={() => navigate(`/account-ledger/${child?.id}`, { state: { accountName: child?.account_name, nature: child?.nature ,  cost_center:selectedCostCenter} })}>
                                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                                     </IconButton>

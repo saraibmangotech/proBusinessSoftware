@@ -529,6 +529,7 @@ function TrialBalance() {
     
                 const { data } = await CustomerServices.getCostCenters(params);
                 setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+                setSelectedCostCenter({ id: 'All', name: 'All' })
 
             } catch (error) {
                 showErrorToast(error);
@@ -1085,6 +1086,7 @@ function TrialBalance() {
                                                                                                                                                     account?.account_name,
                                                                                                                                                 nature:
                                                                                                                                                     account?.nature,
+                                                                                                                                                    cost_center:selectedCostCenter
                                                                                                                                             },
                                                                                                                                         }
                                                                                                                                     )
@@ -1244,6 +1246,7 @@ function TrialBalance() {
                                                                                                                                                                             child?.account_name,
                                                                                                                                                                         nature:
                                                                                                                                                                             child?.nature,
+                                                                                                                                                                            cost_center:selectedCostCenter
                                                                                                                                                                     },
                                                                                                                                                                 }
                                                                                                                                                             )
@@ -1488,6 +1491,7 @@ function TrialBalance() {
                                                                                                                     accountName:
                                                                                                                         account?.account_name,
                                                                                                                     nature: account?.nature,
+                                                                                                                    cost_center:selectedCostCenter
                                                                                                                 },
                                                                                                             }
                                                                                                         )
@@ -1585,6 +1589,7 @@ function TrialBalance() {
                                                                                                                                             child?.account_name,
                                                                                                                                         nature:
                                                                                                                                             child?.nature,
+                                                                                                                                            cost_center:selectedCostCenter
                                                                                                                                     },
                                                                                                                                 }
                                                                                                                             )

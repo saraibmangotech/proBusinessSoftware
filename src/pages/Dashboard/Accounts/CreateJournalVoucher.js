@@ -213,6 +213,7 @@ function CreateJournalVoucher() {
         page: 1,
         limit: 10000,
         name: search,
+        is_disabled:false
 
       }
       const { data } = await FinanceServices.getAccountsDropDown(params)
@@ -287,38 +288,42 @@ function CreateJournalVoucher() {
   }
   // *For Create Journal Voucher
   const createJournalVoucher = async (formData) => {
-    setLoading(true)
+    if (!selectedCostCenter || !selectedCostCenter.name) {
+      showErrorToast("Cost center is required.");
+      return;
+    }
+  
+    setLoading(true);
     try {
-
       let obj = {
         total: totalDebit,
         notes: getValues('note'),
         entries: rows,
-        created_at: moment(fromDate).format('MM-DD-YYYY')
-      }
-
-
+        created_at: moment(fromDate).format('MM-DD-YYYY'),
+        cost_center: selectedCostCenter.name,
+      };
+  
       const promise = FinanceServices.createJournalVoucher(obj);
-
+  
       showPromiseToast(
         promise,
         'Saving...',
         'Added Successfully',
         'Something Went Wrong'
       );
-
+  
       const response = await promise;
       if (response?.responseCode === 200) {
-        navigate('/journal-voucher-list')
+        navigate('/journal-voucher-list');
       }
-
-
+  
     } catch (error) {
-      showErrorToast(error)
+      showErrorToast(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+  
 
   const addItem = (data) => {
     console.log(data);

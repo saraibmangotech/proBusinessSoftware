@@ -220,6 +220,7 @@ function CreatePaymentVoucher() {
                 page: 1,
                 limit: 10000,
                 name: search,
+                is_disabled:false
 
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
@@ -515,8 +516,8 @@ function CreatePaymentVoucher() {
                                 setSelectedCostCenter(value)
 
                             }}
-                            register={register("costcenter", { required: "costcenter is required" })}
-                            error={errors?.costcenter?.message}
+                            register={register1("costcenter", { required: "costcenter is required" })}
+                            error={errors1?.costcenter?.message}
                         />
                     </Grid>
 
@@ -687,13 +688,14 @@ function CreatePaymentVoucher() {
                         onSelect={(value) => {
                             setSelectedParentAccount(value)
                             console.log(value);
-                            setValue('parentAccount', value)
+                            setValue1('parentAccount', value)
 
                         }}
                         //  error={errors?.service?.message}
-                        register={register("parentAccount", {
+                        register={register1("parentAccount", {
                             required: "Please select a parentAccount.",
                         })}
+                        error={errors1?.parentAccount?.message}
                     />
                 </Grid>
             </Grid>

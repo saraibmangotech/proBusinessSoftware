@@ -65,7 +65,8 @@ function CreateFundTransferVoucher() {
         page: 1,
         limit: 5000,
         sub_category: 4,
-        name: search
+        name: search,
+        is_disabled:false
       }
       const { data } = await FinanceServices.getAccountsDropDown(params)
       //console.log(data?.rows);

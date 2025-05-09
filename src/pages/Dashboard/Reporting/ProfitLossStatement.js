@@ -559,7 +559,7 @@ function ProfitLossStatement() {
 
         const { data } = await CustomerServices.getCostCenters(params);
         setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
-
+        setSelectedCostCenter({ id: 'All', name: 'All' })
     } catch (error) {
         showErrorToast(error);
     }

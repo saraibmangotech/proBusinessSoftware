@@ -115,7 +115,7 @@ function CreateProduct() {
     const [balanceType, setBalanceType] = useState(null)
     const [fieldsDisabled, setFieldsDisabled] = useState(false)
     const [holdState, setHoldState] = useState(true)
- 
+
     const [selectedCategory, setSelectedCategory] = useState(null)
     //documents array
 
@@ -141,13 +141,13 @@ function CreateProduct() {
 
         try {
             let obj = {
-                category_id:selectedCategory?.id,
+                category_id: selectedCategory?.id,
                 name: formData?.name,
                 price: formData?.price,
                 sku: formData?.sku,
                 unit: formData?.unit,
                 description: formData?.description,
-                impact_account_id:selectedAccount?.id
+                impact_account_id: selectedAccount?.id
 
 
             };
@@ -219,50 +219,51 @@ function CreateProduct() {
         }
     };
     // *For Get Account
-        const getAccounts = async (search, accountId) => {
-            try {
-                let params = {
-                    page: 1,
-                    limit: 10000,
-                    name: search,
-    
-                }
-                const { data } = await FinanceServices.getAccountsDropDown(params)
-                const updatedAccounts = data?.accounts?.rows?.map(account => ({
-                    ...account,
-                    name: ` ${account.account_code} ${account.name}`
-                }));
-                console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
-    
-                setAccounts(updatedAccounts)
-                getSettings(updatedAccounts)
-            } catch (error) {
-                showErrorToast(error)
-            }
-        }
+    const getAccounts = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false
 
-        const getSettings = async (accountsArray) => {
-            try {
-                let params = {
-                    page: 1,
-                    limit: 10000,
-                  
-    
-                }
-                const { data } = await SystemServices.getSettings(params)
-                console.log(data,'datadata');
-                const filtered = accountsArray?.find(item => item?.id === data?.settings?.inventory);
-                console.log(filtered, 'filtered results');
-                setSelectedAccount(filtered)
-                
-                
-               
-            } catch (error) {
-                showErrorToast(error)
             }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts(updatedAccounts)
+            getSettings(updatedAccounts)
+        } catch (error) {
+            showErrorToast(error)
         }
+    }
+
+    const getSettings = async (accountsArray) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+
+
+            }
+            const { data } = await SystemServices.getSettings(params)
+            console.log(data, 'datadata');
+            const filtered = accountsArray?.find(item => item?.id === data?.settings?.inventory);
+            console.log(filtered, 'filtered results');
+            setSelectedAccount(filtered)
+
+
+
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
     useEffect(() => {
-       
+
         getAccounts()
         getCategories()
     }, [])
@@ -307,7 +308,7 @@ function CreateProduct() {
                                             selected={selectedCategory}
                                             onSelect={(value) => {
                                                 setSelectedCategory(value)
-                                               
+
                                             }}
                                             register={register("category", { required: "category is required" })}
                                             error={errors?.category?.message}
@@ -321,7 +322,7 @@ function CreateProduct() {
                                             selected={selectedAccount}
                                             onSelect={(value) => {
                                                 setSelectedAccount(value)
-                                               
+
                                             }}
                                             register={register("account", { required: "account is required" })}
                                             error={errors?.account?.message}

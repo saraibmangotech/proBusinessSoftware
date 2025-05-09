@@ -41,6 +41,7 @@ import { saveAs } from "file-saver";
 import { PDFExport } from "@progress/kendo-react-pdf";
 import { showErrorToast } from "components/NewToaster";
 import { logDOM } from "@testing-library/react";
+import CustomerServices from "services/Customer";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -50,49 +51,49 @@ const Row = styled(TableRow)(({ theme }) => ({
 
 const Cell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-      fontSize: 14,
-      fontFamily: 'Public Sans',
-      border: '1px solid #EEEEEE',
-      padding: '15px',
-      textAlign: 'left',
-      whiteSpace: 'nowrap',
-      color: '#434343',
-      paddingRight: '50px',
-      background: 'transparent',
-      fontWeight: 'bold'
+    fontSize: 14,
+    fontFamily: 'Public Sans',
+    border: '1px solid #EEEEEE',
+    padding: '15px',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    color: '#434343',
+    paddingRight: '50px',
+    background: 'transparent',
+    fontWeight: 'bold'
 
   },
   [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      fontFamily: 'Public Sans',
+    fontSize: 14,
+    fontFamily: 'Public Sans',
 
-      textWrap: 'nowrap',
-      padding: '5px !important',
-      paddingLeft: '15px !important',
+    textWrap: 'nowrap',
+    padding: '5px !important',
+    paddingLeft: '15px !important',
 
+    '.MuiBox-root': {
+      display: 'flex',
+      gap: '6px',
+      alignItems: 'center',
+      justifyContent: 'center',
       '.MuiBox-root': {
-          display: 'flex',
-          gap: '6px',
-          alignItems: 'center',
-          justifyContent: 'center',
-          '.MuiBox-root': {
-              cursor: 'pointer'
-          }
-      },
-      'svg': {
-          width: 'auto',
-          height: '24px',
-      },
-      '.MuiTypography-root': {
-          textTransform: 'capitalize',
-          fontFamily: FontFamily.NunitoRegular,
-          textWrap: 'nowrap',
-      },
-      '.MuiButtonBase-root': {
-          padding: '8px',
-          width: '28px',
-          height: '28px',
+        cursor: 'pointer'
       }
+    },
+    'svg': {
+      width: 'auto',
+      height: '24px',
+    },
+    '.MuiTypography-root': {
+      textTransform: 'capitalize',
+      fontFamily: FontFamily.NunitoRegular,
+      textWrap: 'nowrap',
+    },
+    '.MuiButtonBase-root': {
+      padding: '8px',
+      width: '28px',
+      height: '28px',
+    }
   },
 }));
 
@@ -119,12 +120,13 @@ function GeneralLedger() {
     "JV#",
     "Particular#",
     "Type",
+    "Cost Center",
     "Description",
     "Comments",
     "Debit (AED)",
     "Credit (AED)",
     "Balance (AED)",
-   
+
   ];
 
   const [loader, setLoader] = useState(false);
@@ -141,6 +143,8 @@ function GeneralLedger() {
 
   let Balance = TotalBalance;
 
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   // *For Accounts
   const [childAccounts, setChildAccounts] = useState([]);
   const [selectedChildAccount, setSelectedChildAccount] = useState(null);
@@ -188,7 +192,8 @@ function GeneralLedger() {
       let params = {
         page: 1,
         limit: 50,
-        name: search
+        name: search,
+        is_disabled:false
       };
       const { data } = await FinanceServices.getAccountsDropDown(params);
 
@@ -248,6 +253,7 @@ function GeneralLedger() {
         ? moment(new Date(fromDate)).format("MM-DD-YYYY")
         : "",
       to_date: toDate ? moment(new Date(toDate)).format("MM-DD-YYYY") : "",
+      cost_center: selectedCostCenter?.name
     };
     getAccountLedgers(1, "", data);
   };
@@ -258,27 +264,27 @@ function GeneralLedger() {
   const downloadExcel = () => {
     const headers = tableHead.filter((item) => item !== "Action");
     const data = accountLedgers;
-  
+
     let totalDebit = 0;
     let totalCredit = 0;
     let runningBalance = 0;
-  
+
     const accountNature = data[0]?.account?.nature || "debit"; // default to debit if undefined
-  
+
     const rows = data.map((item) => {
       const debit = parseFloat(item?.debit || 0);
       const credit = parseFloat(item?.credit || 0);
-  
+
       totalDebit += debit;
       totalCredit += credit;
-  
+
       // Update running balance according to account nature
       if (accountNature === "debit") {
         runningBalance += debit - credit;
       } else {
         runningBalance += credit - debit;
       }
-  
+
       return [
         item?.created_at ? moment(item?.created_at).format("MM-DD-YYYY") : "-",
         item?.journal_id ? item?.series_id + item?.journal_id : "-",
@@ -291,73 +297,85 @@ function GeneralLedger() {
         runningBalance.toFixed(2)
       ];
     });
-  
+
     // Append totals row
     const totalRow = [
-      "Total", "", "", "", "", "", 
+      "Total", "", "", "", "", "",
       totalDebit.toFixed(2),
       totalCredit.toFixed(2),
-      
+
     ];
     rows.push(totalRow);
-  
+
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  
-    const buf = XLSX.write(wb, {
-      bookType: "xlsx",
-      type: "array",
-      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-  
-    saveAs(new Blob([buf]), "General_Ledger.xlsx");
+    const csv = XLSX.utils.sheet_to_csv(ws);
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'General_Ledger.csv');
+
   };
-  
-  
+
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
 
   useEffect(() => {
+    getCostCenters()
     getAccountsDropDown();
   }, []);
 
   return (
-    <Box sx={{ p:3 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mr: 4,
-          my: 4,
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{
-            color: Colors.charcoalGrey,
-            fontFamily: FontFamily.NunitoRegular,
-          }}
-        >
-          General Ledger
-        </Typography>
-        {accountLedgers?.length > 0 && (
-          <Box sx={{
-            textAlign: "right", p: 4, display: "flex", gap: 2
+    <Box sx={{ p: 3 }}>
 
-          }}>
-          
-            <PrimaryButton
-              title={"Download Excel"}
-              onClick={() => downloadExcel()}
-            />
-          </Box>
-        )}
-      </Box>
+      {accountLedgers?.length > 0 && (
+        <Box sx={{
+          textAlign: "right", display: "flex",
+          justifyContent: 'flex-end',
+          mb:2
+
+        }}>
+
+          <PrimaryButton
+            title={"Download Excel"}
+            onClick={() => downloadExcel()}
+          />
+        </Box>
+      )}
 
       {/* Filters */}
       <Box >
         <Box component={"form"} onSubmit={handleSubmit(handleFilter)}>
-          <Grid container spacing={1} columns={14}>
+          <Box sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2
+          }} >
+            <Typography
+              variant="h5"
+              sx={{
+                color: Colors.charcoalGrey,
+                fontFamily: FontFamily.NunitoRegular,
+              }}
+            >
+              General Ledger
+            </Typography>
+            <PrimaryButton title="Search" type="submit" loading={loading} />
+
+
+          </Box>
+          <Grid container spacing={1} columns={12}>
             <Grid item xs={12} sm={2}>
               <SelectField
                 size={"small"}
@@ -394,7 +412,20 @@ function GeneralLedger() {
                 })}
               />
             </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={12} sm={2}>
+              <SelectField
+
+                size={"small"}
+                label={"Cost  Center"}
+                options={costCenters}
+                selected={selectedCostCenter}
+                onSelect={(value) => {
+                  setSelectedCostCenter(value);
+                }}
+                register={register("costCenter")}
+              />
+            </Grid>
+            <Grid item xs={12} sm={2}>
               <DatePicker
                 disableFuture={true}
                 size="small"
@@ -403,7 +434,8 @@ function GeneralLedger() {
                 onChange={(date) => handleFromDate(date)}
               />
             </Grid>
-            <Grid item xs={12} sm={3}>
+
+            <Grid item xs={12} sm={2}>
               <DatePicker
                 disableFuture={true}
                 size="small"
@@ -413,9 +445,7 @@ function GeneralLedger() {
                 onChange={(date) => handleToDate(date)}
               />
             </Grid>
-            <Grid item xs={12} sm={1} sx={{ mt: 3.5 }}>
-              <PrimaryButton title="Search" type="submit" loading={loading} />
-            </Grid>
+
           </Grid>
         </Box>
 
@@ -486,6 +516,7 @@ function GeneralLedger() {
                                 </Cell>
                                 <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
                                 <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
+                                <Cell className="pdf-table">{item?.cost_center ?? "-"}</Cell>
                                 <Cell className="pdf-table">
                                   <Tooltip
                                     className="pdf-hide"
