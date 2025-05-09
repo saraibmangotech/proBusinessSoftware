@@ -47,6 +47,7 @@ function CreatePaidReceipt() {
   const [subTotal, setSubTotal] = useState(0)
   const [payButton, setPayButton] = useState(false)
   const [rows, setRows] = useState([])
+  const [oldRows, setOldRows] = useState([])
   const [buttonDisabled, setButtonDisabled] = useState(false)
   const [amountError, setAmountError] = useState("")
   console.log(rows, "data")
@@ -163,7 +164,7 @@ function CreatePaidReceipt() {
   const [step1FormData, setStep1FormData] = useState()
   const [selectedType, setSelectedType] = useState(null)
   const [date, setDate] = useState(null)
-  const [paidAt, setPaidAt] = useState(null)
+  const [paidAt, setPaidAt] = useState(new Date())
   const [balanceType, setBalanceType] = useState(null)
   const [imageURL, setImageURL] = useState(null)
   const fileInputRef = useRef(null)
@@ -388,6 +389,7 @@ function CreatePaidReceipt() {
         }
 
         setRows(data?.receipt?.sale_receipt_items)
+        setOldRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
         setCreditButton(true)
         setValue1("paid", 0)
@@ -701,6 +703,7 @@ function CreatePaidReceipt() {
         setHoldState(true)
         setCreditButton(true)
         setRows(data?.receipt?.sale_receipt_items)
+        setOldRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
 
         //alert("Data found")
@@ -1111,8 +1114,8 @@ function CreatePaidReceipt() {
                           <TextField
                             size="small"
                             placeholder="Transaction Id"
-                            disabled={item.transaction_id ? true : false}
-                            type="number"
+                            disabled={oldRows[index].transaction_id ? true : false}
+                            type="text"
                             value={item.transaction_id || ""}
                             onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
                           />

@@ -589,7 +589,9 @@ function CollectionReport() {
     });
   
     const csvString = csvRows.map(row => row.join(',')).join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const csvWithBOM = "\uFEFF" + csvString; // Excel needs BOM for UTF-8
+
+    const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

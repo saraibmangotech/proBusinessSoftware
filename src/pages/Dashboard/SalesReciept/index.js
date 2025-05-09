@@ -154,14 +154,14 @@ function SalesReciept() {
   
     setRows((prevRows) => {
       // If not the first row, enforce that all sales_ids must match
-      if (prevRows.length > 0) {
-        const existingSalesId = prevRows[0].sales_id;
+      // if (prevRows.length > 0) {
+      //   const existingSalesId = prevRows[0].sales_id;
   
-        if (existingSalesId !== newSalesId) {
-          showErrorToast("Only items with the same sales account ID can be added.");
-          return prevRows; // Don't add if sales_id is different
-        }
-      }
+      //   if (existingSalesId !== newSalesId) {
+      //     showErrorToast("Only items with the same sales account ID can be added.");
+      //     return prevRows; // Don't add if sales_id is different
+      //   }
+      // }
   
       // Add the item since it's the first one or has the same sales_id
       const updatedRows = [...prevRows, newRow];
@@ -620,14 +620,14 @@ function SalesReciept() {
     setRows(prevItems => {
       console.log("Previous rows:", prevItems);
   
-      // Get the existing sales_id from the list (any one is enough)
-      const existingSalesId = prevItems.length > 0 ? prevItems[0].sales_id : null;
+      // // Get the existing sales_id from the list (any one is enough)
+      // const existingSalesId = prevItems.length > 0 ? prevItems[0].sales_id : null;
   
-      // Check if the updated item has a different sales_id
-      if (existingSalesId && existingSalesId !== updatedSalesId) {
-        showErrorToast("You can only update with the same sales account ID.");
-        return prevItems; // Don't update
-      }
+      // // Check if the updated item has a different sales_id
+      // if (existingSalesId && existingSalesId !== updatedSalesId) {
+      //   showErrorToast("You can only update with the same sales account ID.");
+      //   return prevItems; // Don't update
+      // }
   
       const updatedRows = prevItems.map(item => {
         if (item.id === data.id) {

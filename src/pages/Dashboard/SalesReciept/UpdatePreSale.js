@@ -143,17 +143,17 @@ function UpdatePreSale() {
         console.log(data, 'datadata');
       
         const newSalesId = serviceItem?.sales_account_id;
-        const newRow = { ...data, service: serviceItem, sales_id: newSalesId };
+        const newRow = { ...data, service: serviceItem, sales_id: newSalesId, service_id: serviceItem.id };
       
         setRows((prevRows) => {
           // If not the first row, enforce that all sales_ids must match
           if (prevRows.length > 0) {
-            const existingSalesId = prevRows[0].sales_id ?  prevRows[0].sales_id  : prevRows[0].service.sales_account_id;
-            console.log(prevRows,"prev")
-            if (existingSalesId !== newSalesId) {
-              showErrorToast("Only items with the same sales account ID can be added.");
-              return prevRows; // Don't add if sales_id is different
-            }
+            // const existingSalesId = prevRows[0].sales_id ?  prevRows[0].sales_id  : prevRows[0].service.sales_account_id;
+            // console.log(prevRows,"prev")
+            // if (existingSalesId !== newSalesId) {
+            //   showErrorToast("Only items with the same sales account ID can be added.");
+            //   return prevRows; // Don't add if sales_id is different
+            // }
           }
       
           // Add the item since it's the first one or has the same sales_id
@@ -190,13 +190,13 @@ function UpdatePreSale() {
           console.log("Previous rows:", prevItems);
       
           // Get the existing sales_id from the list (any one is enough)
-          const existingSalesId = prevItems.length > 0 ?  prevItems[0].service.sales_id ? prevItems[0].service.sales_id  : prevItems[0].service.sales_account_id : null;
-            console.log(existingSalesId,"existing")
-          // Check if the updated item has a different sales_id
-          if (existingSalesId && existingSalesId !== updatedSalesId) {
-            showErrorToast("You can only update with the same sales account ID.");
-            return prevItems; // Don't update
-          }
+        //   const existingSalesId = prevItems.length > 0 ?  prevItems[0].sales_id ? prevItems[0].sales_id  : prevItems[0].service.sales_account_id : null;
+        //     console.log(existingSalesId,"existing")
+        //   // Check if the updated item has a different sales_id
+        //   if (existingSalesId && existingSalesId !== updatedSalesId) {
+        //     showErrorToast("You can only update with the same sales account ID.");
+        //     return prevItems; // Don't update
+        //   }
       
           const updatedRows = prevItems.map(item => {
             if (item.id === data.id) {
@@ -1112,6 +1112,7 @@ function UpdatePreSale() {
                                                         setValue("application_id", item?.application_id);
                                                         setValue("ref_no", item?.ref_no);
                                                         setValue("service", item?.service);
+                                                        setValue("service_id", item?.service_id);
                                                         setServiceItem(item?.service);
                                                         setValue("quantity", item?.quantity);
                                                         console.log(item?.service, "tteeet")
