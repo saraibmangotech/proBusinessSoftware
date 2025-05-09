@@ -261,18 +261,23 @@ function GeneralLedger() {
   
     let totalDebit = 0;
     let totalCredit = 0;
-    let totalBalance = 0;
+    let runningBalance = 0;
   
-    const rows = data.map((item, index) => {
-      console.log(item,'itemitem');
-      
+    const accountNature = data[0]?.account?.nature || "debit"; // default to debit if undefined
+  
+    const rows = data.map((item) => {
       const debit = parseFloat(item?.debit || 0);
       const credit = parseFloat(item?.credit || 0);
-      const balance = item?.account?.nature == 'debit' ? parseFloat(item?.debit || 0) - parseFloat(item?.credit || 0) : parseFloat(item?.credit || 0) - parseFloat(item?.debit || 0)   || 0; // Assuming `Balance` is a global or calculated value
   
       totalDebit += debit;
       totalCredit += credit;
-     
+  
+      // Update running balance according to account nature
+      if (accountNature === "debit") {
+        runningBalance += debit - credit;
+      } else {
+        runningBalance += credit - debit;
+      }
   
       return [
         item?.created_at ? moment(item?.created_at).format("MM-DD-YYYY") : "-",
@@ -283,7 +288,7 @@ function GeneralLedger() {
         item?.comment ?? "-",
         debit.toFixed(2),
         credit.toFixed(2),
-        balance.toFixed(2)
+        runningBalance.toFixed(2)
       ];
     });
   
@@ -292,7 +297,7 @@ function GeneralLedger() {
       "Total", "", "", "", "", "", 
       totalDebit.toFixed(2),
       totalCredit.toFixed(2),
-     
+      
     ];
     rows.push(totalRow);
   
@@ -306,8 +311,9 @@ function GeneralLedger() {
       mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
   
-    saveAs(new Blob([buf]), "data.xlsx");
+    saveAs(new Blob([buf]), "General_Ledger.xlsx");
   };
+  
   
 
   useEffect(() => {

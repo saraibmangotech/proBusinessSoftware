@@ -104,7 +104,7 @@ function CreateJournalVoucher() {
   // *For Sub Categories
   const [subCategories, setSubCategories] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-
+  const [editState, setEditState] = useState(false)
   // *For Parent Account
   const [parentAccounts, setParentAccounts] = useState([]);
   const [selectedParentAccount, setSelectedParentAccount] = useState(null);
@@ -240,7 +240,7 @@ function CreateJournalVoucher() {
         credit: formData?.credit ? formData?.credit : 0,
         description: formData?.description,
         currency: selectedAccount?.currency,
-        cost_center:selectedCostCenter?.name
+        cost_center: selectedCostCenter?.name
 
       }
       voucherCopy.push(obj)
@@ -289,7 +289,7 @@ function CreateJournalVoucher() {
   const createJournalVoucher = async (formData) => {
     setLoading(true)
     try {
-     
+
       let obj = {
         total: totalDebit,
         notes: getValues('note'),
@@ -324,38 +324,82 @@ function CreateJournalVoucher() {
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
-  
+
     // Check if both debit and credit are 0
     if (debit === 0 && credit === 0) {
       showErrorToast('Either Debit or Credit must be greater than 0');
       return;
     }
-  
+
     setRows((prevRows) => {
       const newRow = {
         ...data,
         unique_id: Date.now() + Math.random(), // Ensure unique key
         account_id: selectedAccount?.id,
         name: selectedAccount?.name,
+        selectedAccount: selectedAccount
       };
-  
+
       const updatedRows = [...prevRows, newRow];
-  
+
       const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
       const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
-  
+
       setTotalCredit(newTotalCredit);
       setTotalDebit(newTotalDebit);
       setIsCreditDisabled(false);
       setIsDebitDisabled(false);
-  
+
       return updatedRows;
     });
-  
+
     setSelectedAccount(null);
     reset();
   };
-  
+
+  const updateItem = (data) => {
+    if (!selectedRow) {
+      showErrorToast('No row selected to update');
+      return;
+    }
+
+    const debit = parseFloat(data?.debit || 0);
+    const credit = parseFloat(data?.credit || 0);
+
+    if (debit === 0 && credit === 0) {
+      showErrorToast('Either Debit or Credit must be greater than 0');
+      return;
+    }
+
+    setRows((prevRows) => {
+      const updatedRows = prevRows.map((row) =>
+        row.unique_id === selectedRow
+          ? {
+            ...row,
+            ...data,
+            account_id: selectedAccount?.id,
+            name: selectedAccount?.name,
+          }
+          : row
+      );
+
+      const newTotalCredit = updatedRows.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
+      const newTotalDebit = updatedRows.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
+
+      setTotalCredit(newTotalCredit);
+      setTotalDebit(newTotalDebit);
+      setIsCreditDisabled(false);
+      setIsDebitDisabled(false);
+
+      return updatedRows;
+    });
+
+    setSelectedAccount(null);
+    setSelectedRow(null);
+    reset();
+  };
+
+
 
   useEffect(() => {
     getAccounts()
@@ -395,28 +439,28 @@ function CreateJournalVoucher() {
             />
           </Grid>
           <Grid item xs={3}>
-              <SelectField
-                size="small"
-                label="Select Cost Center"
-                options={costCenters}
-                selected={selectedCostCenter}
-                onSelect={(value) => {
-                  setSelectedCostCenter(value)
-                  
-                }}
-                register={register1("costcenter", { required: "costcenter is required" })}
-                error={errors1?.costcenter?.message}
-              />
-            </Grid>
+            <SelectField
+              size="small"
+              label="Select Cost Center"
+              options={costCenters}
+              selected={selectedCostCenter}
+              onSelect={(value) => {
+                setSelectedCostCenter(value)
+
+              }}
+              register={register1("costcenter", { required: "costcenter is required" })}
+              error={errors1?.costcenter?.message}
+            />
+          </Grid>
         </Grid>
 
 
 
-      
+
       </Box>
 
 
-      <form onSubmit={handleSubmit(addItem)}>
+      <form onSubmit={handleSubmit(editState ? updateItem : addItem)}>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -437,7 +481,7 @@ function CreateJournalVoucher() {
                   <SelectField
                     size="small"
                     options={accounts}
-
+                    disabled={editState}
                     selected={selectedAccount}
                     onSelect={(value) => {
                       setSelectedAccount(value)
@@ -480,7 +524,7 @@ function CreateJournalVoucher() {
                     size="small"
                     placeholder="Credit"
                     type="number"
-                       step='any'
+                    step='any'
                     disabled={isCreditDisabled}
                     register={register("credit", {
                       required: "Credit is required",
@@ -510,7 +554,8 @@ function CreateJournalVoucher() {
                 </TableCell>
 
                 <TableCell>
-                  {<Button
+                  <Box sx={{display:'flex',gap:2}}>
+                  {!editState && <Button
                     variant="contained"
                     color="primary"
                     type="submit"
@@ -525,7 +570,42 @@ function CreateJournalVoucher() {
                   >
                     <AddIcon />
                   </Button>}
-
+                  {editState && <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{
+                      textTransform: 'capitalize',
+                      backgroundColor: "rgb(189 155 74)",
+                      fontSize: "12px",
+                      ":hover": {
+                        backgroundColor: "rgb(189 155 74)",
+                      },
+                    }}
+                  >
+                    Update
+                  </Button>}
+                  {editState && <Button
+                    variant="contained"
+                    color="primary"
+                  onClick={()=> {
+                    setSelectedAccount(null)
+                    setValue('debit','')
+                    setValue('credit','')
+                    setValue('description','')
+                    setEditState(false)}}
+                    sx={{
+                      textTransform: 'capitalize',
+                      backgroundColor: "rgb(189 155 74)",
+                      fontSize: "12px",
+                      ":hover": {
+                        backgroundColor: "rgb(189 155 74)",
+                      },
+                    }}
+                  >
+                    Cancel
+                  </Button>}
+                  </Box>
                 </TableCell>
               </TableRow>}
 
@@ -541,6 +621,16 @@ function CreateJournalVoucher() {
 
 
                     <Box>
+                      {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
+                        setSelectedRow(item?.unique_id)
+                        setEditState(true)
+                        console.log(item);
+                        setSelectedAccount(item?.selectedAccount)
+                        setValue('service',item?.selectedAccount?.name)
+                        setValue('debit',item?.debit)
+                        setValue('credit',item?.credit)
+                        setValue('description',item?.description)
+                      }} src={Images.editIcon} width={'35px'}></Box>}
                       {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
                         let selectedID = item?.id
