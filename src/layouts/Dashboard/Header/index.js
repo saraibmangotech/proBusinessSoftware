@@ -588,7 +588,17 @@ function Header() {
           navigation: true,
           order_by: 2,
           children: [
-
+            {
+              id: 33,
+              name: "Create  Sale Invoice Payment",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/create-sale-invoice-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
             {
               id: 33,
               name: "Create  Sale Request",
