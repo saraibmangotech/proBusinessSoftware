@@ -393,11 +393,11 @@ function CreateSaleInvoicePayment() {
         }
 
         const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
-
+        const additionalTotal = payments.reduce((sum, p) => sum + parseFloat(p.additional_charges_value || 0), 0);
         try {
             let obj = {
-                additional_charges_percentage: formData?.percentage,
-                additional_charges_value: formData?.additionalCharges,
+        
+                total_additional_charges: additionalTotal,
                 payment_methods: payments,
                 total_amount: getValues('total'),
                 final_amount: finalTotal,
