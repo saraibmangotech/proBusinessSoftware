@@ -149,7 +149,7 @@ function AccountLedger() {
   }
 
   // *For Get Account Ledger
-  const getAccountLedgers = async (page, limit, filter) => {
+  const getAccountLedgers = async (page, limit, filter,CostCenter) => {
     setLoading(true)
     try {
       const Page = page ? page : currentPage
@@ -162,7 +162,7 @@ function AccountLedger() {
         page: Page,
         limit: Limit,
         account_id: id,
-        cost_center: selectedCostCenter?.name
+        cost_center: CostCenter?.name
       }
       params = { ...params, ...Filter }
       const { data } = await FinanceServices.getAccountLedgers(params)
@@ -208,14 +208,12 @@ function AccountLedger() {
 
   useEffect(() => {
     getCostCenters()
-    getAccountLedgers()
+
   }, []);
-  useEffect(() => {
-  
-    getAccountLedgers()
-  }, [selectedCostCenter]);
+
   useEffect(() => {
     if (state?.cost_center) {
+      getAccountLedgers(null,null,null,state?.cost_center)
       setSelectedCostCenter(state?.cost_center)
     }
 
