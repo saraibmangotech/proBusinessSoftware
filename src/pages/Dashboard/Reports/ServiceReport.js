@@ -8,6 +8,7 @@ import {
   Tooltip,
   Checkbox,
   InputAdornment,
+  Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -34,6 +35,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
+import { FileDownload } from "@mui/icons-material"
 import moment from 'moment';
 import LabelCustomInput from 'components/Input/LabelCustomInput';
 import { showErrorToast, showPromiseToast } from 'components/NewToaster';
@@ -41,6 +43,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
+import { CSVLink } from 'react-csv';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -126,7 +129,7 @@ function ServiceReport() {
     reset,
   } = useForm();
 
-  const tableHead = [{ name: 'SR No.', key: '' },{ name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
   const [loader, setLoader] = useState(false);
@@ -143,7 +146,7 @@ function ServiceReport() {
   const [currentPage, setCurrentPage] = useState(1);
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
-  
+
 
 
 
@@ -161,18 +164,18 @@ function ServiceReport() {
     setLoader(true)
 
     try {
-   
+
       let params = {
         page: 1,
         limit: 1000,
         from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-     
+
       }
-     
+
       const { data } = await CustomerServices.getServiceReport(params)
       setCustomerQueue(data?.rows)
-     
+
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -205,51 +208,51 @@ function ServiceReport() {
     Debounce(() => getCustomerQueue(1, '', data));
   }
 
-    const handleFromDate = (newDate) => {
-      try {
-        // eslint-disable-next-line eqeqeq
-        if (newDate == 'Invalid Date') {
-          setFromDate('invalid')
-          return
-        }
-        console.log(newDate, "newDate")
-        setFromDate(new Date(newDate))
-      } catch (error) {
-        ErrorToaster(error)
+  const handleFromDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setFromDate('invalid')
+        return
       }
+      console.log(newDate, "newDate")
+      setFromDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
     }
-  
-    const handleToDate = (newDate) => {
-      try {
-        // eslint-disable-next-line eqeqeq
-        if (newDate == 'Invalid Date') {
-          setToDate('invalid')
-          return
-        }
-        setToDate(new Date(newDate))
-      } catch (error) {
-        ErrorToaster(error)
+  }
+
+  const handleToDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setToDate('invalid')
+        return
       }
+      setToDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
     }
+  }
 
 
   const handleDelete = async (item) => {
- 
+
 
     try {
-        let params = { reception_id: selectedData?.id }
+      let params = { reception_id: selectedData?.id }
 
 
-        const { message } = await CustomerServices.deleteReception(params)
+      const { message } = await CustomerServices.deleteReception(params)
 
-        SuccessToaster(message);
-        getCustomerQueue()
+      SuccessToaster(message);
+      getCustomerQueue()
     } catch (error) {
-        showErrorToast(error)
+      showErrorToast(error)
     } finally {
-        // setLoader(false)
+      // setLoader(false)
     }
-}
+  }
   const UpdateStatus = async () => {
     try {
       let obj = {
@@ -288,7 +291,7 @@ function ServiceReport() {
     {
       header: "Inv No.",
       accessorKey: "invoice_number",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
         <Box
@@ -302,8 +305,8 @@ function ServiceReport() {
     },
     {
       header: "Inv Date",
-      
-   
+
+
       accessorFn: (row) => row?.receipt?.invoice_date ? moment(row?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
       cell: ({ row }) => (
         <Box
@@ -314,12 +317,12 @@ function ServiceReport() {
           {row?.original?.receipt?.invoice_date ? moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY") : ''}
         </Box>
       ),
-      total:false,
+      total: false,
     },
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: (row) =>  agencyType[process.env.REACT_APP_TYPE].category,
+      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE].category,
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -333,7 +336,7 @@ function ServiceReport() {
     {
       header: "Stock ID",
       accessorKey: "stock_id",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.service?.item_code,
       cell: ({ row }) => (
         <Box
@@ -348,7 +351,7 @@ function ServiceReport() {
     {
       header: "Service Name",
       accessorKey: "service_name",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.service?.name,
       cell: ({ row }) => (
         <Box
@@ -363,7 +366,7 @@ function ServiceReport() {
     {
       header: "Category",
       accessorKey: "category",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.service?.category?.name,
       cell: ({ row }) => (
         <Box
@@ -377,9 +380,9 @@ function ServiceReport() {
     },
     {
       header: "Customer Ref",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.customer?.name,
-  
+
       cell: ({ row }) => (
         <Box
           variant="contained"
@@ -393,7 +396,7 @@ function ServiceReport() {
     {
       header: "Display Customer",
       accessorKey: "customer_name",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
         <Box
@@ -408,7 +411,7 @@ function ServiceReport() {
     {
       header: "Customer Mobile",
       accessorKey: "customer_mobile",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.customer_mobile,
       cell: ({ row }) => (
         <Box
@@ -423,7 +426,7 @@ function ServiceReport() {
     {
       header: "Customer Email",
       accessorKey: "customer_email",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.customer_email,
       cell: ({ row }) => (
         <Box
@@ -475,7 +478,7 @@ function ServiceReport() {
       header: "Govt. Fee",
       accessorKey: "govt_fee",
     },
-   
+
     {
       header: "Bank Service Charge",
       accessorKey: "bank_charge",
@@ -504,29 +507,29 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          { parseFloat(row?.original?.govt_fee) + parseFloat(row?.original?.bank_charge)}
+          {parseFloat(row?.original?.govt_fee) + parseFloat(row?.original?.bank_charge)}
         </Box>
       ),
     },
     {
       header: "Transaction ID",
       accessorKey: "transaction_id",
-      total:false,
+      total: false,
     },
     {
       header: "Application/Case ID",
       accessorKey: "application_id",
-      total:false,
+      total: false,
     },
     {
       header: "Ref Name",
       accessorKey: "ref_no",
-      total:false,
+      total: false,
     },
     {
       header: "Payment Status",
       accessorKey: "payment_status",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.payment_status,
       cell: ({ row }) => (
         <Box
@@ -534,14 +537,14 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {row?.original?.receipt?.is_paid ? "Paid" : "UnPaid" }
+          {row?.original?.receipt?.is_paid ? "Paid" : "UnPaid"}
         </Box>
       ),
     },
     {
       header: "Employee ID",
       accessorKey: "employee_id",
-      total:false,
+      total: false,
       accessorFn: (row) => row?.receipt?.creator?.employee_id,
       cell: ({ row }) => (
         <Box
@@ -555,7 +558,7 @@ function ServiceReport() {
     },
     {
       header: "Employee Name",
-      total:false,
+      total: false,
       accessorKey: "employee_name",
       accessorFn: (row) => row?.receipt?.creator?.name,
       cell: ({ row }) => (
@@ -570,8 +573,8 @@ function ServiceReport() {
     },
     {
       header: "Line Total",
-      
-      accessorKey: "total",
+
+
       accessorFn: (row) => parseFloat(row?.total) + ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05),
       cell: ({ row }) => (
         <Box
@@ -585,7 +588,7 @@ function ServiceReport() {
     },
     {
       header: "Invoice Total",
-      accessorKey: "receipt?.total_amount",
+      accessorKey: "total_amount",
       accessorFn: (row) => parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat),
       cell: ({ row }) => (
         <Box
@@ -593,11 +596,119 @@ function ServiceReport() {
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat) }
+          {parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat)}
         </Box>
       ),
     },
   ];
+  const headers = [
+    "SR No.", 
+    "Inv No.", 
+    "Inv Date", 
+    "Department", 
+    "Stock ID", 
+    "Service Name", 
+    "Category", 
+    "Customer Ref", 
+    "Display Customer", 
+    "Customer Mobile", 
+    "Customer Email", 
+    "Quantity", 
+    "Service Charge", 
+    "Total Service Charge", 
+    "Total VAT", 
+    "Govt. Fee", 
+    "Bank Service Charge", 
+    "Other Charge", 
+    "Total Govt. Fee", 
+    "Transaction ID", 
+    "Application/Case ID", 
+    "Ref Name", 
+    "Payment Status", 
+    "Employee ID", 
+    "Employee Name", 
+    "Line Total", 
+    "Invoice Total"
+];
+
+const prepareCSVData = (data) => {
+ 
+
+  // Map each entry into the desired CSV format based on your provided columns
+  const csvRows = data.map((item) => ({
+      "SR No.": item.id || "",
+      "Inv No.": item?.receipt?.invoice_number || "",
+      "Inv Date": item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
+      "Department": agencyType[process.env.REACT_APP_TYPE]?.category || "",
+      "Stock ID": item?.service?.item_code || "",
+      "Service Name": item?.service?.name || "",
+      "Category": item?.service?.category?.name || "",
+      "Customer Ref": item?.receipt?.customer?.name || "",
+      "Display Customer": item?.receipt?.customer_name || "",
+      "Customer Mobile": item?.receipt?.customer_mobile || "",
+      "Customer Email": item?.receipt?.customer_email || "",
+      "Quantity": item.quantity || 0,
+      "Service Charge": item.center_fee || 0,
+      "Total Service Charge": (parseFloat(item?.center_fee) * parseFloat(item?.quantity)).toFixed(2),
+      "Total VAT": ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05).toFixed(2),
+      "Govt. Fee": item.govt_fee || 0,
+      "Bank Service Charge": item.bank_charge || 0,
+      "Other Charge": "0", // Static value as per original example
+      "Total Govt. Fee": (parseFloat(item?.govt_fee) + parseFloat(item?.bank_charge)).toFixed(2),
+      "Transaction ID": item.transaction_id || "",
+      "Application/Case ID": item.application_id || "",
+      "Ref Name": item.ref_no || "",
+      "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
+      "Employee ID": item?.receipt?.creator?.employee_id || "",
+      "Employee Name": item?.receipt?.creator?.name || "",
+      "Line Total": (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)).toFixed(2),
+      "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(2),
+  }));
+
+  // Calculate totals for Debit and Credit
+  const totalServiceCharge = data.reduce((sum, item) => sum + (parseFloat(item?.center_fee) * parseFloat(item?.quantity)), 0);
+  const totalVat = data.reduce((sum, item) => sum + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05), 0);
+  const totalGovtFee = data.reduce((sum, item) => sum + (parseFloat(item?.govt_fee) + parseFloat(item?.bank_charge)), 0);
+  const totalLineTotal = data.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
+  const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
+
+  // Append totals row
+  csvRows.push({
+      "SR No.": "",
+      "Inv No.": "",
+      "Inv Date": "",
+      "Department": "",
+      "Stock ID": "",
+      "Service Name": "",
+      "Category": "",
+      "Customer Ref": "",
+      "Display Customer": "",
+      "Customer Mobile": "",
+      "Customer Email": "",
+      "Quantity": "",
+      "Service Charge": "",
+      "Total Service Charge": totalServiceCharge.toFixed(2),
+      "Total VAT": totalVat.toFixed(2),
+      "Govt. Fee": "",
+      "Bank Service Charge": "",
+      "Other Charge": "0",
+      "Total Govt. Fee": totalGovtFee.toFixed(2),
+      "Transaction ID": "",
+      "Application/Case ID": "",
+      "Ref Name": "",
+      "Payment Status": "",
+      "Employee ID": "",
+      "Employee Name": "",
+      "Line Total": totalLineTotal.toFixed(2),
+      "Invoice Total": totalInvoiceTotal.toFixed(2),
+  });
+
+  // Ensure data is formatted properly as an array of objects
+  const finalData = [ ...csvRows.map(row => Object.values(row))];
+
+  return finalData;
+};
+
 
 
   useEffect(() => {
@@ -678,7 +789,32 @@ function ServiceReport() {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
-      
+   <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
+               {customerQueue?.length > 0 &&  <CSVLink
+                    data={prepareCSVData(customerQueue)}
+                    headers={headers}
+                    filename="journal_entries.csv"
+                >
+                <Button
+
+                    startIcon={<FileDownload />}
+                   
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                        padding: '10px',
+                        textTransform: 'capitalize !important',
+                        backgroundColor: "#bd9b4a !important",
+                        fontSize: "12px",
+                        ":hover": {
+                            backgroundColor: "#bd9b4a !important",
+                        },
+                    }}
+                >
+                    Export to Excel
+                </Button>
+                </CSVLink>}
+                </Box>
 
 
       </Box>
@@ -686,51 +822,51 @@ function ServiceReport() {
       {/* Filters */}
 
 
-                <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                        <Grid item xs={8}>
-                          <Grid container spacing={1}>
-                            <Grid item xs={5}>
-                              <DatePicker
-                                label={"From Date"}
-                                disableFuture={true}
-                                size="small"
-                                value={fromDate}
-                                onChange={(date) => handleFromDate(date)}
-                              />
-                            </Grid>
-                            <Grid item xs={5}>
-                              <DatePicker
-                                label={"To Date"}
-                
-                                disableFuture={true}
-                                size="small"
-                                value={toDate}
-                                onChange={(date) => handleToDate(date)}
-                              />
-                            </Grid>
-                
-                            <Grid item xs={2} sx={{ marginTop: "30px" }}>
-                              <PrimaryButton
-                                bgcolor={"#bd9b4a"}
-                                icon={<SearchIcon />}
-                                title="Search"
-                                sx={{ marginTop: "30px" }}
-                                onClick={() => getCustomerQueue(null, null, null)}
-                                loading={loading}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                        <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                        
-                        </Grid>
-                      </Grid>
+      <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+        <Grid item xs={8}>
+          <Grid container spacing={1}>
+            <Grid item xs={5}>
+              <DatePicker
+                label={"From Date"}
+                disableFuture={true}
+                size="small"
+                value={fromDate}
+                onChange={(date) => handleFromDate(date)}
+              />
+            </Grid>
+            <Grid item xs={5}>
+              <DatePicker
+                label={"To Date"}
+
+                disableFuture={true}
+                size="small"
+                value={toDate}
+                onChange={(date) => handleToDate(date)}
+              />
+            </Grid>
+
+            <Grid item xs={2} sx={{ marginTop: "30px" }}>
+              <PrimaryButton
+                bgcolor={"#bd9b4a"}
+                icon={<SearchIcon />}
+                title="Search"
+                sx={{ marginTop: "30px" }}
+                onClick={() => getCustomerQueue(null, null, null)}
+                loading={loading}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+
+        </Grid>
+      </Grid>
 
 
       <Box >
 
 
-        {<DataTable loading={loader} total={true} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} total={true}  csvName={'service_report'} data={customerQueue} columns={columns} />}
       </Box>
 
     </Box>
