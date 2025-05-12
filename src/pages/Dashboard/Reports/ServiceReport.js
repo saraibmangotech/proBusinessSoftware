@@ -286,7 +286,6 @@ function ServiceReport() {
     {
       header: "SR No.",
       accessorKey: "id",
-
     },
     {
       header: "Inv No.",
@@ -294,26 +293,16 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.invoice_number}
         </Box>
       ),
     },
     {
       header: "Inv Date",
-
-
       accessorFn: (row) => row?.receipt?.invoice_date ? moment(row?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.invoice_date ? moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY") : ''}
         </Box>
       ),
@@ -322,13 +311,9 @@ function ServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE].category,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category,
+      cell: () => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {agencyType[process.env.REACT_APP_TYPE].category}
         </Box>
       ),
@@ -339,11 +324,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.service?.item_code,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.service?.item_code}
         </Box>
       ),
@@ -354,11 +335,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.service?.name,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.service?.name}
         </Box>
       ),
@@ -369,11 +346,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.service?.category?.name,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.service?.category?.name}
         </Box>
       ),
@@ -382,13 +355,8 @@ function ServiceReport() {
       header: "Customer Ref",
       total: false,
       accessorFn: (row) => row?.receipt?.customer?.name,
-
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.customer?.name}
         </Box>
       ),
@@ -399,11 +367,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.customer_name}
         </Box>
       ),
@@ -414,11 +378,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer_mobile,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.customer_mobile}
         </Box>
       ),
@@ -429,11 +389,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer_email,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.customer_email}
         </Box>
       ),
@@ -445,72 +401,85 @@ function ServiceReport() {
     {
       header: "Service Charge",
       accessorKey: "center_fee",
+      accessorFn: (row) => (parseFloat(row?.center_fee || 0)).toFixed(2),
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.center_fee || 0)).toFixed(2)}
+        </Box>
+      ),
     },
     {
       header: "Total Service Charge",
       accessorKey: "total_service_charge",
-      accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)).toFixed(2),
+      accessorFn: (row) => (parseFloat(row?.center_fee || 0) * parseFloat(row?.quantity || 1)).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)).toFixed(2)}
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.center_fee || 0) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Total VAT",
       accessorKey: "total_vat",
-      accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05,
+      accessorFn: (row) => ((parseFloat(row?.center_fee || 0) * parseFloat(row?.quantity || 1)) * 0.05).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05}
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {((parseFloat(row?.original?.center_fee || 0) * parseFloat(row?.original?.quantity || 1)) * 0.05).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Govt. Fee",
       accessorKey: "govt_fee",
+      accessorFn: (row) => (parseFloat(row?.govt_fee || 0) * parseFloat(row?.quantity || 1)).toFixed(2),
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.govt_fee || 0) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+        </Box>
+      ),
     },
-
     {
       header: "Bank Service Charge",
       accessorKey: "bank_charge",
+      accessorFn: (row) => (parseFloat(row?.bank_charge || 0) * parseFloat(row?.quantity || 1)).toFixed(2),
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.bank_charge || 0) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+        </Box>
+      ),
     },
     {
       header: "Other Charge",
       accessorKey: "other_charge",
-      accessorFn: (row) => 0,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          0
+      accessorFn: () => "0.00",
+      cell: () => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          0.00
         </Box>
       ),
     },
     {
       header: "Total Govt. Fee",
       accessorKey: "total_govt_fee",
-      accessorFn: (row) => parseFloat(row?.govt_fee) + parseFloat(row?.bank_charge),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {parseFloat(row?.original?.govt_fee) + parseFloat(row?.original?.bank_charge)}
-        </Box>
-      ),
+      accessorFn: (row) => {
+        const govtFee = parseFloat(row?.govt_fee || 0);
+        const bankCharge = parseFloat(row?.bank_charge || 0);
+        const quantity = parseFloat(row?.quantity || 1); // Default to 1 if quantity is missing
+        return ((govtFee + bankCharge) * quantity).toFixed(2);
+      },
+      cell: ({ row }) => {
+        const govtFee = parseFloat(row?.original?.govt_fee || 0);
+        const bankCharge = parseFloat(row?.original?.bank_charge || 0);
+        const quantity = parseFloat(row?.original?.quantity || 1);
+        const total = (govtFee + bankCharge) * quantity;
+        return (
+          <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+            {total.toFixed(2)}
+          </Box>
+        );
+      },
     },
+    
     {
       header: "Transaction ID",
       accessorKey: "transaction_id",
@@ -532,11 +501,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.payment_status,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.is_paid ? "Paid" : "UnPaid"}
         </Box>
       ),
@@ -547,60 +512,43 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.creator?.employee_id,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.creator?.employee_id}
         </Box>
       ),
     },
     {
       header: "Employee Name",
-      total: false,
       accessorKey: "employee_name",
+      total: false,
       accessorFn: (row) => row?.receipt?.creator?.name,
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.receipt?.creator?.name}
         </Box>
       ),
     },
     {
       header: "Line Total",
-
-
-      accessorFn: (row) => parseFloat(row?.total) + ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05),
+      accessorFn: (row) => (parseFloat(row?.total || 0) + ((parseFloat(row?.center_fee || 0) * parseFloat(row?.quantity || 1)) * 0.05)).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {parseFloat(row?.original?.total) + ((parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05)}
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.total || 0) + ((parseFloat(row?.original?.center_fee || 0) * parseFloat(row?.original?.quantity || 1)) * 0.05)).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Invoice Total",
       accessorKey: "total_amount",
-      accessorFn: (row) => parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat),
+      accessorFn: (row) => (parseFloat(row?.receipt?.total_amount || 0) + parseFloat(row?.receipt?.total_vat || 0)).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat)}
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.receipt?.total_amount || 0) + parseFloat(row?.original?.receipt?.total_vat || 0)).toFixed(2)}
         </Box>
       ),
     },
   ];
+  
   const headers = [
     "SR No.", 
     "Inv No.", 
@@ -635,7 +583,16 @@ const prepareCSVData = (data) => {
  
 
   // Map each entry into the desired CSV format based on your provided columns
-  const csvRows = data.map((item) => ({
+  const csvRows = data.map((item) => {
+    const quantity = parseFloat(item?.quantity) || 0;
+    const centerFee = parseFloat(item?.center_fee) || 0;
+    const govtFee = parseFloat(item?.govt_fee) || 0;
+    const bankCharge = parseFloat(item?.bank_charge) || 0;
+    const totalServiceCharge = centerFee * quantity;
+    const totalVAT = totalServiceCharge * 0.05;
+    const totalGovtFee = (govtFee + bankCharge) * quantity;
+  
+    return {
       "SR No.": item.id || "",
       "Inv No.": item?.receipt?.invoice_number || "",
       "Inv Date": item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
@@ -647,28 +604,36 @@ const prepareCSVData = (data) => {
       "Display Customer": item?.receipt?.customer_name || "",
       "Customer Mobile": item?.receipt?.customer_mobile || "",
       "Customer Email": item?.receipt?.customer_email || "",
-      "Quantity": item.quantity || 0,
-      "Service Charge": item.center_fee || 0,
-      "Total Service Charge": (parseFloat(item?.center_fee) * parseFloat(item?.quantity)).toFixed(2),
-      "Total VAT": ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05).toFixed(2),
-      "Govt. Fee": item.govt_fee || 0,
-      "Bank Service Charge": item.bank_charge || 0,
-      "Other Charge": "0", // Static value as per original example
-      "Total Govt. Fee": (parseFloat(item?.govt_fee) + parseFloat(item?.bank_charge)).toFixed(2),
+      "Quantity": quantity,
+      "Service Charge": centerFee.toFixed(2),
+      "Total Service Charge": totalServiceCharge.toFixed(2),
+      "Total VAT": totalVAT.toFixed(2),
+      "Govt. Fee": govtFee.toFixed(2),
+      "Bank Service Charge": bankCharge.toFixed(2),
+      "Other Charge": "0", // Static
+      "Total Govt. Fee": totalGovtFee.toFixed(2),
       "Transaction ID": item.transaction_id || "",
       "Application/Case ID": item.application_id || "",
       "Ref Name": item.ref_no || "",
       "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
       "Employee ID": item?.receipt?.creator?.employee_id || "",
       "Employee Name": item?.receipt?.creator?.name || "",
-      "Line Total": (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)).toFixed(2),
+      "Line Total": (parseFloat(item?.total) + totalVAT).toFixed(2),
       "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(2),
-  }));
+    };
+  });
+  
 
   // Calculate totals for Debit and Credit
   const totalServiceCharge = data.reduce((sum, item) => sum + (parseFloat(item?.center_fee) * parseFloat(item?.quantity)), 0);
   const totalVat = data.reduce((sum, item) => sum + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05), 0);
-  const totalGovtFee = data.reduce((sum, item) => sum + (parseFloat(item?.govt_fee) + parseFloat(item?.bank_charge)), 0);
+  const totalGovtFee = data.reduce((sum, item) => {
+    const govtFee = parseFloat(item?.govt_fee) || 0;
+    const bankCharge = parseFloat(item?.bank_charge) || 0;
+    const quantity = parseFloat(item?.quantity) || 0;
+    return sum + ((govtFee + bankCharge) * quantity);
+  }, 0);
+  
   const totalLineTotal = data.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
   const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
 
@@ -793,7 +758,7 @@ const prepareCSVData = (data) => {
                {customerQueue?.length > 0 &&  <CSVLink
                     data={prepareCSVData(customerQueue)}
                     headers={headers}
-                    filename="journal_entries.csv"
+                    filename="service_report.csv"
                 >
                 <Button
 

@@ -162,6 +162,8 @@ function TrialBalance() {
                 to_date:moment(toDate).format('MM-DD-YYYY'),
             }
             const { data } = await FinanceServices.getAccountReports(params);
+            console.log(data?.detail,'data?.detail');
+            
             setBalanceSheet(data?.detail);
             setFilteredBalanceSheet(data?.detail);
             console.log(data?.detail, "data?.detail");

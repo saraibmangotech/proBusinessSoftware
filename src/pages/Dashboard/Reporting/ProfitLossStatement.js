@@ -161,8 +161,8 @@ function ProfitLossStatement() {
       setDateFilter(Filter)
       let params = {
         cost_center:selectedCostCenter?.name,
-        to_date:moment(toDate).format('MM-DD-YYYY'),
-        from_date:moment(fromDate).format('MM-DD-YYYY'),
+        to_date:toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+        from_date:fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         ...Filter
       }
       const { data } = await FinanceServices.getAccountReports(params)
@@ -223,7 +223,7 @@ function ProfitLossStatement() {
       console.log(costData, 'costDatacostData');
       console.log(costData[0]?.sub?.filter(item => item?.type_number == 1));
 
-      console.log(totalEnxpensesVal);
+      console.log(totalEnxpensesVal,'totalEnxpensesVal');
       console.log(revenueTotal, 'revenueTotalrevenueTotalrevenueTotalrevenueTotal');
       setTotalRevenue(revenueTotal)
       setTotalExpenses(totalEnxpensesVal)

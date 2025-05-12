@@ -103,6 +103,9 @@ function BalanceSheet() {
   const tableHead = ['Code', 'Name', 'Major Category', 'Sub Category', 'Sub Total (AED)', 'Final Total (AED)']
 
   const [loader, setLoader] = useState(false);
+  const [totalRevenue, setTotalRevenue] = useState(0)
+  const [totalExpenses, setTotalExpenses] = useState(0)
+  const [totalCost, setTotalCost] = useState(0)
 
   // *For Balance Sheet
   const [balanceSheet, setBalanceSheet] = useState([]);
@@ -178,13 +181,19 @@ function BalanceSheet() {
     try {
       let params = {
         cost_center: selectedCostCenter?.name,
-        to_date: moment(toDate).format('MM-DD-YYYY'),
-        from_date: moment(fromDate).format('MM-DD-YYYY'),
+        to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+        from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
       }
       const { data } = await FinanceServices.getAccountReports(params)
+      console.log(data?.detail, 'data?.detail');
+      let newData = data?.detail.slice(3)
+      console.log(newData, 'newData');
+
+
       let myData = data?.detail
       setBalanceSheet(data?.detail?.slice(0, -2))
       setFilteredBalanceSheet(data?.detail?.slice(0, -2))
+
       const fil = []
       data?.detail.forEach(e => {
         let obj = {
@@ -201,7 +210,7 @@ function BalanceSheet() {
         data?.forEach((item) => {
           try {
             if (item?.name === category) {
-              console.log(item);
+              console.log(item?.name);
               console.log(category);
               processSubItems(item?.sub);
             }
@@ -213,14 +222,12 @@ function BalanceSheet() {
         return total.toFixed(2);
 
         function processSubItems(subItems) {
-          console.log(subItems, 'subItemssubItemssubItems');
           subItems?.forEach((subItem) => {
             console.log(subItem);
             if (subItem?.accounts) {
               subItem.accounts.forEach((account) => {
                 const credit = parseFloat(account.total_credit) || 0;
                 const debit = parseFloat(account.total_debit) || 0;
-
 
                 total += account.nature === 'debit' ? debit - credit : credit - debit;
               });
@@ -231,7 +238,6 @@ function BalanceSheet() {
                 const debit = parseFloat(account.total_debit) || 0;
 
                 total += account.nature === 'debit' ? debit - credit : credit - debit;
-
               });
             }
 
@@ -243,6 +249,71 @@ function BalanceSheet() {
           });
         }
       };
+
+      const totalSales = (data, category) => {
+        let total = 0;
+
+        data?.forEach((item) => {
+          try {
+            if (true) {
+
+              processSubitems2(item?.accounts);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        });
+
+        return total.toFixed(2);
+
+
+
+
+        function processSubitems2(subItems) {
+
+          console.log(subItems)
+          let grandTotal = 0
+          for (let i = 0; i < subItems.length; i++) {
+            const subItem = subItems[i];
+            let accountNature = subItem.nature;
+            let childTotal = 0;
+            if (subItem.childAccounts && subItem.childAccounts.length > 0) {
+              for (let j = 0; j < subItem.childAccounts.length; j++) {
+                const child = subItem.childAccounts[j];
+                console.log(child, "child")
+                const childCredit = parseFloat(child.total_credit) || 0;
+                const childDebit = parseFloat(child.total_debit) || 0;
+
+                childTotal += accountNature == "debit" ? parseFloat(childDebit) - parseFloat(childCredit) : parseFloat(childCredit) - parseFloat(childDebit);
+              }
+            }
+
+            grandTotal += childTotal;
+            const credit = parseFloat(subItem.total_credit) || 0;
+            const debit = parseFloat(subItem.total_debit) || 0;
+            grandTotal += accountNature == "debit" ? parseFloat(debit) - parseFloat(credit) : parseFloat(credit) - parseFloat(debit);
+            console.log(childTotal, "Child total")
+          }
+          setTotalCost(grandTotal)
+          console.log(grandTotal, "grand Total")
+
+
+        }
+      };
+      // Usage
+      let costData = newData.filter(item => item?.name == "Expenses")
+      console.log(costData, 'costDatacostData');
+      console.log(costData[0]?.sub?.filter(item => item?.type_number == 1), 'costDatacostData');
+      const costSalesTotal = totalSales(costData[0]?.sub?.filter(item => item?.type_number == 1));
+      console.log(costSalesTotal, 'costSalesTotal');
+      const revenueTotal = calculateTotal(newData, 'Revenue');
+      const totalEnxpensesVal = calculateTotal(newData, 'Expenses');
+
+
+      console.log(totalEnxpensesVal, 'totalEnxpensesVal');
+      console.log(revenueTotal, 'revenueTotalrevenueTotalrevenueTotalrevenueTotal');
+      setTotalRevenue(revenueTotal)
+      setTotalExpenses(totalEnxpensesVal)
 
       // Usage
       const LiabilitiesTotal = calculateTotal(myData, 'Liabilities');
@@ -338,36 +409,36 @@ function BalanceSheet() {
     const rows = [];
     let GrandTotal = 0;
     let TotalEquity = 0;
-  
+
     filteredBalanceSheet?.forEach((item, index) => {
       let sectionTotal = 0;
-  
+
       item?.sub?.forEach(subItem => {
         let subTotal = 0;
-  
+
         subItem?.accounts?.forEach(account => {
           let accountTotal = 0;
-  
+
           // Calculate base account values
           const credit = parseFloat(account?.total_credit) || 0;
           const debit = parseFloat(account?.total_debit) || 0;
-  
+
           if (Array.isArray(account?.childAccounts) && account.childAccounts.length > 0) {
             // Calculate child accounts total
             let childCredit = 0;
             let childDebit = 0;
-  
+
             account.childAccounts.forEach(child => {
               const cc = parseFloat(child?.total_credit) || 0;
               const cd = parseFloat(child?.total_debit) || 0;
-  
+
               childCredit += cc;
               childDebit += cd;
-  
+
               const childNatureTotal = child?.nature === 'debit'
                 ? cd - cc
                 : cc - cd;
-  
+
               rows.push([
                 child?.account_code ?? '-',
                 child?.account_name ?? '-',
@@ -377,7 +448,7 @@ function BalanceSheet() {
                 parseFloat(childNatureTotal.toFixed(2)),
               ]);
             });
-  
+
             // Account total from children
             accountTotal = account?.nature === 'debit'
               ? childDebit - childCredit
@@ -388,16 +459,16 @@ function BalanceSheet() {
               ? debit - credit
               : credit - debit;
           }
-  
+
           // Add to section, total, and conditionally equity
           subTotal += accountTotal;
           sectionTotal += accountTotal;
           GrandTotal += accountTotal;
-  
+
           if (item?.name?.toLowerCase().includes('equity') || item?.name?.toLowerCase().includes('liabilities')) {
             TotalEquity += accountTotal;
           }
-  
+
           rows.push([
             account?.account_code ?? '-',
             account?.account_name ?? '-',
@@ -407,35 +478,35 @@ function BalanceSheet() {
             parseFloat(accountTotal.toFixed(2))
           ]);
         });
-  
+
         if (subItem?.accounts?.length > 0) {
-          rows.push(['', '', '', '','', `Subtotal of ${subItem?.accounts[0]?.type_code}`, parseFloat(subTotal.toFixed(2))]);
+          rows.push(['', '', '', '', '', `Subtotal of ${subItem?.accounts[0]?.type_code}`, parseFloat(subTotal.toFixed(2))]);
         }
       });
-  
+
       // Section total (Assets / Liabilities / Equity)
       if (item?.sub?.length > 0) {
-        rows.push(['', '', '', '','', `Total ${item?.name}`, parseFloat(sectionTotal.toFixed(2))]);
+        rows.push(['', '', '', '', '', `Total ${item?.name}`, parseFloat(sectionTotal.toFixed(2))]);
       }
     });
-  
+
     // Optional: Add Grand Totals if needed
-    rows.push(['', '', '', '','', '	Owner Capital + Liabilities', CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)).toFixed(2))]);
-    
-  
+    rows.push(['', '', '', '', '', '	Owner Capital + Liabilities', CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)).toFixed(2))]);
+
+
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  
+
     const buf = XLSX.write(wb, {
       bookType: "xlsx",
       type: "array",
       mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-  
+
     saveAs(new Blob([buf]), "Balance_Sheet.xlsx");
   };
-  
+
 
 
   useEffect(() => {
@@ -623,14 +694,19 @@ function BalanceSheet() {
                                             <Fragment>
                                               {subItem?.accounts?.map((account, j) => {
                                                 let childFinalTotal = 0
+                                                console.log(account, 'accountaccount');
+
                                                 const credit = isNaN(account?.total_credit) ? 0 : account?.total_credit
                                                 const debit = isNaN(account?.total_debit) ? 0 : account?.total_debit
                                                 let childTotal = account?.nature === 'debit' ? parseFloat(debit) - parseFloat(credit) : parseFloat(credit) - parseFloat(debit)
+                                                console.log(account?.childAccounts, 'childAccounts');
 
                                                 if (account?.childAccounts?.length > 0) {
                                                   const initialValue = { "credit": 0, "debit": 0 };
 
                                                   const result = account?.childAccounts?.reduce((accumulator, transaction) => {
+                                                    console.log(accumulator, transaction, 'transactiontransaction');
+
                                                     const credit = isNaN(transaction?.total_credit) ? 0 : transaction?.total_credit
                                                     const debit = isNaN(transaction?.total_debit) ? 0 : transaction?.total_debit
                                                     return {
@@ -638,6 +714,8 @@ function BalanceSheet() {
                                                       "debit": parseFloat(accumulator.debit) + parseFloat(debit),
                                                     };
                                                   }, initialValue);
+                                                  console.log(result, 'resultresultresult');
+
                                                   childTotal = account?.nature === 'debit' ? parseFloat(result?.debit) - parseFloat(result?.credit) : parseFloat(result?.credit) - parseFloat(result?.debit)
 
                                                 }
@@ -952,6 +1030,27 @@ function BalanceSheet() {
                               </Fragment>
                             )
                           })}
+                          <Row>
+
+                      
+
+                          </Row>
+                          <Row sx={{ bgcolor: Colors.primary }}>
+                              <Cell colSpan={5}>
+                              <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, ml: 4.5, color: 'white' }}>
+                                Retain Profit
+                              </Typography>
+                              </Cell>
+                              <Cell>
+                                {console.log(totalRevenue, 'asdasd')}
+                                {console.log(totalExpenses, 'asdasd')}
+                                {console.log(parseFloat(parseFloat(totalRevenue) - parseFloat(totalExpenses)).toFixed(2), 'asdasd')}
+
+                                <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
+                                  {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses)).toFixed(2))}
+                                </Typography>
+                              </Cell>
+                            </Row>
                           <Row sx={{ bgcolor: Colors.primary }}>
                             <Cell>
                               <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, ml: 4.5, color: 'white' }}>
@@ -960,7 +1059,7 @@ function BalanceSheet() {
                             </Cell>
                             <Cell colSpan={3}>
                               <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, color: 'white' }}>
-                                Owner Capital + Liabilities
+                                Owner Capital + Liabilities + Retain Profit
 
                               </Typography>
                             </Cell>
@@ -968,7 +1067,7 @@ function BalanceSheet() {
                             </Cell>
                             <Cell>
                               <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, color: 'white' }}>
-                                {CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)).toFixed(2))}
+                                {CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)+(parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses))).toFixed(2))}
                               </Typography>
                             </Cell>
                           </Row>
