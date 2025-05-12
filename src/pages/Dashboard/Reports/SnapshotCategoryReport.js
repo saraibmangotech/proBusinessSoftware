@@ -431,7 +431,7 @@ function SnapshotCategoryReport() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Snapshot Category Report</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Category Report</Typography>
 
 
 

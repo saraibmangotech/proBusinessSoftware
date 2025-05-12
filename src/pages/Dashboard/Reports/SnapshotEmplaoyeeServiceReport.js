@@ -694,7 +694,7 @@ function SnapshotEmployeeServiceReport() {
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Snapshot Employee Service Report</Typography>
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Employee Service Report</Typography>
       
 
 
