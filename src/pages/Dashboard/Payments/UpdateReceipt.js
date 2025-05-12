@@ -530,7 +530,7 @@ function UpdatePaidReceipt() {
                                                             <IconButton
                                                                 onClick={() => getReceptionDetail(true)}
                                                             >
-                                                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                                                <SearchIcon sx={{ color: "#001f3f" }} />
                                                             </IconButton>
                                                         ),
                                                     }}
@@ -539,7 +539,7 @@ function UpdatePaidReceipt() {
 
                                             <Grid item md={3} sm={12} xs={12} mt={2.5}>
                                                 <PrimaryButton
-                                                    bgcolor={"#bd9b4a"}
+                                                    bgcolor={"#001f3f"}
                                                     title="Clear"
                                                     onClick={() => {
                                                         setFieldsDisabled(false);
@@ -829,9 +829,9 @@ function UpdatePaidReceipt() {
                                                         sx={{
                                                             width: "350px",
                                                             textTransform: "capitalize",
-                                                            backgroundColor: "#bd9b4a",
+                                                            backgroundColor: "#001f3f",
                                                             ":hover": {
-                                                                backgroundColor: "rgb(189 155 74)",
+                                                                backgroundColor: "#001f3f",
                                                             },
                                                         }}
                                                     >
@@ -843,9 +843,9 @@ function UpdatePaidReceipt() {
                                                         sx={{
                                                             width: "350px",
                                                             textTransform: "capitalize",
-                                                            backgroundColor: "#bd9b4a",
+                                                            backgroundColor: "#001f3f",
                                                             ":hover": {
-                                                                backgroundColor: "rgb(189 155 74)",
+                                                                backgroundColor: "#001f3f",
                                                             },
                                                         }}
                                                     >
@@ -955,9 +955,9 @@ function UpdatePaidReceipt() {
                       variant="contained"
                       sx={{
                         textTransform: "capitalize",
-                        backgroundColor: "#bd9b4a",
+                        backgroundColor: "#001f3f",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >

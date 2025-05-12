@@ -550,7 +550,7 @@ function UpdateReception() {
                         <Grid container justifyContent={'flex-end'}>
                             <PrimaryButton
                                 disabled={buttonDisabled || buttonDisabled3}
-                                bgcolor={'#bd9b4a'}
+                                bgcolor={'#001f3f'}
                                 title="Update"
                                 type={'submit'}
 
@@ -720,7 +720,7 @@ function UpdateReception() {
                                 <PrimaryButton
 
                                     disabled={subCustDisable}
-                                   bgcolor={'#bd9b4a'}
+                                   bgcolor={'#001f3f'}
                                     onClick={() => setCompanyDialog(true)}
                                     title="Add Company"
 
@@ -731,7 +731,7 @@ function UpdateReception() {
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
                                     // disabled={buttonDisabled2}
-                                    bgcolor={'#bd9b4a'}
+                                    bgcolor={'#001f3f'}
                                     title="Update"
                                     type={'submit'}
 

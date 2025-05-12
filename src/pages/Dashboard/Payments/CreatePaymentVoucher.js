@@ -603,10 +603,10 @@ function CreatePaymentVoucher() {
                                     onClick={() => addItem(getValues('description'), getValues('amount'))}
                                     sx={{
                                         textTransform: 'capitalize',
-                                        backgroundColor: "rgb(189 155 74)",
+                                        backgroundColor: "#001f3f",
                                         fontSize: "12px",
                                         ":hover": {
-                                            backgroundColor: "rgb(189 155 74)",
+                                            backgroundColor: "#001f3f",
                                         },
                                     }}
                                 >

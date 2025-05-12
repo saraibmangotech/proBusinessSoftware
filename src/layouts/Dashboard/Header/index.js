@@ -28,7 +28,7 @@ import {
 } from "@mui/material"
 import {
   Logout,
-  Settings as SettingsIcon,
+
   Menu as MenuIcon,
   ExpandLess,
   ExpandMore,
@@ -55,6 +55,25 @@ import AuthServices from "services/Auth"
 import { ErrorToaster } from "components/Toaster"
 import { Images } from "assets"
 import { agencyType, getDetailWithType } from "utils"
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import PersonIcon from "@mui/icons-material/Person";
+import SecurityIcon from "@mui/icons-material/Security";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ReportIcon from "@mui/icons-material/Assessment";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+
+
+
 
 function DropDown({ anchorEl, openDropdown, handleClose }) {
   const [confirmationDialog, setConfirmationDialog] = useState(false)
@@ -159,13 +178,21 @@ function Header() {
 
   // Map of navigation items to their icons
   const navIcons = {
-    dashboard: <Dashboard fontSize="small" />,
-    "customer management": <People fontSize="small" />,
-    "accounts management": <AccountBalance fontSize="small" />,
-    "user management": <Person fontSize="small" />,
-    "role management": <Security fontSize="small" />,
-    "settings": <SettingsIcon fontSize="small" />,
-  }
+    dashboard: <DashboardIcon fontSize="small" />,
+    receptions: <SupportAgentIcon fontSize="small" />,
+    sales: <PointOfSaleIcon fontSize="small" />,
+    invoice: <ReceiptLongIcon fontSize="small" />,
+    payment: <RequestQuoteIcon fontSize="small" />,
+    cashier: <AccountBalanceWalletIcon fontSize="small" />,
+    vendor: <ShoppingCartIcon fontSize="small" />,
+    product: <ShoppingCartIcon fontSize="small" />,
+    reports: <ReportIcon fontSize="small" />,
+    accounts: <AccountBalanceIcon fontSize="small" />,
+    user: <PersonIcon fontSize="small" />,
+    purchase: <ShoppingBagIcon fontSize="small" />,
+    role: <SecurityIcon fontSize="small" />,
+    settings: <SettingsIcon fontSize="small" />
+  };
 
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -1477,9 +1504,10 @@ function Header() {
       <AppBar
         position="static"
         sx={{
-          backgroundColor: "#404e68",
+          backgroundColor: "#001f3f", // Exact Navy Blue
           boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)",
         }}
+        
       >
         <ClickAwayListener onClickAway={handleDropdownClose}>
 
@@ -1512,7 +1540,7 @@ function Header() {
                   <Button
                     onClick={() => navigate("/dashboard")}
                     sx={{
-                      color: location.pathname === "/dashboard" ? "#bd9b4a" : "white",
+                      color: location.pathname === "/dashboard" ? "#6092d5" : "white",
                       fontWeight: location.pathname === "/dashboard" ? "bold" : 400,
                       textTransform: "none",
                       fontSize: "14px",
@@ -1542,7 +1570,7 @@ function Header() {
                           <Button
                             onClick={(e) => handleDropdownOpen(e, item.id)}
                             sx={{
-                              color: isChildActive(item.childRoute) ? "#bd9b4a" : "white",
+                              color: isChildActive(item.childRoute) ? "#6092d5" : "white",
                               fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
                               textTransform: "none",
                               fontSize: "14px",
@@ -1601,7 +1629,7 @@ function Header() {
                                           backgroundColor: isActive(child.route)
                                             ? "rgba(52, 152, 219, 0.08)"
                                             : "transparent",
-                                          color: isActive(child.route) ? "#3498db" : "#5d6778",
+                                          color: isActive(child.route) ? "#6092d5" : "#5d6778",
                                           fontWeight: isActive(child.route) ? 500 : 400,
                                           fontSize: "14px",
                                           py: 1,
@@ -1632,7 +1660,7 @@ function Header() {
                             }
                           }}
                           sx={{
-                            color: isActive(item.route) ? "#bd9b4a" : "white",
+                            color: isActive(item.route) ? "#6092d5" : "white",
                             fontWeight: isActive(item.route) ? "bold" : 400,
                             textTransform: "none",
                             fontSize: "14px",

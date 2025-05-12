@@ -510,7 +510,7 @@ function CreateAldeed() {
                                                     InputProps={{
                                                         endAdornment: (
                                                             <IconButton onClick={() => getReceptionDetail()}>
-                                                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                                                <SearchIcon sx={{ color: "#001f3f" }} />
                                                             </IconButton>
                                                         ),
                                                     }}
@@ -526,7 +526,7 @@ function CreateAldeed() {
                                                     InputProps={{
                                                         endAdornment: (
                                                             <IconButton onClick={() => getReceptionDetail(true)}>
-                                                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                                                <SearchIcon sx={{ color: "#001f3f" }} />
                                                             </IconButton>
                                                         ),
                                                     }}
@@ -534,7 +534,7 @@ function CreateAldeed() {
                                             </Grid>
                                             <Grid item md={1} sm={12} xs={12} mt={2}>
                                                 <PrimaryButton
-                                                    bgcolor={'#bd9b4a'}
+                                                    bgcolor={'#001f3f'}
                                                     title="Clear"
                                                     onClick={() => {
                                                         setFieldsDisabled(false)
@@ -895,10 +895,10 @@ function CreateAldeed() {
                                                     type="submit"
                                                     sx={{
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                         fontSize: "12px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -960,9 +960,9 @@ function CreateAldeed() {
                                                     sx={{
                                                         width:'350px',
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "#bd9b4a",
+                                                        backgroundColor: "#001f3f",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -975,9 +975,9 @@ function CreateAldeed() {
                                                     sx={{
                                                         width:'350px',
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "#bd9b4a",
+                                                        backgroundColor: "#001f3f",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >

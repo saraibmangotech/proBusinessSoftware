@@ -514,7 +514,7 @@ function BalanceSheet() {
         <Grid item xs={3} mt={'30px'}>
 
           <PrimaryButton
-            bgcolor={"#bd9b4a"}
+            bgcolor={"#001f3f"}
             icon={<SearchIcon />}
             title="Search"
             sx={{ marginTop: "30px" }}

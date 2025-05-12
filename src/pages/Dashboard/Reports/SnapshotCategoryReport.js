@@ -431,7 +431,7 @@ function SnapshotCategoryReport() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Snapshot Category Report</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Category Report</Typography>
 
 
 
@@ -464,7 +464,7 @@ function SnapshotCategoryReport() {
 
                         <Grid item xs={2} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
-                                bgcolor={"#bd9b4a"}
+                                bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
                                 title="Search"
                                 sx={{ marginTop: "30px" }}

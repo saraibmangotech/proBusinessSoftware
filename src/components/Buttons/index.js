@@ -22,7 +22,7 @@ export const PrimaryButton = (props) => {
         pr: '25px',
         // minWidth: { xs: "100px", md: "150px" },
         py: 1.2,
-        background: '#bd9b4a',
+        background: '#001f3f',
         color: props.textcolor ? props.textcolor : Colors.white, // Apply text color
         fontSize: { xs: 12, md: 14 },
         ...props.buttonStyle,

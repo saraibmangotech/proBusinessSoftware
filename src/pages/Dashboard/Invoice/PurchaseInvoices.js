@@ -354,7 +354,7 @@ function PurchaseInvoices() {
 
                     <Box>
                         <PrimaryButton
-                            bgcolor={'#bd9b4a'}
+                            bgcolor={'#001f3f'}
                             title="View Receipts"
                             onClick={() => {
                                 localStorage.setItem("currentUrl", '/create-customer');
@@ -472,7 +472,7 @@ function PurchaseInvoices() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Invoice List</Typography>
                 {true && <PrimaryButton
-                    bgcolor={'#bd9b4a'}
+                    bgcolor={'#001f3f'}
                     title="Create"
                     onClick={() => { navigate('/create-purchase-invoice'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}

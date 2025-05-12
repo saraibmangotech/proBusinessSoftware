@@ -841,9 +841,9 @@ function UpdatePreSale() {
                                             variant="contained"
                                             sx={{
                                                 textTransform: 'capitalize',
-                                                backgroundColor: "#bd9b4a",
+                                                backgroundColor: "#001f3f",
                                                 ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                 },
                                             }}
                                         >
@@ -1028,10 +1028,10 @@ function UpdatePreSale() {
                                                     type="submit"
                                                     sx={{
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                         fontSize: "12px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -1043,10 +1043,10 @@ function UpdatePreSale() {
                                                     type="submit"
                                                     sx={{
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                         fontSize: "12px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -1073,10 +1073,10 @@ function UpdatePreSale() {
                                                         sx={{
                                                             mt: 2,
                                                             textTransform: 'capitalize',
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                             fontSize: "12px",
                                                             ":hover": {
-                                                                backgroundColor: "rgb(189 155 74)",
+                                                                backgroundColor: "#001f3f",
                                                             },
                                                         }}
                                                     >

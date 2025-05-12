@@ -54,7 +54,7 @@ function DashboardLayout() {
   </Box>
 
   {/* ========== Footer ========== */}
-  <Box sx={{ bgcolor: '#121f35', padding: '5px 18px', textAlign: 'center' }}>
+  <Box sx={{ bgcolor: '#001f3f', padding: '5px 18px', textAlign: 'center' }}>
     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
       <Box>
         <p style={{ fontSize: '14px', color: '#ffffff' }}>

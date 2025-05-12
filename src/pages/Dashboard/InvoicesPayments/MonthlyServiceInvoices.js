@@ -894,7 +894,7 @@ function MonthlyServiceInvoices() {
                 <Box sx={{ display: 'flex', gap: '5px' }} >
 
                     {permissions?.create && <PrimaryButton
-                       bgcolor={'#bd9b4a'}
+                       bgcolor={'#001f3f'}
                         title="Create Invoice"
                         onClick={() => navigate('/create-monthly-invoice')}
                         loading={loading}
@@ -934,7 +934,7 @@ function MonthlyServiceInvoices() {
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

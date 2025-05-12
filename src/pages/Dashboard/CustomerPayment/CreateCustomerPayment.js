@@ -1157,10 +1157,10 @@ function CreateCustomerPayment() {
                                                     variant="contained"
                                                     sx={{
                                                         textTransform: "capitalize",
-                                                        backgroundColor: "#bd9b4a",
+                                                        backgroundColor: "#001f3f",
                                                         width: "200px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -1254,9 +1254,9 @@ function CreateCustomerPayment() {
                                             variant="contained"
                                             sx={{
                                                 textTransform: "capitalize",
-                                                backgroundColor: "#bd9b4a",
+                                                backgroundColor: "#001f3f",
                                                 ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                 },
                                             }}
                                         >

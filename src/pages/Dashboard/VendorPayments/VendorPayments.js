@@ -535,7 +535,7 @@ function VendorPaymentList() {
                 </Typography>
                 {/* {true && (
           <PrimaryButton
-            bgcolor={"#bd9b4a"}
+            bgcolor={"#001f3f"}
             title="Create"
             onClick={() => {
               navigate("/sales-receipt");
@@ -573,7 +573,7 @@ function VendorPaymentList() {
 
                         <Grid item xs={2} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
-                                bgcolor={"#bd9b4a"}
+                                bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
                                 title="Search"
                                 sx={{ marginTop: "30px" }}
@@ -585,7 +585,7 @@ function VendorPaymentList() {
                 </Grid>
                 <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
                     <PrimaryButton
-                        bgcolor={'#bd9b4a'}
+                        bgcolor={'#001f3f'}
                         title="Create"
 
                         onClick={() => {

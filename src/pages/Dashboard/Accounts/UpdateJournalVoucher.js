@@ -603,10 +603,10 @@ function UpadateJournalVoucher() {
                       type="submit"
                       sx={{
                         textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                         fontSize: "12px",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >
@@ -618,10 +618,10 @@ function UpadateJournalVoucher() {
                       type="submit"
                       sx={{
                         textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                         fontSize: "12px",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >
@@ -639,10 +639,10 @@ function UpadateJournalVoucher() {
                       }}
                       sx={{
                         textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                         fontSize: "12px",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >

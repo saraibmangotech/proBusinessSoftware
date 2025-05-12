@@ -1289,7 +1289,7 @@ function AdminApproval() {
                 <Box sx={{ display: "flex", gap: "5px" }}>
                     {permissions?.create && (
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Create Request"
                             onClick={() => navigate("/create-request")}
                             loading={loading}
@@ -1424,7 +1424,7 @@ function AdminApproval() {
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

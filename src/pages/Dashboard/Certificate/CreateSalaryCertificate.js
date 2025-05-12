@@ -325,7 +325,7 @@ function CreateSalaryCertificate() {
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
                         {permissions?.generate && <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Download Salary Certificate"
                             disabled={selectedItem ? false : true}
                             onClick={()=> {
@@ -369,7 +369,7 @@ function CreateSalaryCertificate() {
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

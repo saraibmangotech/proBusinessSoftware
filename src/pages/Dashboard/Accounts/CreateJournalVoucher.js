@@ -566,10 +566,10 @@ function CreateJournalVoucher() {
                     type="submit"
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
+                      backgroundColor: "#001f3f",
                       fontSize: "12px",
                       ":hover": {
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                       },
                     }}
                   >
@@ -581,10 +581,10 @@ function CreateJournalVoucher() {
                     type="submit"
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
+                      backgroundColor: "#001f3f",
                       fontSize: "12px",
                       ":hover": {
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                       },
                     }}
                   >
@@ -601,10 +601,10 @@ function CreateJournalVoucher() {
                     setEditState(false)}}
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
+                      backgroundColor: "#001f3f",
                       fontSize: "12px",
                       ":hover": {
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                       },
                     }}
                   >
