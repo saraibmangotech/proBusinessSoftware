@@ -130,7 +130,7 @@ function JournalVoucherList() {
     const [confirmationDialog, setConfirmationDialog] = useState(false)
 
 
-    const tableHead = [{ name: 'Created At', key: '' },{ name: 'Impact Date', key: '' },{ name: 'Cost Center ', key: '' },  { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'Created At', key: '' }, { name: 'Impact Date', key: '' }, { name: 'Cost Center ', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
 
 
 
@@ -194,7 +194,7 @@ function JournalVoucherList() {
         try {
             let obj = {
                 id: selectedVisa?.id,
-         
+
 
             };
 
@@ -213,7 +213,7 @@ function JournalVoucherList() {
             if (response?.responseCode === 200) {
                 setConfirmationDialog(false);
                 getVouchers()
-           
+
             }
         }
         catch (error) {
@@ -438,7 +438,7 @@ function JournalVoucherList() {
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                            bgcolor={'#bd9b4a'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}
@@ -484,7 +484,7 @@ function JournalVoucherList() {
                                                                 <Cell className='pdf-table' >
                                                                     {item?.date ? moment(item?.date).format(
                                                                         "DD/MM/YYYY"
-                                                                    ):'N/A'}
+                                                                    ) : 'N/A'}
                                                                 </Cell >
                                                                 <Cell className='pdf-table' >
                                                                     {item?.cost_center}
@@ -563,7 +563,28 @@ function JournalVoucherList() {
                                                                     </Tooltip>
                                                                 </Cell>
                                                                 <Cell >
-                                                                    {true && <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', gap: '20px' ,justifyContent:'space-between'}}>
+                                                                    {true && <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', gap: '20px', justifyContent: 'space-between' }}>
+
+                                                                        <Cell className="pdf-table">
+                                                                            <IconButton
+                                                                                onClick={() =>
+
+                                                                                    navigate('/general-journal-ledger', {
+                                                                                        state: item?.entry_id
+                                                                                    })
+                                                                                }
+                                                                                sx={{
+                                                                                    bgcolor:
+                                                                                        Colors.primary,
+                                                                                    "&:hover": {
+                                                                                        bgcolor:
+                                                                                            Colors.primary,
+                                                                                    },
+                                                                                }}
+                                                                            >
+                                                                                <EyeIcon />
+                                                                            </IconButton>
+                                                                        </Cell>
                                                                         <Box
                                                                             onClick={() =>
                                                                                 navigate(
@@ -583,19 +604,19 @@ function JournalVoucherList() {
                                                                                 <Box component={'img'} src={Images.detailIcon} onClick={() => navigate(`/journal-voucher-detail/${item?.id}`)} width={'35px'}></Box>
                                                                             </IconButton>
                                                                         </Box>
-                                                                          { <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${item?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                                                                        {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${item?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                                                                         <Box>
-                                                                        <IconButton
-                                                                            sx={{
-                                                                                bgcolor: Colors.primary,
-                                                                                "&:hover": {
-                                                                                    bgcolor:
-                                                                                        Colors.primary,
-                                                                                },
-                                                                            }}
-                                                                        >
-                                                                            <Box component={'img'} src={Images.deleteIcon} onClick={() => {setConfirmationDialog(true); setSelectedVisa(item)}} width={'35px'}></Box>
-                                                                        </IconButton>
+                                                                            <IconButton
+                                                                                sx={{
+                                                                                    bgcolor: Colors.primary,
+                                                                                    "&:hover": {
+                                                                                        bgcolor:
+                                                                                            Colors.primary,
+                                                                                    },
+                                                                                }}
+                                                                            >
+                                                                                <Box component={'img'} src={Images.deleteIcon} onClick={() => { setConfirmationDialog(true); setSelectedVisa(item) }} width={'35px'}></Box>
+                                                                            </IconButton>
                                                                         </Box>
                                                                     </Box>}
                                                                 </Cell>
