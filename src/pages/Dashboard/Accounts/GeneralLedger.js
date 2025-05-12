@@ -126,6 +126,7 @@ function GeneralLedger() {
     "Debit (AED)",
     "Credit (AED)",
     "Balance (AED)",
+    'Action'
 
   ];
 
@@ -134,7 +135,7 @@ function GeneralLedger() {
 
   // *For Account Ledger
   const [accountLedgers, setAccountLedgers] = useState();
-
+  const [accountLedgers2, setAccountLedgers2] = useState();
   // *For Accounts
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -193,7 +194,7 @@ function GeneralLedger() {
         page: 1,
         limit: 50,
         name: search,
-        is_disabled:false
+        is_disabled: false
       };
       const { data } = await FinanceServices.getAccountsDropDown(params);
 
@@ -242,7 +243,29 @@ function GeneralLedger() {
       setLoading(false);
     }
   };
-
+  const getAccountLedgers2 = async (page, limit, filter) => {
+    setLoading(true);
+    try {
+      const Page = page ? page : currentPage;
+      const Limit = limit ? limit : pageLimit;
+      const Filter = { ...filters, ...filter };
+      setCurrentPage(Page);
+      setPageLimit(Limit);
+      setFilters(Filter);
+      let params = {
+        page: 1,
+        limit: 99999,
+      };
+      params = { ...params, ...Filter };
+      const { data } = await FinanceServices.getAccountLedgers(params);
+      setAccountLedgers2(data?.statement?.rows);
+   
+    } catch (error) {
+      showErrorToast(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   // *For Handle Filter
   const handleFilter = () => {
     let data = {
@@ -256,14 +279,18 @@ function GeneralLedger() {
       cost_center: selectedCostCenter?.name
     };
     getAccountLedgers(1, "", data);
+    getAccountLedgers2(1, "", data);
   };
   const handleFilterSearch = (data) => {
-    Debounce(() => getAccountLedgers(1, "", data));
+    Debounce(() => {
+      getAccountLedgers(1, "", data);
+      getAccountLedgers2(1, "", data);
+    })(); // assuming Debounce is a debounce function
   };
-
+  
   const downloadExcel = () => {
     const headers = tableHead.filter((item) => item !== "Action");
-    const data = accountLedgers;
+    const data = accountLedgers2;
 
     let totalDebit = 0;
     let totalCredit = 0;
@@ -324,6 +351,7 @@ function GeneralLedger() {
 
       const { data } = await CustomerServices.getCostCenters(params);
       setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+      setSelectedCostCenter({ id: 'All', name: 'All' })
 
     } catch (error) {
       showErrorToast(error);
@@ -342,7 +370,7 @@ function GeneralLedger() {
         <Box sx={{
           textAlign: "right", display: "flex",
           justifyContent: 'flex-end',
-          mb:2
+          mb: 2
 
         }}>
 
@@ -550,6 +578,26 @@ function GeneralLedger() {
                                 <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
                                 <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
                                 <Cell className="pdf-table">{Balance?.toFixed(2)}</Cell>
+                                <Cell className="pdf-table">
+                                  <IconButton
+                                    onClick={() =>
+
+                                      navigate('/general-journal-ledger', {
+                                        state: item?.journal_id
+                                      })
+                                    }
+                                    sx={{
+                                      bgcolor:
+                                        Colors.primary,
+                                      "&:hover": {
+                                        bgcolor:
+                                          Colors.primary,
+                                      },
+                                    }}
+                                  >
+                                    <EyeIcon />
+                                  </IconButton>
+                                </Cell>
                                 {/* <Cell><Box className="pdf-hide"
                                   onClick={page ? () =>
                                     navigate(`/${page}/${item?.journal_id}`)

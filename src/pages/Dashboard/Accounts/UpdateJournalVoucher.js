@@ -191,7 +191,7 @@ function UpadateJournalVoucher() {
       }
       const { data } = await FinanceServices.getJournalVoucherDetail(params)
       setVoucherDetail(data.voucher)
-      setSelectedCostCenter({id:data?.voucher?.cost_center,name:data?.voucher?.cost_center})
+      setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
         name: ` ${account?.account?.account_code} ${account?.account?.name}`,
@@ -339,7 +339,7 @@ function UpadateJournalVoucher() {
         notes: getValues('note'),
         entries: rows,
         created_at: getYearMonthDateFormate(fromDate),
-        cost_center:selectedCostCenter?.name
+        cost_center: selectedCostCenter?.name
       }
 
 
@@ -435,7 +435,7 @@ function UpadateJournalVoucher() {
       setTotalDebit(newTotalDebit);
       setIsCreditDisabled(false);
       setIsDebitDisabled(false);
-
+      setEditState(false)
       return updatedRows;
     });
 

@@ -114,7 +114,7 @@ function GeneralJournalLedger() {
 
 	// *For General Journal
 	const [generalJournalAccounts, setGeneralJournalAccounts] = useState();
-
+	const [generalJournalAccounts2, setGeneralJournalAccounts2] = useState();
 	// *For Pagination
 	const [totalCount, setTotalCount] = useState(0);
 	const [pageLimit, setPageLimit] = useState(50);
@@ -228,6 +228,30 @@ function GeneralJournalLedger() {
 			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
 			setGeneralJournalAccounts(data?.statement?.rows)
 			setTotalCount(data?.statement?.count)
+		} catch (error) {
+			ErrorToaster(error)
+		} finally {
+			// setLoader(false)
+		}
+	}
+
+	const getGeneralJournalLedgers2 = async (page, limit, filter) => {
+		// setLoader(true)
+		try {
+			const Page = page ? page : currentPage
+			const Limit = limit ? limit : pageLimit
+			const Filter = { ...filters, ...filter }
+			setCurrentPage(Page)
+			setPageLimit(Limit)
+			setFilters(Filter)
+			let params = {
+				page: 1,
+				limit: 99999
+			}
+			params = { ...params, ...Filter }
+			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+			setGeneralJournalAccounts2(data?.statement?.rows)
+			
 		} catch (error) {
 			ErrorToaster(error)
 		} finally {
@@ -392,7 +416,9 @@ function GeneralJournalLedger() {
 	const downloadExcel = () => {
 		// Define headers and data separately
 		const headers = tableHead.filter((item) => item !== "Action");
-		const data = generalJournalAccounts;
+		const data = generalJournalAccounts2;
+		console.log(generalJournalAccounts2?.length,'length');
+		
 	  
 		let totalDebit = 0;
 		let totalCredit = 0;
@@ -446,6 +472,7 @@ function GeneralJournalLedger() {
 	  
 
 	useEffect(() => {
+		getGeneralJournalLedgers2()
 		getGeneralJournalLedgers()
 		getAccountsDropDown()
 		getMajorCategories()

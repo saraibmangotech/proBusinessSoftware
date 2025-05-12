@@ -140,10 +140,12 @@ function SupplierLedgers() {
     "Account Name",
     "Particular#",
     "Type",
+    "Cost Center",
     "Description",
 
     "Debit (AED)",
     "Credit (AED)",
+    "Action"
 
 
   ];
@@ -210,6 +212,9 @@ function SupplierLedgers() {
   const { user } = useAuth();
   const [fieldDisabled, setFieldDisabled] = useState(false)
 
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [costCenters, setCostCenters] = useState([])
+
   // *For Filters
   const [filters, setFilters] = useState({});
 
@@ -233,7 +238,8 @@ function SupplierLedgers() {
         to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
         account_id: selectedUser?.account_id ?? null,
         is_supplier: selectedUser?.account_id ? false : true,
-        is_vendor: true
+        is_vendor: true,
+        cost_center:selectedCostCenter?.name
 
       }
 
@@ -253,7 +259,21 @@ function SupplierLedgers() {
   }
 
 
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 1000,
+      };
 
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+      setSelectedCostCenter({ id: 'All', name: 'All' })
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
 
   const getUsers = async (page, limit, filter) => {
     // setLoader(true)
@@ -379,6 +399,7 @@ function SupplierLedgers() {
 
 
   useEffect(() => {
+    getCostCenters()
     getUsers()
     getCustomerQueue();
     setFromDate(new Date())
@@ -477,7 +498,21 @@ function SupplierLedgers() {
       <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
         <Grid item xs={12}>
           <Grid container spacing={1}>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
+              <SelectField
+                size="small"
+                label="Select Cost Center"
+                options={costCenters}
+                selected={selectedCostCenter}
+                onSelect={(value) => {
+                  setSelectedCostCenter(value)
+
+                }}
+                register={register("costcenter", { required: "costcenter is required" })}
+
+              />
+            </Grid>
+            <Grid item xs={2.5}>
               <SelectField
                 size={"small"}
                 label={"Select Supplier "}
@@ -494,7 +529,7 @@ function SupplierLedgers() {
                 })}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <DatePicker
                 label={"From Date"}
                 disableFuture={true}
@@ -503,7 +538,7 @@ function SupplierLedgers() {
                 onChange={(date) => handleFromDate(date)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <DatePicker
                 label={"To Date"}
 
@@ -627,6 +662,7 @@ function SupplierLedgers() {
                                 <Cell className="pdf-table">{item?.account?.name ?? "-"}</Cell>
                                 <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
                                 <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
+                                <Cell className="pdf-table">{item?.cost_center ?? "-"}</Cell>
                                 <Cell className="pdf-table" sx={{ width: '250px' }}>
                                   <Tooltip
                                     className="pdf-hide"
@@ -659,7 +695,26 @@ function SupplierLedgers() {
 
                                 <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
                                 <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
+                                <Cell className="pdf-table">
+                                  <IconButton
+                                    onClick={() =>
 
+                                      navigate('/general-journal-ledger', {
+                                        state: item?.journal_id
+                                      })
+                                    }
+                                    sx={{
+                                      bgcolor:
+                                        Colors.primary,
+                                      "&:hover": {
+                                        bgcolor:
+                                          Colors.primary,
+                                      },
+                                    }}
+                                  >
+                                    <EyeIcon />
+                                  </IconButton>
+                                </Cell>
                                 {/* <Cell><Box className="pdf-hide"
                                   onClick={page ? () =>
                                     navigate(`/${page}/${item?.journal_id}`)

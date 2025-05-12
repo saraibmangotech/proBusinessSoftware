@@ -140,11 +140,12 @@ function CustomerLedgers() {
         "Account Name",
         "Particular#",
         "Type",
+        "Cost Center",
         "Description",
 
         "Debit (AED)",
         "Credit (AED)",
-
+        "Action",
 
     ];
 
@@ -168,6 +169,8 @@ function CustomerLedgers() {
     const [users, setUsers] = useState([])
     const { user } = useAuth();
     const [fieldDisabled, setFieldDisabled] = useState(false)
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [costCenters, setCostCenters] = useState([])
 
     // *For Filters
     const [filters, setFilters] = useState({});
@@ -221,6 +224,22 @@ function CustomerLedgers() {
         { label: "Credit", key: "Credit" },
     ];
 
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 1000,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+            setSelectedCostCenter({ id: 'All', name: 'All' })
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
         if (true) {
@@ -234,7 +253,8 @@ function CustomerLedgers() {
                     from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                     to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                     account_id: selectedUser?.receivable_account_id,
-                    is_customer: true
+                    is_customer: true,
+                    cost_center: selectedCostCenter?.name
 
                 }
 
@@ -665,7 +685,7 @@ function CustomerLedgers() {
         setFromDate(new Date())
         setToDate(new Date())
         getCustomerQueue()
-
+        getCostCenters()
     }, []);
     useEffect(() => {
         if (user?.role_id != 1000) {
@@ -759,7 +779,21 @@ function CustomerLedgers() {
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
                 <Grid item xs={12}>
                     <Grid container spacing={1}>
-                        <Grid item xs={3}>
+                        <Grid item xs={2.5}>
+                            <SelectField
+                                size="small"
+                                label="Select Cost Center"
+                                options={costCenters}
+                                selected={selectedCostCenter}
+                                onSelect={(value) => {
+                                    setSelectedCostCenter(value)
+
+                                }}
+                                register={register("costcenter", { required: "costcenter is required" })}
+
+                            />
+                        </Grid>
+                        <Grid item xs={2.5}>
                             <SelectField
                                 size={"small"}
                                 label={"Select Customer "}
@@ -776,7 +810,7 @@ function CustomerLedgers() {
                                 })}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={2.5}>
                             <DatePicker
                                 label={"From Date"}
                                 disableFuture={true}
@@ -785,7 +819,7 @@ function CustomerLedgers() {
                                 onChange={(date) => handleFromDate(date)}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={2.5}>
                             <DatePicker
                                 label={"To Date"}
 
@@ -816,31 +850,31 @@ function CustomerLedgers() {
 
             <Box >
 
-               <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
-               {customerQueue?.length > 0 &&  <CSVLink
-                    data={prepareCSVData(customerQueue)}
-                    headers={headers}
-                    filename="journal_entries.csv"
-                >
-                <Button
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    {customerQueue?.length > 0 && <CSVLink
+                        data={prepareCSVData(customerQueue)}
+                        headers={headers}
+                        filename="journal_entries.csv"
+                    >
+                        <Button
 
-                    startIcon={<FileDownload />}
-                   
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                        padding: '10px',
-                        textTransform: 'capitalize !important',
-                        backgroundColor: "#bd9b4a !important",
-                        fontSize: "12px",
-                        ":hover": {
-                            backgroundColor: "#bd9b4a !important",
-                        },
-                    }}
-                >
-                    Export to Excel
-                </Button>
-                </CSVLink>}
+                            startIcon={<FileDownload />}
+
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                                padding: '10px',
+                                textTransform: 'capitalize !important',
+                                backgroundColor: "#bd9b4a !important",
+                                fontSize: "12px",
+                                ":hover": {
+                                    backgroundColor: "#bd9b4a !important",
+                                },
+                            }}
+                        >
+                            Export to Excel
+                        </Button>
+                    </CSVLink>}
                 </Box>
                 {customerQueue?.length > 0 && (
                     <Fragment>
@@ -910,6 +944,7 @@ function CustomerLedgers() {
                                                                 <Cell className="pdf-table">{item?.account?.name ?? "-"}</Cell>
                                                                 <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
                                                                 <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
+                                                                <Cell className="pdf-table">{item?.cost_center ?? "-"}</Cell>
                                                                 <Cell className="pdf-table">
                                                                     <Tooltip
                                                                         className="pdf-hide"
@@ -942,7 +977,26 @@ function CustomerLedgers() {
 
                                                                 <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
                                                                 <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
+                                                                <Cell className="pdf-table">
+                                                                    <IconButton
+                                                                    onClick={()=>
 
+                                                                        navigate('/general-journal-ledger', {
+                                                                            state:  item?.journal_id
+                                                                          })
+                                                                    }
+                                                                        sx={{
+                                                                            bgcolor:
+                                                                                Colors.primary,
+                                                                            "&:hover": {
+                                                                                bgcolor:
+                                                                                    Colors.primary,
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        <EyeIcon />
+                                                                    </IconButton>
+                                                                </Cell>
                                                                 {/* <Cell><Box className="pdf-hide"
                                   onClick={page ? () =>
                                     navigate(`/${page}/${item?.journal_id}`)
