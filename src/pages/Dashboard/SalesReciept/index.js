@@ -664,7 +664,7 @@ function SalesReciept() {
     getCategories();
     getSystemSettings();
     // getServiceItem();
-    getInvoiceNumber();
+    // getInvoiceNumber();
     setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
     setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
     setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
@@ -828,7 +828,7 @@ function SalesReciept() {
                   }}
                 >
                   <Grid container sx={{ gap: "5px 25px" }}>
-                    <Grid item md={5.7} sm={12} xs={12}>
+                    {/* <Grid item md={5.7} sm={12} xs={12}>
                       <InputField
                         label="Request No"
                         size="small"
@@ -836,7 +836,7 @@ function SalesReciept() {
                         placeholder="TSL/83540"
                         register={register1("invoice_no")}
                       />
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={5.7}>
                       <DatePicker
                         label={"Invoice Date :*"}

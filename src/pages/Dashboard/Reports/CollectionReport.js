@@ -705,7 +705,7 @@ function CollectionReport() {
 
             <Grid item xs={2} sx={{ marginTop: "30px" }}>
               <PrimaryButton
-                bgcolor={"#bd9b4a"}
+                bgcolor={"#001f3f"}
                 icon={<SearchIcon />}
                 title="Search"
                 sx={{ marginTop: "30px" }}
@@ -720,7 +720,7 @@ function CollectionReport() {
         <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
         <Grid item>
               <PrimaryButton
-                bgcolor={"#bd9b4a"}
+                bgcolor={"#001f3f"}
                 title="Download Excel"
                 sx={{ marginTop: "30px" }}
                 onClick={() => handleCSVDownload()}
