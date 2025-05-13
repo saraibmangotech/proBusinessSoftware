@@ -191,7 +191,10 @@ function UpadateJournalVoucher() {
       }
       const { data } = await FinanceServices.getJournalVoucherDetail(params)
       setVoucherDetail(data.voucher)
-      setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
+      if(data?.voucher?.cost_center){
+        setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
+      }
+      
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
         name: ` ${account?.account?.account_code} ${account?.account?.name}`,
@@ -330,41 +333,42 @@ function UpadateJournalVoucher() {
   }
   // *For Create Journal Voucher
   const UpadateJournalVoucher = async (formData) => {
-    setLoading(true)
+    if (!selectedCostCenter?.name) {
+      showErrorToast('Cost Center is required');
+      return;
+    }
+  
+    setLoading(true);
     try {
-
-      let obj = {
+      const obj = {
         id: id,
         total: totalDebit,
         notes: getValues('note'),
         entries: rows,
         created_at: getYearMonthDateFormate(fromDate),
-        cost_center: selectedCostCenter?.name
-      }
-
-
+        cost_center: selectedCostCenter.name
+      };
+  
       const promise = FinanceServices.UpdateJournalVoucher(obj);
-
+  
       showPromiseToast(
         promise,
         'Saving...',
         'Added Successfully',
         'Something Went Wrong'
       );
-
+  
       const response = await promise;
       if (response?.responseCode === 200) {
-        navigate('/journal-voucher-list')
+        navigate('/journal-voucher-list');
       }
-
-
     } catch (error) {
-      showErrorToast(error)
+      showErrorToast(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
+  };
+  
   const addItem = (data) => {
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
