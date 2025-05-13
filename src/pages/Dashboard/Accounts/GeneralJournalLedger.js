@@ -432,7 +432,7 @@ function GeneralJournalLedger() {
 	  
 		  return [
 			item?.journal_id ? item?.series_id + item?.journal_id : "-",
-			moment(item?.created_at).format("MM-DD-YYYY") ?? "-",
+			moment(item?.created_at).format("DD/MM/YYYY") ?? "-",
 			item.entry?.reference_no ?? "-",
 			item?.type?.type_name ?? "-",
 			item?.account?.account_code ?? "-",

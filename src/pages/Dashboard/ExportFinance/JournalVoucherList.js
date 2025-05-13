@@ -198,7 +198,7 @@ function JournalVoucherList() {
   const downloadExcel = () => {
     const headers = tableHead.filter((item) => item !== "Action");
     const rows = vouchers?.map((item) => [
-      moment(item?.created_at).format("MM-DD-YYYY"),
+      moment(item?.created_at).format("DD/MM/YYYY"),
       `JV-${item?.id ?? '-'}`,
       item?.entry_no ?? '-',
       item?.total_amount ?? '-',

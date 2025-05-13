@@ -313,7 +313,7 @@ function GeneralLedger() {
       }
 
       return [
-        item?.created_at ? moment(item?.created_at).format("MM-DD-YYYY") : "-",
+        item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "-",
         item?.journal_id ? item?.series_id + item?.journal_id : "-",
         item?.entry?.reference_no ?? "-",
         item?.type?.type_name ?? "-",
@@ -535,7 +535,7 @@ function GeneralLedger() {
                               >
                                 <Cell className="pdf-table">
                                   {item?.created_at
-                                    ? moment(item?.created_at).format("MM-DD-YYYY")
+                                    ? moment(item?.created_at).format("DD/MM/YYYY")
                                     : "-"}
                                 </Cell>
                                 <Cell className="pdf-table">

@@ -374,7 +374,7 @@ function FundTransferVoucherList() {
   const downloadExcel = () => {
     const headers = tableHead.filter((item) => item !== "Action");
     const rows = vouchers?.map((item) => [
-      moment(item?.created_at).format("MM-DD-YYYY"),
+      moment(item?.created_at).format("DD/MM/YYYY"),
       item?.ref_no ?? '-',
       item?.from_account?.account_code ?? '-',
       item?.from_account?.name ?? '-',
