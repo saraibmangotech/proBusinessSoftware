@@ -157,6 +157,7 @@ function SupplierLedgers() {
       JV: `JV-${item.id} ` || "",
       Description: item.description || "",
       Type: item.type?.type_name || "",
+      Cost_Center: item?.cost_center || "",
       Account: item.account?.name || "",
       Debit: parseFloat(item.debit || 0).toFixed(2),
       Credit: parseFloat(item.credit || 0).toFixed(2),
@@ -173,6 +174,7 @@ function SupplierLedgers() {
       Reference: "",
       Description: "",
       Type: "",
+      Cost_Center: "",
       Account: "Total",
       Debit: totalDebit.toFixed(2),
       Credit: totalCredit.toFixed(2),
@@ -187,7 +189,7 @@ function SupplierLedgers() {
     { label: "Reference", key: "Reference" },
     { label: "Description", key: "Description" },
     { label: "Type", key: "Type" },
-
+    { label: "Cost Center", key: "Cost_Center" },
     { label: "Debit", key: "Debit" },
     { label: "Credit", key: "Credit" },
   ];
@@ -572,7 +574,7 @@ function SupplierLedgers() {
           {customerQueue?.length > 0 && <CSVLink
             data={prepareCSVData(customerQueue)}
             headers={headers}
-            filename="journal_entries.csv"
+            filename="supplier_ledgers.csv"
           >
             <Button
 

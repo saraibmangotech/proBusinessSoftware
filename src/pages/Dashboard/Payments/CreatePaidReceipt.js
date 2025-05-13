@@ -377,12 +377,13 @@ function CreatePaidReceipt() {
 
       if (!data?.receipt) {
         ErrorToaster("No Result Found")
+       
         setFieldsDisabled(false)
         return;
       }
 
       if (data?.receipt) {
-
+        getInvoiceNumber(data?.receipt?.id)
         if (data?.receipt?.is_paid) {
           ErrorToaster("Receipt already Paid")
           return;
@@ -562,6 +563,24 @@ function CreatePaidReceipt() {
     }
   }
 
+  const getInvoiceNumber = async (id) => {
+    // setLoader(true)
+    try {
+      const params = {
+       id:id
+      }
+
+      const { data } = await CustomerServices.getInvoiceNumber(params)
+      console.log(data,'datadatadata')
+      setValue1('invoiceID',data?.invoice_number)
+
+      
+    } catch (error) {
+      ErrorToaster(error)
+    } finally {
+      // setLoader(false)
+    }
+  }
   const addPayments = (amount, mode, bank, card, code, percentage = null, additionalCharges = null, submit = null) => {
     const total = parseFloat(getValues1("total")) || 0;
     const currentAmount = parseFloat(amount) || 0;
@@ -705,7 +724,7 @@ function CreatePaidReceipt() {
         setRows(data?.receipt?.sale_receipt_items)
         setOldRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
-
+        getInvoiceNumber(data?.receipt?.id)
         //alert("Data found")
         setValue1("paid", 0)
         //setValue1("customer", data?.receipt?.customer_name)
@@ -795,6 +814,7 @@ function CreatePaidReceipt() {
     getCategories()
     getServiceItem()
     setDate(new Date())
+    
     setValue1("payment", { id: "Cash", name: "Cash" })
     setSelectedMode({ id: "Cash", name: "Cash" })
     //setSelectedCustomer({ id: 11002, name: "Walk-in Customer" })
@@ -962,6 +982,16 @@ function CreatePaidReceipt() {
                             setValue1("paidAt", date)
                             setPaidAt(new Date(date))
                           }}
+                        />
+                      </Grid>
+                      <Grid item md={3.8} sm={5.5} xs={12}>
+                        <InputField
+                          label="Invoice Number"
+                          size="small"
+                          disabled={true}
+                          placeholder="Invoice Number"
+                          register={register1("invoiceID")}
+                          error={errors1?.invoiceID?.message}
                         />
                       </Grid>
                       <Grid item md={3.8} sm={5.5} xs={12}>

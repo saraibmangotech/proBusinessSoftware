@@ -317,6 +317,7 @@ function GeneralLedger() {
         item?.journal_id ? item?.series_id + item?.journal_id : "-",
         item?.entry?.reference_no ?? "-",
         item?.type?.type_name ?? "-",
+        item?.cost_center ?? "-",
         item?.description ?? "-",
         item?.comment ?? "-",
         debit.toFixed(2),
