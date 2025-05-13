@@ -401,6 +401,7 @@ function CreateJournalVoucher() {
 
     setSelectedAccount(null);
     setSelectedRow(null);
+    setEditState(false)
     reset();
   };
 

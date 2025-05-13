@@ -592,10 +592,10 @@ function CreateVendorPayment() {
             return;
         }
 
-        if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
-            showErrorToast("Percentage is required for Bank/Card mode");
-            return;
-        }
+        // if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
+        //     showErrorToast("Percentage is required for Bank/Card mode");
+        //     return;
+        // }
 
         const paymentObj = {
             amount: currentAmount,
@@ -611,8 +611,7 @@ function CreateVendorPayment() {
             ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
             ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
             auth_code: mode === "Card" ? code : null,
-            additional_charges_percentage: mode === "Bank" || mode === "Card" ? parseFloat(percentage) : null,
-            additional_charges_value: mode === "Bank" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
+          
         };
 
         setPayments((prev) => [...prev, paymentObj]);
@@ -1068,7 +1067,7 @@ function CreateVendorPayment() {
                                                 </Grid>
                                             )}
 
-                                            {(selectedMode?.id === "Bank" || selectedMode?.id === "Payment Link") && (
+                                            {/* {(selectedMode?.id === "Bank" || selectedMode?.id === "Payment Link") && (
                                                 <>
                                                     <Grid item md={3.8} sm={12} xs={12}>
                                                         <InputField
@@ -1105,7 +1104,7 @@ function CreateVendorPayment() {
                                                         />
                                                     </Grid>
                                                 </>
-                                            )}
+                                            )} */}
 
                                             <Grid item md={12} sm={12} xs={12}>
                                                 <Button
