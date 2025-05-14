@@ -421,8 +421,14 @@ const SupplierLedgers= lazy(() =>
 const UpdateJournalVoucher= lazy(() =>
   import("pages/Dashboard/Accounts/UpdateJournalVoucher")
 );
+const AttendanceTable= lazy(() =>
+  import("pages/Dashboard/HRMS/AttendanceReport")
+);
 const AdminRoutes = [
-  
+  {
+    path: "/attendance-report",
+    component: <AttendanceTable />,
+  },
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,

@@ -31,6 +31,9 @@ function CreateFundTransferVoucher() {
   const [cashierAccounts, setCashierAccounts] = useState([])
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [childAccounts, setChildAccounts] = useState([]);
+  const [childAccounts2, setChildAccounts2] = useState([]);
+  const [selectedChildAccount, setSelectedChildAccount] = useState(null);
 
   // *For Handle Date
   const [vaultDate, setVaultDate] = useState(new Date());
@@ -150,6 +153,41 @@ function CreateFundTransferVoucher() {
       showErrorToast(error);
     }
   };
+    // *For Get Account
+    const getChildAccounts = async (accountId) => {
+      try {
+        let params = {
+          page: 1,
+          limit: 50,
+          primary_account_id: accountId,
+        };
+        const { data } = await FinanceServices.getAccounts(params);
+        if(data?.accounts?.rows?.length > 0){
+          setSelectedFromAccount(null)
+          showErrorToast('Cannot use this account because it has child accounts.')
+        }
+        setChildAccounts(data?.accounts?.rows);
+      } catch (error) {
+        showErrorToast(error);
+      }
+    };
+    const getChildAccounts2 = async (accountId) => {
+      try {
+        let params = {
+          page: 1,
+          limit: 50,
+          primary_account_id: accountId,
+        };
+        const { data } = await FinanceServices.getAccounts(params);
+        if(data?.accounts?.rows?.length > 0){
+          setSelectedToAccount(null)
+          showErrorToast('Cannot use this account because it has child accounts.')
+        }
+        setChildAccounts2(data?.accounts?.rows);
+      } catch (error) {
+        showErrorToast(error);
+      }
+    };
 
   useEffect(() => {
     getPaymentAccounts()
@@ -241,7 +279,11 @@ function CreateFundTransferVoucher() {
               label={'Fund Transfer From'}
               options={accounts}
               selected={selectedFromAccount}
-              onSelect={(value) => setSelectedFromAccount(value)}
+              onSelect={(value) => {
+                
+                setSelectedFromAccount(value)
+                getChildAccounts(value?.id)
+              }}
               error={errors?.from?.message}
               register={register("from", {
                 required: 'Please select from account.',
@@ -266,7 +308,9 @@ function CreateFundTransferVoucher() {
               label={'Fund Transfer To'}
               options={accounts}
               selected={selectedToAccount}
-              onSelect={(value) => setSelectedToAccount(value)}
+              onSelect={(value) => {
+                getChildAccounts2(value?.id)
+                setSelectedToAccount(value)}}
               error={errors?.to?.message}
               register={register("to", {
                 required: 'Please select to account.',

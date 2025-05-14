@@ -36,6 +36,11 @@ import SendIcon from "@mui/icons-material/Send"
 import TaskAltIcon from "@mui/icons-material/TaskAlt"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import NetworkWifiIcon from "@mui/icons-material/NetworkWifi";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 // Navy blue theme colors
 const THEME = {
   primary: "#001f3f", // Dark navy blue (primary color)
@@ -148,7 +153,7 @@ function CustomStepIcon(props) {
 const statsData = [
   {
     title: "Total Sales",
-    value: "248",
+    value: "1,250",
     icon: <PeopleAltIcon />,
     color: THEME.accent1,
     bgColor: THEME.accent1,
@@ -157,36 +162,37 @@ const statsData = [
   },
   {
     title: "Employee Service Count",
-    value: "436",
+    value: "320",
     icon: <DescriptionIcon />,
     color: THEME.secondary,
     bgColor: THEME.secondary,
-    trend: "+8%",
+    trend: "+9%",
     trendUp: true,
   },
   {
-    title: "Sales Category Count",
-    value: "123",
+    title: "Sales Categories",
+    value: "18",
     icon: <SendIcon />,
     color: THEME.accent2,
     bgColor: THEME.accent2,
-    trend: "+5%",
-    trendUp: true,
+    trend: "",
+    // trendUp: true,
   },
   {
-    title: "Quantity",
-    value: "$1,264",
+    title: "Total Quantity Sold",
+    value: "5,480",
     icon: <TaskAltIcon />,
     color: THEME.success,
     bgColor: THEME.success,
-    trend: "-3%",
+    trend: "-2%",
     trendUp: false,
   },
-]
+];
+
 const statsData2 = [
   {
     title: "Total Sales",
-    value: "248",
+    value: "85,400",
     icon: <PeopleAltIcon />,
     color: THEME.secondary,
     bgColor: THEME.secondary,
@@ -195,16 +201,16 @@ const statsData2 = [
   },
   {
     title: "Today's Invoices",
-    value: "436",
+    value: "74",
     icon: <DescriptionIcon />,
     color: THEME.secondary,
     bgColor: THEME.secondary,
-    trend: "+8%",
+    trend: "+6%",
     trendUp: true,
   },
   {
-    title: "Monthly Sale",
-    value: "123",
+    title: "Monthly Sales",
+    value: "21,300",
     icon: <SendIcon />,
     color: THEME.accent1,
     bgColor: THEME.accent1,
@@ -213,24 +219,64 @@ const statsData2 = [
   },
   {
     title: "Monthly Invoices",
-    value: "123",
+    value: "680",
     icon: <ReceiptLongIcon />,
     color: THEME.accent2,
     bgColor: THEME.accent2,
-    trend: "+5%",
+    trend: "+8%",
     trendUp: true,
   },
   {
     title: "Monthly Commission",
-    value: "$1,264",
+    value: "4,560",
     icon: <TaskAltIcon />,
     color: THEME.success,
     bgColor: THEME.success,
-    trend: "-3%",
-    trendUp: false,
+    trend: "+3%",
+    trendUp: true,
   },
 ];
 
+
+const statsData3 = [
+  {
+    title: "Card Payments Collected",
+    value: "85,400",
+    icon: <PaymentsIcon />, // Represents card or digital payments
+    color: THEME.secondary,
+    bgColor: THEME.secondary,
+    trend: "+12%",
+    trendUp: true,
+  },
+  {
+    title: "Cash Payments Collected",
+    value: "14,200",
+    icon: <AttachMoneyIcon />, // Clearly denotes cash
+    color: THEME.secondary,
+    bgColor: THEME.secondary,
+    trend: "+6%",
+    trendUp: true,
+  },
+  {
+    title: "Network/Online Transfers",
+    value: "21,300",
+    icon: <NetworkWifiIcon />, // Denotes network/digital transfer
+    color: THEME.accent1,
+    bgColor: THEME.accent1,
+    trend: "+5%",
+    trendUp: true,
+  },
+  {
+    title: "Total Collection (All Modes)",
+    value: "120,900",
+    icon: <AccountBalanceWalletIcon />, // Represents a total collection/wallet
+    color: THEME.accent2,
+    bgColor: THEME.accent2,
+    trend: "+8%",
+    trendUp: true,
+  },
+
+];
 
 // Sample data for charts
 const salesData = [
@@ -263,13 +309,13 @@ const employeeData = [
 ]
 
 const revenueData = [
-  { name: "Jan", sales: 4000, commission: 2400 },
-  { name: "Feb", sales: 3000, commission: 1398 },
-  { name: "Mar", sales: 2000, commission: 9800 },
-  { name: "Apr", sales: 2780, commission: 3908 },
-  { name: "May", sales: 1890, commission: 4800 },
-  { name: "Jun", sales: 2390, commission: 3800 },
-  { name: "Jul", sales: 3490, commission: 4300 },
+  { name: "Jan", sales: 4000, expenses: 2400 },
+  { name: "Feb", sales: 3000, expenses: 1398 },
+  { name: "Mar", sales: 2000, expenses: 9800 },
+  { name: "Apr", sales: 2780, expenses: 3908 },
+  { name: "May", sales: 1890, expenses: 4800 },
+  { name: "Jun", sales: 2390, expenses: 3800 },
+  { name: "Jul", sales: 3490, expenses: 4300 },
   
 ]
 const revenueData2 = [
@@ -282,6 +328,16 @@ const revenueData2 = [
   { name: "Jul", sales: 3490, text: 4300 },
   
 ]
+const revenueData3 = [
+  { name: "Jan", credit: 5000, paid: 3200 },
+  { name: "Feb", credit: 4200, paid: 3000 },
+  { name: "Mar", credit: 6100, paid: 4500 },
+  { name: "Apr", credit: 4800, paid: 3900 },
+  { name: "May", credit: 5300, paid: 4700 },
+  { name: "Jun", credit: 4600, paid: 4300 },
+  { name: "Jul", credit: 5800, paid: 5500 },
+];
+
 function Dashboard() {
   const classes = useStyle()
   const navigate = useNavigate()
@@ -293,6 +349,7 @@ function Dashboard() {
   const [stepperLabel, setStepperLabel] = useState([])
   const [statsDetail, setStatsDetail] = useState(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [currentState, setCurrentState] = useState(user?.role_id  == 1000 ? 'Admin' : user?.role_id  == 1004 ? 'Cashier' : user?.role_id  == 1003 ? 'Typist' : '')
 
   const pdfContent = Images?.guidelinePDF
 
@@ -362,7 +419,7 @@ function Dashboard() {
           <Grid container spacing={2} alignItems="center" justifyContent={'space-between'}>
             <Grid item xs={12} md={8}>
               <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Welcome back, Test ! <span className="waving-hand">&#x1F44B;</span>
+                Welcome back, {user?.name} ! <span className="waving-hand">&#x1F44B;</span>
               </Typography>
               <Typography variant="body1">Here's what's happening with your business today.</Typography>
             </Grid>
@@ -382,7 +439,7 @@ function Dashboard() {
 
         {/* Stats Cards */}
         <Grid container mt={1} xs={12} spacing={2} justifyContent={'space-between'}>
-          {statsData2.map((stat, index) => (
+          {currentState == 'Typist' && statsData2.map((stat, index) => (
             <Grid item xs={12} sm={6} md={2.4} key={index}>
               <Card
                 className={classes.dashboardCard}
@@ -455,12 +512,158 @@ function Dashboard() {
               </Card>
             </Grid>
           ))}
+             {currentState == 'Admin' && statsData.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card
+                className={classes.dashboardCard}
+                sx={{
+                  borderRadius: "16px",
+                  backgroundColor: THEME.primary,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  height: "120px",
+                  position: "relative",
+                  overflow: "visible",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  color: "white",
+                }}
+              >
+                <CardContent sx={{ position: "relative", zIndex: 1, width: "100%" }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Box
+                        sx={{
+                          backgroundColor: stat.bgColor,
+                          borderRadius: "12px",
+                          width: 48,
+                          height: 48,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          marginRight: 2,
+                        }}
+                      >
+                        {stat.icon}
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)" }}>
+                          {stat.title}
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography variant="h5" sx={{ fontWeight: "bold", color: "white" }}>
+                            {stat.value}
+                          </Typography>
+                          { stat.title != 'Sales Categories' && <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              ml: 1,
+                              color: "white",
+                              bgcolor: stat.trendUp ? "rgba(0,184,148,0.3)" : "rgba(255,118,117,0.3)",
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            {stat.trendUp ? (
+                              <ArrowUpwardIcon sx={{ fontSize: 12, mr: 0.5 }} />
+                            ) : (
+                              <ArrowUpwardIcon sx={{ fontSize: 12, mr: 0.5, transform: "rotate(180deg)" }} />
+                            )}
+                            {stat.trend}
+                          </Box>}
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+             {currentState == 'Cashier' && statsData3.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card
+                className={classes.dashboardCard}
+                sx={{
+                  borderRadius: "16px",
+                  backgroundColor: THEME.primary,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  height: "120px",
+                  position: "relative",
+                  overflow: "visible",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  color: "white",
+                }}
+              >
+                <CardContent sx={{ position: "relative", zIndex: 1, width: "100%" }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Box
+                        sx={{
+                          backgroundColor: stat.bgColor,
+                          borderRadius: "12px",
+                          width: 48,
+                          height: 48,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          marginRight: 2,
+                        }}
+                      >
+                        {stat.icon}
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)" }}>
+                          {stat.title}
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography variant="h5" sx={{ fontWeight: "bold", color: "white" }}>
+                            {stat.value}
+                          </Typography>
+                          { stat.title != 'Sales Categories' && <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              ml: 1,
+                              color: "white",
+                              bgcolor: stat.trendUp ? "rgba(0,184,148,0.3)" : "rgba(255,118,117,0.3)",
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            {stat.trendUp ? (
+                              <ArrowUpwardIcon sx={{ fontSize: 12, mr: 0.5 }} />
+                            ) : (
+                              <ArrowUpwardIcon sx={{ fontSize: 12, mr: 0.5, transform: "rotate(180deg)" }} />
+                            )}
+                            {stat.trend}
+                          </Box>}
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
 
         {/* Charts Section */}
-        <Grid container spacing={3} mt={2}>
+        {currentState == 'Admin' && <Grid container spacing={3} mt={2}>
           {/* Sales Trend Chart */}
-          {/* <Grid item xs={12} md={12}>
+          <Grid item xs={12} md={8}>
             <Card
               sx={{
                 p: 2,
@@ -498,10 +701,10 @@ function Dashboard() {
                 </AreaChart>
               </ResponsiveContainer>
             </Card>
-          </Grid> */}
+          </Grid>
 
           {/* Category Distribution */}
-          {/* <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <Card
               sx={{
                 p: 2,
@@ -595,10 +798,10 @@ function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
             </Card>
-          </Grid> */}
+          </Grid>
 
           {/* Employee Service Distribution */}
-          {/* <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <Card
               sx={{
                 p: 2,
@@ -620,10 +823,10 @@ function Dashboard() {
                 </BarChart>
               </ResponsiveContainer>
             </Card>
-          </Grid> */}
+          </Grid>
 
           {/* Revenue vs Expenses */}
-          {/* <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={8}>
             <Card
               sx={{
                 p: 2,
@@ -647,8 +850,36 @@ function Dashboard() {
                 </LineChart>
               </ResponsiveContainer>
             </Card>
-          </Grid> */}
-          <Grid item xs={12} md={12}>
+          </Grid>
+        
+        </Grid>}
+        <Grid container spacing={3} mt={2}>
+       {currentState == 'Cashier' &&  <Grid item xs={12} md={12}>
+            <Card
+              sx={{
+                p: 2,
+                borderRadius: "16px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                border: `1px solid ${THEME.primary}`,
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
+                Credit Invoices vs Paid Invoices
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={revenueData3} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="credit" stroke={THEME.accent1} activeDot={{ r: 8 }} strokeWidth={2} />
+                  <Line type="monotone" dataKey="paid" stroke={THEME.accent2} strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </Card>
+          </Grid>}
+          {currentState == 'Typist' && <Grid item xs={12} md={12}>
             <Card
               sx={{
                 p: 2,
@@ -672,7 +903,7 @@ function Dashboard() {
                 </LineChart>
               </ResponsiveContainer>
             </Card>
-          </Grid>
+          </Grid>}
         </Grid>
       </Box>
     </Fragment>
