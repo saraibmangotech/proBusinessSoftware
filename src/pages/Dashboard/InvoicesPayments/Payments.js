@@ -956,7 +956,7 @@ function Payments() {
                                                                     {item?.id}
                                                                 </Cell>
                                                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {moment(item?.created_at).format("MM-DD-YYYY")}
+                                                                    {moment(item?.created_at).format("DD/MM/YYYY")}
                                                                 </Cell>
                                                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                                                     {item?.customer?.name}

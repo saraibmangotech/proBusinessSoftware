@@ -13,6 +13,7 @@ import FinanceServices from 'services/Finance';
 import { useReactToPrint } from 'react-to-print';
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
+import InputField from 'components/Input';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -135,11 +136,11 @@ function JournalVoucherDetail() {
       <Box display={'flex'} gap={2}>
         <Box display={'flex'} gap={1}>
           <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Date : </Typography>
-          <Typography sx={{ fontSize: '14px',mt:0.7}}>{moment(voucherDetail?.created_at).format('MM-DD-YYYY')} </Typography>
+          <Typography sx={{ fontSize: '14px', mt: 0.7 }}>{moment(voucherDetail?.created_at).format('MM-DD-YYYY')} </Typography>
         </Box>
         <Box display={'flex'} alignItems={'center'} gap={1}>
           <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>JV No : </Typography>
-          <Typography sx={{ fontSize: '14px', mt:0.5 }}>JV-{voucherDetail?.entry_id} </Typography>
+          <Typography sx={{ fontSize: '14px', mt: 0.5 }}>JV-{voucherDetail?.entry_id} </Typography>
         </Box>
       </Box>
       {/* {!loader && (
@@ -225,6 +226,15 @@ function JournalVoucherDetail() {
                         </TableBody>
                       </Table>
                     </TableContainer>
+                    <Grid item xs={12} sm={4} mt={2}>
+                      <InputField
+                        label={'Note'}
+                        value={voucherDetail?.notes}
+                        placeholder={'Note'}
+                        disabled={true}
+              
+                      />
+                    </Grid>
                   </Grid>
 
                 </Grid>

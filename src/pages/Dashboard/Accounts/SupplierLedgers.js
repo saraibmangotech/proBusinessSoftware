@@ -153,7 +153,7 @@ function SupplierLedgers() {
     // Map each entry into the desired CSV format
     const csvRows = data.map((item) => ({
       Reference: item.entry.reference_no || "",
-      Date: item?.created_at || '',
+      Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
       JV: `JV-${item.id} ` || "",
       Description: item.description || "",
       Type: item.type?.type_name || "",
@@ -241,7 +241,7 @@ function SupplierLedgers() {
         account_id: selectedUser?.account_id ?? null,
         is_supplier: selectedUser?.account_id ? false : true,
         is_vendor: true,
-        cost_center:selectedCostCenter?.name
+        cost_center: selectedCostCenter?.name
 
       }
 
@@ -653,7 +653,7 @@ function SupplierLedgers() {
                               >
                                 <Cell className="pdf-table">
                                   {item?.created_at
-                                    ? moment(item?.created_at).format("MM-DD-YYYY")
+                                    ? moment(item?.created_at).format("DD/MM/YYYY")
                                     : "-"}
                                 </Cell>
                                 <Cell className="pdf-table">

@@ -239,7 +239,7 @@ function ReceiptVoucherList() {
 	const downloadExcel = () => {
 		const headers = tableHead.filter((item) => item !== "Action");
 		const rows = vouchers?.map((item) => [
-			moment(item?.created_at).format("MM-DD-YYYY"),
+			moment(item?.created_at).format("DD/MM/YYYY"),
 			item?.account?.name ?? "-",
 			item?.payment_medium ?? "-",
 			`$ ${item?.usd_total ?? "-"}`,
