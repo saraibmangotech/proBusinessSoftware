@@ -775,10 +775,10 @@ function CreatePurchaseReceipt() {
                                                     type="submit"
                                                     sx={{
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                         fontSize: "12px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -843,9 +843,9 @@ function CreatePurchaseReceipt() {
                                                                                             sx={{
                                                                                                 width:'350px',
                                                                                                 textTransform: 'capitalize',
-                                                                                                backgroundColor: "#bd9b4a",
+                                                                                                backgroundColor: "#001f3f",
                                                                                                 ":hover": {
-                                                                                                    backgroundColor: "rgb(189 155 74)",
+                                                                                                    backgroundColor: "#001f3f",
                                                                                                 },
                                                                                             }}
                                                                                         >
@@ -858,9 +858,9 @@ function CreatePurchaseReceipt() {
                                                                                             sx={{
                                                                                                 width:'350px',
                                                                                                 textTransform: 'capitalize',
-                                                                                                backgroundColor: "#bd9b4a",
+                                                                                                backgroundColor: "#001f3f",
                                                                                                 ":hover": {
-                                                                                                    backgroundColor: "rgb(189 155 74)",
+                                                                                                    backgroundColor: "#001f3f",
                                                                                                 },
                                                                                             }}
                                                                                         >

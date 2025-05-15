@@ -170,7 +170,7 @@ function AgentDetail() {
         <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >AGENT DETAIL</Typography>
         <Box sx={{ display: 'flex', gap: '10px' }}>
           {permissions?.edit_details && <PrimaryButton
-           bgcolor={'#bd9b4a'}
+           bgcolor={'#001f3f'}
             title="Edit"
             onClick={() => navigate(`/update-agent/${id}`)}
 

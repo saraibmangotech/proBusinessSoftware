@@ -376,7 +376,7 @@ function ReceptionForm() {
 
                                     //       }}
                                     //     >
-                                    //       <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                    //       <SearchIcon sx={{ color: "#001f3f" }} />
                                     //     </IconButton>
                                     //   ),
                                     // }}
@@ -523,7 +523,7 @@ function ReceptionForm() {
                         <Grid container justifyContent={'flex-end'}>
                             <PrimaryButton
                                 disabled={buttonDisabled || buttonDisabled3}
-                                bgcolor={'#bd9b4a'}
+                                bgcolor={'#001f3f'}
                                 title="Create"
                                 type={'submit'}
 
@@ -676,7 +676,7 @@ function ReceptionForm() {
                                 <PrimaryButton
 
                                     disabled={subCustDisable}
-                                   bgcolor={'#bd9b4a'}
+                                   bgcolor={'#001f3f'}
                                     onClick={() => setCompanyDialog(true)}
                                     title="Add Customer"
 
@@ -687,7 +687,7 @@ function ReceptionForm() {
                             <Grid container justifyContent={'flex-end'}>
                                 <PrimaryButton
                                     // disabled={buttonDisabled2}
-                                    bgcolor={'#bd9b4a'}
+                                    bgcolor={'#001f3f'}
                                     title="Create"
                                     type={'submit'}
 

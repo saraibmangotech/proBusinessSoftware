@@ -539,7 +539,7 @@ function ReceivableAging() {
               loading={loading}
             />
             <PrimaryButton
-             bgcolor={'#bd9b4a'}
+             bgcolor={'#001f3f'}
               title="Search"
               onClick={() => handleFilter()}
               loading={loading}

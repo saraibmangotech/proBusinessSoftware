@@ -480,18 +480,18 @@ function BalanceSheet() {
         });
 
         if (subItem?.accounts?.length > 0) {
-          rows.push(['', '', '', '', '', `Subtotal of ${subItem?.accounts[0]?.type_code}`, parseFloat(subTotal.toFixed(2))]);
+          rows.push([`Subtotal of ${subItem?.accounts[0]?.type_code}`,'','','','','', parseFloat(subTotal.toFixed(2))]);
         }
       });
 
       // Section total (Assets / Liabilities / Equity)
       if (item?.sub?.length > 0) {
-        rows.push(['', '', '', '', '', `Total ${item?.name}`, parseFloat(sectionTotal.toFixed(2))]);
+        rows.push([ `Total ${item?.name}`, '','','','','',parseFloat(sectionTotal.toFixed(2))]);
       }
     });
 
     // Optional: Add Grand Totals if needed
-    rows.push(['', '', '', '', '', '	Owner Capital + Liabilities', CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)).toFixed(2))]);
+    rows.push([ '	Owner Capital + Liabilities + Retain Profit', '','','','','', CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal)+(parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses))).toFixed(2))]);
 
 
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
@@ -585,7 +585,7 @@ function BalanceSheet() {
         <Grid item xs={3} mt={'30px'}>
 
           <PrimaryButton
-            bgcolor={"#bd9b4a"}
+            bgcolor={"#001f3f"}
             icon={<SearchIcon />}
             title="Search"
             sx={{ marginTop: "30px" }}

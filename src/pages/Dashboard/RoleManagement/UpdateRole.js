@@ -65,7 +65,7 @@ function UpdateRole() {
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >CREATE ROLE</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
             <PrimaryButton
-             bgcolor={'#bd9b4a'}
+             bgcolor={'#001f3f'}
               title="Update"
               type={'submit'}
 

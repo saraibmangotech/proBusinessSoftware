@@ -113,6 +113,7 @@ function CreatePaymentVoucher() {
     // *For Accounts
     const [accounts, setAccounts] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(null);
+    const [childAccounts, setChildAccounts] = useState([]);
 
     // *For Journal Voucher List
     const [journalVoucherList, setJournalVoucherList] = useState([]);
@@ -212,6 +213,23 @@ function CreatePaymentVoucher() {
             showErrorToast(error)
         }
     }
+    const getChildAccounts = async (accountId) => {
+        try {
+          let params = {
+            page: 1,
+            limit: 50,
+            primary_account_id: accountId,
+          };
+          const { data } = await FinanceServices.getAccounts(params);
+          if(data?.accounts?.rows?.length > 0){
+            setSelectedAccount(null)
+            showErrorToast('Cannot use this account because it has child accounts.')
+          }
+          setChildAccounts(data?.accounts?.rows);
+        } catch (error) {
+          showErrorToast(error);
+        }
+      };
 
     // *For Get Account
     const getAccounts = async (search, accountId) => {
@@ -556,6 +574,7 @@ function CreatePaymentVoucher() {
                                         setSelectedAccount(value)
                                         console.log(value);
                                         setValue('AccountCode', value?.account_code)
+                                        getChildAccounts(value?.id)
 
                                     }}
                                     //  error={errors?.service?.message}
@@ -603,10 +622,10 @@ function CreatePaymentVoucher() {
                                     onClick={() => addItem(getValues('description'), getValues('amount'))}
                                     sx={{
                                         textTransform: 'capitalize',
-                                        backgroundColor: "rgb(189 155 74)",
+                                        backgroundColor: "#001f3f",
                                         fontSize: "12px",
                                         ":hover": {
-                                            backgroundColor: "rgb(189 155 74)",
+                                            backgroundColor: "#001f3f",
                                         },
                                     }}
                                 >

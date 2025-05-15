@@ -161,18 +161,18 @@ const DataTable = ({
   const exportToExcel = () => {
     // Filter out selection/checkbox column
     const exportColumns = columns.filter((col) => !col.id || col.id !== "select");
-  
+
     // Create CSV headers
     const headers = exportColumns
       .map((col) => col.header || col.accessorKey || col.id)
       .join(",");
-  
+
     // Generate a row from a data object
     const generateRow = (row) => {
       return exportColumns
         .map((col) => {
           let cellValue;
-  
+
           // Extract value from row using accessor
           if (col.accessorFn) {
             cellValue = col.accessorFn(row);
@@ -183,12 +183,12 @@ const DataTable = ({
           } else {
             cellValue = "";
           }
-  
+
           // Handle null/undefined
           if (cellValue === null || cellValue === undefined) {
             return "";
           }
-  
+
           // Handle objects
           if (typeof cellValue === "object" && cellValue !== null) {
             if (cellValue instanceof Date) {
@@ -198,7 +198,7 @@ const DataTable = ({
             } else {
               const displayProps = ["name", "title", "label", "value", "id", "key", "text", "description"];
               const foundProp = displayProps.find((prop) => cellValue[prop] !== undefined);
-  
+
               if (foundProp) {
                 cellValue = cellValue[foundProp];
               } else if (col.cell) {
@@ -217,27 +217,27 @@ const DataTable = ({
               }
             }
           }
-  
+
           // Convert value to string and escape if needed
           cellValue = String(cellValue);
           if (cellValue.includes(",") || cellValue.includes('"') || cellValue.includes("\n")) {
             return `"${cellValue.replace(/"/g, '""')}"`;
           }
-  
+
           return cellValue;
         })
         .join(",");
     };
-  
+
     // Generate data rows
     const dataRows = filteredData.map(generateRow);
-  
+
     // Generate total row
     const totalRowObj = {};
     exportColumns.forEach((col, idx) => {
       const key = col.accessorKey || col.id;
       const shouldTotal = col.total !== false;
-  
+
       if (idx === 0) {
         totalRowObj[key] = "Total";
       } else if (shouldTotal) {
@@ -258,13 +258,13 @@ const DataTable = ({
         totalRowObj[key] = "";
       }
     });
-  
+
     const totalRowString = generateRow(totalRowObj);
-  
+
     // Combine all parts into CSV content
     const csvContent = `${headers}\n${dataRows.join("\n")}\n${totalRowString}`;
     const csvWithBOM = "\uFEFF" + csvContent; // Excel needs BOM for UTF-8
-  
+
     // Trigger download
     const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -276,9 +276,9 @@ const DataTable = ({
     link.click();
     document.body.removeChild(link);
   };
-  
-  
-  
+
+
+
 
   return (
     <div>
@@ -318,10 +318,10 @@ const DataTable = ({
               sx={{
                 padding: '10px',
                 textTransform: 'capitalize !important',
-                backgroundColor: "#bd9b4a !important",
+                backgroundColor: "#001f3f !important",
                 fontSize: "12px",
                 ":hover": {
-                  backgroundColor: "#bd9b4a !important",
+                  backgroundColor: "#001f3f !important",
                 },
               }}
             >
@@ -401,12 +401,27 @@ const DataTable = ({
                         flexRender(header.column.columnDef.header, header.getContext())
                       ) : (
                         <TableSortLabel
-                          active={!!header.column.getIsSorted()}
-                          direction={header.column.getIsSorted() || "asc"}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableSortLabel>
+                        active={!!header.column.getIsSorted()}
+                        direction={header.column.getIsSorted() || "asc"}
+                        onClick={header.column.getToggleSortingHandler()}
+                        sx={{
+                          color: header.column.getIsSorted() ? "#6092d5 !important" : "white !important",
+                          '& .MuiTableSortLabel-icon': {
+                            color: header.column.getIsSorted() ? "#6092d5 !important" : "white !important",
+                          },
+                          '&:hover': {
+                            color: "#6092d5 !important",
+                            '& .MuiTableSortLabel-icon': {
+                              color: "#6092d5 !important",
+                            },
+                          },
+                        }}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableSortLabel>
+                      
+                      
+
                       )}
                     </TableCell>
                   ))}
@@ -448,7 +463,7 @@ const DataTable = ({
                       {!loading ? (
                         <strong style={{ fontSize: "18px" }}>No Data Found</strong>
                       ) : (
-                        <CircularProgress sx={{ color: "#bd9b4a" }} size={50} />
+                        <CircularProgress sx={{ color: "#001f3f" }} size={50} />
                       )}
                     </Box>
                   </TableCell>

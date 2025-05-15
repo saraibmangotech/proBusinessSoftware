@@ -304,9 +304,9 @@ const CreateDebitNote = () => {
                         variant="contained"
                         sx={{
                             textTransform: "capitalize",
-                            backgroundColor: "#bd9b4a",
+                            backgroundColor: "#001f3f",
                             ":hover": {
-                                backgroundColor: "rgb(189 155 74)",
+                                backgroundColor: "#001f3f",
                             },
                         }}
                     >

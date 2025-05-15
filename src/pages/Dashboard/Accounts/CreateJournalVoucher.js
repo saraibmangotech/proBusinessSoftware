@@ -129,6 +129,9 @@ function CreateJournalVoucher() {
 
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    // *For Accounts
+    const [childAccounts, setChildAccounts] = useState([]);
+    const [selectedChildAccount, setSelectedChildAccount] = useState(null);
 
   // *For Total of Credit & Debit
   let TotalDebit = 0
@@ -193,6 +196,21 @@ function CreateJournalVoucher() {
       showErrorToast(error)
     }
   }
+
+   // *For Get Account
+    const getChildAccounts = async (accountId) => {
+      try {
+        let params = {
+          page: 1,
+          limit: 50,
+          primary_account_id: accountId ?? selectedAccount?.id,
+        };
+        const { data } = await FinanceServices.getAccounts(params);
+        setChildAccounts(data?.accounts?.rows);
+      } catch (error) {
+        showErrorToast(error);
+      }
+    };
   const getCostCenters = async () => {
     try {
       let params = {
@@ -326,6 +344,11 @@ function CreateJournalVoucher() {
   
 
   const addItem = (data) => {
+    if (childAccounts?.length > 0) {
+      showErrorToast("Cannot use this account because it has child accounts.");
+      return
+    }
+    
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
@@ -359,10 +382,15 @@ function CreateJournalVoucher() {
     });
 
     setSelectedAccount(null);
+    setSelectedChildAccount(null);
+    setChildAccounts([])
     reset();
   };
 
   const updateItem = (data) => {
+    
+    
+    
     if (!selectedRow) {
       showErrorToast('No row selected to update');
       return;
@@ -473,6 +501,7 @@ function CreateJournalVoucher() {
               <TableRow>
 
                 <TableCell sx={{ width: "400px" }}>Accounts</TableCell>
+          
                 <TableCell sx={{ width: "150px" }}>Debit</TableCell>
                 <TableCell sx={{ width: "150px" }}>Credit</TableCell>
                 <TableCell sx={{ width: "150px" }}>Description</TableCell>
@@ -493,6 +522,7 @@ function CreateJournalVoucher() {
                       setSelectedAccount(value)
                       console.log(value);
                       setValue('AccountCode', value?.account_code)
+                      getChildAccounts(value?.id)
 
                     }}
                     //  error={errors?.service?.message}
@@ -502,6 +532,25 @@ function CreateJournalVoucher() {
                   />
                   {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
                 </TableCell>
+                {/* <TableCell>
+                  <SelectField
+                    size="small"
+                    options={childAccounts}
+                    disabled={editState}
+                    selected={selectedChildAccount}
+                    onSelect={(value) => {
+                      setSelectedChildAccount(value)
+                      console.log(value);
+                      setValue('childAccount', value?.account_code)
+
+                    }}
+                    //  error={errors?.service?.message}
+                    register={register("childAccount", {
+                      required: childAccounts?.length >  0 ? "Please select a childAccount." :false,
+                    })}
+                  />
+                  {errors.childAccount && <span style={{ color: "red" }}>{errors.childAccount.message}</span>}
+                </TableCell> */}
                 <TableCell>
                   <InputField
                     size="small"
@@ -567,10 +616,10 @@ function CreateJournalVoucher() {
                     type="submit"
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
+                      backgroundColor: "#001f3f",
                       fontSize: "12px",
                       ":hover": {
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                       },
                     }}
                   >
@@ -582,10 +631,10 @@ function CreateJournalVoucher() {
                     type="submit"
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
+                      backgroundColor: "#001f3f",
                       fontSize: "12px",
                       ":hover": {
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                       },
                     }}
                   >
@@ -602,10 +651,10 @@ function CreateJournalVoucher() {
                     setEditState(false)}}
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: "rgb(189 155 74)",
+                      backgroundColor: "#001f3f",
                       fontSize: "12px",
                       ":hover": {
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                       },
                     }}
                   >

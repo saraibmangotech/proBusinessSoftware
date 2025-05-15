@@ -886,7 +886,7 @@ function WPSList() {
                 <Box sx={{ display: 'flex', gap: '5px' }} >
 
                     {user?.user_type == 'C' && <PrimaryButton
-                       bgcolor={'#bd9b4a'}
+                       bgcolor={'#001f3f'}
                         title="Create WPS"
                         onClick={() => {
                             setWpsDoc(null)

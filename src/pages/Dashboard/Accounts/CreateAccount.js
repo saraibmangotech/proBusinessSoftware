@@ -252,7 +252,7 @@ function CreateAccount() {
         <Box sx={{ display: 'flex', gap: '5px' }} >
 
           <PrimaryButton
-           bgcolor={'#bd9b4a'}
+           bgcolor={'#001f3f'}
             title="Save"
             type={'submit'}
 

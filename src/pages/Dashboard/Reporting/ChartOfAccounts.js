@@ -415,7 +415,7 @@ function ChartOfAccount() {
                 <Grid item xs={3} mt={'30px'}>
 
                     <PrimaryButton
-                        bgcolor={"#bd9b4a"}
+                        bgcolor={"#001f3f"}
                         icon={<SearchIcon />}
                         title="Search"
                         sx={{ marginTop: "30px" }}
@@ -586,7 +586,17 @@ function ChartOfAccount() {
                                                                                                     <Cell>
                                                                                                         {!account?.childAccounts &&
                                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                                <Box onClick={() => navigate(`/account-ledger/${account?.id}`, { state: { accountName: account?.account_name, nature: account?.nature ,  cost_center:selectedCostCenter} })}>
+                                                                                                                <Box onClick={() => {
+  const url = `/account-ledger/${account?.id}`;
+  const state = {
+    accountName: account?.account_name,
+    nature: account?.nature,
+    cost_center: selectedCostCenter,
+  };
+  const encodedState = encodeURIComponent(JSON.stringify(state));
+  window.open(`${url}?state=${encodedState}`, '_blank');
+}}
+>
                                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                                     </IconButton>
@@ -627,7 +637,17 @@ function ChartOfAccount() {
                                                                                                                         </Cell>
                                                                                                                         <Cell>
                                                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                                                <Box onClick={() => navigate(`/account-ledger/${child?.id}`, { state: { accountName: child?.account_name, nature: child?.nature,  cost_center:selectedCostCenter } })}>
+                                                                                                                                <Box onClick={() => {
+  const url = `/account-ledger/${account?.id}`;
+  const state = {
+    accountName: account?.account_name,
+    nature: account?.nature,
+    cost_center: selectedCostCenter,
+  };
+  const encodedState = encodeURIComponent(JSON.stringify(state));
+  window.open(`${url}?state=${encodedState}`, '_blank');
+}}
+>
                                                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                                                     </IconButton>
@@ -709,7 +729,17 @@ function ChartOfAccount() {
                                                                                     <Cell>
                                                                                         {!account?.childAccounts &&
                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                <Box onClick={() => navigate(`/account-ledger/${account?.id}`, { state: { accountName: account?.account_name, nature: account?.nature ,  cost_center:selectedCostCenter} })}>
+                                                                                                <Box onClick={() => {
+  const url = `/account-ledger/${account?.id}`;
+  const state = {
+    accountName: account?.account_name,
+    nature: account?.nature,
+    cost_center: selectedCostCenter,
+  };
+  const encodedState = encodeURIComponent(JSON.stringify(state));
+  window.open(`${url}?state=${encodedState}`, '_blank');
+}}
+>
                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                     </IconButton>
@@ -750,7 +780,16 @@ function ChartOfAccount() {
                                                                                                         </Cell>
                                                                                                         <Cell>
                                                                                                             <Box component={'div'} className='pdf-hide' sx={{ gap: '16px !important' }}>
-                                                                                                                <Box onClick={() => navigate(`/account-ledger/${child?.id}`, { state: { accountName: child?.account_name, nature: child?.nature ,  cost_center:selectedCostCenter} })}>
+                                                                                                                <Box onClick={() => {
+  const url = `/account-ledger/${account?.id}`;
+  const state = {
+ 
+    cost_center: selectedCostCenter,
+  };
+  const encodedState = encodeURIComponent(JSON.stringify(state));
+  window.open(`${url}?state=${encodedState}`, '_blank');
+}}
+>
                                                                                                                     <IconButton sx={{ bgcolor: Colors.primary, '&:hover': { bgcolor: Colors.primary } }}>
                                                                                                                         <Box component={'img'} src={Images.ledgerIcon} sx={{ height: '16px', objectFit: 'contain' }} />
                                                                                                                     </IconButton>

@@ -2384,7 +2384,7 @@ const AddVisa = () => {
                     <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >ADD NEW</Typography>
                     <Box sx={{ display: 'flex', gap: '10px' }}>
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Save"
                             onClick={() => setConfirmationDialog3(true)}
                             disabled={candidates.length > 0 ? false : true}
@@ -2423,7 +2423,7 @@ const AddVisa = () => {
 
                 <Grid container mt={2} xs={10} justifyContent={'flex-end'}>
                     <PrimaryButton
-                       bgcolor={'#bd9b4a'}
+                       bgcolor={'#001f3f'}
                         title="Add Candidate"
                         disabled={(selectedCustomer && customerDetail) ? false : true}
                         onClick={() => {

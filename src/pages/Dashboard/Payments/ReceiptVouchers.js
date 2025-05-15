@@ -464,7 +464,7 @@ function ReceiptVouchers() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Receipt Voucher List</Typography>
                 {true && <PrimaryButton
-                    bgcolor={'#bd9b4a'}
+                    bgcolor={'#001f3f'}
                     title="Create"
                     onClick={() => { navigate('/create-receipt-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}

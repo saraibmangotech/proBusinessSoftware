@@ -122,7 +122,7 @@ const RateSetup = () => {
                     <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >RATE MANAGEMENT</Typography>
                     <Box sx={{ display: 'flex', gap: '10px' }}>
                         {permissions?.save && <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Save"
                             type={'submit'}
 

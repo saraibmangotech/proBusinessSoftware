@@ -1204,10 +1204,10 @@ function UpdatePurchaseInvoice() {
                                             onClick={() => addItem(serviceItem, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
-                                                backgroundColor: "rgb(189 155 74)",
+                                                backgroundColor: "#001f3f",
                                                 fontSize: "12px",
                                                 ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                 },
                                             }}
                                         >
@@ -1219,10 +1219,10 @@ function UpdatePurchaseInvoice() {
                                             onClick={() => updateItem(serviceItem, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
-                                                backgroundColor: "rgb(189 155 74)",
+                                                backgroundColor: "#001f3f",
                                                 fontSize: "12px",
                                                 ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                 },
                                             }}
                                         >
@@ -1249,10 +1249,10 @@ function UpdatePurchaseInvoice() {
                                                 sx={{
                                                     mt: 2,
                                                     textTransform: 'capitalize',
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                     fontSize: "12px",
                                                     ":hover": {
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                     },
                                                 }}
                                             >
@@ -1358,10 +1358,10 @@ function UpdatePurchaseInvoice() {
                                                 variant="contained"
                                                 sx={{
                                                     textTransform: "capitalize",
-                                                    backgroundColor: "#bd9b4a",
+                                                    backgroundColor: "#001f3f",
                                                     width: "200px",
                                                     ":hover": {
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                     },
                                                 }}
                                             >
@@ -1375,10 +1375,10 @@ function UpdatePurchaseInvoice() {
                                                                                 variant="contained"
                                                                                 sx={{
                                                                                     textTransform: "capitalize",
-                                                                                    backgroundColor: "#bd9b4a",
+                                                                                    backgroundColor: "#001f3f",
                                                                                     width: "200px",
                                                                                     ":hover": {
-                                                                                        backgroundColor: "rgb(189 155 74)",
+                                                                                        backgroundColor: "#001f3f",
                                                                                     },
                                                                                 }}
                                                                             >
@@ -1571,10 +1571,10 @@ function UpdatePurchaseInvoice() {
                                         variant="contained"
                                         sx={{
                                             textTransform: "capitalize",
-                                            backgroundColor: "#bd9b4a",
+                                            backgroundColor: "#001f3f",
                                             width: "200px",
                                             ":hover": {
-                                                backgroundColor: "rgb(189 155 74)",
+                                                backgroundColor: "#001f3f",
                                             },
                                         }}
                                     >
@@ -1637,9 +1637,9 @@ function UpdatePurchaseInvoice() {
                                     variant="contained"
                                     sx={{
                                         textTransform: "capitalize",
-                                        backgroundColor: "#bd9b4a",
+                                        backgroundColor: "#001f3f",
                                         ":hover": {
-                                            backgroundColor: "rgb(189 155 74)",
+                                            backgroundColor: "#001f3f",
                                         },
                                     }}
                                 >

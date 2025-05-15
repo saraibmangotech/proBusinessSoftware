@@ -469,7 +469,7 @@ function PurchaseInvoicePaymentList() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>  Invoice History</Typography>
                 {true && <PrimaryButton
-                    bgcolor={'#bd9b4a'}
+                    bgcolor={'#001f3f'}
                     title="Create"
                     onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
@@ -494,7 +494,7 @@ function PurchaseInvoicePaymentList() {
                     </Grid>
                     <Grid item xs={2} sm={3} sx={{ marginTop: "30px" }}>
                         <PrimaryButton
-                            bgcolor={"#bd9b4a"}
+                            bgcolor={"#001f3f"}
 
                             icon={<SearchIcon />}
                             title="Search"

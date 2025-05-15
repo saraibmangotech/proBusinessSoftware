@@ -198,6 +198,23 @@ function CreateReceiptVoucher() {
             showErrorToast(error)
         }
     }
+        const getChildAccounts = async (accountId) => {
+            try {
+              let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId,
+              };
+              const { data } = await FinanceServices.getAccounts(params);
+              if(data?.accounts?.rows?.length > 0){
+                setSelectedAccount(null)
+                showErrorToast('Cannot use this account because it has child accounts.')
+              }
+           
+            } catch (error) {
+              showErrorToast(error);
+            }
+          };
 
     // *For Get Account
     const getAccounts = async (search, accountId) => {
@@ -553,6 +570,7 @@ function CreateReceiptVoucher() {
                                         setSelectedAccount(value)
                                         console.log(value);
                                         setValue('AccountCode', value?.account_code)
+                                        getChildAccounts(value?.id)
 
                                     }}
                                     //  error={errors?.service?.message}
@@ -600,10 +618,10 @@ function CreateReceiptVoucher() {
                                     onClick={() => addItem(getValues('description'), getValues('amount'))}
                                     sx={{
                                         textTransform: 'capitalize',
-                                        backgroundColor: "rgb(189 155 74)",
+                                        backgroundColor: "#001f3f",
                                         fontSize: "12px",
                                         ":hover": {
-                                            backgroundColor: "rgb(189 155 74)",
+                                            backgroundColor: "#001f3f",
                                         },
                                     }}
                                 >

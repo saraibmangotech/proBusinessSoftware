@@ -128,7 +128,9 @@ const ChartOfAccounts = lazy(() =>
 const TrialBalance = lazy(() =>
   import("pages/Dashboard/Reporting/TrialBalance")
 );
-
+const TrialBalanceDetailed = lazy(() =>
+  import("pages/Dashboard/Reporting/TrialBalanceDetail")
+);
 const AccountLedger = lazy(() =>
   import("pages/Dashboard/Accounts/AccountLedger")
 );
@@ -421,8 +423,14 @@ const SupplierLedgers= lazy(() =>
 const UpdateJournalVoucher= lazy(() =>
   import("pages/Dashboard/Accounts/UpdateJournalVoucher")
 );
+const AttendanceTable= lazy(() =>
+  import("pages/Dashboard/HRMS/AttendanceReport")
+);
 const AdminRoutes = [
-  
+  {
+    path: "/attendance-report",
+    component: <AttendanceTable />,
+  },
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
@@ -883,6 +891,10 @@ const AdminRoutes = [
   {
     path: "/trial-balance",
     component: <TrialBalance />,
+  },
+  {
+    path: "/trial-balance-detailed",
+    component: <TrialBalanceDetailed />,
   },
   {
     path: "/service-invoice",

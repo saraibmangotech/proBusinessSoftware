@@ -120,7 +120,7 @@ const CreateServiceInvoice = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Create Service Invoice</Typography>
         <PrimaryButton
-         bgcolor={'#bd9b4a'}
+         bgcolor={'#001f3f'}
           title="Save"
           type={'submit'}
           loading={loading}

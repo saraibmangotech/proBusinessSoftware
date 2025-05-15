@@ -719,9 +719,9 @@ function SalesReciept() {
                 sx={{
                   width: "200px",
                   textTransform: "capitalize",
-                  backgroundColor: "#bd9b4a",
+                  backgroundColor: "#001f3f",
                   ":hover": {
-                    backgroundColor: "rgb(189 155 74)",
+                    backgroundColor: "#001f3f",
                   },
                 }}
               >
@@ -750,7 +750,7 @@ function SalesReciept() {
 
                                 }}
                               >
-                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                <SearchIcon sx={{ color: "#001f3f" }} />
                               </IconButton>
                             ),
                           }}
@@ -772,7 +772,7 @@ function SalesReciept() {
 
                                 }}
                               >
-                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                <SearchIcon sx={{ color: "#001f3f" }} />
                               </IconButton>
                             ),
                           }}
@@ -792,7 +792,7 @@ function SalesReciept() {
                       </Grid>
                       <Grid item md={1} sm={12} xs={12} mt={2}>
                         <PrimaryButton
-                          bgcolor={"#bd9b4a"}
+                          bgcolor={"#001f3f"}
                           title="Clear"
                           onClick={() => {
                             setFieldsDisabled(false);
@@ -1190,10 +1190,10 @@ function SalesReciept() {
                         type="submit"
                         sx={{
                           textTransform: "capitalize",
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                           fontSize: "12px",
                           ":hover": {
-                            backgroundColor: "rgb(189 155 74)",
+                            backgroundColor: "#001f3f",
                           },
                         }}
                       >
@@ -1208,10 +1208,10 @@ function SalesReciept() {
                           type="submit"
                           sx={{
                             textTransform: "capitalize",
-                            backgroundColor: "rgb(189 155 74)",
+                            backgroundColor: "#001f3f",
                             fontSize: "12px",
                             ":hover": {
-                              backgroundColor: "rgb(189 155 74)",
+                              backgroundColor: "#001f3f",
                             },
                           }}
                         >
@@ -1236,10 +1236,10 @@ function SalesReciept() {
                           sx={{
                             mt: 2,
                             textTransform: "capitalize",
-                            backgroundColor: "rgb(189 155 74)",
+                            backgroundColor: "#001f3f",
                             fontSize: "12px",
                             ":hover": {
-                              backgroundColor: "rgb(189 155 74)",
+                              backgroundColor: "#001f3f",
                             },
                           }}
                         >

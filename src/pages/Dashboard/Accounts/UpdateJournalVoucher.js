@@ -131,6 +131,8 @@ function UpadateJournalVoucher() {
   const [voucherDetail, setVoucherDetail] = useState(null)
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [childAccounts, setChildAccounts] = useState([]);
+  const [selectedChildAccount, setSelectedChildAccount] = useState(null);
 
   // *For Total of Credit & Debit
   let TotalDebit = 0
@@ -370,6 +372,11 @@ function UpadateJournalVoucher() {
   };
   
   const addItem = (data) => {
+    if (childAccounts?.length > 0) {
+      showErrorToast("Cannot use this account because it has child accounts.");
+      return
+    }
+    
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
@@ -405,6 +412,20 @@ function UpadateJournalVoucher() {
     setSelectedAccount(null);
     reset();
   };
+    // *For Get Account
+    const getChildAccounts = async (accountId) => {
+      try {
+        let params = {
+          page: 1,
+          limit: 50,
+          primary_account_id: accountId ?? selectedAccount?.id,
+        };
+        const { data } = await FinanceServices.getAccounts(params);
+        setChildAccounts(data?.accounts?.rows);
+      } catch (error) {
+        showErrorToast(error);
+      }
+    };
 
   const updateItem = (data) => {
     if (!selectedRow) {
@@ -535,6 +556,7 @@ function UpadateJournalVoucher() {
                       setSelectedAccount(value)
                       console.log(value);
                       setValue('AccountCode', value?.account_code)
+                      getChildAccounts(value?.id)
 
                     }}
                     //  error={errors?.service?.message}
@@ -609,10 +631,10 @@ function UpadateJournalVoucher() {
                       type="submit"
                       sx={{
                         textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                         fontSize: "12px",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >
@@ -624,10 +646,10 @@ function UpadateJournalVoucher() {
                       type="submit"
                       sx={{
                         textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                         fontSize: "12px",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >
@@ -645,10 +667,10 @@ function UpadateJournalVoucher() {
                       }}
                       sx={{
                         textTransform: 'capitalize',
-                        backgroundColor: "rgb(189 155 74)",
+                        backgroundColor: "#001f3f",
                         fontSize: "12px",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >
