@@ -624,7 +624,65 @@ export default function AttendanceTable() {
                     </Typography>
                 </Box>
             </Box>
+   {/* Filters */}
+   <Card
+                elevation={0}
+                sx={{
+                    mb: 4,
+                    borderRadius: 2,
+                    border: `1px solid #001f3f`,
+                }}
+            >
+                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                        <Filter fontSize="small" color={theme.palette.primary.main} />
+                        <Typography variant="h6" component="h2" sx={{ ml: 1, fontWeight: 600 }}>
+                            Filter Attendance Records
+                        </Typography>
+                    </Box>
 
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="Search by Name"
+                                variant="outlined"
+                                size="small"
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon fontSize="small" color={theme.palette.text.secondary} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="Select Month"
+                                type="month"
+                                variant="outlined"
+                                size="small"
+                                value={selectedDate.format("YYYY-MM")}
+                                onChange={(e) => {
+                                    setSelectedDate(moment(e.target.value, "YYYY-MM"))
+                                    getAttendance(moment(e.target.value).format("MMMM"),moment(e.target.value).format("YYYY"))
+                                }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon fontSize="small" color={theme.palette.text.secondary} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
             {/* Summary Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
@@ -762,65 +820,7 @@ export default function AttendanceTable() {
                 </Grid>
             </Grid>
 
-            {/* Filters */}
-            <Card
-                elevation={0}
-                sx={{
-                    mb: 4,
-                    borderRadius: 2,
-                    border: `1px solid #001f3f`,
-                }}
-            >
-                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                        <Filter fontSize="small" color={theme.palette.primary.main} />
-                        <Typography variant="h6" component="h2" sx={{ ml: 1, fontWeight: 600 }}>
-                            Filter Attendance Records
-                        </Typography>
-                    </Box>
-
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth
-                                label="Search by Name"
-                                variant="outlined"
-                                size="small"
-                                value={nameFilter}
-                                onChange={(e) => setNameFilter(e.target.value)}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon fontSize="small" color={theme.palette.text.secondary} />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth
-                                label="Select Month"
-                                type="month"
-                                variant="outlined"
-                                size="small"
-                                value={selectedDate.format("YYYY-MM")}
-                                onChange={(e) => {
-                                    setSelectedDate(moment(e.target.value, "YYYY-MM"))
-                                    getAttendance(moment(e.target.value).format("MMMM"),moment(e.target.value).format("YYYY"))
-                                }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon fontSize="small" color={theme.palette.text.secondary} />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
+         
 
             {/* Attendance Progress */}
             <Box sx={{ mb: 3 }}>
