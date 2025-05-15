@@ -482,7 +482,7 @@ function UpdateAldeed() {
                                                     InputProps={{
                                                         endAdornment: (
                                                             <IconButton onClick={() => getReceptionDetail()}>
-                                                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                                                <SearchIcon sx={{ color: "#001f3f" }} />
                                                             </IconButton>
                                                         ),
                                                     }}
@@ -498,7 +498,7 @@ function UpdateAldeed() {
                                                     InputProps={{
                                                         endAdornment: (
                                                             <IconButton onClick={() => getReceptionDetail(true)}>
-                                                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                                                <SearchIcon sx={{ color: "#001f3f" }} />
                                                             </IconButton>
                                                         ),
                                                     }}
@@ -679,9 +679,9 @@ function UpdateAldeed() {
                                             variant="contained"
                                             sx={{
                                                 textTransform: 'capitalize',
-                                                backgroundColor: "#bd9b4a",
+                                                backgroundColor: "#001f3f",
                                                 ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                 },
                                             }}
                                         >
@@ -808,10 +808,10 @@ function UpdateAldeed() {
                                                     type="submit"
                                                     sx={{
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                         fontSize: "12px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -822,10 +822,10 @@ function UpdateAldeed() {
                                                     type="submit"
                                                     sx={{
                                                         textTransform: 'capitalize',
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                         fontSize: "12px",
                                                         ":hover": {
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                         },
                                                     }}
                                                 >
@@ -848,10 +848,10 @@ function UpdateAldeed() {
                                                         sx={{
                                                             mt: 2,
                                                             textTransform: 'capitalize',
-                                                            backgroundColor: "rgb(189 155 74)",
+                                                            backgroundColor: "#001f3f",
                                                             fontSize: "12px",
                                                             ":hover": {
-                                                                backgroundColor: "rgb(189 155 74)",
+                                                                backgroundColor: "#001f3f",
                                                             },
                                                         }}
                                                     >

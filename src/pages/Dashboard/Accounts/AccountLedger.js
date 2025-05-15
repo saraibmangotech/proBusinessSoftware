@@ -7,7 +7,7 @@ import { CircleLoading } from 'components/Loaders';
 import { ErrorToaster } from 'components/Toaster';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { Debounce, LedgerLinking } from 'utils';
@@ -90,7 +90,8 @@ function AccountLedger() {
   const classes = useStyles();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { state } = useLocation();
+
+  
   const [TotalBalance, setTotalBalance] = useState();
 
   let Balance = TotalBalance;
@@ -210,16 +211,29 @@ function AccountLedger() {
     getCostCenters()
 
   }, []);
-
+  const [searchParams] = useSearchParams();
+  const rawState = searchParams.get('state');
+  const parsedState = JSON.parse(decodeURIComponent(rawState));
   useEffect(() => {
-    if (state?.cost_center) {
-      getAccountLedgers(null,null,null,state?.cost_center)
-      setSelectedCostCenter(state?.cost_center)
+
+    console.log(parsedState,'rawStaterawState');
+    
+    if (rawState) {
+      try {
+        
+        const costCenter = parsedState?.cost_center;
+
+        if (costCenter) {
+          getAccountLedgers(null, null, null, costCenter);
+          setSelectedCostCenter(costCenter);
+        }
+      } catch (error) {
+        console.error('Invalid state in query params', error);
+      }
     }
+  }, [searchParams]);
 
-  }, [state])
 
-  console.log(state, 'statestate');
 
 
 
@@ -227,7 +241,7 @@ function AccountLedger() {
     <Box sx={{ m: 4, mb: 2 }}>
 
       <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
-        {state?.accountName} Account's Ledger
+        {parsedState?.accountName} Account's Ledger
       </Typography>
 
       {/* Filters */}
@@ -306,12 +320,12 @@ function AccountLedger() {
                         let page = LedgerLinking(item?.entry?.reference_module)
                         let debit = item?.debit;
                         let credit = item?.credit;
-                        if (state?.currency) {
+                        if (parsedState?.currency) {
                           credit = item?.credit_cur
                           debit = item?.debit_cur
                         }
 
-                        const balance = state?.nature === 'debit' ? (parseFloat(debit) - parseFloat(credit)).toFixed(2) : (parseFloat(credit) - parseFloat(debit)).toFixed(2)
+                        const balance = parsedState?.nature === 'debit' ? (parseFloat(debit) - parseFloat(credit)).toFixed(2) : (parseFloat(credit) - parseFloat(debit)).toFixed(2)
                         Balance += parseFloat(balance)
                         return (
                           <Row key={index} sx={{ bgcolor: index % 2 !== 0 && '#EEFBEE' }}>
@@ -396,10 +410,10 @@ function AccountLedger() {
           <Pagination
             currentPage={currentPage}
             pageSize={pageLimit}
-            onPageSizeChange={(size) => getAccountLedgers(1, size.target.value)}
+            onPageSizeChange={(size) => getAccountLedgers(1, size.target.value,null,selectedCostCenter)}
             tableCount={accountLedgers?.length}
             totalCount={totalCount}
-            onPageChange={(page) => getAccountLedgers(page, '')}
+            onPageChange={(page) => getAccountLedgers(page, '',null,selectedCostCenter)}
           />
 
         </Fragment>

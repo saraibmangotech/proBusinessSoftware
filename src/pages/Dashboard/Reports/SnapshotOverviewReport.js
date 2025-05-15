@@ -482,7 +482,7 @@ function SnapshotOverviewReport() {
 
                         <Grid item xs={2} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
-                                bgcolor={"#bd9b4a"}
+                                bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
                                 title="Search"
                                 sx={{ marginTop: "30px" }}
@@ -499,7 +499,7 @@ function SnapshotOverviewReport() {
                         filename={"table-data.csv"}
                         style={{ textDecoration: 'none' }} // Remove the default link styling
                     >
-                        <Button sx={{backgroundColor:'#bd9b4a',textTransform:'capitalize'}} variant="contained" color="primary">
+                        <Button sx={{backgroundColor:'#001f3f',textTransform:'capitalize'}} variant="contained" color="primary">
                             Export to Excel
                         </Button>
                     </CSVLink>

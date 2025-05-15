@@ -398,7 +398,7 @@ function UpdateProduct() {
                                 <Grid container justifyContent={'flex-end'}>
                                     <PrimaryButton
 
-                                        bgcolor={'#bd9b4a'}
+                                        bgcolor={'#001f3f'}
                                         title="Submit"
                                         type={'submit'}
 

@@ -243,9 +243,9 @@ function Home() {
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
-                            <Visibility sx={{ color: "rgb(189 155 74)" }} />
+                            <Visibility sx={{ color: "#001f3f" }} />
                           ) : (
-                            <VisibilityOff sx={{ color: "rgb(189 155 74)" }} />
+                            <VisibilityOff sx={{ color: "#001f3f" }} />
                           )}
                         </IconButton>
                       </InputAdornment>
@@ -280,9 +280,9 @@ function Home() {
               <Grid item xs={6} sm={6} sx={{ textAlign: "left" }}>
                 <Checkbox
                   sx={{
-                    color: "rgb(189 155 74)",
+                    color: "#001f3f",
                     "& .MuiCheckbox-colorPrimary": {
-                      color: "rgb(189 155 74) !important",
+                      color: "#001f3f !important",
                     },
                   }}
                 />
@@ -317,7 +317,7 @@ function Home() {
                   fullWidth
                   title="Login"
                   type="submit"
-                  bgcolor={"rgb(189 155 74)"}
+                  bgcolor={"#001f3f"}
                   loading={loading}
                 />
               </Grid>

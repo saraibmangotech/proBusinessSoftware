@@ -2611,7 +2611,7 @@ const UpdateVisa = () => {
 
                     <Box sx={{ display: 'flex', gap: '10px' }}>
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Add Candidate"
                             disabled={visaDetail?.processing_status == 'Approved' ? true : false}
                             onClick={handleClickOpen('paper')}
@@ -2619,7 +2619,7 @@ const UpdateVisa = () => {
 
                         />
                         <PrimaryButton
-                           bgcolor={'#bd9b4a'}
+                           bgcolor={'#001f3f'}
                             title="Update"
 
                             onClick={() => setConfirmationDialog3(true)}

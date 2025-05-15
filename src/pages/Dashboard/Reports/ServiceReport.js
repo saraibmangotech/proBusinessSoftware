@@ -769,10 +769,10 @@ const prepareCSVData = (data) => {
                     sx={{
                         padding: '10px',
                         textTransform: 'capitalize !important',
-                        backgroundColor: "#bd9b4a !important",
+                        backgroundColor: "#001f3f !important",
                         fontSize: "12px",
                         ":hover": {
-                            backgroundColor: "#bd9b4a !important",
+                            backgroundColor: "#001f3f !important",
                         },
                     }}
                 >
@@ -812,7 +812,7 @@ const prepareCSVData = (data) => {
 
             <Grid item xs={2} sx={{ marginTop: "30px" }}>
               <PrimaryButton
-                bgcolor={"#bd9b4a"}
+                bgcolor={"#001f3f"}
                 icon={<SearchIcon />}
                 title="Search"
                 sx={{ marginTop: "30px" }}

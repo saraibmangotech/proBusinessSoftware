@@ -59,7 +59,8 @@ const routes = {
   UpdateRole:'/roles/update',
   uploadCVSDraft:"visas/processing/upload",
   getStats:'system/stats',
-  getSettings:'/system/settings'
+  getSettings:'/system/settings',
+  getAttendance:'users/attendance/logs'
   
 };
 

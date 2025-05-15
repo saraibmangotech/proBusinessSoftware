@@ -2594,7 +2594,7 @@ function VisaDetail() {
         />
         {/* <Box sx={{ display: 'flex', gap: '10px' }}>
           <PrimaryButton
-           bgcolor={'#bd9b4a'}
+           bgcolor={'#001f3f'}
             title="Edit"
             onClick={() => navigate(`/update-customer/${id}`)}
 

@@ -868,7 +868,7 @@ function CreatePaidReceipt() {
                           InputProps={{
                             endAdornment: (
                               <IconButton onClick={() => getReceptionDetail(true)}>
-                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                <SearchIcon sx={{ color: "#001f3f" }} />
                               </IconButton>
                             ),
                           }}
@@ -888,7 +888,7 @@ function CreatePaidReceipt() {
                                   getReceiptDetail()
                                 }}
                               >
-                                <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                <SearchIcon sx={{ color: "#001f3f" }} />
                               </IconButton>
                             ),
                           }}
@@ -896,7 +896,7 @@ function CreatePaidReceipt() {
                       </Grid>
                       <Grid item md={2} sm={12} xs={12} mt={2.5}>
                         <PrimaryButton
-                          bgcolor={"#bd9b4a"}
+                          bgcolor={"#001f3f"}
                           title="Clear"
                           onClick={() => {
                             setCreditButton(false)
@@ -1261,10 +1261,10 @@ function CreatePaidReceipt() {
                             variant="contained"
                             sx={{
                               textTransform: "capitalize",
-                              backgroundColor: "#bd9b4a",
+                              backgroundColor: "#001f3f",
                               width: "200px",
                               ":hover": {
-                                backgroundColor: "rgb(189 155 74)",
+                                backgroundColor: "#001f3f",
                               },
                             }}
                           >
@@ -1278,10 +1278,10 @@ function CreatePaidReceipt() {
                             variant="contained"
                             sx={{
                               textTransform: "capitalize",
-                              backgroundColor: "#bd9b4a",
+                              backgroundColor: "#001f3f",
                               width: "200px",
                               ":hover": {
-                                backgroundColor: "rgb(189 155 74)",
+                                backgroundColor: "#001f3f",
                               },
                             }}
                           >
@@ -1292,10 +1292,10 @@ function CreatePaidReceipt() {
                             variant="contained"
                             sx={{
                               textTransform: "capitalize",
-                              backgroundColor: "#bd9b4a",
+                              backgroundColor: "#001f3f",
                               width: "200px",
                               ":hover": {
-                                backgroundColor: "rgb(189 155 74)",
+                                backgroundColor: "#001f3f",
                               },
                             }}
                           >
@@ -1534,10 +1534,10 @@ function CreatePaidReceipt() {
                         variant="contained"
                         sx={{
                           textTransform: "capitalize",
-                          backgroundColor: "#bd9b4a",
+                          backgroundColor: "#001f3f",
                           width: "200px",
                           ":hover": {
-                            backgroundColor: "rgb(189 155 74)",
+                            backgroundColor: "#001f3f",
                           },
                         }}
                       >
@@ -1621,9 +1621,9 @@ function CreatePaidReceipt() {
                       variant="contained"
                       sx={{
                         textTransform: "capitalize",
-                        backgroundColor: "#bd9b4a",
+                        backgroundColor: "#001f3f",
                         ":hover": {
-                          backgroundColor: "rgb(189 155 74)",
+                          backgroundColor: "#001f3f",
                         },
                       }}
                     >

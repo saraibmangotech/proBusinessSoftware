@@ -292,7 +292,7 @@ function UpdateVendor() {
 
                                             //       }}
                                             //     >
-                                            //       <SearchIcon sx={{ color: "#bd9b4a" }} />
+                                            //       <SearchIcon sx={{ color: "#001f3f" }} />
                                             //     </IconButton>
                                             //   ),
                                             // }}
@@ -312,7 +312,7 @@ function UpdateVendor() {
                                         />
                                         {/* <Grid item md={1} sm={12} xs={12} mt={2}>
                       <PrimaryButton
-                        bgcolor={"#bd9b4a"}
+                        bgcolor={"#001f3f"}
                         title="Clear"
                         onClick={() => {
                           setFieldsDisabled(false);
@@ -388,7 +388,7 @@ function UpdateVendor() {
                                 <Grid container justifyContent={'flex-end'}>
                                     <PrimaryButton
 
-                                        bgcolor={'#bd9b4a'}
+                                        bgcolor={'#001f3f'}
                                         title="Update"
                                         type={'submit'}
 

@@ -220,7 +220,7 @@ function CommissionList() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Commission Management</Typography>
                 {permissions?.create && <PrimaryButton
-                   bgcolor={'#bd9b4a'}
+                   bgcolor={'#001f3f'}
                     title="Create Agent"
                     onClick={() =>{ navigate('/create-agent'); localStorage.setItem("currentUrl", '/create-agent')}}
                     loading={loading}
@@ -254,7 +254,7 @@ function CommissionList() {
                     loading={loading}
                 />
                     <PrimaryButton
-                   bgcolor={'#bd9b4a'}
+                   bgcolor={'#001f3f'}
                     title="Search"
                     onClick={() => handleFilter()}
                     loading={loading}

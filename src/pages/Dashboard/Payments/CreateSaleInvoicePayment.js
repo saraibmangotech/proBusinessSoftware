@@ -707,7 +707,7 @@ function CreateSaleInvoicePayment() {
                     </Grid>
                     <Grid item xs={2} sm={3} sx={{ marginTop: "30px" }}>
                         <PrimaryButton
-                            bgcolor={"#bd9b4a"}
+                            bgcolor={"#001f3f"}
                             icon={<SearchIcon />}
                             title="Search"
                             sx={{ marginTop: "30px" }}
@@ -1180,10 +1180,10 @@ function CreateSaleInvoicePayment() {
                                                 variant="contained"
                                                 sx={{
                                                     textTransform: "capitalize",
-                                                    backgroundColor: "#bd9b4a",
+                                                    backgroundColor: "#001f3f",
                                                     width: "200px",
                                                     ":hover": {
-                                                        backgroundColor: "rgb(189 155 74)",
+                                                        backgroundColor: "#001f3f",
                                                     },
                                                 }}
                                             >
@@ -1267,9 +1267,9 @@ function CreateSaleInvoicePayment() {
                                             variant="contained"
                                             sx={{
                                                 textTransform: "capitalize",
-                                                backgroundColor: "#bd9b4a",
+                                                backgroundColor: "#001f3f",
                                                 ":hover": {
-                                                    backgroundColor: "rgb(189 155 74)",
+                                                    backgroundColor: "#001f3f",
                                                 },
                                             }}
                                         >

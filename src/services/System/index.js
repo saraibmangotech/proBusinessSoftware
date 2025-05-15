@@ -27,6 +27,10 @@ const SystemServices = {
     const data = await get(routes.getStats);
     return data;
   },
+  getAttendance: async (params) => {
+    const data = await get(routes.getAttendance,params);
+    return data;
+  },
   getBanks: async () => {
     const data = await get(routes.getBanks);
     return data;

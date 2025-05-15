@@ -73,7 +73,7 @@ function ForgetPassword() {
           <Box sx={{display:'flex',justifyContent:'center',flexDirection:'column',alignItems:'center',mb:2}}>
           <Box component={'img'} sx={{textAlign:'center'}} src={Images.mainLogo} width={'200px'}></Box>
           </Box>
-          <Typography variant="h3" sx={{ color: "rgb(189 155 74)", textAlign: 'center' }}>
+          <Typography variant="h3" sx={{ color: "#001f3f", textAlign: 'center' }}>
             Forget Password
           </Typography>
           <Box component="form" onSubmit={handleSubmit(sendOtp)} sx={{ mt: 2 }}>
@@ -100,7 +100,7 @@ function ForgetPassword() {
                   title="send OTP"
                   type='submit'
                   loading={loading}
-                  bgcolor={'rgb(189 155 74)'}
+                  bgcolor={'#001f3f'}
 
                 />
               </Grid>

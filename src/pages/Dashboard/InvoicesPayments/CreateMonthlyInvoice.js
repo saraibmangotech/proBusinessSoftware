@@ -691,7 +691,7 @@ const CreateMonthlyInvoice = () => {
                     Create Monthly Service Invoice</Typography>
                 {selectedRows.length > 0 && <Box sx={{ display: 'flex', gap: '10px' }}>
                     <PrimaryButton
-                       bgcolor={'#bd9b4a'}
+                       bgcolor={'#001f3f'}
                         title="Create Invoice"
                         type='submit'
 

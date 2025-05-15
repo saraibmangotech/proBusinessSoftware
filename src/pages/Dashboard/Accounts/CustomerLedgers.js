@@ -835,7 +835,7 @@ function CustomerLedgers() {
 
                         <Grid item xs={1} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
-                                bgcolor={"#bd9b4a"}
+                                bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
                                 title="Search"
                                 sx={{ marginTop: "30px" }}
@@ -861,23 +861,23 @@ function CustomerLedgers() {
                     >
                         <Button
 
-                            startIcon={<FileDownload />}
-
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                                padding: '10px',
-                                textTransform: 'capitalize !important',
-                                backgroundColor: "#bd9b4a !important",
-                                fontSize: "12px",
-                                ":hover": {
-                                    backgroundColor: "#bd9b4a !important",
-                                },
-                            }}
-                        >
-                            Export to Excel
-                        </Button>
-                    </CSVLink>}
+                    startIcon={<FileDownload />}
+                   
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                        padding: '10px',
+                        textTransform: 'capitalize !important',
+                        backgroundColor: "#001f3f !important",
+                        fontSize: "12px",
+                        ":hover": {
+                            backgroundColor: "#001f3f !important",
+                        },
+                    }}
+                >
+                    Export to Excel
+                </Button>
+                </CSVLink>}
                 </Box>
                 {customerQueue?.length > 0 && (
                     <Fragment>

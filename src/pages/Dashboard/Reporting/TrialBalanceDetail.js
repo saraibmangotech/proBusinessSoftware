@@ -106,7 +106,7 @@ const useStyles = makeStyles({
     },
 });
 
-function TrialBalance() {
+function TrialBalanceDetailed() {
     const classes = useStyles();
     const navigate = useNavigate();
     const contentRef = useRef(null);
@@ -1688,4 +1688,4 @@ function TrialBalance() {
     );
 }
 
-export default TrialBalance;
+export default TrialBalanceDetailed;
