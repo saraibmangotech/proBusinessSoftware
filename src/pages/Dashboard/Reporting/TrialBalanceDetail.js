@@ -25,13 +25,14 @@ import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+
 import SearchIcon from "@mui/icons-material/Search";
 import FinanceServices from "services/Finance";
 import Highlighter from "react-highlight-words";
 import InputField from "components/Input";
 import { PrimaryButton } from "components/Buttons";
 import ExportFinanceServices from "services/ExportFinance";
-import * as XLSX from "xlsx";
+import  XLSX from "xlsx-js-style";
 import { saveAs } from "file-saver";
 import { CommaSeparator, handleExportWithComponent } from "utils";
 import { PDFExport } from "@progress/kendo-react-pdf";
@@ -40,6 +41,8 @@ import SelectField from "components/Select";
 import DatePicker from "components/DatePicker";
 import CustomerServices from "services/Customer";
 import { showErrorToast } from "components/NewToaster";
+import ExcelJS from "exceljs";
+
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -112,16 +115,18 @@ function TrialBalanceDetailed() {
     const contentRef = useRef(null);
     const { register } = useForm();
 
-
+    const [expandedCategories, setExpandedCategories] = useState({})
 
     const tableHead = [
         "Code",
         "Name",
-        "Major Category",
-        "Sub Category",
-        "Debit (AED)",
-        "Credit (AED)",
-        "Action",
+
+        "Opening Balance",
+        "Total Debit (AED)",
+        "Total Credit (AED)",
+        "Period Difference (AED)",
+        "Balance (AED)",
+
     ];
 
     const [loader, setLoader] = useState(false);
@@ -138,8 +143,9 @@ function TrialBalanceDetailed() {
     // *For Filters
     const [filters, setFilters] = useState("all");
     const [filterData, setFilterData] = useState();
-    const [childTabs, setChildTabs] = useState([]);
 
+    const [childTabs, setChildTabs] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("")
     const [allDebit, setAllDebit] = useState(0)
     const [allCredit, setAllCredit] = useState(0)
 
@@ -151,19 +157,54 @@ function TrialBalanceDetailed() {
 
 
 
+    const filterData2 = (item) => {
+        if (!searchTerm) return true
+
+        const searchLower = searchTerm.toLowerCase()
+
+        // Check if the account code, name, category, or subcategory contains the search term
+        return (
+            item.account_code?.toLowerCase().includes(searchLower) ||
+            item.account_name?.toLowerCase().includes(searchLower) ||
+            item.account_category?.toLowerCase().includes(searchLower) ||
+            item.account_subcategory?.toLowerCase().includes(searchLower)
+        )
+    }
+
     let TotalEquity = 0;
+    const toggleCategory = (categoryId) => {
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [categoryId]: !prev[categoryId],
+        }))
+    }
+
+    const toggleSubCategory = (subCategoryId) => {
+        console.log(subCategoryId, 'subCategoryIdsubCategoryId')
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [`sub_${subCategoryId}`]: !prev[`sub_${subCategoryId}`],
+        }))
+    }
+
+    const formatAmount = (amount) => {
+        return new Intl.NumberFormat("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(amount)
+    }
 
     // *For Get Balance Sheet
     const getBalanceSheet = async (filter) => {
         try {
-            let params={
-                cost_center:selectedCostCenter?.name,
-                from_date:moment(fromDate).format('MM-DD-YYYY'),
-                to_date:moment(toDate).format('MM-DD-YYYY'),
+            let params = {
+                cost_center: selectedCostCenter?.name,
+                from_date: moment(fromDate).format('MM-DD-YYYY'),
+                to_date: moment(toDate).format('MM-DD-YYYY'),
             }
             const { data } = await FinanceServices.getAccountReports(params);
-            console.log(data?.detail,'data?.detail');
-            
+            console.log(data?.detail, 'data?.detail');
+
             setBalanceSheet(data?.detail);
             setFilteredBalanceSheet(data?.detail);
             console.log(data?.detail, "data?.detail");
@@ -186,12 +227,12 @@ function TrialBalanceDetailed() {
                         const credit = parseFloat(account.total_credit) || 0;
                         const debit = parseFloat(account.total_debit) || 0;
 
-                        if (account.nature === 'debit') {
-                            totalDebit += debit - credit;
+                        
+                            totalDebit += debit 
 
-                        } else if (account.nature === 'credit') {
-                            totalCredit += credit - debit;
-                        }
+                     
+                            totalCredit += credit 
+                        
 
                         console.log(debit, 'Debit', account.nature);
                         console.log(credit, 'credit', account.nature);
@@ -357,145 +398,186 @@ function TrialBalanceDetailed() {
         setFilteredBalanceSheet(result);
     };
 
-    const downloadExcel = () => {
-        const headers = tableHead.filter(item => item !== "Action");
-        const rows = [];
-        let TotalEquity = 0;
     
-        // Track totals per category
-        let TotalAssets = 0;
-        let TotalLiabilities = 0;
-        let TotalRevenue = 0;
-        let TotalExpenses = 0;
+
     
-        filteredBalanceSheet?.forEach((item, index) => {
-            item?.sub?.forEach(subItem => {
-                let TotalDebit = 0;
-                let TotalCredit = 0;
-    
-                subItem?.accounts?.forEach(account => {
-                    let credit = 0;
-                    let debit = 0;
-    
-                    if (account?.childAccounts?.length > 0) {
-                        const result = account.childAccounts.reduce(
-                            (acc, child) => {
-                                const c = isNaN(child?.total_credit) ? 0 : parseFloat(child.total_credit);
-                                const d = isNaN(child?.total_debit) ? 0 : parseFloat(child.total_debit);
-                                return {
-                                    credit: acc.credit + c,
-                                    debit: acc.debit + d,
-                                };
-                            },
-                            { credit: 0, debit: 0 }
-                        );
-    
-                        credit = result.credit;
-                        debit = result.debit;
-                    } else {
-                        credit = isNaN(account?.total_credit) ? 0 : parseFloat(account.total_credit);
-                        debit = isNaN(account?.total_debit) ? 0 : parseFloat(account.total_debit);
-                    }
-    
-                    let amount = account?.nature === "debit"
-                        ? debit - credit
-                        : credit - debit;
-    
-                    if (account?.nature === "debit") {
-                        TotalDebit += amount;
-                    } else {
-                        TotalCredit += amount;
-                    }
-    
-                    if (index !== 0) {
-                        TotalEquity += amount;
-                    }
-    
-                    // Track totals by category
-                    const cat = account?.account_category?.toLowerCase();
-                    if (cat?.includes("asset")) {
-                        TotalAssets += amount;
-                    } else if (cat?.includes("liability")) {
-                        TotalLiabilities += amount;
-                    } else if (cat?.includes("revenue") || cat?.includes("income")) {
-                        TotalRevenue += amount;
-                    } else if (cat?.includes("expense")) {
-                        TotalExpenses += amount;
-                    }
-    
-                    rows.push([
-                        account?.account_code ?? '-',
-                        account?.account_name ?? '-',
-                        account?.account_category ?? '-',
-                        account?.account_subcategory ?? '-',
-                        account?.nature === "debit" ? parseFloat(amount.toFixed(2)) : "0.00",
-                        account?.nature === "credit" ? parseFloat(amount.toFixed(2)) : "0.00",
-                    ]);
-    
-                    // Handle child accounts
-                    account?.childAccounts?.forEach(child => {
-                        const c = isNaN(child?.total_credit) ? 0 : parseFloat(child.total_credit);
-                        const d = isNaN(child?.total_debit) ? 0 : parseFloat(child.total_debit);
-                        const subAmount = account?.nature === "debit"
-                            ? d - c
-                            : c - d;
-    
-                        rows.push([
-                            child?.account_code ?? '-',
-                            child?.account_name ?? '-',
-                            child?.account_category ?? '-',
-                            child?.account_subcategory ?? '-',
-                            account?.nature === "debit" ? parseFloat(subAmount.toFixed(2)) : "0.00",
-                            account?.nature === "credit" ? parseFloat(subAmount.toFixed(2)) : "0.00",
-                        ]);
-                    });
-                });
-    
-                if (subItem?.accounts?.length > 0) {
-                    rows.push([
-                        `Total of ${subItem?.accounts[0]?.type_code}`,
-                        "",
-                        `Total ${subItem.name}`,
-                        "",
-                        parseFloat(TotalDebit.toFixed(2)),
-                        parseFloat(TotalCredit.toFixed(2)),
-                    ]);
-                }
-    
-                
-                
-               
-               
+    const downloadExcel = async () => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Trial Balance");
+      
+        const headers = [
+          "Account Code",
+          "Account Name",
+          "Opening Balance",
+          "Total Debit",
+          "Total Credit",
+          "Period Difference",
+          "Balance",
+        ];
+      
+        worksheet.addRow(headers).eachCell(cell => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '808080' }, // Gray
+          };
+          cell.font = { bold: true, color: { argb: 'FFFFFF' } }; // White bold
+        });
+      
+        // Grand totals initialization
+        let grandOpening = 0,
+            grandDebit = 0,
+            grandCredit = 0,
+            grandDiff = 0,
+            grandBalance = 0;
+      
+        filteredBalanceSheet.forEach(category => {
+          const catRow = worksheet.addRow([category.name]);
+          catRow.getCell(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '4472C4' }, // Blue
+          };
+          catRow.getCell(1).font = { bold: true, color: { argb: 'FFFFFF' } };
+      
+          category.sub?.forEach(subCategory => {
+            const subCatRow = worksheet.addRow(["", subCategory.name]);
+            subCatRow.getCell(2).fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'D3D3D3' }, // Light gray
+            };
+            subCatRow.getCell(2).font = { bold: true };
+      
+            const subcategoryTypeGroups = {};
+      
+            subCategory.accounts?.forEach(account => {
+              const subType = account.account_subcategory || "Uncategorized";
+              if (!subcategoryTypeGroups[subType]) subcategoryTypeGroups[subType] = [];
+      
+              const debit = parseFloat(account.total_debit) || 0;
+              const credit = parseFloat(account.total_credit) || 0;
+              const opening = parseFloat(account.opening_balance) || 0;
+              const periodDiff = account.nature === "debit" ? debit - credit : credit - debit;
+              const closingBalance = opening + periodDiff;
+      
+              subcategoryTypeGroups[subType].push([
+                account.account_code,
+                account.account_name,
+                opening,
+                debit,
+                credit,
+                periodDiff,
+                closingBalance,
+              ]);
             });
-            rows.push([
-                `Total`,
+      
+            Object.entries(subcategoryTypeGroups).forEach(([subType, rows]) => {
+              const subTypeRow = worksheet.addRow(["", `Subcategory: ${subType}`]);
+              subTypeRow.getCell(2).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'A9A9A9' }, // Dark gray
+              };
+              subTypeRow.getCell(2).font = { bold: true, color: { argb: 'FFFFFF' } };
+      
+              let totalOpening = 0, totalDebit = 0, totalCredit = 0, totalDiff = 0, totalBalance = 0;
+      
+              rows.forEach(data => {
+                const [code, name, opn, deb, cred, diff, bal] = data;
+                worksheet.addRow([
+                  code,
+                  name,
+                  opn.toFixed(2),
+                  deb.toFixed(2),
+                  cred.toFixed(2),
+                  diff.toFixed(2),
+                  bal.toFixed(2),
+                ]);
+                totalOpening += opn;
+                totalDebit += deb;
+                totalCredit += cred;
+                totalDiff += diff;
+                totalBalance += bal;
+              });
+      
+              // Subcategory total row (orange)
+              const totalRow = worksheet.addRow([
                 "",
-                ``,
-                "",
-              
-                CommaSeparator(parseFloat(allDebit).toFixed(2)),
-                CommaSeparator(parseFloat(allCredit).toFixed(2)),
-            ]);
+                `${subType} Total`,
+                totalOpening.toFixed(2),
+                totalDebit.toFixed(2),
+                totalCredit.toFixed(2),
+                totalDiff.toFixed(2),
+                totalBalance.toFixed(2),
+              ]);
+      
+              totalRow.eachCell(cell => {
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'FFA500' }, // Orange
+                };
+                cell.font = { bold: true };
+              });
+      
+              // Update grand totals
+              grandOpening += totalOpening;
+              grandDebit += totalDebit;
+              grandCredit += totalCredit;
+              grandDiff += totalDiff;
+              grandBalance += totalBalance;
+            });
+          });
         });
-    
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    
-        const buf = XLSX.write(wb, {
-            bookType: "xlsx",
-            type: "array",
-            mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      
+        // Add Grand Total row at the end
+        const grandTotalRow = worksheet.addRow([
+          "Grand Total",
+          "",
+          '',
+          parseFloat(allDebit).toFixed(2),
+          parseFloat(allCredit).toFixed(2),
+          '',
+          '',
+        ]);
+      
+        grandTotalRow.eachCell(cell => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '000000' }, // Black
+          };
+          cell.font = { bold: true, color: { argb: 'FFFFFF' } }; // White bold
         });
+      
+        // Set column widths
+        worksheet.columns = [
+          { width: 15 },
+          { width: 30 },
+          { width: 18 },
+          { width: 18 },
+          { width: 18 },
+          { width: 18 },
+          { width: 18 },
+        ];
+      
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        saveAs(blob, "TrialBalance.xlsx");
+      };
+      
+      
+      
     
-        saveAs(new Blob([buf]), "Trial_Balance.xlsx");
-    };
+
     
-    
-    
-    
-    
-    
+
+
+
+
+
+
     const handleFromDate = (newDate) => {
         try {
             // eslint-disable-next-line eqeqeq
@@ -522,22 +604,22 @@ function TrialBalanceDetailed() {
             ErrorToaster(error)
         }
     }
-        const getCostCenters = async () => {
-            try {
-                let params = {
-                    page: 1,
-                    limit: 1000,
-                };
-    
-                const { data } = await CustomerServices.getCostCenters(params);
-                setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
-                setSelectedCostCenter({ id: 'All', name: 'All' })
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 1000,
+            };
 
-            } catch (error) {
-                showErrorToast(error);
-            }
-        };
-    
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+            setSelectedCostCenter({ id: 'All', name: 'All' })
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
 
     useEffect(() => {
         getCostCenters()
@@ -720,909 +802,239 @@ function TrialBalanceDetailed() {
                                     {!loader ? (
                                         filteredBalanceSheet?.length > 0 ? (
                                             <>
-                                                <Fragment>
-                                                    {filteredBalanceSheet?.map((item, index) => {
-                                                        let GrandTotal = 0;
-                                                        let GrandTotal2 = 0;
-                                                        return (
-                                                            <Fragment key={index}>
-                                                                <Row>
-                                                                    <Cell className="pdf-table" colSpan={tableHead?.length}>
-                                                                        <Typography className="pdf-table"
-                                                                            variant="subtitle1"
-                                                                            sx={{ textAlign: "left" }}
-                                                                        >
-                                                                            {console.log(expand)}
-                                                                            {expand.indexOf(item.id) === -1 ? (
-                                                                                <ExpandMore className="pdf-hide"
-                                                                                    sx={{
-                                                                                        verticalAlign: "sub",
-                                                                                        cursor: "pointer",
-                                                                                        opacity:
-                                                                                            item?.sub?.length > 0 ? 1 : 0,
-                                                                                    }}
-                                                                                    onClick={() => handleExpand(item.id)}
-                                                                                />
-                                                                            ) : (
-                                                                                <ExpandLess className="pdf-hide"
-                                                                                    sx={{
-                                                                                        verticalAlign: "sub",
-                                                                                        cursor: "pointer",
-                                                                                        transform: "rotate(90deg)",
-                                                                                        opacity:
-                                                                                            item?.sub?.length > 0 ? 1 : 0,
-                                                                                    }}
-                                                                                    onClick={() => handleExpand(item.id)}
-                                                                                />
-                                                                            )}
-                                                                            {item?.name}
-                                                                        </Typography>
-                                                                    </Cell>
-                                                                </Row>
-                                                                {expand.indexOf(item.id) === -1 && (
-                                                                    <Fragment>
-                                                                        {item?.sub?.map((subItem, i) => {
-                                                                            let Total = 0;
-                                                                            let Total2 = 0;
-                                                                            return (
-                                                                                <Fragment key={i}>
-                                                                                    <Row>
-                                                                                        <Cell className="pdf-table" colSpan={tableHead?.length}>
-                                                                                            <Typography
-                                                                                                variant="body1"
-                                                                                                sx={{
-                                                                                                    fontWeight: 700,
-                                                                                                    textAlign: "left",
-                                                                                                    ml: 1.5,
-                                                                                                }}
-                                                                                            >
-                                                                                                {expand.indexOf(subItem.id) ===
-                                                                                                    -1 ? (
-                                                                                                    <ExpandMore className="pdf-hide"
-                                                                                                        sx={{
-                                                                                                            verticalAlign: "sub",
-                                                                                                            cursor: "pointer",
-                                                                                                            opacity:
-                                                                                                                subItem?.accounts
-                                                                                                                    ?.length > 0
-                                                                                                                    ? 1
-                                                                                                                    : 0,
-                                                                                                        }}
-                                                                                                        onClick={() =>
-                                                                                                            handleExpand(subItem.id)
-                                                                                                        }
-                                                                                                    />
-                                                                                                ) : (
-                                                                                                    <ExpandLess className="pdf-hide"
-                                                                                                        sx={{
-                                                                                                            verticalAlign: "sub",
-                                                                                                            cursor: "pointer",
-                                                                                                            transform: "rotate(90deg)",
-                                                                                                            opacity:
-                                                                                                                subItem?.accounts
-                                                                                                                    ?.length > 0
-                                                                                                                    ? 1
-                                                                                                                    : 0,
-                                                                                                        }}
-                                                                                                        onClick={() =>
-                                                                                                            handleExpand(subItem.id)
-                                                                                                        }
-                                                                                                    />
-                                                                                                )}
-                                                                                                {subItem?.name}
-                                                                                            </Typography>
-                                                                                        </Cell>
-                                                                                    </Row>
-                                                                                    {expand.indexOf(subItem.id) === -1 && (
-                                                                                        <Fragment>
-                                                                                            {subItem?.accounts?.map(
-                                                                                                (account, j) => {
-                                                                                                    let childFinalTotal = 0;
-                                                                                                    let childTotal = 0;
-                                                                                                    let childTotal2 = 0;
-                                                                                                    if (
-                                                                                                        account?.childAccounts
-                                                                                                            ?.length > 0
-                                                                                                    ) {
-                                                                                                        const initialValue = {
-                                                                                                            credit: 0,
-                                                                                                            debit: 0,
-                                                                                                        };
 
-                                                                                                        const result =
-                                                                                                            account?.childAccounts?.reduce(
-                                                                                                                (
-                                                                                                                    accumulator,
-                                                                                                                    transaction
-                                                                                                                ) => {
-                                                                                                                    const credit = isNaN(
-                                                                                                                        transaction?.total_credit
-                                                                                                                    )
-                                                                                                                        ? 0
-                                                                                                                        : transaction?.total_credit;
-                                                                                                                    const debit = isNaN(
-                                                                                                                        transaction?.total_debit
-                                                                                                                    )
-                                                                                                                        ? 0
-                                                                                                                        : transaction?.total_debit;
-                                                                                                                    return {
-                                                                                                                        credit:
-                                                                                                                            parseFloat(
-                                                                                                                                accumulator.credit
-                                                                                                                            ) +
-                                                                                                                            parseFloat(credit),
-                                                                                                                        debit:
-                                                                                                                            parseFloat(
-                                                                                                                                accumulator.debit
-                                                                                                                            ) +
-                                                                                                                            parseFloat(debit),
-                                                                                                                    };
-                                                                                                                },
-                                                                                                                initialValue
-                                                                                                            );
-                                                                                                        console.log(account?.nature, 'result');
-                                                                                                        console.log(result, 'result');
-
-                                                                                                        childTotal =
-                                                                                                            account?.nature === "credit"
-                                                                                                                ?
-                                                                                                                parseFloat(
-                                                                                                                    result?.credit
-                                                                                                                ) -
-                                                                                                                parseFloat(
-                                                                                                                    result?.debit
-                                                                                                                ) : 0;
-                                                                                                        childTotal2 =
-                                                                                                            account?.nature ===
-                                                                                                                "debit" ||
-                                                                                                                account?.nature === null
-                                                                                                                ? parseFloat(
-                                                                                                                    result?.debit
-                                                                                                                ) -
-                                                                                                                parseFloat(
-                                                                                                                    result?.credit
-                                                                                                                )
-                                                                                                                : parseFloat(0).toFixed(
-                                                                                                                    2
-                                                                                                                );
-                                                                                                    } else {
-                                                                                                        childTotal =
-                                                                                                            account?.nature === "credit"
-                                                                                                                ? parseFloat(
-                                                                                                                    account?.total_credit
-                                                                                                                ) - parseFloat(
-                                                                                                                    account?.total_debit
-                                                                                                                ) : parseFloat(0)
-
-                                                                                                        childTotal2 =
-                                                                                                            account?.nature === "debit"
-                                                                                                                ?
-                                                                                                                parseFloat(
-                                                                                                                    account?.total_debit
-                                                                                                                ) -
-                                                                                                                parseFloat(
-                                                                                                                    account?.total_credit
-                                                                                                                ) : 0
-
-
-                                                                                                    }
-
-                                                                                                    console.log(account, childTotal2, 'childTotal2');
-                                                                                                    Total += parseFloat(childTotal);
-                                                                                                    Total2 +=
-                                                                                                        parseFloat(childTotal2);
-                                                                                                    console.log(Total2, 'childTotal2Total');
-
-                                                                                                    GrandTotal +=
-                                                                                                        parseFloat(childTotal);
-                                                                                                    GrandTotal2 +=
-                                                                                                        parseFloat(childTotal2);
-                                                                                                    if (index !== 0) {
-                                                                                                        TotalEquity +=
-                                                                                                            parseFloat(childTotal);
-                                                                                                    }
-                                                                                                    return (
-                                                                                                        <Fragment key={j}>
-                                                                                                            <Row>
-                                                                                                                <Cell
-                                                                                                                    className={
-                                                                                                                        account?.childAccounts
-                                                                                                                            ? classes.anchorLink
-                                                                                                                            : ""
-                                                                                                                    }
-                                                                                                                    onClick={() =>
-                                                                                                                        handleExpand(
-                                                                                                                            account?.id
-                                                                                                                        )
-                                                                                                                    }
-                                                                                                                >
-                                                                                                                    <Typography
-                                                                                                                        variant="body1"
-                                                                                                                        sx={{ ml: 3 }}
-                                                                                                                        className={account?.account_code + " " + 'highlighted' ??
-                                                                                                                            "-"}
-                                                                                                                    >
-                                                                                                                        <Highlighter
-                                                                                                                            highlightClassName={
-                                                                                                                                account?.account_code + " " + 'highlighted' ??
-                                                                                                                                "-"
-                                                                                                                            }
-                                                                                                                            searchWords={[
-                                                                                                                                textValue,
-                                                                                                                            ]}
-                                                                                                                            autoEscape={true}
-                                                                                                                            textToHighlight={
-                                                                                                                                account?.account_code ??
-                                                                                                                                "-"
-                                                                                                                            }
-                                                                                                                        />
-                                                                                                                    </Typography>
-                                                                                                                </Cell>
-                                                                                                                <Cell
-                                                                                                                    className={
-                                                                                                                        account?.childAccounts
-                                                                                                                            ? classes.anchorLink + " " + 'pdf-table'
-                                                                                                                            : "pdf-table"
-                                                                                                                    }
-                                                                                                                    onClick={() =>
-                                                                                                                        handleExpand(
-                                                                                                                            account?.id
-                                                                                                                        )
-                                                                                                                    }
-                                                                                                                >
-                                                                                                                    <Highlighter
-                                                                                                                        highlightClassName={
-                                                                                                                            account?.account_name ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                        searchWords={[
-                                                                                                                            textValue,
-                                                                                                                        ]}
-                                                                                                                        autoEscape={true}
-                                                                                                                        textToHighlight={
-                                                                                                                            account?.account_name ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                    />
-                                                                                                                </Cell>
-                                                                                                                <Cell className="pdf-table">
-                                                                                                                    <Highlighter
-                                                                                                                        highlightClassName={
-                                                                                                                            account?.account_category ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                        searchWords={[
-                                                                                                                            textValue,
-                                                                                                                        ]}
-                                                                                                                        autoEscape={true}
-                                                                                                                        textToHighlight={
-                                                                                                                            account?.account_category ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                    />
-                                                                                                                </Cell>
-                                                                                                                <Cell className="pdf-table">
-                                                                                                                    <Highlighter
-                                                                                                                        highlightClassName={
-                                                                                                                            account?.account_subcategory ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                        searchWords={[
-                                                                                                                            textValue,
-                                                                                                                        ]}
-                                                                                                                        autoEscape={true}
-                                                                                                                        textToHighlight={
-                                                                                                                            account?.account_subcategory ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                    />
-                                                                                                                </Cell>
-
-                                                                                                                <Cell className="pdf-table">
-                                                                                                                    <Highlighter
-                                                                                                                        highlightClassName={
-                                                                                                                            account?.account_subcategory ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                        searchWords={[
-                                                                                                                            textValue,
-                                                                                                                        ]}
-                                                                                                                        autoEscape={true}
-                                                                                                                        textToHighlight={
-                                                                                                                            account.nature ==
-                                                                                                                                "debit" ||
-                                                                                                                                account?.nature ===
-                                                                                                                                null ||
-                                                                                                                                account?.nature ===
-                                                                                                                                "combine"
-                                                                                                                                ? CommaSeparator(parseFloat(
-                                                                                                                                    childTotal2
-                                                                                                                                ).toFixed(2))
-                                                                                                                                : parseFloat(
-                                                                                                                                    0
-                                                                                                                                ).toFixed(2)
-                                                                                                                        }
-                                                                                                                    />
-                                                                                                                </Cell>
-                                                                                                                <Cell className="pdf-table">
-
-                                                                                                                    <Highlighter
-                                                                                                                        highlightClassName={
-                                                                                                                            account?.account_subcategory ??
-                                                                                                                            "-"
-                                                                                                                        }
-                                                                                                                        searchWords={[
-                                                                                                                            textValue,
-                                                                                                                        ]}
-                                                                                                                        autoEscape={true}
-                                                                                                                        textToHighlight={
-                                                                                                                            account.nature ==
-                                                                                                                                "credit" ||
-                                                                                                                                account?.nature ===
-                                                                                                                                "combine"
-                                                                                                                                ? CommaSeparator(parseFloat(
-                                                                                                                                    childTotal
-                                                                                                                                ).toFixed(2))
-                                                                                                                                : parseFloat(
-                                                                                                                                    0
-                                                                                                                                ).toFixed(2)
-                                                                                                                        }
-                                                                                                                    />
-                                                                                                                </Cell>
-                                                                                                                <Cell className="pdf-table">
-                                                                                                                    {!account?.childAccounts && (
-                                                                                                                        <Box
-                                                                                                                            sx={{
-                                                                                                                                gap: "16px !important",
-                                                                                                                            }}
-                                                                                                                        >
-                                                                                                                            <Box
-                                                                                                                                component={'div'}
-                                                                                                                                className="pdf-hide"
-                                                                                                                                onClick={() => {
-                                                                                                                                    const url = `/account-ledger/${account?.id}`;
-                                                                                                                                    const state = {
-                                                                                                                                      accountName: account?.account_name,
-                                                                                                                                      nature: account?.nature,
-                                                                                                                                      cost_center: selectedCostCenter,
-                                                                                                                                    };
-                                                                                                                                    const encodedState = encodeURIComponent(JSON.stringify(state));
-                                                                                                                                    window.open(`${url}?state=${encodedState}`, '_blank');
-                                                                                                                                  }}
-                                                                                                                            >
-                                                                                                                                <IconButton
-                                                                                                                                    sx={{
-                                                                                                                                        bgcolor:
-                                                                                                                                            Colors.primary,
-                                                                                                                                        "&:hover": {
-                                                                                                                                            bgcolor:
-                                                                                                                                                Colors.primary,
-                                                                                                                                        },
-                                                                                                                                    }}
-                                                                                                                                >
-                                                                                                                                    <Box
-                                                                                                                                        component={
-                                                                                                                                            "img"
-                                                                                                                                        }
-                                                                                                                                        src={
-                                                                                                                                            Images.ledgerIcon
-                                                                                                                                        }
-                                                                                                                                        sx={{
-                                                                                                                                            height:
-                                                                                                                                                "16px",
-                                                                                                                                            objectFit:
-                                                                                                                                                "contain",
-                                                                                                                                        }}
-                                                                                                                                    />
-                                                                                                                                </IconButton>
-                                                                                                                                <Typography variant="body2">
-                                                                                                                                    View
-                                                                                                                                </Typography>
-                                                                                                                            </Box>
-                                                                                                                        </Box>
-                                                                                                                    )}
-                                                                                                                </Cell>
-                                                                                                            </Row>
-                                                                                                            {expand.indexOf(
-                                                                                                                account.id
-                                                                                                            ) !== -1 && (
-                                                                                                                    <Fragment>
-                                                                                                                        {account?.childAccounts?.map(
-                                                                                                                            (child, j) => {
-                                                                                                                                console.log(child, 'child');
-                                                                                                                                let credit =
-                                                                                                                                    isNaN(
-                                                                                                                                        child?.total_credit
-                                                                                                                                    )
-                                                                                                                                        ? 0
-                                                                                                                                        : child?.total_credit;
-                                                                                                                                const debit = isNaN(
-                                                                                                                                    child?.total_debit
-                                                                                                                                )
-                                                                                                                                    ? 0
-                                                                                                                                    : child?.total_debit;
-                                                                                                                                let subTotal =
-                                                                                                                                    child?.nature ===
-                                                                                                                                        "debit"
-                                                                                                                                        ? (
-                                                                                                                                            parseFloat(
-                                                                                                                                                debit
-                                                                                                                                            ) -
-                                                                                                                                            parseFloat(
-                                                                                                                                                credit
-                                                                                                                                            )
-                                                                                                                                        ).toFixed(2)
-                                                                                                                                        : (
-                                                                                                                                            parseFloat(
-                                                                                                                                                credit
-                                                                                                                                            ) -
-                                                                                                                                            parseFloat(
-                                                                                                                                                debit
-                                                                                                                                            )
-                                                                                                                                        ).toFixed(2);
-                                                                                                                                childFinalTotal +=
-                                                                                                                                    parseFloat(
-                                                                                                                                        subTotal
-                                                                                                                                    );
-                                                                                                                                console.log(subTotal, 'subTotal');
-                                                                                                                                return (
-                                                                                                                                    <Fragment key={j}>
-                                                                                                                                        <Row
-                                                                                                                                            sx={{
-                                                                                                                                                bgcolor:
-                                                                                                                                                    "#EEFBEE",
-                                                                                                                                            }}
-                                                                                                                                        >
-                                                                                                                                            <Cell className="pdf-table">
-                                                                                                                                                <Typography
-                                                                                                                                                    variant="body1"
-                                                                                                                                                    sx={{
-                                                                                                                                                        ml: 4.5,
-                                                                                                                                                    }}
-                                                                                                                                                >
-                                                                                                                                                    {child?.account_code ??
-                                                                                                                                                        "-"}
-                                                                                                                                                </Typography>
-                                                                                                                                            </Cell>
-                                                                                                                                            <Cell className="pdf-table">
-                                                                                                                                                {child?.account_name ??
-                                                                                                                                                    "-"}
-                                                                                                                                            </Cell>
-                                                                                                                                            <Cell className="pdf-table">
-                                                                                                                                                {child?.account_category ??
-                                                                                                                                                    "-"}
-                                                                                                                                            </Cell>
-                                                                                                                                            <Cell className="pdf-table">
-                                                                                                                                                {child?.account_subcategory ??
-                                                                                                                                                    "-"}
-                                                                                                                                            </Cell>
-                                                                                                                                            <Cell className="pdf-table">
-                                                                                                                                                {account.nature ==
-                                                                                                                                                    "debit" ||
-                                                                                                                                                    account?.nature ===
-                                                                                                                                                    null
-                                                                                                                                                    ? CommaSeparator(parseFloat(
-                                                                                                                                                        subTotal
-                                                                                                                                                    ).toFixed(
-                                                                                                                                                        2
-                                                                                                                                                    ))
-                                                                                                                                                    : parseFloat(
-                                                                                                                                                        0
-                                                                                                                                                    ).toFixed(
-                                                                                                                                                        2
-                                                                                                                                                    )}
-                                                                                                                                            </Cell>
-                                                                                                                                            <Cell className="pdf-table">
-                                                                                                                                                {account.nature ==
-                                                                                                                                                    "credit"
-                                                                                                                                                    ? CommaSeparator(parseFloat(
-                                                                                                                                                        subTotal
-                                                                                                                                                    ).toFixed(
-                                                                                                                                                        2
-                                                                                                                                                    ))
-                                                                                                                                                    : parseFloat(
-                                                                                                                                                        0
-                                                                                                                                                    ).toFixed(
-                                                                                                                                                        2
-                                                                                                                                                    )}
-                                                                                                                                            </Cell>
-                                                                                                                                            <Cell>
-                                                                                                                                                <Box component={'div'}
-                                                                                                                                                    className="pdf-hide"
-                                                                                                                                                    sx={{
-                                                                                                                                                        gap: "16px !important",
-                                                                                                                                                    }}
-                                                                                                                                                >
-                                                                                                                                                    <Box
-                                                                                                                                                    onClick={() => {
-                                                                                                                                                        const url = `/account-ledger/${account?.id}`;
-                                                                                                                                                        const state = {
-                                                                                                                                                          accountName: account?.account_name,
-                                                                                                                                                          nature: account?.nature,
-                                                                                                                                                          cost_center: selectedCostCenter,
-                                                                                                                                                        };
-                                                                                                                                                        const encodedState = encodeURIComponent(JSON.stringify(state));
-                                                                                                                                                        window.open(`${url}?state=${encodedState}`, '_blank');
-                                                                                                                                                      }}
-                                                                                                                                                    >
-                                                                                                                                                        <IconButton
-                                                                                                                                                            sx={{
-                                                                                                                                                                bgcolor:
-                                                                                                                                                                    Colors.primary,
-                                                                                                                                                                "&:hover":
-                                                                                                                                                                {
-                                                                                                                                                                    bgcolor:
-                                                                                                                                                                        Colors.primary,
-                                                                                                                                                                },
-                                                                                                                                                            }}
-                                                                                                                                                        >
-                                                                                                                                                            <Box
-                                                                                                                                                                component={
-                                                                                                                                                                    "img"
-                                                                                                                                                                }
-                                                                                                                                                                src={
-                                                                                                                                                                    Images.ledgerIcon
-                                                                                                                                                                }
-                                                                                                                                                                sx={{
-                                                                                                                                                                    height:
-                                                                                                                                                                        "16px",
-                                                                                                                                                                    objectFit:
-                                                                                                                                                                        "contain",
-                                                                                                                                                                }}
-                                                                                                                                                            />
-                                                                                                                                                        </IconButton>
-                                                                                                                                                        <Typography variant="body2">
-                                                                                                                                                            View
-                                                                                                                                                        </Typography>
-                                                                                                                                                    </Box>
-                                                                                                                                                </Box>
-                                                                                                                                            </Cell>
-                                                                                                                                        </Row>
-                                                                                                                                    </Fragment>
-                                                                                                                                );
-                                                                                                                            }
-                                                                                                                        )}
-                                                                                                                    </Fragment>
-                                                                                                                )}
-                                                                                                        </Fragment>
-                                                                                                    );
-                                                                                                }
-                                                                                            )}
-                                                                                            {subItem?.accounts?.length > 0 && (
-                                                                                                <Row>
-                                                                                                    <Cell>
-                                                                                                        <Typography
-                                                                                                            variant="body1"
-                                                                                                            sx={{
-                                                                                                                fontWeight: 700,
-                                                                                                                ml: 4.5,
-                                                                                                            }}
-                                                                                                        >
-                                                                                                            Total of{" "}
-                                                                                                            {
-                                                                                                                subItem?.accounts[0]
-                                                                                                                    ?.type_code
-                                                                                                            }
-                                                                                                        </Typography>
-                                                                                                    </Cell>
-                                                                                                    <Cell colSpan={3}>
-                                                                                                        <Typography
-                                                                                                            variant="body1"
-                                                                                                            sx={{ fontWeight: 700 }}
-                                                                                                        >
-                                                                                                            Total {subItem?.name}
-                                                                                                        </Typography>
-                                                                                                    </Cell>
-                                                                                                    <Cell>
-                                                                                                        <Typography
-                                                                                                            variant="body1"
-                                                                                                            sx={{ fontWeight: 700 }}
-                                                                                                        >
-                                                                                                            {CommaSeparator(parseFloat(Total2).toFixed(
-                                                                                                                2
-                                                                                                            ))}
-                                                                                                        </Typography>
-                                                                                                    </Cell>
-                                                                                                    <Cell>
-                                                                                                        <Typography
-                                                                                                            variant="body1"
-                                                                                                            sx={{ fontWeight: 700 }}
-                                                                                                        >
-                                                                                                            {CommaSeparator(parseFloat(Total).toFixed(
-                                                                                                                2
-                                                                                                            ))}
-                                                                                                        </Typography>
-                                                                                                    </Cell>
-                                                                                                </Row>
-                                                                                            )}
-                                                                                        </Fragment>
-                                                                                    )}
-                                                                                </Fragment>
-                                                                            );
-                                                                        })}
-                                                                        {item?.sub?.length > 0 &&
-                                                                            <Fragment>
-                                                                                <Row sx={{ bgcolor: Colors.bluishCyan }}>
-                                                                                    <Cell>
-                                                                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white, ml: 4.5 }}>
-                                                                                            Total
-                                                                                        </Typography>
-                                                                                    </Cell>
-                                                                                    <Cell colSpan={3}>
-                                                                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
-                                                                                            Total {item?.name}
-                                                                                        </Typography>
-                                                                                    </Cell>
-
-                                                                                    <Cell>
-                                                                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
-                                                                                            {CommaSeparator(parseFloat(GrandTotal2).toFixed(2))}
-                                                                                        </Typography>
-                                                                                    </Cell>
-                                                                                    <Cell>
-                                                                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
-                                                                                            {CommaSeparator(parseFloat(GrandTotal).toFixed(2))}
-                                                                                        </Typography>
-                                                                                    </Cell>
-                                                                                </Row>
-                                                                            </Fragment>
-                                                                        }
-                                                                    </Fragment>
-                                                                )}
-                                                            </Fragment>
-                                                        );
-                                                    })}
-                                                </Fragment>
                                                 <Fragment>
 
-                                                    {filteredBalanceSheet?.map((item, index) => (
-                                                        <Fragment key={index}>
-                                                            {true && (
-                                                                <Fragment>
-                                                                    {item?.accounts?.map((account, j) => {
-                                                                        let Balance = 0;
-                                                                        let Total = 0;
-                                                                        if (account?.childAccounts?.length > 0) {
-                                                                            const initialValue = {
-                                                                                credit: 0,
-                                                                                debit: 0,
-                                                                            };
+                                                    {filteredBalanceSheet.map((category) => (
+                                                        <React.Fragment key={category.id}>
+                                                            {/* Category Row */}
+                                                            <TableRow
+                                                                className="bg-primary/90 text-primary-foreground font-medium cursor-pointer hover:bg-primary/80"
+                                                                onClick={() => toggleCategory(category.id)}
+                                                            >
+                                                                <TableCell colSpan={7}>
+                                                                    {expandedCategories[category.id] ? "▼" : "▶"} {category.name}
+                                                                </TableCell>
+                                                            </TableRow>
 
-                                                                            const result =
-                                                                                account?.childAccounts?.reduce(
-                                                                                    (accumulator, transaction) => {
-                                                                                        const credit = isNaN(
-                                                                                            transaction?.total_credit
-                                                                                        )
-                                                                                            ? 0
-                                                                                            : transaction?.total_credit;
-                                                                                        const debit = isNaN(
-                                                                                            transaction?.total_debit
-                                                                                        )
-                                                                                            ? 0
-                                                                                            : transaction?.total_debit;
-                                                                                        return {
-                                                                                            credit:
-                                                                                                parseFloat(accumulator.credit) +
-                                                                                                parseFloat(credit),
-                                                                                            debit:
-                                                                                                parseFloat(accumulator.debit) +
-                                                                                                parseFloat(debit),
-                                                                                        };
-                                                                                    },
-                                                                                    initialValue
-                                                                                );
-                                                                            Balance =
-                                                                                account?.nature === "credit"
-                                                                                    ? parseFloat(result?.credit) -
-                                                                                    parseFloat(result?.debit)
-                                                                                    : parseFloat(result?.debit) -
-                                                                                    parseFloat(result?.credit);
-                                                                        } else {
-                                                                            Total =
-                                                                                account?.nature === "credit"
-                                                                                    ? parseFloat(account?.total_credit) -
-                                                                                    parseFloat(account?.total_debit)
-                                                                                    : parseFloat(account?.total_debit) -
-                                                                                    parseFloat(account?.total_credit);
+                                                            {/* Sub-categories and accounts */}
+                                                            {expandedCategories[category.id] &&
+                                                                category.sub.map((subCategory) => {
+                                                                    // Calculate subcategory totals
+                                                                    let subCategoryDebit = 0
+                                                                    let subCategoryCredit = 0
+
+                                                                    subCategory?.accounts?.forEach((account) => {
+                                                                        const debit = Number.parseFloat(account.total_debit) || 0
+                                                                        const credit = Number.parseFloat(account.total_credit) || 0
+
+                                                                        subCategoryDebit += debit
+
+                                                                        subCategoryCredit += credit
+
+                                                                        console.log(subCategoryDebit, 'debitdebitdebitdebit');
+
+                                                                        // Process child accounts if any
+                                                                        if (account.childAccounts) {
+                                                                            account.childAccounts.forEach((childAccount) => {
+                                                                                const childDebit = Number.parseFloat(childAccount.total_debit) || 0
+                                                                                const childCredit = Number.parseFloat(childAccount.total_credit) || 0
+
+
+                                                                                subCategoryDebit += childDebit
+
+                                                                                subCategoryCredit += childCredit
+
+                                                                            })
                                                                         }
-                                                                        return (
-                                                                            <Fragment key={j}>
-                                                                                <Row>
-                                                                                    <Cell
-                                                                                        className={
-                                                                                            account?.childAccounts
-                                                                                                ? classes.anchorLink
-                                                                                                : ""
-                                                                                        }
-                                                                                        onClick={() =>
-                                                                                            handleExpand(account?.id)
-                                                                                        }
-                                                                                    >
-                                                                                        <Typography
-                                                                                            variant="body1"
-                                                                                            sx={{ ml: 3 }}
-                                                                                        >
-                                                                                            {account?.account_code ?? "-"}
-                                                                                        </Typography>
-                                                                                    </Cell>
-                                                                                    <Cell
-                                                                                        className={
-                                                                                            account?.childAccounts
-                                                                                                ? classes.anchorLink
-                                                                                                : ""
-                                                                                        }
-                                                                                        onClick={() =>
-                                                                                            handleExpand(account?.id)
-                                                                                        }
-                                                                                    >
-                                                                                        {account?.account_name ?? "-"}
-                                                                                    </Cell>
-                                                                                    <Cell>{account?.unit ?? "-"}</Cell>
-                                                                                    <Cell>
-                                                                                        {account?.account_category ?? "-"}
-                                                                                    </Cell>
-                                                                                    <Cell>
-                                                                                        {account?.account_subcategory ?? "-"}
-                                                                                    </Cell>
-                                                                                    <Cell>
-                                                                                        {account?.childAccounts
-                                                                                            ? CommaSeparator(Balance.toFixed(2))
-                                                                                            : CommaSeparator(Total.toFixed(2))}
-                                                                                    </Cell>
-                                                                                    <Cell>
-                                                                                        {!account?.childAccounts && (
-                                                                                            <Box
-                                                                                                sx={{ gap: "16px !important" }}
-                                                                                            >
-                                                                                                <Box
-                                                                                                    onClick={() => {
-                                                                                                        const url = `/account-ledger/${account?.id}`;
-                                                                                                        const state = {
-                                                                                                          accountName: account?.account_name,
-                                                                                                          nature: account?.nature,
-                                                                                                          cost_center: selectedCostCenter,
-                                                                                                        };
-                                                                                                        const encodedState = encodeURIComponent(JSON.stringify(state));
-                                                                                                        window.open(`${url}?state=${encodedState}`, '_blank');
-                                                                                                      }}
-                                                                                                >
-                                                                                                    <IconButton
-                                                                                                        sx={{
-                                                                                                            bgcolor: Colors.primary,
-                                                                                                            "&:hover": {
-                                                                                                                bgcolor: Colors.primary,
-                                                                                                            },
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <Box
-                                                                                                            component={"img"}
-                                                                                                            src={Images.ledgerIcon}
-                                                                                                            sx={{
-                                                                                                                height: "16px",
-                                                                                                                objectFit: "contain",
-                                                                                                            }}
-                                                                                                        />
-                                                                                                    </IconButton>
-                                                                                                    <Typography variant="body2">
-                                                                                                        View
-                                                                                                    </Typography>
-                                                                                                </Box>
-                                                                                            </Box>
-                                                                                        )}
-                                                                                    </Cell>
-                                                                                </Row>
-                                                                                {expand.indexOf(account.id) !== -1 && (
-                                                                                    <Fragment>
-                                                                                        {account?.childAccounts?.map(
-                                                                                            (child, j) => {
-                                                                                                let ChildBalance = 0;
-                                                                                                ChildBalance =
-                                                                                                    child?.nature === "credit"
-                                                                                                        ? parseFloat(
-                                                                                                            child?.total_credit
-                                                                                                        ) -
-                                                                                                        parseFloat(
-                                                                                                            child?.total_debit
-                                                                                                        )
-                                                                                                        : parseFloat(
-                                                                                                            child?.total_debit
-                                                                                                        ) -
-                                                                                                        parseFloat(
-                                                                                                            child?.total_credit
-                                                                                                        );
-                                                                                                return (
-                                                                                                    <Fragment key={j}>
-                                                                                                        <Row
-                                                                                                            sx={{ bgcolor: "#EEFBEE" }}
-                                                                                                        >
-                                                                                                            <Cell>
-                                                                                                                <Typography
-                                                                                                                    variant="body1"
-                                                                                                                    sx={{ ml: 4.5 }}
-                                                                                                                >
-                                                                                                                    {child?.account_code ??
-                                                                                                                        "-"}
-                                                                                                                </Typography>
-                                                                                                            </Cell>
-                                                                                                            <Cell>
-                                                                                                                {child?.account_name ??
-                                                                                                                    "-"}
-                                                                                                            </Cell>
-                                                                                                            <Cell>
-                                                                                                                {child?.unit ?? "-"}
-                                                                                                            </Cell>
-                                                                                                            <Cell>
-                                                                                                                {child?.account_category ??
-                                                                                                                    "-"}
-                                                                                                            </Cell>
-                                                                                                            <Cell>
-                                                                                                                {child?.account_subcategory ??
-                                                                                                                    "-"}
-                                                                                                            </Cell>
-                                                                                                            <Cell>
-                                                                                                                {CommaSeparator(ChildBalance.toFixed(2))}
-                                                                                                            </Cell>
-                                                                                                            <Cell>
-                                                                                                                <Box
-                                                                                                                    sx={{
-                                                                                                                        gap: "16px !important",
-                                                                                                                    }}
-                                                                                                                >
-                                                                                                                    <Box
-                                                                                                                   onClick={() => {
-                                                                                                                    const url = `/account-ledger/${account?.id}`;
-                                                                                                                    const state = {
-                                                                                                                      accountName: account?.account_name,
-                                                                                                                      nature: account?.nature,
-                                                                                                                      cost_center: selectedCostCenter,
-                                                                                                                    };
-                                                                                                                    const encodedState = encodeURIComponent(JSON.stringify(state));
-                                                                                                                    window.open(`${url}?state=${encodedState}`, '_blank');
-                                                                                                                  }}
-                                                                                                                    >
-                                                                                                                        <IconButton
-                                                                                                                            sx={{
-                                                                                                                                bgcolor:
-                                                                                                                                    Colors.primary,
-                                                                                                                                "&:hover": {
-                                                                                                                                    bgcolor:
-                                                                                                                                        Colors.primary,
-                                                                                                                                },
-                                                                                                                            }}
-                                                                                                                        >
-                                                                                                                            <Box
-                                                                                                                                component={"img"}
-                                                                                                                                src={
-                                                                                                                                    Images.ledgerIcon
-                                                                                                                                }
-                                                                                                                                sx={{
-                                                                                                                                    height: "16px",
-                                                                                                                                    objectFit:
-                                                                                                                                        "contain",
-                                                                                                                                }}
-                                                                                                                            />
-                                                                                                                        </IconButton>
-                                                                                                                        <Typography variant="body2">
-                                                                                                                            View
-                                                                                                                        </Typography>
-                                                                                                                    </Box>
-                                                                                                                </Box>
-                                                                                                            </Cell>
-                                                                                                        </Row>
-                                                                                                    </Fragment>
-                                                                                                );
+
+                                                                        console.log(subCategoryDebit, 'debitdebitdebitdebit');
+                                                                    })
+
+                                                                    return (
+                                                                        <React.Fragment key={subCategory.id}>
+                                                                            {/* Sub-category Header Row */}
+                                                                            {/* <TableRow
+                                                                                className="bg-secondary text-secondary-foreground font-medium cursor-pointer hover:bg-secondary/90"
+                                                                                onClick={() => toggleSubCategory(subCategory.id)}
+                                                                            >
+                                                                                <TableCell></TableCell>
+                                                                                <TableCell>
+                                                                                    {expandedCategories[`sub_${subCategory.id}`] ? "▼" : "▶"} {subCategory.name}
+                                                                                </TableCell>
+
+                                                                                <TableCell>0</TableCell>
+                                                                                <TableCell className="text-right">{formatAmount(subCategoryDebit)}</TableCell>
+                                                                                <TableCell className="text-right">{formatAmount(subCategoryCredit)}</TableCell>
+                                                                                <TableCell className="text-right">
+                                                                                    {formatAmount(subCategoryDebit - subCategoryCredit)}
+                                                                                </TableCell>
+                                                                                <TableCell className="text-right">
+                                                                                    {formatAmount(subCategoryDebit - subCategoryCredit)}
+                                                                                </TableCell>
+                                                                            </TableRow> */}
+
+                                                                            {/* Accounts under this subcategory */}
+                                                                            {true &&
+                                                                                (() => {
+                                                                                    // Group accounts by subcategory type
+                                                                                    const subcategoryTypeGroups = {}
+
+                                                                                    subCategory?.accounts?.filter(filterData2).forEach((account) => {
+                                                                                        console.log(account)
+                                                                                        const subcategoryType = account.account_subcategory || "Uncategorized"
+
+                                                                                        if (!subcategoryTypeGroups[subcategoryType]) {
+                                                                                            subcategoryTypeGroups[subcategoryType] = {
+                                                                                                accounts: [],
+                                                                                                debitTotal: 0,
+                                                                                                creditTotal: 0,
+                                                                                                openingBalanceTotal: 0,
+                                                                                                periodDiffTotal: 0
                                                                                             }
-                                                                                        )}
-                                                                                    </Fragment>
-                                                                                )}
-                                                                            </Fragment>
-                                                                        );
-                                                                    })}
-                                                                </Fragment>
-                                                            )}
+                                                                                        }
 
-                                                        </Fragment>
+                                                                                        const debit = Number.parseFloat(account.total_debit) || 0
+                                                                                        const credit = Number.parseFloat(account.total_credit) || 0
+                                                                                        let netAmount = 0
+
+                                                                                        netAmount = debit
+                                                                                        let diff = account?.nature === "debit" ? debit - credit : credit - debit
+                                                                                        subcategoryTypeGroups[subcategoryType].periodDiffTotal += diff
+                                                                                        subcategoryTypeGroups[subcategoryType].openingBalanceTotal += account.opening_balance || 0
+                                                                                        subcategoryTypeGroups[subcategoryType].debitTotal += netAmount
+
+                                                                                        netAmount = credit
+                                                                                        subcategoryTypeGroups[subcategoryType].creditTotal += netAmount
+
+
+                                                                                        subcategoryTypeGroups[subcategoryType].accounts.push({
+                                                                                            ...account,
+                                                                                            netAmount,
+                                                                                        })
+
+                                                                                        // Process child accounts if any
+                                                                                        if (account.childAccounts) {
+                                                                                            account.childAccounts.filter(filterData2).forEach((childAccount) => {
+                                                                                                const childDebit = Number.parseFloat(childAccount.total_debit) || 0
+                                                                                                const childCredit = Number.parseFloat(childAccount.total_credit) || 0
+                                                                                                let childNetAmount = 0
+                                                                                                let diff = account?.nature === "debit" ? debit - credit : credit - debit
+                                                                                                subcategoryTypeGroups[subcategoryType].periodDiffTotal += diff
+                                                                                                if (childAccount.nature === "debit") {
+                                                                                                    subcategoryTypeGroups[subcategoryType].openingBalanceTotal += account.opening_balance || 0
+                                                                                                    childNetAmount = childDebit
+                                                                                                    subcategoryTypeGroups[subcategoryType].debitTotal += childNetAmount
+                                                                                                } else {
+                                                                                                    subcategoryTypeGroups[subcategoryType].openingBalanceTotal += account.opening_balance || 0
+                                                                                                    childNetAmount = childCredit
+                                                                                                    subcategoryTypeGroups[subcategoryType].creditTotal += childNetAmount
+                                                                                                }
+
+                                                                                                subcategoryTypeGroups[subcategoryType].accounts.push({
+                                                                                                    ...childAccount,
+                                                                                                    netAmount: childNetAmount,
+                                                                                                    isChild: true,
+                                                                                                })
+                                                                                            })
+                                                                                        }
+                                                                                    })
+
+                                                                                    // Render each subcategory type group
+                                                                                    return Object.entries(subcategoryTypeGroups).map(([subcategoryType, group]) => (
+                                                                                        <React.Fragment key={`${subCategory.id}-${subcategoryType}`}>
+                                                                                            {/* Subcategory Type Header */}
+                                                                                            <TableRow className="bg-muted/70 font-medium">
+
+                                                                                                <TableCell className="pl-6" style={{ fontWeight: 'bold' }} colspan={7} >{subcategoryType}</TableCell>
+
+                                                                                            </TableRow>
+
+                                                                                            {/* Accounts in this subcategory type */}
+                                                                                            {
+                                                                                                group.accounts.map((account) => {
+                                                                                                    let totalBalance = 0;
+                                                                                                    totalBalance = +account.opening_balance;
+                                                                                                    return (
+                                                                                                        <React.Fragment key={account.id}>
+                                                                                                            <TableRow
+                                                                                                                className={
+                                                                                                                    account.isChild ? "bg-muted/10 hover:bg-muted/30" : "hover:bg-muted/50"
+                                                                                                                }
+                                                                                                            >
+                                                                                                                <TableCell>{account.account_code}</TableCell>
+                                                                                                                <TableCell className={account.isChild ? "pl-10" : "pl-6"}>
+                                                                                                                    {account.account_name}
+                                                                                                                </TableCell>
+
+                                                                                                                <TableCell className="text-right">{account.opening_balance || 0.0}</TableCell>
+                                                                                                                <TableCell className="text-right">
+                                                                                                                    {formatAmount(account.total_debit)}
+                                                                                                                </TableCell>
+                                                                                                                <TableCell className="text-right">
+                                                                                                                    {formatAmount(account.total_credit)}
+                                                                                                                </TableCell>
+                                                                                                                <TableCell className="text-right">
+                                                                                                                    {parseFloat(
+                                                                                                                        account.nature === "debit"
+                                                                                                                            ? parseFloat(account.total_debit) - parseFloat(account.total_credit)
+                                                                                                                            : parseFloat(account.total_credit) - parseFloat(account.total_debit)
+                                                                                                                    ).toFixed(2)}
+                                                                                                                </TableCell>
+
+                                                                                                                <TableCell className="text-right">
+                                                                                                                    {parseFloat(
+                                                                                                                        parseFloat(account.opening_balance || 0.0) +
+                                                                                                                        (account.nature === "debit"
+                                                                                                                            ? parseFloat(account.total_debit) - parseFloat(account.total_credit)
+                                                                                                                            : parseFloat(account.total_credit) - parseFloat(account.total_debit))
+                                                                                                                    ).toFixed(2)}
+                                                                                                                </TableCell>
+                                                                                                            </TableRow>
+                                                                                                        </React.Fragment>
+                                                                                                    );
+                                                                                                })
+                                                                                            }
+
+
+                                                                                            {/* Subcategory Type Total */}
+                                                                                            <TableRow className="bg-muted/30 font-medium">
+
+                                                                                                <TableCell className="pl-6" style={{ fontWeight: 'bold' }}>Total - {subcategoryType}</TableCell>
+
+                                                                                                <TableCell></TableCell>
+                                                                                                <TableCell>{formatAmount(group?.openingBalanceTotal)}</TableCell>
+                                                                                                <TableCell className="text-right">{formatAmount(group.debitTotal)}</TableCell>
+                                                                                                <TableCell className="text-right">{formatAmount(group.creditTotal)}</TableCell>
+                                                                                                <TableCell className="text-right">
+                                                                                                    {formatAmount(group.periodDiffTotal)}
+                                                                                                </TableCell>
+                                                                                                <TableCell className="text-right">
+                                                                                                    {parseFloat(parseFloat(group.periodDiffTotal)+parseFloat(group?.openingBalanceTotal)).toFixed(2)}
+                                                                                                </TableCell>
+                                                                                            </TableRow>
+                                                                                        </React.Fragment>
+                                                                                    ))
+                                                                                })()}
+
+                                                                            {/* Sub-category Total Row */}
+                                                                            {/* {true && (
+                                                                                <TableRow className="bg-muted font-medium">
+                                                                                    <TableCell></TableCell>
+                                                                                    <TableCell className="pl-6">Total - {subCategory.name}</TableCell>
+                                                                                    <TableCell></TableCell>
+                                                                                    <TableCell></TableCell>
+                                                                                    <TableCell className="text-right">{formatAmount(subCategoryDebit)}</TableCell>
+                                                                                    <TableCell className="text-right">{formatAmount(subCategoryCredit)}</TableCell>
+                                                                                    <TableCell className="text-right">
+                                                                                        {formatAmount(subCategoryDebit - subCategoryCredit)}
+                                                                                    </TableCell>
+                                                                                </TableRow>
+                                                                            )} */}
+                                                                        </React.Fragment>
+                                                                    )
+                                                                })}
+                                                        </React.Fragment>
                                                     ))}
 
                                                 </Fragment>
@@ -1659,7 +1071,7 @@ function TrialBalanceDetailed() {
 
 
 
-                                            <Cell colSpan={4}>
+                                            <Cell colSpan={3}>
                                                 <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
                                                     Total
                                                 </Typography>
@@ -1674,6 +1086,9 @@ function TrialBalanceDetailed() {
                                                     {CommaSeparator(parseFloat(allCredit).toFixed(2))}
                                                 </Typography>
                                             </Cell>
+                                            <Cell colSpan={2} >
+                                             
+                                            </Cell>
                                         </Row>}
                                     </Fragment>
                                 </TableBody>
@@ -1683,8 +1098,9 @@ function TrialBalanceDetailed() {
                 </Fragment>
             ) : (
                 <CircleLoading />
-            )}
-        </Box>
+            )
+            }
+        </Box >
     );
 }
 

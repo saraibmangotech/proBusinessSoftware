@@ -633,6 +633,7 @@ export default function AttendanceTable() {
                         sx={{
                             borderRadius: 2,
                             height: "100%",
+                            backgroundColor:'#001f3f',
                             border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                             boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
                             transition: "transform 0.2s, box-shadow 0.2s",
@@ -644,14 +645,14 @@ export default function AttendanceTable() {
                     >
                         <CardContent sx={{ p: 3 }}>
                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary">
+                                <Typography variant="subtitle2" sx={{color:'white'}}>
                                     Total Employees
                                 </Typography>
-                                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
-                                    <Users fontSize="small" />
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'white' }}>
+                                    <Users fontSize="small" sx={{color:'white'}} />
                                 </Avatar>
                             </Box>
-                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
+                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 ,color:'white'}}>
                                 {transformedData?.length}
                             </Typography>
                         </CardContent>
@@ -663,6 +664,7 @@ export default function AttendanceTable() {
                         sx={{
                             borderRadius: 2,
                             height: "100%",
+                            
                             border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
                             boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
                             transition: "transform 0.2s, box-shadow 0.2s",
@@ -698,7 +700,7 @@ export default function AttendanceTable() {
                             height: "100%",
                             border: `1px solid ${alpha(theme.palette.error.main, 0.1)}`,
                             boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-
+                            backgroundColor:'#001f3f',
                             transition: "transform 0.2s, box-shadow 0.2s",
                             "&:hover": {
                                 transform: "translateY(-4px)",
@@ -708,17 +710,17 @@ export default function AttendanceTable() {
                     >
                         <CardContent sx={{ p: 3 }}>
                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary">
+                                <Typography variant="subtitle2" sx={{color:'white'}}>
                                     Absent Days
                                 </Typography>
-                                <Avatar sx={{ bgcolor: alpha(theme.palette.error.main, 0.1), color: theme.palette.error.main }}>
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.error.main, 0.1), color: 'white' }}>
                                     <XCircleIcon fontSize="small" />
                                 </Avatar>
                             </Box>
-                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
+                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1,color:'white' }}>
                                 {absentCount}
                             </Typography>
-                            <Typography variant="body2" color="error.main" sx={{ fontWeight: 500 }}>
+                            <Typography variant="body2" color="error.main" sx={{ fontWeight: 500,color:'white' }}>
                                 {Math.round((absentCount / totalDays) * 100)}% of total days
                             </Typography>
                         </CardContent>
@@ -766,7 +768,7 @@ export default function AttendanceTable() {
                 sx={{
                     mb: 4,
                     borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                    border: `1px solid #001f3f`,
                 }}
             >
                 <CardContent sx={{ p: { xs: 2, md: 3 } }}>
@@ -837,7 +839,7 @@ export default function AttendanceTable() {
                         bgcolor: alpha(theme.palette.primary.main, 0.1),
                         "& .MuiLinearProgress-bar": {
                             borderRadius: 4,
-                            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                            background: `linear-gradient(90deg, '#001f3f', ${theme.palette.primary.light})`,
                         },
                     }}
                 />
