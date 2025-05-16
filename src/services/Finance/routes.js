@@ -60,7 +60,8 @@ const routes = {
   getCustomerPaymentDetail:'payments/customer/details',
   getVendorPaymentDetail:'payments/vendor/details',
   CreateVoucher:'/accounts/vouchers/add',
-getNewAccountLedgers:'accounts/ledger/primary'
+getNewAccountLedgers:'accounts/ledger/primary',
+getAccountReportsDetail:'accounts/reports/tb'
 
 };
 

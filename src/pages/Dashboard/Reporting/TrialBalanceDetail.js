@@ -202,7 +202,7 @@ function TrialBalanceDetailed() {
                 from_date: moment(fromDate).format('MM-DD-YYYY'),
                 to_date: moment(toDate).format('MM-DD-YYYY'),
             }
-            const { data } = await FinanceServices.getAccountReports(params);
+            const { data } = await FinanceServices.getAccountReportsDetail(params);
             console.log(data?.detail, 'data?.detail');
 
             setBalanceSheet(data?.detail);
@@ -901,7 +901,7 @@ function TrialBalanceDetailed() {
                                                                                         netAmount = debit
                                                                                         let diff = account?.nature === "debit" ? debit - credit : credit - debit
                                                                                         subcategoryTypeGroups[subcategoryType].periodDiffTotal += diff
-                                                                                        subcategoryTypeGroups[subcategoryType].openingBalanceTotal += account.opening_balance || 0
+                                                                                        subcategoryTypeGroups[subcategoryType].openingBalanceTotal += parseFloat(account.opening_balance) || 0
                                                                                         subcategoryTypeGroups[subcategoryType].debitTotal += netAmount
 
                                                                                         netAmount = credit
@@ -922,11 +922,11 @@ function TrialBalanceDetailed() {
                                                                                                 let diff = account?.nature === "debit" ? debit - credit : credit - debit
                                                                                                 subcategoryTypeGroups[subcategoryType].periodDiffTotal += diff
                                                                                                 if (childAccount.nature === "debit") {
-                                                                                                    subcategoryTypeGroups[subcategoryType].openingBalanceTotal += account.opening_balance || 0
+                                                                                                    subcategoryTypeGroups[subcategoryType].openingBalanceTotal += parseFloat(account.opening_balance) || 0
                                                                                                     childNetAmount = childDebit
                                                                                                     subcategoryTypeGroups[subcategoryType].debitTotal += childNetAmount
                                                                                                 } else {
-                                                                                                    subcategoryTypeGroups[subcategoryType].openingBalanceTotal += account.opening_balance || 0
+                                                                                                    subcategoryTypeGroups[subcategoryType].openingBalanceTotal += parseFloat(account.opening_balance) || 0
                                                                                                     childNetAmount = childCredit
                                                                                                     subcategoryTypeGroups[subcategoryType].creditTotal += childNetAmount
                                                                                                 }
@@ -967,7 +967,7 @@ function TrialBalanceDetailed() {
                                                                                                                     {account.account_name}
                                                                                                                 </TableCell>
 
-                                                                                                                <TableCell className="text-right">{account.opening_balance || 0.0}</TableCell>
+                                                                                                                <TableCell className="text-right">{parseFloat(account.opening_balance) || 0.0}</TableCell>
                                                                                                                 <TableCell className="text-right">
                                                                                                                     {formatAmount(account.total_debit)}
                                                                                                                 </TableCell>
@@ -984,7 +984,7 @@ function TrialBalanceDetailed() {
 
                                                                                                                 <TableCell className="text-right">
                                                                                                                     {parseFloat(
-                                                                                                                        parseFloat(account.opening_balance || 0.0) +
+                                                                                                                        parseFloat(parseFloat(account.opening_balance) || 0.0) +
                                                                                                                         (account.nature === "debit"
                                                                                                                             ? parseFloat(account.total_debit) - parseFloat(account.total_credit)
                                                                                                                             : parseFloat(account.total_credit) - parseFloat(account.total_debit))
