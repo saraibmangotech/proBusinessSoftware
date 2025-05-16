@@ -624,149 +624,13 @@ export default function AttendanceTable() {
                     </Typography>
                 </Box>
             </Box>
-
-            {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            borderRadius: 2,
-                            height: "100%",
-                            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-                            transition: "transform 0.2s, box-shadow 0.2s",
-                            "&:hover": {
-                                transform: "translateY(-4px)",
-                                boxShadow: theme.shadows[4],
-                            },
-                        }}
-                    >
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary">
-                                    Total Employees
-                                </Typography>
-                                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
-                                    <Users fontSize="small" />
-                                </Avatar>
-                            </Box>
-                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
-                                {transformedData?.length}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            borderRadius: 2,
-                            height: "100%",
-                            border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
-                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-                            transition: "transform 0.2s, box-shadow 0.2s",
-                            "&:hover": {
-                                transform: "translateY(-4px)",
-                                boxShadow: theme.shadows[4],
-                            },
-                        }}
-                    >
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary">
-                                    Present Days
-                                </Typography>
-                                <Avatar sx={{ bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main }}>
-                                    <CheckCircleIcon fontSize="small" />
-                                </Avatar>
-                            </Box>
-                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
-                                {presentCount}
-                            </Typography>
-                            <Typography variant="body2" color="success.main" sx={{ fontWeight: 500 }}>
-                                {Math.round((presentCount / totalDays) * 100)}% of total days
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            borderRadius: 2,
-                            height: "100%",
-                            border: `1px solid ${alpha(theme.palette.error.main, 0.1)}`,
-                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-
-                            transition: "transform 0.2s, box-shadow 0.2s",
-                            "&:hover": {
-                                transform: "translateY(-4px)",
-                                boxShadow: theme.shadows[4],
-                            },
-                        }}
-                    >
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary">
-                                    Absent Days
-                                </Typography>
-                                <Avatar sx={{ bgcolor: alpha(theme.palette.error.main, 0.1), color: theme.palette.error.main }}>
-                                    <XCircleIcon fontSize="small" />
-                                </Avatar>
-                            </Box>
-                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
-                                {absentCount}
-                            </Typography>
-                            <Typography variant="body2" color="error.main" sx={{ fontWeight: 500 }}>
-                                {Math.round((absentCount / totalDays) * 100)}% of total days
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            borderRadius: 2,
-                            height: "100%",
-                            border: `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
-                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-
-                            transition: "transform 0.2s, box-shadow 0.2s",
-                            "&:hover": {
-                                transform: "translateY(-4px)",
-                                boxShadow: theme.shadows[4],
-                            },
-                        }}
-                    >
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary">
-                                    Total Work Hours
-                                </Typography>
-                                <Avatar sx={{ bgcolor: alpha(theme.palette.warning.main, 0.1), color: theme.palette.warning.main }}>
-                                    <Clock fontSize="small" />
-                                </Avatar>
-                            </Box>
-                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
-                                4h 43m
-                            </Typography>
-                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 500 }}>
-                                For May 2025
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-
-            {/* Filters */}
-            <Card
+   {/* Filters */}
+   <Card
                 elevation={0}
                 sx={{
                     mb: 4,
                     borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                    border: `1px solid #001f3f`,
                 }}
             >
                 <CardContent sx={{ p: { xs: 2, md: 3 } }}>
@@ -819,6 +683,144 @@ export default function AttendanceTable() {
                     </Grid>
                 </CardContent>
             </Card>
+            {/* Summary Cards */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 2,
+                            height: "100%",
+                            backgroundColor:'#001f3f',
+                            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                            transition: "transform 0.2s, box-shadow 0.2s",
+                            "&:hover": {
+                                transform: "translateY(-4px)",
+                                boxShadow: theme.shadows[4],
+                            },
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                                <Typography variant="subtitle2" sx={{color:'white'}}>
+                                    Total Employees
+                                </Typography>
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'white' }}>
+                                    <Users fontSize="small" sx={{color:'white'}} />
+                                </Avatar>
+                            </Box>
+                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 ,color:'white'}}>
+                                {transformedData?.length}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 2,
+                            height: "100%",
+                            
+                            border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
+                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                            transition: "transform 0.2s, box-shadow 0.2s",
+                            "&:hover": {
+                                transform: "translateY(-4px)",
+                                boxShadow: theme.shadows[4],
+                            },
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    Present Days
+                                </Typography>
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main }}>
+                                    <CheckCircleIcon fontSize="small" />
+                                </Avatar>
+                            </Box>
+                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
+                                {presentCount}
+                            </Typography>
+                            <Typography variant="body2" color="success.main" sx={{ fontWeight: 500 }}>
+                                {Math.round((presentCount / totalDays) * 100)}% of total days
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 2,
+                            height: "100%",
+                            border: `1px solid ${alpha(theme.palette.error.main, 0.1)}`,
+                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                            backgroundColor:'#001f3f',
+                            transition: "transform 0.2s, box-shadow 0.2s",
+                            "&:hover": {
+                                transform: "translateY(-4px)",
+                                boxShadow: theme.shadows[4],
+                            },
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                                <Typography variant="subtitle2" sx={{color:'white'}}>
+                                    Absent Days
+                                </Typography>
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.error.main, 0.1), color: 'white' }}>
+                                    <XCircleIcon fontSize="small" />
+                                </Avatar>
+                            </Box>
+                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1,color:'white' }}>
+                                {absentCount}
+                            </Typography>
+                            <Typography variant="body2" color="error.main" sx={{ fontWeight: 500,color:'white' }}>
+                                {Math.round((absentCount / totalDays) * 100)}% of total days
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 2,
+                            height: "100%",
+                            border: `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
+                            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+
+                            transition: "transform 0.2s, box-shadow 0.2s",
+                            "&:hover": {
+                                transform: "translateY(-4px)",
+                                boxShadow: theme.shadows[4],
+                            },
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    Total Work Hours
+                                </Typography>
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.warning.main, 0.1), color: theme.palette.warning.main }}>
+                                    <Clock fontSize="small" />
+                                </Avatar>
+                            </Box>
+                            <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
+                                4h 43m
+                            </Typography>
+                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 500 }}>
+                                For May 2025
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+
+         
 
             {/* Attendance Progress */}
             <Box sx={{ mb: 3 }}>
@@ -837,7 +839,7 @@ export default function AttendanceTable() {
                         bgcolor: alpha(theme.palette.primary.main, 0.1),
                         "& .MuiLinearProgress-bar": {
                             borderRadius: 4,
-                            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                            background: `linear-gradient(90deg, '#001f3f', ${theme.palette.primary.light})`,
                         },
                     }}
                 />
