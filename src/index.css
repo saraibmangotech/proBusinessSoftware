@@ -1455,3 +1455,6 @@ th {
     background-color: transparent !important;
     border: 1px solid black !important;
   }
+  .recharts-responsive-container{
+    padding: 5px !important;
+  }

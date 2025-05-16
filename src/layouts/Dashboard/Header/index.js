@@ -604,34 +604,7 @@ function Header() {
     }
     else {
       setNavigationData([
-        {
-          id: 22,
-          name: "HRMS",
-          icon: "customer",
-          parent_id: null,
-          api: "/api/customers",
-          route: "",
-          identifier: null,
-          navigation: true,
-          order_by: 2,
-          children: [
-            {
-              id: 55,
-              name: "Attendance Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/attendance-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-           
-
-
-
-          ],
-        },
+      
         {
           id: 2,
           name: "Receptions",
@@ -1114,7 +1087,7 @@ function Header() {
               icon: "customer",
               parent_id: 12,
               api: null,
-              route: "/trial-balance",
+              route: "/trial-balance-detailed",
               identifier: null,
               navigation: true,
               order_by: 39,
@@ -1156,6 +1129,34 @@ function Header() {
             "/profit-loss-customer-report",
             "/balance-sheet",
             "/profit-loss-visa-report",
+          ],
+        },
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+           
+
+
+
           ],
         },
         {
