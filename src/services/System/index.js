@@ -75,6 +75,14 @@ const SystemServices = {
     const data = await patch(routes.UpdateCost,obj);
     return data;
   },
+  UpdateSettings: async (obj) => {
+    const data = await patch(routes.UpdateSettings,obj);
+    return data;
+  },
+  getSettings: async () => {
+    const data = await get(routes.getSettings);
+    return data;
+  },
   getBranches: async () => {
     const data = await get(routes.getBranches);
     return data;

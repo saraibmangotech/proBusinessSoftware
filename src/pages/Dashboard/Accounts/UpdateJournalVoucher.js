@@ -208,6 +208,7 @@ function UpadateJournalVoucher() {
       console.log(updatedAccounts, 'updatedAccounts');
 
       setRows(updatedAccounts)
+      setFromDate(new Date(data?.voucher?.created_at))
       setValue1('Journal', `JV-${data?.voucher?.entries[0]?.jv_id}`)
       setValue('note', data?.voucher?.notes)
       const newTotalCredit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
@@ -474,7 +475,7 @@ function UpadateJournalVoucher() {
     getAccounts()
     getMajorCategories()
     getSubCategories()
-    setFromDate(new Date())
+    //setFromDate(new Date())
     getJournalVouchers()
     getCostCenters()
   }, []);
