@@ -210,7 +210,7 @@ function UpadateJournalVoucher() {
       setRows(updatedAccounts)
       setFromDate(new Date(data?.voucher?.created_at))
       setValue1('Journal', `JV-${data?.voucher?.entries[0]?.jv_id}`)
-      setValue('note', data?.voucher?.notes)
+      setValue1('note', data?.voucher?.notes)
       const newTotalCredit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
       const newTotalDebit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
 
@@ -346,7 +346,7 @@ function UpadateJournalVoucher() {
       const obj = {
         id: id,
         total: totalDebit,
-        notes: getValues('note'),
+        notes: getValues1('note'),
         entries: rows,
         created_at: getYearMonthDateFormate(fromDate),
         cost_center: selectedCostCenter.name
@@ -411,7 +411,9 @@ function UpadateJournalVoucher() {
     });
 
     setSelectedAccount(null);
-    reset();
+    setValue('debit','')
+    setValue('credit','')
+    setValue('description','')
   };
     // *For Get Account
     const getChildAccounts = async (accountId) => {
@@ -467,7 +469,10 @@ function UpadateJournalVoucher() {
 
     setSelectedAccount(null);
     setSelectedRow(null);
-    reset();
+    setSelectedAccount(null);
+    setValue('debit','')
+    setValue('credit','')
+    setValue('description','')
   };
 
 
@@ -551,7 +556,7 @@ function UpadateJournalVoucher() {
                   <SelectField
                     size="small"
                     options={accounts}
-                    disabled={editState}
+                 
                     selected={selectedAccount}
                     onSelect={(value) => {
                       setSelectedAccount(value)
@@ -768,7 +773,7 @@ function UpadateJournalVoucher() {
             <InputField
               label={'Note'}
               placeholder={'Note'}
-              register={register("note")}
+              register={register1("note")}
             />
           </Grid>
         </Grid>

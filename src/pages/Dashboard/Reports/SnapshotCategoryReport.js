@@ -335,7 +335,7 @@ function SnapshotCategoryReport() {
 
 
         {
-            header: "Total service charge",
+            header: "Net service charge",
             accessorKey: "netCharges",
             accessorFn: (row) => {
                 const net = parseFloat(row?.netCharges || 0);
@@ -360,7 +360,7 @@ function SnapshotCategoryReport() {
             },
         }
         
-
+,
         {
             header: "Gross Invoice Amount",
             accessorKey: "netCharges",
