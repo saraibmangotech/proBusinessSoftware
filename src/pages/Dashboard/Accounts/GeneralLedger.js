@@ -661,7 +661,7 @@ function GeneralLedger() {
                       Opening Balance
                     </Typography>
                     <Typography variant="body1" sx={{ mt: 1 }}>
-                      {/* Replace with actual value or variable */}
+                     
                       0.00
                     </Typography>
                   </Grid>
@@ -670,7 +670,7 @@ function GeneralLedger() {
                       Closing Balance
                     </Typography>
                     <Typography variant="body1" sx={{ mt: 1 }}>
-                      {/* Replace with actual value or variable */}
+                    
                       0.00
                     </Typography>
                   </Grid>
