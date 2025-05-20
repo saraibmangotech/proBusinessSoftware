@@ -568,6 +568,111 @@ function TrialBalanceDetailed() {
       };
       
       
+      const downloadExcel2 = async () => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Trial Balance");
+      
+        const headers = [
+          "Account Code",
+          "Account Name",
+          "Opening Balance",
+          "Total Debit",
+          "Total Credit",
+          "Period Difference",
+          "Balance",
+        ];
+      
+        worksheet.addRow(headers).eachCell(cell => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '808080' },
+          };
+          cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+        });
+      
+        let grandOpening = 0, grandDebit = 0, grandCredit = 0, grandDiff = 0, grandBalance = 0;
+      
+        filteredBalanceSheet.forEach(category => {
+          const catRow = worksheet.addRow([category.name]);
+          catRow.getCell(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '4472C4' },
+          };
+          catRow.getCell(1).font = { bold: true, color: { argb: 'FFFFFF' } };
+      
+          category.sub?.forEach(subCategory => {
+            let totalOpening = 0, totalDebit = 0, totalCredit = 0, totalDiff = 0, totalBalance = 0;
+      
+            subCategory.accounts?.forEach(account => {
+              const debit = parseFloat(account.total_debit) || 0;
+              const credit = parseFloat(account.total_credit) || 0;
+              const opening = parseFloat(account.opening_balance) || 0;
+              const periodDiff = account.nature === "debit" ? debit - credit : credit - debit;
+              const closingBalance = opening + periodDiff;
+      
+              totalOpening += opening;
+              totalDebit += debit;
+              totalCredit += credit;
+              totalDiff += periodDiff;
+              totalBalance += closingBalance;
+            });
+      
+            // Show only subcategory (parent account) with total of its children
+            const summaryRow = worksheet.addRow([
+              "", // No account code for subCategory
+              subCategory.name,
+              totalOpening.toFixed(2),
+              totalDebit.toFixed(2),
+              totalCredit.toFixed(2),
+              totalDiff.toFixed(2),
+              totalBalance.toFixed(2),
+            ]);
+            summaryRow.getCell(2).font = { bold: true };
+      
+            // Update grand totals
+            grandOpening += totalOpening;
+            grandDebit += totalDebit;
+            grandCredit += totalCredit;
+            grandDiff += totalDiff;
+            grandBalance += totalBalance;
+          });
+        });
+      
+        const grandTotalRow = worksheet.addRow([
+          "Grand Total",
+          "",
+          grandOpening.toFixed(2),
+          grandDebit.toFixed(2),
+          grandCredit.toFixed(2),
+          grandDiff.toFixed(2),
+          grandBalance.toFixed(2),
+        ]);
+      
+        grandTotalRow.eachCell(cell => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '000000' },
+          };
+          cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+        });
+      
+        worksheet.columns = [
+          { width: 15 },
+          { width: 30 },
+          { width: 18 },
+          { width: 18 },
+          { width: 18 },
+          { width: 18 },
+          { width: 18 },
+        ];
+      
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        saveAs(blob, "TrialBalance.xlsx");
+      };
       
     
 
@@ -727,6 +832,7 @@ function TrialBalanceDetailed() {
                             title={"Export To Excel"}
                             onClick={() => downloadExcel()}
                         />
+                        
                     </Box>
                 )}
             </Box>
