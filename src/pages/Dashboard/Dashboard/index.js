@@ -237,8 +237,8 @@ function Dashboard() {
       trendUp: true,
     },
     {
-      title: "Employee Service Count",
-      value: statsDetail?.detailedStats?.totalServiceCount,
+      title: "Total Invoices",
+      value: statsDetail?.detailedStats?.totalSalesReceipts,
       icon: <DescriptionIcon />,
       color: THEME.secondary,
       bgColor: THEME.secondary,
@@ -246,22 +246,22 @@ function Dashboard() {
       trendUp: true,
     },
     {
-      title: "Sales Categories",
-      value: statsDetail?.categoriesCount,
+      title: "Total Services Sold",
+      value: statsDetail?.detailedStats?.totalServiceCount,
       icon: <SendIcon />,
       color: THEME.accent2,
       bgColor: THEME.accent2,
       trend: "",
-      // trendUp: true,
+       trendUp: true,
     },
     {
-      title: "Total Quantity Sold",
-      value: statsDetail?.detailedStats?.quantity,
+      title: "Total Collection",
+      value: statsDetail?.overviewReport?.totalAmount?.toFixed(2),
       icon: <TaskAltIcon />,
       color: THEME.success,
       bgColor: THEME.success,
       trend: "-2%",
-      trendUp: false,
+      trendUp: true,
     },
   ];
   
@@ -393,11 +393,11 @@ function Dashboard() {
       console.log(data?.detailedStats?.resultByCategory)
       const result = data?.detailedStats?.resultByCategory?.map(item => ({
         name: item.category_name,
-        value: parseFloat(item.total_quantity)
+        value: parseFloat(item.item_count)
       }));
       const result2 = data?.detailedStats?.resultByTypist?.map(item => ({
         name: item.creator_name,
-        value: parseFloat(item.total_quantity)
+        value: parseFloat(item.item_count)
       }));
       console.log(result);
       setEmployeess(result2)
@@ -696,7 +696,7 @@ function Dashboard() {
               }}
             >
               <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Weekly Sales Graph
+                Monthly Sales Graph
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={statsDetail?.salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -733,7 +733,7 @@ function Dashboard() {
               }}
             >
               <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Category Distribution
+                Category Wise Service Distribution
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -830,17 +830,18 @@ function Dashboard() {
               }}
             >
               <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Employee Service Distribution
+                Typist Wise Service Distribution
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={employeess} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" tick={false} />
                   <YAxis />
                   <RechartsTooltip />
                   <Bar dataKey="value" fill={THEME.accent1} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+
             </Card>
           </Grid>
 
@@ -914,7 +915,7 @@ function Dashboard() {
                   }}
                 >
                   <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                    Weekly Sales Graph
+                    Monthly Sales Graph
                   </Typography>
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={statsDetail?.salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>

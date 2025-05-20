@@ -12,6 +12,7 @@ import GalaxyCustomers from "pages/Dashboard/Customers/GalaxyCustomers";
 import MyCustomers from "pages/Dashboard/Customers/MyCustomers";
 import MyVehicles from "pages/Dashboard/Customers/MyVehicles";
 import UpdateCustomer from "pages/Dashboard/Customers/UpdateCustomer";
+import SystemSettings from "pages/Dashboard/Settings/SystemSettings";
 
 import CandidateDetail from "pages/Dashboard/Visa/CandidateDetail";
 import VisaDetail from "pages/Dashboard/Visa/VisaDetail";
@@ -427,6 +428,10 @@ const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
 const AdminRoutes = [
+  {
+    path: "/system-settings",
+    component: <SystemSettings />,
+  },
   {
     path: "/attendance-report",
     component: <AttendanceTable />,
