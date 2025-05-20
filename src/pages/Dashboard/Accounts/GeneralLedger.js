@@ -149,7 +149,8 @@ function GeneralLedger() {
   // *For Accounts
   const [childAccounts, setChildAccounts] = useState([]);
   const [selectedChildAccount, setSelectedChildAccount] = useState(null);
-
+  const [openingBal, setOpeningBal] = useState(0)
+  const [closingBal, setClosingBal] = useState(0)
   // *For Pagination
   const [totalCount, setTotalCount] = useState(0);
   const [pageLimit, setPageLimit] = useState(50);
@@ -236,6 +237,8 @@ function GeneralLedger() {
       const { data } = await FinanceServices.getAccountLedgers(params);
       setAccountLedgers(data?.statement?.rows);
       setTotalCount(data?.statement?.count);
+      setOpeningBal(data?.statement?.opening_balance)
+      setClosingBal(data?.state?.rows[data?.state?.rows?.length - 1]?.opening_balance)
       setTotalBalance(data?.statement?.opening_balance_aed);
     } catch (error) {
       showErrorToast(error);
@@ -259,7 +262,7 @@ function GeneralLedger() {
       params = { ...params, ...Filter };
       const { data } = await FinanceServices.getAccountLedgers(params);
       setAccountLedgers2(data?.statement?.rows);
-   
+
     } catch (error) {
       showErrorToast(error);
     } finally {
@@ -287,7 +290,7 @@ function GeneralLedger() {
       getAccountLedgers2(1, "", data);
     })(); // assuming Debounce is a debounce function
   };
-  
+
   const downloadExcel = () => {
     const headers = tableHead.filter((item) => item !== "Action");
     const data = accountLedgers2;
@@ -651,6 +654,28 @@ function GeneralLedger() {
                   </TableBody>
                 </Table>
               </TableContainer>
+              {/* <Box sx={{ mt: 4 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} display={'flex'} gap={1}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      Opening Balance
+                    </Typography>
+                    <Typography variant="body1" sx={{ mt: 1 }}>
+                      {/* Replace with actual value or variable */}
+                      0.00
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} display={'flex'} gap={1}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      Closing Balance
+                    </Typography>
+                    <Typography variant="body1" sx={{ mt: 1 }}>
+                      {/* Replace with actual value or variable */}
+                      0.00
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Box> */}
             </PDFExport>
             {/* ========== Pagination ========== */}
             <Pagination

@@ -193,10 +193,10 @@ function UpadateJournalVoucher() {
       }
       const { data } = await FinanceServices.getJournalVoucherDetail(params)
       setVoucherDetail(data.voucher)
-      if(data?.voucher?.cost_center){
+      if (data?.voucher?.cost_center) {
         setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
       }
-      
+
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
         name: ` ${account?.account?.account_code} ${account?.account?.name}`,
@@ -340,7 +340,7 @@ function UpadateJournalVoucher() {
       showErrorToast('Cost Center is required');
       return;
     }
-  
+
     setLoading(true);
     try {
       const obj = {
@@ -351,16 +351,16 @@ function UpadateJournalVoucher() {
         created_at: getYearMonthDateFormate(fromDate),
         cost_center: selectedCostCenter.name
       };
-  
+
       const promise = FinanceServices.UpdateJournalVoucher(obj);
-  
+
       showPromiseToast(
         promise,
         'Saving...',
         'Added Successfully',
         'Something Went Wrong'
       );
-  
+
       const response = await promise;
       if (response?.responseCode === 200) {
         navigate('/journal-voucher-list');
@@ -371,13 +371,13 @@ function UpadateJournalVoucher() {
       setLoading(false);
     }
   };
-  
+
   const addItem = (data) => {
     if (childAccounts?.length > 0) {
       showErrorToast("Cannot use this account because it has child accounts.");
       return
     }
-    
+
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
@@ -411,24 +411,24 @@ function UpadateJournalVoucher() {
     });
 
     setSelectedAccount(null);
-    setValue('debit','')
-    setValue('credit','')
-    setValue('description','')
+    setValue('debit', '')
+    setValue('credit', '')
+    setValue('description', '')
   };
-    // *For Get Account
-    const getChildAccounts = async (accountId) => {
-      try {
-        let params = {
-          page: 1,
-          limit: 50,
-          primary_account_id: accountId ?? selectedAccount?.id,
-        };
-        const { data } = await FinanceServices.getAccounts(params);
-        setChildAccounts(data?.accounts?.rows);
-      } catch (error) {
-        showErrorToast(error);
-      }
-    };
+  // *For Get Account
+  const getChildAccounts = async (accountId) => {
+    try {
+      let params = {
+        page: 1,
+        limit: 50,
+        primary_account_id: accountId ?? selectedAccount?.id,
+      };
+      const { data } = await FinanceServices.getAccounts(params);
+      setChildAccounts(data?.accounts?.rows);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
 
   const updateItem = (data) => {
     if (!selectedRow) {
@@ -470,9 +470,9 @@ function UpadateJournalVoucher() {
     setSelectedAccount(null);
     setSelectedRow(null);
     setSelectedAccount(null);
-    setValue('debit','')
-    setValue('credit','')
-    setValue('description','')
+    setValue('debit', '')
+    setValue('credit', '')
+    setValue('description', '')
   };
 
 
@@ -556,7 +556,7 @@ function UpadateJournalVoucher() {
                   <SelectField
                     size="small"
                     options={accounts}
-                 
+
                     selected={selectedAccount}
                     onSelect={(value) => {
                       setSelectedAccount(value)
@@ -761,6 +761,8 @@ function UpadateJournalVoucher() {
             </TableBody>
           </Table>
         </TableContainer>
+    
+
         <Grid container spacing={2} >
           <Grid item xs={12} sm={12}>
             {parseFloat(totalCredit).toFixed(2) != parseFloat(totalDebit).toFixed(2) &&
