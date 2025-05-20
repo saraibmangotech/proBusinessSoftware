@@ -304,9 +304,9 @@ function PrepaidInvoices() {
   
           <Box sx={{display:'flex',gap:1}}>
             {/* {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/reception-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>} */}
-            {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-prepaid-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-prepaid-invoice') }} src={Images.editIcon} width={'35px'}></Box>}
+            {row?.original?.months_recorded == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-prepaid-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-prepaid-invoice') }} src={Images.editIcon} width={'35px'}></Box>}
             <Box>
-              {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+              {row?.original?.months_recorded == 0 && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
   
               {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
             </Box>
