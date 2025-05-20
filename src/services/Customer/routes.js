@@ -125,7 +125,18 @@ const routes = {
   getPaymentInvoices:'/purchases/invoice/payments',
   getInvoicesPayments:'/purchases/invoice/specific/payments',
   getInvoiceNumberToken:'/purchases/invoice/number',
-  getCostCenters:'system/costCenters'
+  getCostCenters:'system/costCenters',
+  CreatePrepaidInvoices:'/purchases/prepaidExpenses/add',
+  getPrepaidList:'/purchases/prepaidExpenses/',
+  deletePrepaid:'/purchases/prepaidExpenses/delete',
+  getPrepaidDetail:'/purchases/prepaidExpenses/details',
+  UpdatePrepaidInvoices:'/purchases/prepaidExpenses/update',
+  CreateFixedAssets:'/purchases/fixedAssets/add',
+  UpdateFixedAssets:'/purchases/fixedAssets/update',
+  getFixedAssets:'/purchases/fixedAssets/',
+  getFixedAssetsDetail:'/purchases/fixedAssets/details',
+  deleteFixedAssets:"/purchases/fixedAssets/delete"
+
 
 };
 

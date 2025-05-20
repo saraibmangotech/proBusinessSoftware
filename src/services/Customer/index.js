@@ -6,6 +6,14 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+  CreatePrepaidInvoices: async (obj) => {
+    const data = await post(routes.CreatePrepaidInvoices, obj);
+    return data;
+  },
+  CreateFixedAssets: async (obj) => {
+    const data = await post(routes.CreateFixedAssets, obj);
+    return data;
+  },
   CreateVendor: async (obj) => {
     const data = await post(routes.CreateVendor, obj);
     return data;
@@ -74,6 +82,14 @@ const CustomerServices = {
     const data = await deleted(routes.DeleteBank, obj);
     return data;
   },
+  deleteFixedAssets: async (obj) => {
+    const data = await deleted(routes.deleteFixedAssets, obj);
+    return data;
+  },
+  deletePrepaid: async (obj) => {
+    const data = await deleted(routes.deletePrepaid, obj);
+    return data;
+  },
   deleteNotes: async (obj) => {
     const data = await deleted(routes.deleteNotes, obj);
     return data;
@@ -104,6 +120,14 @@ const CustomerServices = {
   },
   UpdateWPStatus: async (obj) => {
     const data = await patch(routes.UpdateWPStatus, obj);
+    return data;
+  },
+  UpdatePrepaidInvoices: async (obj) => {
+    const data = await patch(routes.UpdatePrepaidInvoices, obj);
+    return data;
+  },
+  UpdateFixedAssets: async (obj) => {
+    const data = await patch(routes.UpdateFixedAssets, obj);
     return data;
   },
   UpdateVendor: async (obj) => {
@@ -186,6 +210,18 @@ const CustomerServices = {
     const data = await get(routes.getVoucherToken, params);
     return data;
   },
+  getPrepaidDetail: async (params) => {
+    const data = await get(routes.getPrepaidDetail, params);
+    return data;
+  },
+  getFixedAssetsDetail: async (params) => {
+    const data = await get(routes.getFixedAssetsDetail, params);
+    return data;
+  },
+  getFixedAssets: async (params) => {
+    const data = await get(routes.getFixedAssets, params);
+    return data;
+  },
   getInvoicesPayments: async (params) => {
     const data = await get(routes.getInvoicesPayments, params);
     return data;
@@ -200,6 +236,10 @@ const CustomerServices = {
   },
   getVendors: async (params) => {
     const data = await get(routes.getVendors, params);
+    return data;
+  },
+  getPrepaidList: async (params) => {
+    const data = await get(routes.getPrepaidList, params);
     return data;
   },
   getPurchaseInvoices: async (params) => {

@@ -424,6 +424,24 @@ const SupplierLedgers= lazy(() =>
 const UpdateJournalVoucher= lazy(() =>
   import("pages/Dashboard/Accounts/UpdateJournalVoucher")
 );
+const CreatePrepaidInvoice= lazy(() =>
+  import("pages/Dashboard/Invoice/CreatePrePaidInvoices")
+);
+const PrepaidInvoices= lazy(() =>
+  import("pages/Dashboard/Invoice/PrepaidInvoices")
+);
+const UpdatePrepaidInvoices= lazy(() =>
+  import("pages/Dashboard/Invoice/UpdatePrepaidInvoice")
+);
+const CreateFixedAssets= lazy(() =>
+  import("pages/Dashboard/Invoice/CreateFixedAssets")
+);
+const FixedAssets= lazy(() =>
+  import("pages/Dashboard/Invoice/FixedAssets")
+);
+const UpdateFixedAssets= lazy(() =>
+  import("pages/Dashboard/Invoice/UpdateFixedAssets")
+);
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
@@ -435,6 +453,14 @@ const AdminRoutes = [
   {
     path: "/attendance-report",
     component: <AttendanceTable />,
+  },
+  {
+    path: "/prepaid-invoices",
+    component: <PrepaidInvoices />,
+  },
+  {
+    path: "/fixed-assets",
+    component: <FixedAssets />,
   },
   {
     path: "/create-service-item",
@@ -563,6 +589,14 @@ const AdminRoutes = [
   {
     path: "/update-product/:id",
     component: <UpdateProduct />,
+  },
+  {
+    path: "/update-prepaid-invoice/:id",
+    component: <UpdatePrepaidInvoices />,
+  },
+  {
+    path: "/update-fixed-assets/:id",
+    component: <UpdateFixedAssets />,
   },
   {
     path: "/update-product-category/:id",
@@ -724,6 +758,14 @@ const AdminRoutes = [
   {
     path: "/create-reception",
     component: <CreateReception />,
+  },
+  {
+    path: "/create-prepaid-invoice",
+    component: <CreatePrepaidInvoice />,
+  },
+  {
+    path: "/create-fixed-assets",
+    component: <CreateFixedAssets />,
   },
   {
     path: "/category-list",

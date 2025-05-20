@@ -878,6 +878,28 @@ function Header() {
           children: [
             {
               id: 1501,
+              name: "Prepaid Invoices",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/purchase/orders",
+              route: "/prepaid-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 1,
+            },
+            {
+              id: 1501,
+              name: "Fixed Assets",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/purchase/orders",
+              route: "/fixed-assets",
+              identifier: null,
+              navigation: true,
+              order_by: 1,
+            },
+            {
+              id: 1501,
               name: "Vendor Management",
               icon: "customer",
               parent_id: 15,
