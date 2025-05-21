@@ -605,9 +605,9 @@ function CreatePrepaidInvoices() {
                             </Grid>
                             <Grid item xs={2.8}>
                                 <InputField
-                                    label={" Amortization Months *:"}
+                                    label={" Depreciation Months *:"}
                                     size={"small"}
-                                    placeholder={" Amortization Months "}
+                                    placeholder={" Depreciation Months "}
                                     error={errors1?.months?.message}
                                     register={register1("months", {
                                         required: "Please enter months.",
