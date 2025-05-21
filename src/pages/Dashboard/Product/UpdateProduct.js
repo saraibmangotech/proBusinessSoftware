@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Checkbox, Container, FormControlLabel, Grid, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, Checkbox, Container, FormControlLabel, FormLabel, Grid, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
 import RegisterContainer from 'container/Register'
 import { useTheme } from '@mui/material/styles';
 import MobileStepper from '@mui/material/MobileStepper';
@@ -108,6 +108,8 @@ function UpdateProduct() {
 
     // *For Stepper Forms Data
     const [stepFormData, setStepFormData] = useState()
+    const [hasInventory, setHasInventory] = useState(false);
+
 
     const [selectedType, setSelectedType] = useState(null)
     const [date, setDate] = useState(null)
@@ -149,7 +151,8 @@ function UpdateProduct() {
                 sku: formData?.sku,
                 unit: formData?.unit,
                 description: formData?.description,
-                impact_account_id:selectedAccount?.id
+                impact_account_id: selectedAccount?.id,
+                is_inventory:hasInventory
 
 
             };
@@ -242,6 +245,7 @@ function UpdateProduct() {
             setValue1('sku', detail?.sku)
             setValue1('unit', detail?.unit)
             setValue1('price', detail?.price)
+            setHasInventory(detail?.is_inventory)
 
         } catch (error) {
             console.error("Error fetching location:", error);
@@ -271,12 +275,12 @@ function UpdateProduct() {
         }
     }
     useEffect(() => {
-        if(ApiDetail){
-            setSelectedAccount(accounts?.find(item=> item?.id == ApiDetail?.impact_account_id))
+        if (ApiDetail) {
+            setSelectedAccount(accounts?.find(item => item?.id == ApiDetail?.impact_account_id))
         }
-     
-    }, [accounts,ApiDetail])
-    
+
+    }, [accounts, ApiDetail])
+
     useEffect(() => {
         getAccounts()
         getData()
@@ -390,7 +394,19 @@ function UpdateProduct() {
                                             })}
                                         />
                                     </Grid>
+                                    {/* ✅ Inventory Checkbox */}
+                                    <Grid item xs={3} mt={4} display={'flex'} gap={1} alignItems={'center'}>
+                                        <FormLabel sx={{ fontWeight: 'bold', color: 'black' }}>Inventory</FormLabel>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={hasInventory}
+                                                    onChange={(e) => setHasInventory(e.target.checked)}
+                                                />
+                                            }
 
+                                        />
+                                    </Grid>
                                 </Grid>
 
 
@@ -399,7 +415,7 @@ function UpdateProduct() {
                                     <PrimaryButton
 
                                         bgcolor={'#001f3f'}
-                                        title="Submit"
+                                        title="Update"
                                         type={'submit'}
 
 

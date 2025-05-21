@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Checkbox, Container, FormControlLabel, Grid, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, Checkbox, Container, FormControlLabel, FormLabel, Grid, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
 import RegisterContainer from 'container/Register'
 import { useTheme } from '@mui/material/styles';
 import MobileStepper from '@mui/material/MobileStepper';
@@ -100,6 +100,7 @@ function CreateProduct() {
     const [uploadedSize, setUploadedSize] = useState(0);
     const [slipDetail, setSlipDetail] = useState([]);
     const [categories, setCategories] = useState([])
+    const [hasInventory, setHasInventory] = useState(false);
 
     const [emailVerify, setEmailVerify] = useState(false)
 
@@ -147,7 +148,8 @@ function CreateProduct() {
                 sku: formData?.sku,
                 unit: formData?.unit,
                 description: formData?.description,
-                impact_account_id: selectedAccount?.id
+                impact_account_id: selectedAccount?.id,
+                is_inventory:hasInventory
 
 
             };
@@ -276,123 +278,121 @@ function CreateProduct() {
 
             </Box>
             <Box m={3} sx={{ backgroundColor: 'white', borderRadius: "12px" }} >
-                {<>
+            <>
+  <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', p: 3, alignItems: 'flex-end' }}>
+      <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }}>Create Product</Typography>
+    </Box>
 
-                    <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', p: 3, alignItems: 'flex-end' }}>
-                            <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Create Product</Typography>
+    <Box sx={{ p: 3 }}>
+      <Grid container gap={2} justifyContent={'space-between'}>
+        <Grid container item xs={12} spacing={2} p={2} sx={{ borderRadius: '12px' }}>
+          {/* Existing fields */}
+          <Grid item xs={3}>
+            <InputField
+              label={" Name :*"}
+              size={'small'}
+              placeholder={" Name"}
+              error={errors1?.name?.message}
+              register={register1("name", {
+                required: "Please enter your name."
+              })}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <SelectField
+              size="small"
+              label="Select Category"
+              options={categories}
+              selected={selectedCategory}
+              onSelect={(value) => setSelectedCategory(value)}
+              register={register("category", { required: "category is required" })}
+              error={errors?.category?.message}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <SelectField
+              size="small"
+              label="Select Impact Account"
+              options={accounts}
+              selected={selectedAccount}
+              onSelect={(value) => setSelectedAccount(value)}
+              register={register("account", { required: "account is required" })}
+              error={errors?.account?.message}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <InputField
+              label={" Price :*"}
+              size={'small'}
+              placeholder={" Price"}
+              error={errors1?.price?.message}
+              register={register1("price", {
+                required: 'price is required',
+              })}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <InputField
+              label={" SKU :*"}
+              size={'small'}
+              placeholder={" SKU"}
+              error={errors1?.sku?.message}
+              register={register1("sku", {
+                required: false
+              })}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <InputField
+              label={" Unit :*"}
+              size={'small'}
+              placeholder={" Unit"}
+              error={errors1?.unit?.message}
+              register={register1("unit", {
+                required: 'unit is required',
+              })}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <InputField
+              label={" Description :*"}
+              size={'small'}
+              placeholder={" Description"}
+              error={errors1?.description?.message}
+              register={register1("description", {
+                required: false,
+              })}
+            />
+          </Grid>
 
-                        </Box>
+          {/* ✅ Inventory Checkbox */}
+          <Grid item xs={3} mt={4} display={'flex'} gap={1} alignItems={'center'}>
+            <FormLabel sx={{fontWeight:'bold',color:'black'}}>Inventory</FormLabel>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={hasInventory}
+                  onChange={(e) => setHasInventory(e.target.checked)}
+                />
+              }
+            
+            />
+          </Grid>
+        </Grid>
 
-                        <Box sx={{ p: 3 }}>
+        <Grid container justifyContent={'flex-end'}>
+          <PrimaryButton
+            bgcolor={'#001f3f'}
+            title="Submit"
+            type={'submit'}
+          />
+        </Grid>
+      </Grid>
+    </Box>
+  </Box>
+</>
 
-
-                            <Grid container gap={2} justifyContent={'space-between'}>
-                                <Grid container item xs={12} spacing={2} p={2} sx={{ borderRadius: '12px' }}>
-                                    <Grid item xs={3}>
-                                        <InputField
-                                            label={" Name :*"}
-                                            size={'small'}
-                                            placeholder={" Name"}
-                                            error={errors1?.name?.message}
-                                            register={register1("name", {
-                                                required: "Please enter your name."
-                                            })}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={3}>
-                                        <SelectField
-                                            size="small"
-                                            label="Select Category"
-                                            options={categories}
-                                            selected={selectedCategory}
-                                            onSelect={(value) => {
-                                                setSelectedCategory(value)
-
-                                            }}
-                                            register={register("category", { required: "category is required" })}
-                                            error={errors?.category?.message}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={3}>
-                                        <SelectField
-                                            size="small"
-                                            label="Select Impact Account"
-                                            options={accounts}
-                                            selected={selectedAccount}
-                                            onSelect={(value) => {
-                                                setSelectedAccount(value)
-
-                                            }}
-                                            register={register("account", { required: "account is required" })}
-                                            error={errors?.account?.message}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={3}>
-                                        <InputField
-                                            label={" Price :*"}
-                                            size={'small'}
-                                            placeholder={" Price"}
-                                            error={errors1?.price?.message}
-                                            register={register1("price", {
-                                                required: 'price is required',
-                                            })}
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={3}>
-                                        <InputField
-                                            label={" SKU :*"}
-                                            size={'small'}
-                                            placeholder={" SKU"}
-                                            error={errors1?.sku?.message}
-                                            register={register1("sku", {
-                                                required: false
-                                            })}
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={3}>
-                                        <InputField
-                                            label={" Unit :*"}
-                                            size={'small'}
-                                            placeholder={" Unit"}
-                                            error={errors1?.unit?.message}
-                                            register={register1("unit", {
-                                                required: 'unit is required',
-                                            })}
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={3}>
-                                        <InputField
-                                            label={" Description :*"}
-                                            size={'small'}
-                                            placeholder={" Description"}
-                                            error={errors1?.description?.message}
-                                            register={register1("description", {
-                                                required: false,
-                                            })}
-                                        />
-                                    </Grid>
-
-                                </Grid>
-
-
-
-                                <Grid container justifyContent={'flex-end'}>
-                                    <PrimaryButton
-
-                                        bgcolor={'#001f3f'}
-                                        title="Submit"
-                                        type={'submit'}
-
-
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    </Box></>}
 
             </Box>
         </>

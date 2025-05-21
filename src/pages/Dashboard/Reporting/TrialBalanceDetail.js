@@ -458,7 +458,7 @@ function TrialBalanceDetailed() {
               const debit = parseFloat(account.total_debit) || 0;
               const credit = parseFloat(account.total_credit) || 0;
               const opening = parseFloat(account.opening_balance) || 0;
-              const periodDiff = account.nature === "debit" ? debit - credit : credit - debit;
+              const periodDiff = account.nature === "debit" ? debit - credit : -1 * ( credit - debit);
               const closingBalance = opening + periodDiff;
       
               subcategoryTypeGroups[subType].push([
@@ -625,7 +625,7 @@ function TrialBalanceDetailed() {
               const debit = parseFloat(account.total_debit) || 0;
               const credit = parseFloat(account.total_credit) || 0;
               const opening = parseFloat(account.opening_balance) || 0;
-              const periodDiff = account.nature === "debit" ? debit - credit : credit - debit;
+              const periodDiff = account.nature === "debit" ? debit - credit :-1 *  (credit - debit);
               const closingBalance = opening + periodDiff;
       
               subcategoryTypeGroups[subType].push([
@@ -644,7 +644,7 @@ function TrialBalanceDetailed() {
                   const cDebit = parseFloat(child.total_debit) || 0;
                   const cCredit = parseFloat(child.total_credit) || 0;
                   const cOpening = parseFloat(child.opening_balance) || 0;
-                  const cPeriodDiff = child.nature === "debit" ? cDebit - cCredit : cCredit - cDebit;
+                  const cPeriodDiff = child.nature === "debit" ? cDebit - cCredit : -1 * ( cCredit - cDebit);
                   const cClosingBalance = cOpening + cPeriodDiff;
       
                   subcategoryTypeGroups[subType].push([
@@ -1179,7 +1179,7 @@ function TrialBalanceDetailed() {
                                                                                                                         parseFloat(parseFloat(account.opening_balance) || 0.0) +
                                                                                                                         (account.nature === "debit"
                                                                                                                             ? parseFloat(account.total_debit) - parseFloat(account.total_credit)
-                                                                                                                            : parseFloat(account.total_credit) - parseFloat(account.total_debit))
+                                                                                                                            :  -1 * ( parseFloat(account.total_credit) - parseFloat(account.total_debit)))
                                                                                                                     ).toFixed(2)}
                                                                                                                 </TableCell>
                                                                                                             </TableRow>
