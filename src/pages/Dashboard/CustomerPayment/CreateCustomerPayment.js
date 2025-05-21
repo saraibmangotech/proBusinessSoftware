@@ -152,6 +152,7 @@ function CreateCustomerPayment() {
     const [loader, setLoader] = useState(false)
     const [totalDepositVal, setTotalDepositVal] = useState(0)
     console.log(selectedBank, "objobj")
+    const [selectedAccount, setSelectedAccount] = useState(null);
 
     const [center, setCenter] = useState(null)
     const [status, setStatus] = useState(null)
@@ -225,7 +226,7 @@ function CreateCustomerPayment() {
                     date: paidAt,
                     description: formData?.description,
                     payment_mode: paymentModesString,
-                    additional_charges_value:totalAdditionalCharges,
+                    additional_charges_value: totalAdditionalCharges,
                     payment_methods: payments
                 }
 
@@ -542,24 +543,46 @@ function CreateCustomerPayment() {
         }
     }
 
-    const getAccounts = async (page, limit, filter) => {
-        // setLoader(true)
+    const getAccounts = async (search, accountId) => {
         try {
-            const params = {
+            let params = {
                 page: 1,
-                limit: 1000,
+                limit: 10000,
+                name: search,
+                is_disabled: false
+
             }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
 
-            const { data } = await FinanceServices.getAccounts(params)
-            console.log(data?.accounts?.rows)
-
-            setAccounts(data?.accounts?.rows)
+            setAccounts(updatedAccounts)
         } catch (error) {
-            ErrorToaster(error)
-        } finally {
-            // setLoader(false)
+            showErrorToast(error)
         }
     }
+
+    // *For Get Account
+    const getChildAccounts = async (accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId ?? selectedAccount?.id,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+
+            if (data?.accounts?.rows?.length > 0) {
+                showErrorToast('Cannot use this account because it has child accounts.')
+                setSelectedAccount(null)
+            }
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
 
     const handleInputChange = (index, field, value) => {
         const updatedRows = [...rows]
@@ -590,7 +613,8 @@ function CreateCustomerPayment() {
         }
     }
 
-    const addPayments = (amount, mode, bank, card, code, percentage = null, additionalCharges = null, submit = null) => {
+
+    const addPayments = (amount, account, submit = null) => {
         const total = parseFloat(getValues1("total")) || 0;
         const currentAmount = parseFloat(amount) || 0;
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
@@ -610,47 +634,23 @@ function CreateCustomerPayment() {
             return;
         }
 
-        if (!mode) {
-            showErrorToast("Payment mode is required");
+
+
+        if (!account) {
+            showErrorToast("Account is required");
             return;
         }
 
-        if (mode === "Bank" && !bank) {
-            showErrorToast("Bank is required for Bank mode");
-            return;
-        }
 
-        if (mode === "Card" && !card) {
-            showErrorToast("Card is required for Card mode");
-            return;
-        }
 
-        if (mode === "Card" && !code) {
-            showErrorToast("Authorization code is required for Card mode");
-            return;
-        }
-
-        if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
-            showErrorToast("Percentage is required for Bank/Card mode");
-            return;
-        }
 
         const paymentObj = {
             amount: currentAmount,
-            payment_mode: mode,
-            account_id:
-                mode === "Bank"
-                    ? bank?.account_id
-                    : mode === "Card"
-                        ? card?.account_id
-                        : mode === "Cash"
-                            ? 700117
-                            : 700171,
-            ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
-            ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
-            auth_code: mode === "Card" ? code : null,
-            additional_charges_percentage: mode === "Payment Link" || mode === "Card" ? parseFloat(percentage) : null,
-            additional_charges_value: mode === "Payment Link" || mode === "Card" ? parseFloat(additionalCharges || 0) : null,
+            payment_mode: account?.name,
+            account_id: account?.id
+
+
+
         };
 
         setPayments((prev) => [...prev, paymentObj]);
@@ -667,6 +667,7 @@ function CreateCustomerPayment() {
         // setValue1("payment", { id: "Cash", name: "Cash" });
         // setSelectedMode({ id: "Cash", name: "Cash" });
     };
+
 
     useEffect(() => {
         console.log(payments, 'paymentspayments');
@@ -999,7 +1000,7 @@ function CreateCustomerPayment() {
 
                                         </Grid>
                                         <Grid container spacing={3}>
-                                            <Grid item md={3.8} sm={12} xs={12}>
+                                        <Grid item md={3.8} sm={12} xs={12}>
                                                 <InputField
                                                     label="Amount"
                                                     size="small"
@@ -1017,142 +1018,44 @@ function CreateCustomerPayment() {
                                                     error={errors1?.payamount?.message}
                                                 />
                                             </Grid>
-                                            <Grid item md={3.8} sm={12} xs={12}>
-                                                <SelectField
-                                                    label="Payment Mode"
-                                                    size="small"
-                                                    options={[
-                                                        { id: "Cash", name: "Cash" },
-                                                        { id: "Bank", name: "Bank" },
-                                                        { id: "Card", name: "Card" },
-                                                        { id: "Payment Link", name: "Payment Link" },
-                                                    ]}
-                                                    selected={watch1("payment")}
-                                                    onSelect={(value) => {
-                                                        setValue1("payment", value)
-                                                        setSelectedMode(value)
-                                                        if ((agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ||
-                                                            agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED")
-                                                            && value?.id === 'Card') {
-                                                            console.log(value?.id, 'value?.id');
 
-                                                            setValue1('percentage', 1);
-                                                            const percentageValue = parseFloat(1 || 0);
-                                                            const amount = parseFloat(getValues1("payamount") || 0);
-                                                            const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
-                                                            setValue1("additionalCharges", additionalCharge);
+                                          
 
-                                                        } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
-                                                            value?.id === 'Payment Link') {
-                                                            setValue1('percentage', 1.35);
-                                                            const percentageValue = parseFloat(1.35 || 0);
-                                                            const amount = parseFloat(getValues1("payamount") || 0);
-                                                            const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
-
-                                                            setValue1("additionalCharges", additionalCharge);
-                                                        }
-                                                    }}
-                                                    register={register1("payment", {
-                                                        required: "Please select payment mode",
-                                                    })}
-                                                    error={errors1?.payment?.message}
-                                                />
-                                            </Grid>
-                                            {selectedMode?.id == "Bank" && (
-                                                <Grid item md={3.8} sm={12} xs={12}>
-                                                    <SelectField
-                                                        label="Banks"
-                                                        size="small"
-                                                        options={banks}
-                                                        selected={selectedBank}
-                                                        onSelect={(value) => {
-                                                            setSelectedBank(value)
-                                                        }}
-                                                        register={register1("bank", {
-                                                            required: "Please select a bank",
-                                                        })}
-                                                        error={errors1?.bank?.message}
-                                                    />
-                                                </Grid>
+                                         
+                                            { (
+                                                 <Grid item xs={3.8} >
+                                                 <SelectField
+                                                     size="small"
+                                                     options={accounts}
+                                                     label={'Select Account *:'}
+                                                     selected={selectedAccount}
+                                                     onSelect={(value) => {
+                                                         setSelectedAccount(value)
+                                                         console.log(value);
+                                                         setValue('AccountCode', value?.account_code)
+                                                         getChildAccounts(value?.id)
+                 
+                                                     }}
+                                                     error={errors?.service?.message}
+                                                     register={register("service", {
+                                                         required: false,
+                                                     })}
+                                                 />
+                                             </Grid>
                                             )}
-                                            {selectedMode?.id == "Card" && (
-                                                <Grid item md={3.8} sm={12} xs={12}>
-                                                    <SelectField
-                                                        label="Card"
-                                                        size="small"
-                                                        options={cards}
-                                                        selected={selectedCard}
-                                                        onSelect={(value) => {
-                                                            setSelectedCard(value)
-                                                        }}
-                                                        register={register1("card", {
-                                                            required: "Please select a card",
-                                                        })}
-                                                        error={errors1?.card?.message}
-                                                    />
-                                                </Grid>
-                                            )}
-                                            {selectedMode?.id == "Card" && <Grid item md={3.8} sm={12} xs={12}>
-                                                <InputField
-                                                    label="Authorization Code"
-                                                    size="small"
-                                                    placeholder="Authorization Code"
-                                                    register={register1("remarks", {
-                                                        required: "Please enter code",
-                                                    })}
-                                                    error={errors1?.remarks?.message}
-                                                />
-                                            </Grid>}
-                                            {(selectedMode?.id === "Card" || selectedMode?.id === "Payment Link") && (
-                                                <>
-                                                    <Grid item md={3.8} sm={12} xs={12}>
-                                                        <InputField
-                                                            label="Percentage"
-                                                            size="small"
-                                                            placeholder="Enter percentage"
-                                                            type="number"
-                                                            register={register1("percentage", {
-                                                                required: "Please enter percentage",
-                                                                min: { value: 0, message: "Minimum 0%" },
-                                                                max: { value: 100, message: "Maximum 100%" },
-                                                                onChange: (e) => {
-                                                                    const percentageValue = parseFloat(e.target.value || 0);
-                                                                    const amount = parseFloat(getValues1("payamount") || 0);
-                                                                    const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
+                                         
 
-                                                                    setValue1("additionalCharges", additionalCharge);
-                                                                },
-                                                            })}
-                                                            error={errors1?.percentage?.message}
-                                                        />
-                                                    </Grid>
-
-
-                                                    <Grid item md={3.8} sm={12} xs={12}>
-                                                        <InputField
-                                                            label="Additional Charges"
-                                                            size="small"
-                                                            placeholder="Auto calculated"
-                                                            disabled
-                                                            value={watch1("additionalCharges")}
-                                                            register={register1("additionalCharges")}
-                                                            error={errors1?.additionalCharges?.message}
-                                                        />
-                                                    </Grid>
-                                                </>
-                                            )}
                                             <Grid item md={12} sm={12} xs={12}>
                                                 <Button
-                                                    onClick={() => addPayments(
-                                                        getValues1("payamount"),
-                                                        selectedMode?.id,
-                                                        selectedBank,
-                                                        selectedCard,
-                                                        getValues1("remarks"),
-                                                        getValues1("percentage"),
-                                                        getValues1("additionalCharges")
-                                                    )}
+                                                    onClick={() =>
+                                                        addPayments(
+                                                            getValues1("payamount"),
+
+
+                                                            selectedAccount
+                                                        )
+                                                    }
 
                                                     variant="contained"
                                                     sx={{
@@ -1204,7 +1107,7 @@ function CreateCustomerPayment() {
                                                                 <strong>Amount:</strong> {payment.amount}
                                                             </Typography>
                                                             <Typography variant="body1">
-                                                                <strong>Mode:</strong> {payment.payment_mode}
+                                                                <strong>Account Name :</strong> {payment.payment_mode}
                                                             </Typography>
                                                             {payment.mode === "Bank" && (
                                                                 <Typography variant="body1">

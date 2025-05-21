@@ -14,10 +14,11 @@ import SimpleDialog from "components/Dialog/SimpleDialog"
 import { ErrorToaster } from "components/Toaster"
 import { useNavigate, useParams } from "react-router-dom"
 import DatePicker from "components/DatePicker"
+import FinanceServices from "services/Finance"
 
 function UpdatePrepaidInvoices() {
     const navigate = useNavigate()
-    const {id}=useParams()
+    const { id } = useParams()
     const [customerType, setCustomerType] = useState("company")
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [buttonDisabled2, setButtonDisabled2] = useState(true)
@@ -31,6 +32,14 @@ function UpdatePrepaidInvoices() {
     const [categories, setCategories] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [date, setDate] = useState(null)
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [parentAccounts, setParentAccounts] = useState([]);
+    const [selectedParentAccount, setSelectedParentAccount] = useState(null);
+
+    // *For Accounts
+    const [accounts, setAccounts] = useState([]);
+    const [selectedAccount, setSelectedAccount] = useState(null);
 
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
@@ -98,12 +107,14 @@ function UpdatePrepaidInvoices() {
         console.log(formData);
         try {
             let obj = {
-                id:id,
+                id: id,
                 date: date,
                 name: formData?.customerName,
                 vendor_id: selectedCustomer?.id,
                 amount: formData?.Amount,
-                amortization_months: formData?.months
+                amortization_months: formData?.months,
+                cost_center: selectedCostCenter?.name,
+                payment_account_id: selectedAccount?.id
 
 
             };
@@ -128,6 +139,47 @@ function UpdatePrepaidInvoices() {
             setButtonDisabled3(false)
         }
     };
+
+       const getAccounts = async (search, accountId) => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 10000,
+                    name: search,
+                    is_disabled: false
+    
+                }
+                const { data } = await FinanceServices.getAccountsDropDown(params)
+                const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                    ...account,
+                    name: ` ${account.account_code} ${account.name}`
+                }));
+                console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+    
+                setAccounts(updatedAccounts)
+            } catch (error) {
+                showErrorToast(error)
+            }
+        }
+    
+        // *For Get Account
+        const getChildAccounts = async (accountId) => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 50,
+                    primary_account_id: accountId ?? selectedAccount?.id,
+                };
+                const { data } = await FinanceServices.getAccounts(params);
+             
+                if(data?.accounts?.rows?.length > 0){
+                    showErrorToast('Cannot use this account because it has child accounts.')
+                    setSelectedAccount(null)
+                }
+            } catch (error) {
+                showErrorToast(error);
+            }
+        };
     // *For Get Customer Queue
     const getCustomerQueue = async (id) => {
 
@@ -143,8 +195,8 @@ function UpdatePrepaidInvoices() {
 
             const { data } = await CustomerServices.getVendors(params)
             setCustomers(data?.rows)
-      
-           
+
+
         } catch (error) {
             showErrorToast(error)
         }
@@ -157,17 +209,18 @@ function UpdatePrepaidInvoices() {
 
             const { data } = await CustomerServices.getPrepaidDetail(params);
             console.log(data)
-            setValue1("customerName" , data?.expense?.name)
+            setValue1("customerName", data?.expense?.name)
             setDate(new Date(data?.expense?.date))
-            setValue1("Amount" , data?.expense?.amount)
-            setValue1("months" , data?.expense?.amortization_months)
-            setValue1("customer" , data?.expense?.vendor)
+            setValue1("Amount", data?.expense?.amount)
+            setValue1("months", data?.expense?.amortization_months)
+            setValue1("customer", data?.expense?.vendor)
             setSelectedCustomer(data?.expense?.vendor)
+            setSelectedCostCenter({id:data?.expense?.cost_center,name:data?.expense?.cost_center})
 
-           
-           
-            
-            
+
+
+
+
 
 
         } catch (error) {
@@ -316,10 +369,10 @@ function UpdatePrepaidInvoices() {
         console.log(formData);
         try {
             let obj = {
-         
+
                 name: formData?.name,
-                mobile:formData?.mobileVal,
-                email:formData?.emailVal
+                mobile: formData?.mobileVal,
+                email: formData?.emailVal
 
 
             };
@@ -334,9 +387,9 @@ function UpdatePrepaidInvoices() {
             const response = await promise;
             if (response?.responseCode === 200) {
                 console.log(response);
-                
+
                 getCustomerQueue(response?.data?.id)
-                
+
                 setCompanyDialog(false)
             }
 
@@ -345,7 +398,23 @@ function UpdatePrepaidInvoices() {
             ErrorToaster(error);
         }
     };
+      const getCostCenters = async () => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 1000,
+                };
+    
+                const { data } = await CustomerServices.getCostCenters(params);
+                setCostCenters(data?.cost_centers);
+    
+            } catch (error) {
+                showErrorToast(error);
+            }
+        };
     useEffect(() => {
+        getAccounts()
+        getCostCenters()
         getData()
         getCategories()
         getCustomerQueue()
@@ -373,7 +442,7 @@ function UpdatePrepaidInvoices() {
                                     })}
                                 />
                             </Grid>
-                        
+
                             <Grid item xs={12}>
                                 <InputField
                                     label={"Mobile *:"}
@@ -555,25 +624,25 @@ function UpdatePrepaidInvoices() {
 
 
                         <Grid container sx={{ gap: "5px 25px" }}>
-                         
 
-                        <Grid item xs={2.8}>
-                      <DatePicker
-                        label={"Invoice Date :*"}
-                        value={date}
-                  
-                        size={"small"}
-                        error={errors1?.invoice_date?.message}
-                        register={register1("invoice_date", {
-                          required: date ? false : "please enter  date.",
-                        })}
-                        maxDate={new Date()}
-                        onChange={(date) => {
-                          setValue1("invoice_date", date);
-                          setDate(new Date(date));
-                        }}
-                      />
-                    </Grid>
+
+                            <Grid item xs={2.8}>
+                                <DatePicker
+                                    label={"Invoice Date :*"}
+                                    value={date}
+
+                                    size={"small"}
+                                    error={errors1?.invoice_date?.message}
+                                    register={register1("invoice_date", {
+                                        required: date ? false : "please enter  date.",
+                                    })}
+                                    maxDate={new Date()}
+                                    onChange={(date) => {
+                                        setValue1("invoice_date", date);
+                                        setDate(new Date(date));
+                                    }}
+                                />
+                            </Grid>
 
                             <Grid item xs={2.8}>
                                 <InputField
@@ -612,12 +681,50 @@ function UpdatePrepaidInvoices() {
                                     selected={selectedCustomer}
                                     onSelect={(value) => {
                                         setSelectedCustomer(value)
-                                        
-                                    
+
+
 
                                     }}
                                     error={errors1?.customer?.message}
                                     register={register1("customer")}
+                                />
+                            </Grid>
+                            <Grid item xs={2.8} >
+                                <SelectField
+                                    size={'small'}
+                                    label={'Select Cost Center *:'}
+
+                                    options={costCenters}
+                                    selected={selectedCostCenter}
+                                    onSelect={(value) => {
+                                        setSelectedCostCenter(value)
+
+
+
+                                    }}
+                                    error={errors1?.costCenter?.message}
+                                    register={register1("costCenter", {
+                                        required: "Please select a cost center.",
+                                    })}
+                                />
+                            </Grid>
+                            <Grid item xs={2.8} >
+                                <SelectField
+                                    size="small"
+                                    options={accounts}
+                                    label={'Select Account *:'}
+                                    selected={selectedAccount}
+                                    onSelect={(value) => {
+                                        setSelectedAccount(value)
+                                        console.log(value);
+                                        setValue('AccountCode', value?.account_code)
+                                        getChildAccounts(value?.id)
+
+                                    }}
+                                    error={errors?.service?.message}
+                                    register={register("service", {
+                                        required: "Please select a account.",
+                                    })}
                                 />
                             </Grid>
                             <Grid item xs={2.8}>
@@ -649,7 +756,7 @@ function UpdatePrepaidInvoices() {
                                     })}
                                 />
                             </Grid> */}
-                           
+
                             {/* <Grid item xs={2.8} mt={4} >
                                 <PrimaryButton
 

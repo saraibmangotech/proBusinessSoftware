@@ -175,24 +175,24 @@ function CreatePurchaseInvoice() {
     }, [payments]);
     const addItem = (item, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
-    
+
         // Parse numeric inputs
         const parsedQuantity = parseFloat(quantity);
         const parsedCharges = parseFloat(charges);
         const parsedTotal = parseFloat(total);
-    
+
         // Basic required field validation
         if (!item || quantity === "" || charges === "") {
             showErrorToast("Item, quantity, and charges are required!");
             return;
         }
-    
+
         // Check for negative values
         if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
             showErrorToast("Quantity, charges, and total must be 0 or greater!");
             return;
         }
-    
+
         // Check for consistent impact account ID
         if (rows.length > 0) {
             const firstImpactAccountId = rows[0].item?.impact_account_id;
@@ -201,14 +201,14 @@ function CreatePurchaseInvoice() {
                 return;
             }
         }
-    
+
         // Check for duplicate product
         const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
         if (isDuplicate) {
             showErrorToast("This product has already been added.");
             return;
         }
-    
+
         // Create a new row
         const newRow = {
             product_id: serviceItem?.id,
@@ -221,7 +221,7 @@ function CreatePurchaseInvoice() {
             selectedService: serviceItem
         };
         console.log(newRow);
-    
+
         // Update rows and subtotal
         setRows((prevRows) => {
             const updatedRows = [...prevRows, newRow];
@@ -232,23 +232,23 @@ function CreatePurchaseInvoice() {
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
             return updatedRows;
         });
-    
+
         setPayments([]);
         setServiceItem("");
     };
-    
+
     const getTokenNumber = async () => {
         try {
-          
-    
-          const { data } = await CustomerServices.getInvoiceNumberToken();
-          console.log(data);
-          setValue1('invoiceNumber', "PI-"+data?.number)
-    
+
+
+            const { data } = await CustomerServices.getInvoiceNumberToken();
+            console.log(data);
+            setValue1('invoiceNumber', "PI-" + data?.number)
+
         } catch (error) {
-          showErrorToast(error);
+            showErrorToast(error);
         }
-      };
+    };
 
 
     const [activeStep, setActiveStep] = React.useState(1);
@@ -287,6 +287,7 @@ function CreatePurchaseInvoice() {
     const [governmentAccount, setGovernmnentAccount] = useState(null);
     const [description, setDescription] = useState(null);
     const [ownGovBank, setOwnGovBank] = useState(null);
+    const [selectedAccount, setSelectedAccount] = useState(null);
     const [services, setServices] = useState([]);
     const [serviceItem, setServiceItem] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -393,10 +394,10 @@ function CreatePurchaseInvoice() {
                     total_amount: getValues1('finalTotal'),
                     payment_mode: paymentModesString,
                     payment_status: parseFloat(existingTotal) === 0
-                    ? 'Unpaid'
-                    : parseFloat(existingTotal) === parseFloat(newTotal)
-                    ? 'Paid'
-                    : 'Partial',
+                        ? 'Unpaid'
+                        : parseFloat(existingTotal) === parseFloat(newTotal)
+                            ? 'Paid'
+                            : 'Partial',
                     is_paid: existingTotal == newTotal ? true : false,
                     payment_methods: payments
                 }
@@ -424,71 +425,61 @@ function CreatePurchaseInvoice() {
         }
     }
 
-    const addPayments = (amount, mode, bank, card, code, submit = null) => {
-        const total = parseFloat(getValues1("finalTotal")) || 0;
 
-
-        // Convert amount to number for calculation
+    const addPayments = (amount, account, submit = null) => {
+        const total = parseFloat(getValues1("total")) || 0;
         const currentAmount = parseFloat(amount) || 0;
-
-        // Calculate current total of payments
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
 
-        // Check if new total will exceed
         if (existingTotal + currentAmount > total) {
             showErrorToast("Total payment exceeds the required amount.");
             return;
         }
 
-        // Validation
         if (!amount) {
             showErrorToast("Amount is required");
             return;
         }
 
-        if (parseFloat(amount) == 0) {
+        if (parseFloat(amount) === 0) {
             showErrorToast("Amount is 0");
             return;
         }
 
 
-        if (!mode) {
-            showErrorToast("Payment mode is required");
+
+        if (!account) {
+            showErrorToast("Account is required");
             return;
         }
 
-        if (mode === "Bank" && !bank) {
-            showErrorToast("Bank is required for Bank mode");
-            return;
-        }
 
-        if (mode === "Card" && !card) {
-            showErrorToast("Card is required for Card mode");
-            return;
-        }
-        if (mode === "Card" && !code) {
-            showErrorToast("Authorization code is required for Card mode");
-            return;
-        }
+
+
         const paymentObj = {
             amount: currentAmount,
-            payment_mode: mode,
-            account_id: mode === "Bank" ? bank?.account_id : mode === "Card" ? card?.account_id : mode === "Cash" ? 700117 : 700171,
-            ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
-            ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
-            auth_code:code
+            payment_mode: account?.name,
+            account_id: account?.id
+
+
 
         };
 
         setPayments((prev) => [...prev, paymentObj]);
-        //setValue1('payamount', '')
 
-        setSelectedBank(null)
-        setSelectedCard(null)
-        setValue1('authCode', '')
-        // setValue1("payment", { id: "Cash", name: "Cash" })
-        // setSelectedMode({ id: "Cash", name: "Cash" })
+        // Reset form fields
+        setSelectedBank(null);
+        setSelectedCard(null);
+        setValue1("payamount", "");
+        setValue1("percentage", "");
+        setValue1("additionalCharges", "");
+        setValue1("remarks", "");
+        setValue1("authCode", "");
+        // Optionally reset payment mode
+        // setValue1("payment", { id: "Cash", name: "Cash" });
+        // setSelectedMode({ id: "Cash", name: "Cash" });
     };
+
 
 
 
@@ -630,24 +621,7 @@ function CreatePurchaseInvoice() {
     };
 
 
-    const getAccounts = async (page, limit, filter) => {
-        // setLoader(true)
-        try {
-            let params = {
-                page: 1,
-                limit: 1000,
-            };
 
-            const { data } = await FinanceServices.getAccounts(params);
-            console.log(data?.accounts?.rows);
-
-            setAccounts(data?.accounts?.rows);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
     // *For Get Account
     const getReceiptDetail = async (state) => {
         setFieldsDisabled(true);
@@ -710,29 +684,29 @@ function CreatePurchaseInvoice() {
     };
     const updateItem = (item2, quantity, charges, description, ref, total) => {
         console.log("Current serviceItem:", serviceItem);
-    
+
         // Parse numeric values
         const parsedQuantity = parseFloat(quantity);
         const parsedCharges = parseFloat(charges);
         const parsedTotal = parseFloat(total);
-    
+
         // Validation
         if (!item2 || quantity === "" || charges === "") {
             showErrorToast("Item, quantity, and charges are required!");
             return;
         }
-    
+
         // Negative value validation
         if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
             showErrorToast("Quantity, charges, and total must be 0 or greater!");
             return;
         }
-    
+
         if (!item2?.id) {
             console.warn("No valid ID found in item2. Skipping update.");
             return;
         }
-    
+
         // Updated item using current form data and serviceItem
         const updatedItem = {
             id: item2.id, // Ensure ID is retained
@@ -745,35 +719,35 @@ function CreatePurchaseInvoice() {
             product_id: serviceItem?.id,
             selectedService: item2
         };
-    
+
         console.log("Updated item to be saved:", updatedItem);
-    
+
         setRows((prevItems) => {
             console.log("Previous rows:", prevItems);
-    
+
             const updatedRows = prevItems.map((item) =>
                 item.product_id === item2.id ? updatedItem : item
             );
-    
+
             console.log("Rows after update:", updatedRows);
-    
+
             // Calculate new subtotal
             const newSubTotal = updatedRows.reduce((sum, row) => {
                 const rowTotal = parseFloat(row.total || 0);
                 return sum + (isNaN(rowTotal) ? 0 : rowTotal);
             }, 0);
-    
+
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-    
+
             return updatedRows;
         });
-    
+
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
         setEditState(false);
     };
-    
+
 
 
     const getVendors = async (page, limit, filter) => {
@@ -862,6 +836,47 @@ function CreatePurchaseInvoice() {
             showErrorToast(error)
         }
     }
+
+    const getAccounts = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false
+
+            }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts(updatedAccounts)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
+
+    // *For Get Account
+    const getChildAccounts = async (accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId ?? selectedAccount?.id,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+
+            if (data?.accounts?.rows?.length > 0) {
+                showErrorToast('Cannot use this account because it has child accounts.')
+                setSelectedAccount(null)
+            }
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
     useEffect(() => {
         getTokenNumber()
         getProducts()
@@ -874,7 +889,7 @@ function CreatePurchaseInvoice() {
         getCategories();
         getSystemSettings();
         // getServiceItem();
-        
+
         setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
         setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
         setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
@@ -966,7 +981,7 @@ function CreatePurchaseInvoice() {
                                         })}
                                     />
                                 </Grid>
-                       
+
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="System Invoice Number"
@@ -984,7 +999,7 @@ function CreatePurchaseInvoice() {
                                         label="Ref Invoice Number"
                                         size="small"
                                         placeholder="Invoice Number"
-                                        
+
                                         register={register1("refInvoiceNumber", {
                                             required: 'Ref Invoice Number is required'
                                         })}
@@ -1013,9 +1028,9 @@ function CreatePurchaseInvoice() {
                                         placeholder="Mobile No"
                                         disabled={true}
                                         register={register1("mobile", {
-                                          
+
                                         })}
-                                   
+
                                     />
                                 </Grid>
 
@@ -1481,75 +1496,37 @@ function CreatePurchaseInvoice() {
                                         error={errors1?.payamount?.message}
                                     />
                                 </Grid>
-                                <Grid item md={3} sm={12} xs={12}>
-                                    <SelectField
-                                        label="Payment Mode"
-                                        size="small"
-                                        options={[
-                                            { id: "Cash", name: "Cash" },
-                                            { id: "Bank", name: "Bank" },
-                                            { id: "Card", name: "Card" },
-                                            { id: "Payment Link", name: "Payment Link" },
-                                        ]}
-                                        selected={watch1("payment")}
-                                        onSelect={(value) => {
-                                            setValue1("payment", value)
-                                            setSelectedMode(value)
-                                        }}
-                                        register={register1("payment", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.payment?.message}
-                                    />
-                                </Grid>
-                                {selectedMode?.id == "Bank" && (
-                                    <Grid item md={3} sm={12} xs={12}>
+                                {(
+                                    <Grid item xs={3.8} >
                                         <SelectField
-                                            label="Banks"
                                             size="small"
-                                            options={banks}
-                                            selected={selectedBank}
+                                            options={accounts}
+                                            label={'Select Account *:'}
+                                            selected={selectedAccount}
                                             onSelect={(value) => {
-                                                setSelectedBank(value)
+                                                setSelectedAccount(value)
+                                                console.log(value);
+                                                setValue('AccountCode', value?.account_code)
+                                                getChildAccounts(value?.id)
+
                                             }}
-                                            register={register1("bank", {
+                                            error={errors?.service?.message}
+                                            register={register("service", {
                                                 required: false,
                                             })}
-                                            error={errors1?.bank?.message}
                                         />
                                     </Grid>
                                 )}
-                                {selectedMode?.id == "Card" && (
-                                    <Grid item md={3} sm={12} xs={12}>
-                                        <SelectField
-                                            label="Card"
-                                            size="small"
-                                            options={cards}
-                                            selected={selectedCard}
-                                            onSelect={(value) => {
-                                                setSelectedCard(value)
-                                            }}
-                                            register={register1("card", {
-                                                required: false,
-                                            })}
-                                            error={errors1?.card?.message}
-                                        />
-                                    </Grid>
-                                )}
-                                {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
-                                    <InputField
-                                        label="Authorization Code"
-                                        size="small"
-                                        placeholder="Authorization Code"
-                                        register={register1("remarks", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.remarks?.message}
-                                    />
-                                </Grid>}
                                 <Grid item md={12} sm={12} xs={12}>
                                     <Button
-                                        onClick={() => addPayments(getValues1('payamount'), selectedMode?.id, selectedBank, selectedCard, getValues1('remarks'))}
+                                        onClick={() =>
+                                            addPayments(
+                                                getValues1("payamount"),
+
+
+                                                selectedAccount
+                                            )
+                                        }
 
                                         variant="contained"
                                         sx={{
@@ -1598,7 +1575,7 @@ function CreatePurchaseInvoice() {
                                                 </IconButton>
 
                                                 <Typography variant="body1"><strong>Amount:</strong> {payment.amount}</Typography>
-                                                <Typography variant="body1"><strong>Mode:</strong> {payment.payment_mode}</Typography>
+                                                <Typography variant="body1"><strong>Account Name:</strong> {payment.payment_mode}</Typography>
                                                 {payment.mode === 'Bank' && (
                                                     <Typography variant="body1"><strong>Bank:</strong> {payment.bank?.name || payment.bank}</Typography>
                                                 )}

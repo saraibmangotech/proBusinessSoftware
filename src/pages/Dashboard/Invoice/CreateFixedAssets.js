@@ -14,6 +14,7 @@ import SimpleDialog from "components/Dialog/SimpleDialog"
 import { ErrorToaster } from "components/Toaster"
 import { useNavigate } from "react-router-dom"
 import DatePicker from "components/DatePicker"
+import FinanceServices from "services/Finance"
 
 function CreatePrepaidInvoices() {
     const navigate = useNavigate()
@@ -30,7 +31,14 @@ function CreatePrepaidInvoices() {
     const [categories, setCategories] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [date, setDate] = useState(null)
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [parentAccounts, setParentAccounts] = useState([]);
+    const [selectedParentAccount, setSelectedParentAccount] = useState(null);
 
+    // *For Accounts
+    const [accounts, setAccounts] = useState([]);
+    const [selectedAccount, setSelectedAccount] = useState(null);
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -101,7 +109,9 @@ function CreatePrepaidInvoices() {
                 name: formData?.customerName,
                 vendor_id: selectedCustomer?.id,
                 amount: formData?.Amount,
-                depreciation_months: formData?.months
+                depreciation_months: formData?.months,
+                cost_center: selectedCostCenter?.name,
+                payment_account_id: selectedAccount?.id
 
 
             };
@@ -141,18 +151,18 @@ function CreatePrepaidInvoices() {
 
             const { data } = await CustomerServices.getVendors(params)
             setCustomers(data?.rows)
-            if(!id){
+            if (!id) {
                 let filter = await data?.rows.find(item => item?.name == 'Walk-In Customer')
                 setSelectedCustomer(filter)
             }
-            else{
+            else {
                 let filter = await data?.rows.find(item => item?.id == id)
                 setSelectedCustomer(filter)
                 setValue1('customerName', filter?.name)
                 setValue1('email', filter?.email)
                 setValue1('mobile', filter?.mobile)
             }
-           
+
         } catch (error) {
             showErrorToast(error)
         }
@@ -200,110 +210,69 @@ function CreatePrepaidInvoices() {
             console.error("Error fetching location:", error);
         }
     };
-    const getCustomerDetail2 = async (phone) => {
+    const getAccounts = async (search, accountId) => {
         try {
             let params = {
-                mobile: phone
-            };
-
-            const { data } = await CustomerServices.getCustomerDetail(params);
-            let detail = data?.customer
-            console.log(detail);
-            if (data?.customer) {
-                setSelectedCustomer(detail)
-                setValue1('customer', detail)
-                setValue1('customerName', detail?.name)
-                setValue1('email', detail?.email)
-                setValue1('mobile', detail?.mobile)
-            }
-            else {
-                let filter = await customers.find(item => item?.name == 'Walk-In Customer')
-                console.log(filter);
-
-                setSelectedCustomer(filter)
-                setValue1('customer', filter?.name)
-
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false
 
             }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
 
-
-
+            setAccounts(updatedAccounts)
         } catch (error) {
-            console.error("Error fetching location:", error);
+            showErrorToast(error)
+        }
+    }
+
+    // *For Get Account
+    const getChildAccounts = async (accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId ?? selectedAccount?.id,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+
+            if (data?.accounts?.rows?.length > 0) {
+                showErrorToast('Cannot use this account because it has child accounts.')
+                setSelectedAccount(null)
+            }
+        } catch (error) {
+            showErrorToast(error);
         }
     };
 
-    const getCompanies = async (id) => {
-        try {
-            let params = {
-                customer_id: id ? id : selectedCustomer?.id
-            };
-
-            const { data } = await CustomerServices.getCompanies(params);
-            setCompanies(data?.companies)
-
-
-
-
-        } catch (error) {
-            console.error("Error fetching location:", error);
-        }
-    };
-    const getTokenValidation = async (value) => {
-        try {
-            let params = {
-                validate: true,
-                token_number: value
-            };
-
-            const { data } = await CustomerServices.getReceptionDetail(params);
-            console.log(data);
-            if (data?.token) {
-                setButtonDisabled(true)
-                showErrorToast('Token Number Already Exist')
+       const getCostCenters = async () => {
+            try {
+                let params = {
+                    page: 1,
+                    limit: 1000,
+                };
+    
+                const { data } = await CustomerServices.getCostCenters(params);
+                setCostCenters(data?.cost_centers);
+    
+            } catch (error) {
+                showErrorToast(error);
             }
-            else {
-                setButtonDisabled(false)
-            }
-
-
-        } catch (error) {
-
-            console.error("Error fetching location:", error);
-        }
-    };
-    const getTokenValidation2 = async (value) => {
-        try {
-            let params = {
-                validate: true,
-                token_number: value
-            };
-
-            const { data } = await CustomerServices.getReceptionDetail(params);
-            console.log(data);
-            if (data?.token) {
-                setButtonDisabled2(true)
-                showErrorToast('Token Number Already Exist')
-            }
-            else {
-                setButtonDisabled2(false)
-            }
-
-
-        } catch (error) {
-
-            console.error("Error fetching location:", error);
-        }
-    };
-
+        };
     const CreateCompany = async (formData) => {
         console.log(formData);
         try {
             let obj = {
-         
+
                 name: formData?.name,
-                mobile:formData?.mobileVal,
-                email:formData?.emailVal
+                mobile: formData?.mobileVal,
+                email: formData?.emailVal
 
 
             };
@@ -318,9 +287,9 @@ function CreatePrepaidInvoices() {
             const response = await promise;
             if (response?.responseCode === 200) {
                 console.log(response);
-                
+
                 getCustomerQueue(response?.data?.id)
-                
+
                 setCompanyDialog(false)
             }
 
@@ -330,6 +299,8 @@ function CreatePrepaidInvoices() {
         }
     };
     useEffect(() => {
+        getAccounts()
+        getCostCenters()
         getCategories()
         getCustomerQueue()
     }, [])
@@ -356,7 +327,7 @@ function CreatePrepaidInvoices() {
                                     })}
                                 />
                             </Grid>
-                        
+
                             <Grid item xs={12}>
                                 <InputField
                                     label={"Mobile *:"}
@@ -538,25 +509,25 @@ function CreatePrepaidInvoices() {
 
 
                         <Grid container sx={{ gap: "5px 25px" }}>
-                         
 
-                        <Grid item xs={2.8}>
-                      <DatePicker
-                        label={"Invoice Date :*"}
-                        value={date}
-                  
-                        size={"small"}
-                        error={errors1?.invoice_date?.message}
-                        register={register1("invoice_date", {
-                          required: date ? false : "please enter  date.",
-                        })}
-                        maxDate={new Date()}
-                        onChange={(date) => {
-                          setValue1("invoice_date", date);
-                          setDate(new Date(date));
-                        }}
-                      />
-                    </Grid>
+
+                            <Grid item xs={2.8}>
+                                <DatePicker
+                                    label={"Invoice Date :*"}
+                                    value={date}
+
+                                    size={"small"}
+                                    error={errors1?.invoice_date?.message}
+                                    register={register1("invoice_date", {
+                                        required: date ? false : "please enter  date.",
+                                    })}
+                                    maxDate={new Date()}
+                                    onChange={(date) => {
+                                        setValue1("invoice_date", date);
+                                        setDate(new Date(date));
+                                    }}
+                                />
+                            </Grid>
 
                             <Grid item xs={2.8}>
                                 <InputField
@@ -595,14 +566,52 @@ function CreatePrepaidInvoices() {
                                     selected={selectedCustomer}
                                     onSelect={(value) => {
                                         setSelectedCustomer(value)
-                                        
-                                    
+
+
 
                                     }}
                                     error={errors1?.customer?.message}
                                     register={register1("customer")}
                                 />
                             </Grid>
+                             <Grid item xs={2.8} >
+                                                            <SelectField
+                                                                size={'small'}
+                                                                label={'Select Cost Center *:'}
+                            
+                                                                options={costCenters}
+                                                                selected={selectedCostCenter}
+                                                                onSelect={(value) => {
+                                                                    setSelectedCostCenter(value)
+                            
+                            
+                            
+                                                                }}
+                                                                error={errors1?.costCenter?.message}
+                                                                register={register1("costCenter", {
+                                                                    required: "Please select a cost center.",
+                                                                })}
+                                                            />
+                                                        </Grid>
+                                                        <Grid item xs={2.8} >
+                                                            <SelectField
+                                                                size="small"
+                                                                options={accounts}
+                                                                label={'Select Account *:'}
+                                                                selected={selectedAccount}
+                                                                onSelect={(value) => {
+                                                                    setSelectedAccount(value)
+                                                                    console.log(value);
+                                                                    setValue('AccountCode', value?.account_code)
+                                                                    getChildAccounts(value?.id)
+                            
+                                                                }}
+                                                                 error={errors?.service?.message}
+                                                                register={register("service", {
+                                                                    required: "Please select a account.",
+                                                                })}
+                                                            />
+                                                        </Grid>
                             <Grid item xs={2.8}>
                                 <InputField
                                     label={" Depreciation Months *:"}
@@ -632,7 +641,7 @@ function CreatePrepaidInvoices() {
                                     })}
                                 />
                             </Grid> */}
-                           
+
                             {/* <Grid item xs={2.8} mt={4} >
                                 <PrimaryButton
 
