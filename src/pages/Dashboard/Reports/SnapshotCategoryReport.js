@@ -334,10 +334,35 @@ function SnapshotCategoryReport() {
         },
 
 
-
-
         {
-            header: "Net Service Charge",
+            header: "Net service charge",
+            accessorKey: "netCharges",
+            accessorFn: (row) => {
+                const net = parseFloat(row?.netCharges || 0);
+                const pro = parseFloat(row?.proCommission || 0);
+                const typist = parseFloat(row?.typistCommission || 0);
+                return (net - pro - typist).toFixed(2);
+            },
+            cell: ({ row }) => {
+                const net = parseFloat(row?.original?.netCharges || 0);
+                const pro = parseFloat(row?.original?.proCommission || 0);
+                const typist = parseFloat(row?.original?.typistCommission || 0);
+                const total = net - pro - typist;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {total.toFixed(2)}
+                    </Box>
+                );
+            },
+        }
+        
+,
+        {
+            header: "Gross Invoice Amount",
             accessorKey: "netCharges",
             accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
             cell: ({ row }) => (
@@ -350,7 +375,7 @@ function SnapshotCategoryReport() {
                 </Box>
             ),
         },
-
+       
     ];
 
 

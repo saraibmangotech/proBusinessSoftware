@@ -586,12 +586,17 @@ function TrialBalanceDetailed() {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: '808080' },
+            fgColor: { argb: '808080' }, // Gray
           };
-          cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+          cell.font = { bold: true, color: { argb: 'FFFFFF' } }; // White bold
         });
       
-        let grandOpening = 0, grandDebit = 0, grandCredit = 0, grandDiff = 0, grandBalance = 0;
+        // Grand totals initialization
+        let grandOpening = 0,
+          grandDebit = 0,
+          grandCredit = 0,
+          grandDiff = 0,
+          grandBalance = 0;
       
         filteredBalanceSheet.forEach(category => {
           const catRow = worksheet.addRow([category.name]);
@@ -603,43 +608,116 @@ function TrialBalanceDetailed() {
           catRow.getCell(1).font = { bold: true, color: { argb: 'FFFFFF' } };
       
           category.sub?.forEach(subCategory => {
-            let totalOpening = 0, totalDebit = 0, totalCredit = 0, totalDiff = 0, totalBalance = 0;
+            const subCatRow = worksheet.addRow(["", subCategory.name]);
+            subCatRow.getCell(2).fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'D3D3D3' },
+            };
+            subCatRow.getCell(2).font = { bold: true };
+      
+            const subcategoryTypeGroups = {};
       
             subCategory.accounts?.forEach(account => {
+              const subType = account.account_subcategory || "Uncategorized";
+              if (!subcategoryTypeGroups[subType]) subcategoryTypeGroups[subType] = [];
+      
               const debit = parseFloat(account.total_debit) || 0;
               const credit = parseFloat(account.total_credit) || 0;
               const opening = parseFloat(account.opening_balance) || 0;
               const periodDiff = account.nature === "debit" ? debit - credit : credit - debit;
               const closingBalance = opening + periodDiff;
       
-              totalOpening += opening;
-              totalDebit += debit;
-              totalCredit += credit;
-              totalDiff += periodDiff;
-              totalBalance += closingBalance;
+              subcategoryTypeGroups[subType].push([
+                account.account_code,
+                account.account_name,
+                opening,
+                debit,
+                credit,
+                periodDiff,
+                closingBalance,
+              ]);
+      
+              // Also add child accounts if they exist
+              if (account.childAccounts && account.childAccounts.length > 0) {
+                account.childAccounts.forEach(child => {
+                  const cDebit = parseFloat(child.total_debit) || 0;
+                  const cCredit = parseFloat(child.total_credit) || 0;
+                  const cOpening = parseFloat(child.opening_balance) || 0;
+                  const cPeriodDiff = child.nature === "debit" ? cDebit - cCredit : cCredit - cDebit;
+                  const cClosingBalance = cOpening + cPeriodDiff;
+      
+                  subcategoryTypeGroups[subType].push([
+                    child.account_code,
+                    `-- ${child.account_name}`, // Indent child name
+                    cOpening,
+                    cDebit,
+                    cCredit,
+                    cPeriodDiff,
+                    cClosingBalance,
+                  ]);
+                });
+              }
             });
       
-            // Show only subcategory (parent account) with total of its children
-            const summaryRow = worksheet.addRow([
-              "", // No account code for subCategory
-              subCategory.name,
-              totalOpening.toFixed(2),
-              totalDebit.toFixed(2),
-              totalCredit.toFixed(2),
-              totalDiff.toFixed(2),
-              totalBalance.toFixed(2),
-            ]);
-            summaryRow.getCell(2).font = { bold: true };
+            Object.entries(subcategoryTypeGroups).forEach(([subType, rows]) => {
+              const subTypeRow = worksheet.addRow(["", `Subcategory: ${subType}`]);
+              subTypeRow.getCell(2).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'A9A9A9' },
+              };
+              subTypeRow.getCell(2).font = { bold: true, color: { argb: 'FFFFFF' } };
       
-            // Update grand totals
-            grandOpening += totalOpening;
-            grandDebit += totalDebit;
-            grandCredit += totalCredit;
-            grandDiff += totalDiff;
-            grandBalance += totalBalance;
+              let totalOpening = 0, totalDebit = 0, totalCredit = 0, totalDiff = 0, totalBalance = 0;
+      
+              rows.forEach(data => {
+                const [code, name, opn, deb, cred, diff, bal] = data;
+                worksheet.addRow([
+                  code,
+                  name,
+                  opn.toFixed(2),
+                  deb.toFixed(2),
+                  cred.toFixed(2),
+                  diff.toFixed(2),
+                  bal.toFixed(2),
+                ]);
+                totalOpening += opn;
+                totalDebit += deb;
+                totalCredit += cred;
+                totalDiff += diff;
+                totalBalance += bal;
+              });
+      
+              const totalRow = worksheet.addRow([
+                "",
+                `${subType} Total`,
+                totalOpening.toFixed(2),
+                totalDebit.toFixed(2),
+                totalCredit.toFixed(2),
+                totalDiff.toFixed(2),
+                totalBalance.toFixed(2),
+              ]);
+      
+              totalRow.eachCell(cell => {
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'FFA500' },
+                };
+                cell.font = { bold: true };
+              });
+      
+              grandOpening += totalOpening;
+              grandDebit += totalDebit;
+              grandCredit += totalCredit;
+              grandDiff += totalDiff;
+              grandBalance += totalBalance;
+            });
           });
         });
       
+        // Add Grand Total row at the end
         const grandTotalRow = worksheet.addRow([
           "Grand Total",
           "",
@@ -659,6 +737,7 @@ function TrialBalanceDetailed() {
           cell.font = { bold: true, color: { argb: 'FFFFFF' } };
         });
       
+        // Set column widths
         worksheet.columns = [
           { width: 15 },
           { width: 30 },
@@ -670,9 +749,13 @@ function TrialBalanceDetailed() {
         ];
       
         const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const blob = new Blob([buffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
         saveAs(blob, "TrialBalance.xlsx");
       };
+      
+      
       
     
 
@@ -829,10 +912,13 @@ function TrialBalanceDetailed() {
                             onClick={() => handleExportWithComponent(contentRef)}
                         /> */}
                         <PrimaryButton
-                            title={"Export To Excel"}
+                            title={"Download Report"}
                             onClick={() => downloadExcel()}
                         />
-                        
+                         <PrimaryButton
+                            title={"Download Detailed Report"}
+                            onClick={() => downloadExcel2()}
+                        />
                     </Box>
                 )}
             </Box>

@@ -193,10 +193,10 @@ function UpadateJournalVoucher() {
       }
       const { data } = await FinanceServices.getJournalVoucherDetail(params)
       setVoucherDetail(data.voucher)
-      if(data?.voucher?.cost_center){
+      if (data?.voucher?.cost_center) {
         setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
       }
-      
+
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
         name: ` ${account?.account?.account_code} ${account?.account?.name}`,
@@ -210,7 +210,7 @@ function UpadateJournalVoucher() {
       setRows(updatedAccounts)
       setFromDate(new Date(data?.voucher?.created_at))
       setValue1('Journal', `JV-${data?.voucher?.entries[0]?.jv_id}`)
-      setValue('note', data?.voucher?.notes)
+      setValue1('note', data?.voucher?.notes)
       const newTotalCredit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
       const newTotalDebit = data?.voucher?.entries?.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);
 
@@ -340,27 +340,27 @@ function UpadateJournalVoucher() {
       showErrorToast('Cost Center is required');
       return;
     }
-  
+
     setLoading(true);
     try {
       const obj = {
         id: id,
         total: totalDebit,
-        notes: getValues('note'),
+        notes: getValues1('note'),
         entries: rows,
         created_at: getYearMonthDateFormate(fromDate),
         cost_center: selectedCostCenter.name
       };
-  
+
       const promise = FinanceServices.UpdateJournalVoucher(obj);
-  
+
       showPromiseToast(
         promise,
         'Saving...',
         'Added Successfully',
         'Something Went Wrong'
       );
-  
+
       const response = await promise;
       if (response?.responseCode === 200) {
         navigate('/journal-voucher-list');
@@ -371,13 +371,13 @@ function UpadateJournalVoucher() {
       setLoading(false);
     }
   };
-  
+
   const addItem = (data) => {
     if (childAccounts?.length > 0) {
       showErrorToast("Cannot use this account because it has child accounts.");
       return
     }
-    
+
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
@@ -411,22 +411,24 @@ function UpadateJournalVoucher() {
     });
 
     setSelectedAccount(null);
-    reset();
+    setValue('debit', '')
+    setValue('credit', '')
+    setValue('description', '')
   };
-    // *For Get Account
-    const getChildAccounts = async (accountId) => {
-      try {
-        let params = {
-          page: 1,
-          limit: 50,
-          primary_account_id: accountId ?? selectedAccount?.id,
-        };
-        const { data } = await FinanceServices.getAccounts(params);
-        setChildAccounts(data?.accounts?.rows);
-      } catch (error) {
-        showErrorToast(error);
-      }
-    };
+  // *For Get Account
+  const getChildAccounts = async (accountId) => {
+    try {
+      let params = {
+        page: 1,
+        limit: 50,
+        primary_account_id: accountId ?? selectedAccount?.id,
+      };
+      const { data } = await FinanceServices.getAccounts(params);
+      setChildAccounts(data?.accounts?.rows);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
 
   const updateItem = (data) => {
     if (!selectedRow) {
@@ -467,7 +469,10 @@ function UpadateJournalVoucher() {
 
     setSelectedAccount(null);
     setSelectedRow(null);
-    reset();
+    setSelectedAccount(null);
+    setValue('debit', '')
+    setValue('credit', '')
+    setValue('description', '')
   };
 
 
@@ -551,7 +556,7 @@ function UpadateJournalVoucher() {
                   <SelectField
                     size="small"
                     options={accounts}
-                    disabled={editState}
+
                     selected={selectedAccount}
                     onSelect={(value) => {
                       setSelectedAccount(value)
@@ -756,6 +761,8 @@ function UpadateJournalVoucher() {
             </TableBody>
           </Table>
         </TableContainer>
+    
+
         <Grid container spacing={2} >
           <Grid item xs={12} sm={12}>
             {parseFloat(totalCredit).toFixed(2) != parseFloat(totalDebit).toFixed(2) &&
@@ -768,7 +775,7 @@ function UpadateJournalVoucher() {
             <InputField
               label={'Note'}
               placeholder={'Note'}
-              register={register("note")}
+              register={register1("note")}
             />
           </Grid>
         </Grid>
