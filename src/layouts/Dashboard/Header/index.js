@@ -878,7 +878,7 @@ function Header() {
           children: [
             {
               id: 1501,
-              name: "Prepaid Invoices",
+              name: "Prepaid Expenses",
               icon: "customer",
               parent_id: 15,
               api: "/api/purchase/orders",

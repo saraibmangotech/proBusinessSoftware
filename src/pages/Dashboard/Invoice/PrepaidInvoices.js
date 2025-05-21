@@ -394,7 +394,7 @@ function PrepaidInvoices() {
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Prepaid Invoice List</Typography>
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Prepaid Expense List</Typography>
       {user?.role_id != 1003 && <PrimaryButton
          bgcolor={'#001f3f'}
           title="Create "

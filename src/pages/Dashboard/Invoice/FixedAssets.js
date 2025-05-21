@@ -270,8 +270,8 @@ function PrepaidInvoices() {
   
       },
       {
-        header: "Amortization Months",
-        accessorKey: "amortization_months",
+        header: "Depreciation Months",
+        accessorKey: "depreciation_months",
   
   
       },
@@ -304,7 +304,7 @@ function PrepaidInvoices() {
   
           <Box sx={{display:'flex',gap:1}}>
             {/* {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/reception-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>} */}
-            {row?.original?.months_recorded == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-prepaid-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-prepaid-invoice') }} src={Images.editIcon} width={'35px'}></Box>}
+            {row?.original?.months_recorded == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-fixed-asset/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-prepaid-invoice') }} src={Images.editIcon} width={'35px'}></Box>}
             <Box>
               {row?.original?.months_recorded == 0 && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
   
@@ -398,7 +398,7 @@ function PrepaidInvoices() {
       {user?.role_id != 1003 && <PrimaryButton
          bgcolor={'#001f3f'}
           title="Create "
-          onClick={() => { navigate('/create-prepaid-invoice'); localStorage.setItem("currentUrl", '/create-customer') }}
+          onClick={() => { navigate('/create-fixed-asset'); localStorage.setItem("currentUrl", '/create-fixed-asset') }}
           loading={loading}
         />}
 

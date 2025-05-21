@@ -103,7 +103,7 @@ function UpdatePrepaidInvoices() {
                 name: formData?.customerName,
                 vendor_id: selectedCustomer?.id,
                 amount: formData?.Amount,
-                amortization_months: formData?.months
+                depreciation_months: formData?.months
 
 
             };
@@ -170,7 +170,7 @@ function UpdatePrepaidInvoices() {
             setValue1("customerName" , data?.expense?.name)
             setDate(new Date(data?.expense?.date))
             setValue1("Amount" , data?.expense?.amount)
-            setValue1("months" , data?.expense?.amortization_months)
+            setValue1("months" , data?.expense?.depreciation_months)
             setValue1("customer" , data?.expense?.vendor_id)
             setSelectedCustomer(data?.expense?.vendor_id)
 

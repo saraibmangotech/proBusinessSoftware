@@ -446,7 +446,7 @@ function UpdatePrepaidInvoices() {
                 </Box>
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
-                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Update Prepaid Invoice</Typography>
+                <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Update Prepaid Expense</Typography>
             </Box>
 
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>

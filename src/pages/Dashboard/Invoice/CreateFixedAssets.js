@@ -101,7 +101,7 @@ function CreatePrepaidInvoices() {
                 name: formData?.customerName,
                 vendor_id: selectedCustomer?.id,
                 amount: formData?.Amount,
-                amortization_months: formData?.months
+                depreciation_months: formData?.months
 
 
             };
