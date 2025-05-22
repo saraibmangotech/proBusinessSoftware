@@ -494,17 +494,20 @@ function SnapshotEmployeeServiceReport() {
     {
       header: "Service Charge",
       accessorKey: "center_fee",
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {parseFloat(row?.original?.center_fee).toFixed(2)}
+        </Box>
+      ),
     },
+    
     {
       header: "Total Service Charge",
       accessorKey: "total_service_charge",
-      accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)).toFixed(2),
+      accessorFn: (row) =>
+        (parseFloat(row?.center_fee) * parseFloat(row?.quantity)).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)).toFixed(2)}
         </Box>
       ),
@@ -512,14 +515,11 @@ function SnapshotEmployeeServiceReport() {
     {
       header: "Total VAT",
       accessorKey: "total_vat",
-      accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05,
+      accessorFn: (row) =>
+        ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05}
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {((parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05).toFixed(2)}
         </Box>
       ),
     },
@@ -580,28 +580,26 @@ function SnapshotEmployeeServiceReport() {
     {
       header: "Line Total",
       accessorKey: "total",
-      accessorFn: (row) => parseFloat(row?.total) + ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05),
+      accessorFn: (row) => (
+        parseFloat(row?.total) +
+        ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05)
+      ).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {parseFloat(row?.original?.total) + ((parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05)}
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.total) +
+            ((parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05)).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Invoice Total",
       accessorKey: "inv_total",
-      accessorFn: (row) => parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat),
+      accessorFn: (row) =>
+        (parseFloat(row?.receipt?.total_amount) + parseFloat(row?.receipt?.total_vat)).toFixed(2),
       cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {parseFloat(row?.original?.receipt?.total_amount) + parseFloat(row?.original?.receipt?.total_vat) }
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {(parseFloat(row?.original?.receipt?.total_amount) +
+            parseFloat(row?.original?.receipt?.total_vat)).toFixed(2)}
         </Box>
       ),
     },

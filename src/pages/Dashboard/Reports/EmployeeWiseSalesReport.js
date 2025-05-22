@@ -344,24 +344,24 @@ function EmployeeWiseSalesReport() {
         },
         {
             header: "Total Service Charges",
-            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0),
+            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0).toFixed(2),
             accessorKey: "totalCenterFee",
         },
 
         {
             header: "Tax",
-            accessorFn: (row) => parseFloat(row?.totalVat || 0),
+            accessorFn: (row) => parseFloat(row?.totalVat || 0).toFixed(2),
             accessorKey: "totalVat",
         },
 
         {
             header: "Typist Commission",
-            accessorFn: (row) => parseFloat(row?.typistCommission || 0),
+            accessorFn: (row) => parseFloat(row?.typistCommission || 0).toFixed(2),
             accessorKey: "typistCommission",
         },
         {
             header: "Customer Commission",
-            accessorFn: (row) => parseFloat(row?.proCommission || 0),
+            accessorFn: (row) => parseFloat(row?.proCommission || 0).toFixed(2),
             accessorKey: "proCommission",
         },
 
