@@ -135,7 +135,8 @@ const routes = {
   UpdateFixedAssets:'/purchases/fixedAssets/update',
   getFixedAssets:'/purchases/fixedAssets/',
   getFixedAssetsDetail:'/purchases/fixedAssets/details',
-  deleteFixedAssets:"/purchases/fixedAssets/delete"
+  deleteFixedAssets:"/purchases/fixedAssets/delete",
+  getEmployeeSalesReport:'/reports/employeeSalesSummary'
 
 
 };
