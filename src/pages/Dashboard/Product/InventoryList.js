@@ -8,7 +8,6 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
-    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -30,8 +29,6 @@ import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
 import { PrimaryButton } from 'components/Buttons';
 import SelectField from 'components/Select';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
@@ -109,7 +106,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PurchaseInvoices() {
+function InventoryList() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -173,7 +170,7 @@ function PurchaseInvoices() {
 
             }
 
-            const { data } = await CustomerServices.getPurchaseInvoices(params)
+            const { data } = await CustomerServices.getInventory(params)
             console.log(data);
 
             setCustomerQueue(data?.rows)
@@ -216,7 +213,7 @@ function PurchaseInvoices() {
             let params = { id: selectedData?.id }
 
 
-            const { message } = await CustomerServices.DeleteProductCategory(params)
+            const { message } = await CustomerServices.DeleteProduct(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -256,143 +253,62 @@ function PurchaseInvoices() {
     };
     const columns = [
         {
-            header: "System #",
-            accessorKey: "invoice_number",
+            header: "SR No.",
+            accessorKey: "id",
 
 
         },
         {
-            header: "Invoice Number",
-            accessorKey: "ref_invoice_number",
-
-
-        },
-        {
-            header: " Date",
-
-
-            accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.purchase_date ? moment(row?.original?.purchase_date).format("DD/MM/YYYY") : ''}
-                </Box>
-            ),
-            total: false,
-        },
-        {
-            header: "Vendor Name",
+            header: "Name",
             accessorKey: "name",
+
+
+        },
+        {
+            header: "Category",
+            accessorKey: "category",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {row?.original?.vendor?.name}
+
+                    {row?.original?.category?.name}
 
                 </Box>
             ),
 
 
         },
-        {
-            header: "Total Charges",
-            accessorKey: "total_charges",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.total_charges || 0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Tax",
-            accessorKey: "tax",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.tax || 0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Paid",
-            accessorKey: "paid_amount",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
-            ),
-        },
-        
+
 
         {
-            header: "Balance",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
-
-                </Box>
-            ),
+            header: "Unit Count",
+            accessorKey: "unit_count",
 
 
         },
-        {
-            header: "Payment Status",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
 
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
-
-                </Box>
-            ),
-
-
-        },
 
 
         {
             header: "Actions",
             cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
-                    <Box>
-                        {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                    </Box>
-
-                  
-                        <PrimaryButton
-                            bgcolor={'#001f3f'}
-                            title="View Receipts"
-                            onClick={() => {
-                                localStorage.setItem("currentUrl", '/create-customer');
-                                navigate('/purchase-payment-invoice-list', {
-                                    state: { id: row?.original?.id }, // Replace 123 with your actual ID
-                                });
-                            }}
-                            loading={loading}
-                        />
-
-                    
-
-                    <Tooltip title="Invoice">
-                        <IconButton
-                            onClick={() => {
-                                window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
-                                    '_blank'
-                                );
-                            }}
-                            sx={{
-                                backgroundColor: "#f9f9f9",
-                                borderRadius: 2,
-                                border: "1px solid #eee",
-                                width: 35,
-                                height: 35,
-                            }}
-                        >
-                            <ReceiptIcon color="black" fontSize="10px" />
-                        </IconButton>
-                    </Tooltip>
-
-                </Box>
-            ),
+                parseFloat(row?.original?.unit_count) > 0 ? (
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: 150 }}>
+                    <PrimaryButton
+                      bgcolor="#001f3f"
+                      title="View Units"
+                      onClick={() => {
+                        localStorage.setItem('currentUrl', '/create-customer');
+                        navigate('/product-unit-list', {
+                          state: { name:row?.original?.name,id:row?.original?.id },
+                        });
+                      }}
+                      loading={loading}
+                    />
+                  </Box>
+                ) : null           // render nothing when unit_count ≤ 0
+              ),
+              
         },
 
     ]
@@ -474,11 +390,11 @@ function PurchaseInvoices() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Invoice List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Inventory List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#001f3f'}
                     title="Create"
-                    onClick={() => { navigate('/create-purchase-invoice'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    onClick={() => { navigate('/create-product'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
                 />}
 
@@ -496,4 +412,4 @@ function PurchaseInvoices() {
     );
 }
 
-export default PurchaseInvoices;
+export default InventoryList;

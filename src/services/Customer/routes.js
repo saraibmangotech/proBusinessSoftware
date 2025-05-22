@@ -117,6 +117,7 @@ const routes = {
   CreateProduct:'/products/add',
   DeleteProduct:'/products/delete',
   getProductDetail:'/products/details',
+  getInventory:'products/inventory',
   UpdateProduct:'/products/update',
   CreatePurchaseInvoice:'/purchases/invoice/add',
   getPurchaseInvoices:'/purchases/invoice',
@@ -136,7 +137,9 @@ const routes = {
   getFixedAssets:'/purchases/fixedAssets/',
   getFixedAssetsDetail:'/purchases/fixedAssets/details',
   deleteFixedAssets:"/purchases/fixedAssets/delete",
-  getEmployeeSalesReport:'/reports/employeeSalesSummary'
+  getEmployeeSalesReport:'/reports/employeeSalesSummary',
+  getUnits:'products/inventory/units',
+  unitStatusUpdate:'/products/inventory/units/mark'
 
 
 };

@@ -945,6 +945,17 @@ function Header() {
             },
             {
               id: 1502,
+              name: "Inventory List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/inventory-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
               name: "Product Category Management",
               icon: "customer",
               parent_id: 15,
