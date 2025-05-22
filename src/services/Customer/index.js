@@ -122,6 +122,10 @@ const CustomerServices = {
     const data = await patch(routes.UpdateWPStatus, obj);
     return data;
   },
+  unitStatusUpdate: async (obj) => {
+    const data = await post(routes.unitStatusUpdate, obj);
+    return data;
+  },
   UpdatePrepaidInvoices: async (obj) => {
     const data = await patch(routes.UpdatePrepaidInvoices, obj);
     return data;
@@ -196,6 +200,14 @@ const CustomerServices = {
   },
   getAgents: async (params) => {
     const data = await get(routes.getAgents, params);
+    return data;
+  },
+  getInventory: async (params) => {
+    const data = await get(routes.getInventory, params);
+    return data;
+  },
+  getUnits: async (params) => {
+    const data = await get(routes.getUnits, params);
     return data;
   },
   getCostCenters: async (params) => {

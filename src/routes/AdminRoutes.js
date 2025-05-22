@@ -445,6 +445,12 @@ const FixedAssets= lazy(() =>
 const UpdateFixedAssets= lazy(() =>
   import("pages/Dashboard/Invoice/UpdateFixedAssets")
 );
+const InventoryList= lazy(() =>
+  import("pages/Dashboard/Product/InventoryList")
+);
+const ProductUnitList= lazy(() =>
+  import("pages/Dashboard/Product/ProductUnitList")
+);
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
@@ -500,6 +506,14 @@ const AdminRoutes = [
   {
     path: "/employee-sales-summary-report",
     component: <EmployeeSalesSummary />,
+  },
+  {
+    path: "/inventory-list",
+    component: <InventoryList />,
+  },
+  {
+    path: "/product-unit-list",
+    component: <ProductUnitList />,
   },
   {
     path: "/vendor-list",

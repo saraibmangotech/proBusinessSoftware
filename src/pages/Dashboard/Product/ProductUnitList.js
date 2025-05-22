@@ -8,11 +8,10 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
-    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Colors from 'assets/Style/Colors';
 import { CircleLoading } from 'components/Loaders';
 import { ErrorToaster, SuccessToaster } from 'components/Toaster';
@@ -30,8 +29,6 @@ import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
 import { PrimaryButton } from 'components/Buttons';
 import SelectField from 'components/Select';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
@@ -43,6 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import UserServices from 'services/User';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -109,7 +107,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PurchaseInvoices() {
+function ProductUnitList() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -119,6 +117,7 @@ function PurchaseInvoices() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const { state } = useLocation()
     const {
         register,
         handleSubmit,
@@ -143,6 +142,7 @@ function PurchaseInvoices() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
+    const [users, setUsers] = useState([])
 
 
 
@@ -169,11 +169,12 @@ function PurchaseInvoices() {
             let params = {
                 page: 1,
                 limit: 1000,
+                product_id: state?.id
 
 
             }
 
-            const { data } = await CustomerServices.getPurchaseInvoices(params)
+            const { data } = await CustomerServices.getUnits(params)
             console.log(data);
 
             setCustomerQueue(data?.rows)
@@ -199,7 +200,32 @@ function PurchaseInvoices() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
+  const getUsers = async (page, limit, filter) => {
+    // setLoader(true)
+    try {
+      const Page = page ? page : currentPage
+      const Limit = limit ? limit : pageLimit
+      const Filter = filter ?  { ...filters, ...filter } : null;
+      setCurrentPage(Page)
+      setPageLimit(Limit)
+      setFilters(Filter)
+      let params = {
+        page: 1,
+        limit: 9999,
+      }
+      params = { ...params, ...Filter }
 
+      const { data } = await UserServices.getUsers(params)
+      setUsers(data?.users?.rows)
+   
+    
+
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      // setLoader(false)
+    }
+  }
 
     // *For Handle Filter
 
@@ -213,10 +239,10 @@ function PurchaseInvoices() {
 
 
         try {
-            let params = { id: selectedData?.id }
+            let params = { id: selectedData?.id, status: 'Unassigned' }
 
 
-            const { message } = await CustomerServices.DeleteProductCategory(params)
+            const { message } = await CustomerServices.unitStatusUpdate(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -226,14 +252,18 @@ function PurchaseInvoices() {
             // setLoader(false)
         }
     }
-    const UpdateStatus = async () => {
+    const UpdateStatus = async (formData) => {
         try {
             let obj = {
-                customer_id: selectedData?.id,
-                is_active: status?.id,
+                id: selectedData?.id, 
+                reference_detail: formData?.reference_detail,
+                assigned_user_id:status?.id,
+                assigned_name:status?.name,
+                status:'Assigned'
+
             };
 
-            const promise = CustomerServices.CustomerStatus(obj);
+            const promise = CustomerServices.unitStatusUpdate(obj);
             console.log(promise);
 
             showPromiseToast(
@@ -256,76 +286,55 @@ function PurchaseInvoices() {
     };
     const columns = [
         {
-            header: "System #",
-            accessorKey: "invoice_number",
+            header: "SR No.",
+            accessorKey: "id",
 
 
         },
         {
-            header: "Invoice Number",
-            accessorKey: "ref_invoice_number",
-
-
-        },
-        {
-            header: " Date",
-
-
-            accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',
+            id: "created_at",
+            header: "Purchased Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
             cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.purchase_date ? moment(row?.original?.purchase_date).format("DD/MM/YYYY") : ''}
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.created_at).format("MM-DD-YYYY")}
                 </Box>
             ),
-            total: false,
         },
         {
-            header: "Vendor Name",
+            header: "Assigned To",
             accessorKey: "name",
             cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {row?.original?.vendor?.name}
-
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.assignee?.name}
                 </Box>
             ),
 
-
         },
         {
-            header: "Total Charges",
-            accessorKey: "total_charges",
+            header: "Assigned At",
+            accessorFn: (row) =>
+                row?.assigned_at ? moment(row.assigned_at).format("MM-DD-YYYY") : '-',
             cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.total_charges || 0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Tax",
-            accessorKey: "tax",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.tax || 0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Paid",
-            accessorKey: "paid_amount",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
+                <Box
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {row?.original?.assigned_at
+                        ? moment(row.original.assigned_at).format("MM-DD-YYYY")
+                        : '-'}
+                </Box>
             ),
         },
         
-
         {
-            header: "Balance",
-            accessorKey: "total_amount",
+            header: "Reference Detail",
+            accessorKey: "reference_detail",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
+
+                    {row?.original?.reference_detail}
 
                 </Box>
             ),
@@ -333,167 +342,158 @@ function PurchaseInvoices() {
 
         },
         {
-            header: "Payment Status",
-            accessorKey: "total_amount",
+            header: "Status",
+            accessorKey: "status",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
+
+                    {row?.original?.status}
 
                 </Box>
             ),
 
 
         },
+
+
+
 
 
         {
             header: "Actions",
             cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
-                    <Box>
-                        {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                    </Box>
-
-                  
+                (
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: 150 }}>
                         <PrimaryButton
-                            bgcolor={'#001f3f'}
-                            title="View Receipts"
+                            bgcolor="#001f3f"
+                            title={row?.original?.status == 'Assigned' ? 'Unassign' : 'Assign'}
                             onClick={() => {
-                                localStorage.setItem("currentUrl", '/create-customer');
-                                navigate('/purchase-payment-invoice-list', {
-                                    state: { id: row?.original?.id }, // Replace 123 with your actual ID
-                                });
+                                console.log('asdasd');
+                                setSelectedData(row?.original)
+
+                                if (row?.original?.status == 'Assigned') {
+                                    setConfirmationDialog(true)
+                                }
+                                else {
+                                    setStatusDialog(true)
+                                }
+
+
                             }}
                             loading={loading}
                         />
-
-                    
-
-                    <Tooltip title="Invoice">
-                        <IconButton
-                            onClick={() => {
-                                window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
-                                    '_blank'
-                                );
-                            }}
-                            sx={{
-                                backgroundColor: "#f9f9f9",
-                                borderRadius: 2,
-                                border: "1px solid #eee",
-                                width: 35,
-                                height: 35,
-                            }}
-                        >
-                            <ReceiptIcon color="black" fontSize="10px" />
-                        </IconButton>
-                    </Tooltip>
-
-                </Box>
+                    </Box>
+                ) : null           // render nothing when unit_count ≤ 0
             ),
-        },
+
+},
 
     ]
 
 
 
-    useEffect(() => {
-        getCustomerQueue()
-    }, []);
+useEffect(() => {
+    getUsers()
+    getCustomerQueue()
+}, []);
 
-    return (
-        <Box sx={{ p: 3 }}>
+return (
+    <Box sx={{ p: 3 }}>
+        <SimpleDialog
+            open={statusDialog}
+            onClose={() => setStatusDialog(false)}
+            title={"Assign User"}
+        >
+            <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={12}>
+                        <SelectField
+                            size={"small"}
+                            label={"Select User :"}
+                            options={users}
+                            selected={status}
+                            onSelect={(value) => {
+                                setStatus(value);
+                            }}
+                            error={errors?.status?.message}
+                            register={register("status", {
+                                required: "Please select status.",
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={12}>
+                        <InputField
+                            label={"Reference Detail :"}
+                            size={'small'}
+                            fullWidth={true}
+                            multiline={true}
+                            rows={7}
+                            placeholder={"Reference Detail"}
+                            error={errors?.reference_detail?.message}
+                            register={register("reference_detail", {
+                                required:
+                                    'reference detail is required'
 
-            <ConfirmationDialog
-                open={confirmationDialog}
-                onClose={() => setConfirmationDialog(false)}
-                message={"Are You Sure?"}
-                action={() => {
-                    setConfirmationDialog(false);
-                    handleDelete()
-
-                }}
-            />
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={
-
-                                    [
-                                        { id: false, name: "Disabled" },
-                                        { id: true, name: "Enabled" },
-
-                                    ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
-                                }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
+                            })}
+                        />
+                    </Grid>
+                    <Grid container sx={{ justifyContent: "center" }}>
+                        <Grid
+                            item
+                            xs={6}
+                            sm={6}
+                            sx={{
+                                mt: 2,
+                                display: "flex",
+                                justifyContent: "space-between",
+                                gap: "25px",
+                            }}
+                        >
+                            <PrimaryButton
+                                bgcolor={Colors.primary}
+                                title="Yes,Confirm"
+                                type="submit"
+                            />
+                            <PrimaryButton
+                                onClick={() => setStatusDialog(false)}
+                                bgcolor={"#FF1F25"}
+                                title="No,Cancel"
                             />
                         </Grid>
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
                     </Grid>
-                </Box>
-            </SimpleDialog>
-
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Invoice List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-purchase-invoice'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
-
-
+                </Grid>
             </Box>
+        </SimpleDialog>
+        <ConfirmationDialog
+            open={confirmationDialog}
+            onClose={() => setConfirmationDialog(false)}
+            message={"Are You Sure?"}
+            action={() => {
+                setConfirmationDialog(false);
+                handleDelete()
 
-            {/* Filters */}
-            <Box >
+            }}
+        />
+    
 
 
-                {<DataTable loading={loader} data={customerQueue} columns={columns} />}
-            </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>{state?.name}'s Units</Typography>
+
+
 
         </Box>
-    );
+
+        {/* Filters */}
+        <Box >
+
+
+            {<DataTable loading={loader} data={customerQueue} columns={columns} />}
+        </Box>
+
+    </Box>
+);
 }
 
-export default PurchaseInvoices;
+export default ProductUnitList;
