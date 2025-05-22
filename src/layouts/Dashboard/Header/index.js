@@ -1369,6 +1369,18 @@ function Header() {
           order_by: 2,
           children: [
             {
+              id: 13,
+              name: "Employee management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/user-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            {
               id: 55,
               name: "Attendance Report",
               icon: "customer",

@@ -54,7 +54,7 @@ export const PaginationButton = (props) => {
   );
 }
 
-export const SwitchButton = ({ isChecked, setIsChecked }) => {
+export const SwitchButton = ({ isChecked, setIsChecked,sx }) => {
 
   return (
     <Switch
@@ -62,6 +62,7 @@ export const SwitchButton = ({ isChecked, setIsChecked }) => {
       onClick={setIsChecked}
       focusVisibleClassName=".Mui-focusVisible"
       sx={{
+       
         width: 50,
         height: 28,
         padding: 0,
@@ -104,6 +105,7 @@ export const SwitchButton = ({ isChecked, setIsChecked }) => {
           opacity: 1,
           transition: 500,
         },
+        ...sx,
       }}
     />
   );
