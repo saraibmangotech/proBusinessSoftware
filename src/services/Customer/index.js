@@ -202,6 +202,10 @@ const CustomerServices = {
     const data = await get(routes.getCostCenters, params);
     return data;
   },
+  getEmployeeSalesReport: async (params) => {
+    const data = await get(routes.getEmployeeSalesReport, params);
+    return data;
+  },
   getVouchers: async (params) => {
     const data = await get(routes.getVouchers, params);
     return data;

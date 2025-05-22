@@ -41,8 +41,6 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
-import UserServices from 'services/User';
-import { useAuth } from 'context/UseContext';
 
 
 // *For Table Style
@@ -111,8 +109,6 @@ const useStyles = makeStyles({
 })
 
 function EmployeeSalesSummary() {
-    const { user } = useAuth();
-    console.log(user, 'useruser');
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -142,14 +138,14 @@ function EmployeeSalesSummary() {
     const [customerQueue, setCustomerQueue] = useState([]);
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
-    const [fieldDisabled, setFieldDisabled] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState(null)
+
 
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [selectedUser, setSelectedUser] = useState(null)
-    const [users, setUsers] = useState([])
+
 
     // *For Filters
     const [filters, setFilters] = useState({});
@@ -159,32 +155,23 @@ function EmployeeSalesSummary() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
-    const getUsers = async (page, limit, filter) => {
-        // setLoader(true)
+    const [categories, setCategories] = useState([])
+
+    const getCategories = async () => {
         try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
             let params = {
                 page: 1,
                 limit: 1000,
-            }
-            params = { ...params, ...Filter }
+            };
 
-            const { data } = await UserServices.getUsers(params)
-            setUsers(data?.users?.rows)
-
-
+            const { data } = await CustomerServices.getCategoryList(params);
+            setCategories([{ id: 'All', name: 'All' }, ...(data?.categories || [])]);
+            setSelectedCategory({ id: 'All', name: 'All' })
 
         } catch (error) {
-            showErrorToast(error)
-        } finally {
-            // setLoader(false)
+            showErrorToast(error);
         }
-    }
+    };
 
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
@@ -197,11 +184,11 @@ function EmployeeSalesSummary() {
                 limit: 1000,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-                created_by: selectedUser?.id
+                category_id:selectedCategory?.id
 
             }
 
-            const { data } = await CustomerServices.getSnapshotCategoryReport(params)
+            const { data } = await CustomerServices.getEmployeeSalesReport(params)
             setCustomerQueue(data?.report)
 
         } catch (error) {
@@ -311,34 +298,34 @@ function EmployeeSalesSummary() {
     const columns = [
 
         {
-            header: "Category",
-            accessorKey: "category",
-            accessorFn: (row) => row?.category,
+            header: "Employee ID",
+            accessorKey: "employeeId",
+            accessorFn: (row) => row?.employeeId,
             cell: ({ row }) => (
                 <Box
                     variant="contained"
                     color="primary"
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
-                    {row?.original?.category}
+                    {row?.original?.employeeId}
                 </Box>
             ),
         },
         {
-            header: "Count",
-            accessorKey: "itemCount",
+            header: "Employee Name",
+            accessorKey: "employeeName",
         },
         {
             header: "Total Govt. Charges",
-            accessorKey: "totalCharges",
-            accessorFn: (row) => parseFloat(row?.totalCharges || 0),
+            accessorKey: "totalGovernmentCharges",
+            accessorFn: (row) => parseFloat(row?.totalGovernmentCharges || 0),
             cell: ({ row }) => (
                 <Box
                     variant="contained"
                     color="primary"
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
-                    {parseFloat(row?.original?.totalCharges || 0).toFixed(2)}
+                    {parseFloat(row?.original?.totalGovernmentCharges || 0).toFixed(2)}
                 </Box>
             ),
         },
@@ -366,39 +353,66 @@ function EmployeeSalesSummary() {
         },
 
 
-
-
         {
-            header: "Net Service Charge",
+            header: "Net service charge",
             accessorKey: "netCharges",
-            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.netCharges || 0).toFixed(2)}
-                </Box>
-            ),
+            accessorFn: (row) => {
+                const net = parseFloat(row?.netCharges || 0);
+
+                return (net).toFixed(2);
+            },
+            cell: ({ row }) => {
+                const net = parseFloat(row?.original?.netCharges || 0);
+            
+                const total = net ;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {total.toFixed(2)}
+                    </Box>
+                );
+            },
+        }
+
+        ,
+        {
+            header: "Gross Invoice Amount",
+            accessorKey: "netCharges", // you can keep this or remove if not required
+            accessorFn: (row) => {
+                const net = parseFloat(row?.netCharges || 0);
+                const pro = parseFloat(row?.proCommission || 0);
+                const typist = parseFloat(row?.typistCommission || 0);
+                return (net + pro + typist).toFixed(2);
+            },
+            cell: ({ row }) => {
+                const net = parseFloat(row?.original?.netCharges || 0);
+                const pro = parseFloat(row?.original?.proCommission || 0);
+                const typist = parseFloat(row?.original?.typistCommission || 0);
+                const gross = net + pro + typist;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {gross.toFixed(2)}
+                    </Box>
+                );
+            },
         },
+        
 
     ];
 
-    useEffect(() => {
-        if (user?.role_id != 1000) {
-            setFieldDisabled(true)
-            setSelectedUser(user)
-        
-        }
-
-    }, [user])
 
     useEffect(() => {
-        getUsers()
         setFromDate(new Date())
         setToDate(new Date())
         getCustomerQueue()
+        getCategories()
     }, []);
 
     return (
@@ -421,23 +435,6 @@ function EmployeeSalesSummary() {
             >
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
-                        <Grid item xs={3}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select User "}
-                                disabled={fieldDisabled}
-                                options={users}
-                                selected={selectedUser}
-                                onSelect={(value) => {
-                                    setSelectedUser(value);
-
-                                }}
-                                error={errors?.user?.message}
-                                register={register("user", {
-                                    required: "Please select user account.",
-                                })}
-                            />
-                        </Grid>
                         <Grid item xs={12} sm={12}>
                             <SelectField
                                 size={"small"}
@@ -489,7 +486,7 @@ function EmployeeSalesSummary() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Employee Sales Summary Report</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Employee Sales Summary Report</Typography>
 
 
 
@@ -500,21 +497,17 @@ function EmployeeSalesSummary() {
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
                 <Grid item xs={8}>
                     <Grid container spacing={1}>
-                        <Grid item xs={3.5}>
+                        <Grid item xs={12} sm={3.5}>
                             <SelectField
-                                size={"small"}
-                                label={"Select User "}
-                                disabled={fieldDisabled}
-                                options={users}
-                                selected={selectedUser}
-                                onSelect={(value) => {
-                                    setSelectedUser(value);
 
+                                size={"small"}
+                                label={"Select Category"}
+                                options={categories}
+                                selected={selectedCategory}
+                                onSelect={(value) => {
+                                    setSelectedCategory(value);
                                 }}
-                                error={errors?.user?.message}
-                                register={register("user", {
-                                    required: "Please select user account.",
-                                })}
+                                register={register("category")}
                             />
                         </Grid>
                         <Grid item xs={3.5}>
@@ -537,7 +530,7 @@ function EmployeeSalesSummary() {
                             />
                         </Grid>
 
-                        <Grid item xs={1.5} sx={{ marginTop: "30px" }}>
+                        <Grid item xs={1} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
                                 bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
@@ -556,7 +549,7 @@ function EmployeeSalesSummary() {
             <Box >
 
 
-                {<DataTable loading={loader} total={true} csv={true} csvName={'category_report'} data={customerQueue} columns={columns} />}
+                {<DataTable loading={loader} total={true} csv={true} csvName={'employee_sales_summary_report'} data={customerQueue} columns={columns} />}
             </Box>
 
         </Box>

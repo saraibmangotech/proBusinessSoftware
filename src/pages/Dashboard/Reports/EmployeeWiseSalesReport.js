@@ -41,6 +41,8 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
+import UserServices from 'services/User';
+import { useAuth } from 'context/UseContext';
 
 
 // *For Table Style
@@ -108,7 +110,9 @@ const useStyles = makeStyles({
     }
 })
 
-function SnapshotCategoryReport() {
+function EmployeeWiseSalesReport() {
+    const { user } = useAuth();
+    console.log(user, 'useruser');
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -138,13 +142,14 @@ function SnapshotCategoryReport() {
     const [customerQueue, setCustomerQueue] = useState([]);
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
-
+    const [fieldDisabled, setFieldDisabled] = useState(false)
 
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
 
-
+    const [selectedUser, setSelectedUser] = useState(null)
+    const [users, setUsers] = useState([])
 
     // *For Filters
     const [filters, setFilters] = useState({});
@@ -154,6 +159,32 @@ function SnapshotCategoryReport() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
+    const getUsers = async (page, limit, filter) => {
+        // setLoader(true)
+        try {
+            const Page = page ? page : currentPage
+            const Limit = limit ? limit : pageLimit
+            const Filter = filter ? { ...filters, ...filter } : null;
+            setCurrentPage(Page)
+            setPageLimit(Limit)
+            setFilters(Filter)
+            let params = {
+                page: 1,
+                limit: 1000,
+            }
+            params = { ...params, ...Filter }
+
+            const { data } = await UserServices.getUsers(params)
+            setUsers(data?.users?.rows)
+
+
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            // setLoader(false)
+        }
+    }
 
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
@@ -166,6 +197,7 @@ function SnapshotCategoryReport() {
                 limit: 1000,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+                created_by: selectedUser?.id
 
             }
 
@@ -277,12 +309,17 @@ function SnapshotCategoryReport() {
     };
 
     const columns = [
+
         {
             header: "Category",
             accessorKey: "category",
             accessorFn: (row) => row?.category,
             cell: ({ row }) => (
-                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
                     {row?.original?.category}
                 </Box>
             ),
@@ -293,93 +330,72 @@ function SnapshotCategoryReport() {
         },
         {
             header: "Total Govt. Charges",
-            accessorKey: "totalGovernmentCharges",
-            accessorFn: (row) => parseFloat(row?.totalGovernmentCharges || 0).toFixed(2),
+            accessorKey: "totalCharges",
+            accessorFn: (row) => parseFloat(row?.totalCharges || 0),
             cell: ({ row }) => (
-                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {parseFloat(row?.original?.totalGovernmentCharges || 0).toFixed(2)}
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {parseFloat(row?.original?.totalCharges || 0).toFixed(2)}
                 </Box>
             ),
         },
         {
             header: "Total Service Charges",
+            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0),
             accessorKey: "totalCenterFee",
-            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {parseFloat(row?.original?.totalCenterFee || 0).toFixed(2)}
-                </Box>
-            ),
         },
+
         {
             header: "Tax",
+            accessorFn: (row) => parseFloat(row?.totalVat || 0),
             accessorKey: "totalVat",
-            accessorFn: (row) => parseFloat(row?.totalVat || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {parseFloat(row?.original?.totalVat || 0).toFixed(2)}
-                </Box>
-            ),
         },
+
         {
             header: "Typist Commission",
+            accessorFn: (row) => parseFloat(row?.typistCommission || 0),
             accessorKey: "typistCommission",
-            accessorFn: (row) => parseFloat(row?.typistCommission || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {parseFloat(row?.original?.typistCommission || 0).toFixed(2)}
-                </Box>
-            ),
         },
         {
             header: "Customer Commission",
+            accessorFn: (row) => parseFloat(row?.proCommission || 0),
             accessorKey: "proCommission",
-            accessorFn: (row) => parseFloat(row?.proCommission || 0).toFixed(2),
+        },
+
+
+
+
+        {
+            header: "Net Service Charge",
+            accessorKey: "netCharges",
+            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
             cell: ({ row }) => (
-                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {parseFloat(row?.original?.proCommission || 0).toFixed(2)}
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {parseFloat(row?.original?.netCharges || 0).toFixed(2)}
                 </Box>
             ),
         },
-        {
-            header: "Net service charge",
-            accessorKey: "netCharges",
-            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
-            cell: ({ row }) => {
-                const net = parseFloat(row?.original?.netCharges || 0);
-                return (
-                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                        {net.toFixed(2)}
-                    </Box>
-                );
-            },
-        },
-        {
-            header: "Gross Invoice Amount",
-            accessorKey: "grossInvoiceAmount", // Use a unique key to avoid conflict
-            accessorFn: (row) => {
-                const net = parseFloat(row?.netCharges || 0);
-                const pro = parseFloat(row?.proCommission || 0);
-                const typist = parseFloat(row?.typistCommission || 0);
-                return (net + pro + typist).toFixed(2);
-            },
-            cell: ({ row }) => {
-                const net = parseFloat(row?.original?.netCharges || 0);
-                const pro = parseFloat(row?.original?.proCommission || 0);
-                const typist = parseFloat(row?.original?.typistCommission || 0);
-                const gross = net + pro + typist;
-                return (
-                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                        {gross.toFixed(2)}
-                    </Box>
-                );
-            },
-        },
-    ];
-    
 
+    ];
 
     useEffect(() => {
+        if (user?.role_id != 1000) {
+            setFieldDisabled(true)
+            setSelectedUser(user)
+        
+        }
+
+    }, [user])
+
+    useEffect(() => {
+        getUsers()
         setFromDate(new Date())
         setToDate(new Date())
         getCustomerQueue()
@@ -405,6 +421,23 @@ function SnapshotCategoryReport() {
             >
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
+                        <Grid item xs={3}>
+                            <SelectField
+                                size={"small"}
+                                label={"Select User "}
+                                disabled={fieldDisabled}
+                                options={users}
+                                selected={selectedUser}
+                                onSelect={(value) => {
+                                    setSelectedUser(value);
+
+                                }}
+                                error={errors?.user?.message}
+                                register={register("user", {
+                                    required: "Please select user account.",
+                                })}
+                            />
+                        </Grid>
                         <Grid item xs={12} sm={12}>
                             <SelectField
                                 size={"small"}
@@ -456,7 +489,7 @@ function SnapshotCategoryReport() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Category Report</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Employee Wise Sales Report</Typography>
 
 
 
@@ -467,7 +500,24 @@ function SnapshotCategoryReport() {
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
                 <Grid item xs={8}>
                     <Grid container spacing={1}>
-                        <Grid item xs={5}>
+                        <Grid item xs={3.5}>
+                            <SelectField
+                                size={"small"}
+                                label={"Select User "}
+                                disabled={fieldDisabled}
+                                options={users}
+                                selected={selectedUser}
+                                onSelect={(value) => {
+                                    setSelectedUser(value);
+
+                                }}
+                                error={errors?.user?.message}
+                                register={register("user", {
+                                    required: "Please select user account.",
+                                })}
+                            />
+                        </Grid>
+                        <Grid item xs={3.5}>
                             <DatePicker
                                 label={"From Date"}
                                 disableFuture={true}
@@ -476,7 +526,7 @@ function SnapshotCategoryReport() {
                                 onChange={(date) => handleFromDate(date)}
                             />
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={3.5}>
                             <DatePicker
                                 label={"To Date"}
 
@@ -487,7 +537,7 @@ function SnapshotCategoryReport() {
                             />
                         </Grid>
 
-                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                        <Grid item xs={1.5} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
                                 bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
@@ -513,4 +563,4 @@ function SnapshotCategoryReport() {
     );
 }
 
-export default SnapshotCategoryReport;
+export default EmployeeWiseSalesReport;

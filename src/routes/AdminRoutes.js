@@ -62,6 +62,7 @@ import ServiceDetail from "pages/Dashboard/ServiceItem/ServiceDetail";
 
 
 
+
 const CreateCustomer = lazy(() =>
   import("pages/Dashboard/Customers/CreateCustomer")
 );
@@ -135,7 +136,9 @@ const TrialBalanceDetailed = lazy(() =>
 const AccountLedger = lazy(() =>
   import("pages/Dashboard/Accounts/AccountLedger")
 );
-
+const EmployeeSalesSummary = lazy(() =>
+  import("pages/Dashboard/Reports/EmployeeSalesSummary")
+);
 
 const GeneralLedger = lazy(() =>
   import("pages/Dashboard/Accounts/GeneralLedger")
@@ -337,8 +340,8 @@ const CreateReceiptVoucher= lazy(() =>
 const CreateVendor= lazy(() =>
   import("pages/Dashboard/Vendors/CreateVendor")
 );
-const EmployeeSalesSummary= lazy(() =>
-  import("pages/Dashboard/Reports/EmployeeSalesSummary")
+const EmployeeWiseSalesReport= lazy(() =>
+  import("pages/Dashboard/Reports/EmployeeWiseSalesReport")
 );
 const Vendors= lazy(() =>
   import("pages/Dashboard/Vendors/Vendors")
@@ -489,6 +492,10 @@ const AdminRoutes = [
   {
     path: "/create-product-category",
     component: <CreateProductCategory />,
+  },
+  {
+    path: "/employee-wise-sales-report",
+    component: <EmployeeWiseSalesReport />,
   },
   {
     path: "/employee-sales-summary-report",
