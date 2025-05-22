@@ -235,7 +235,8 @@ function CreatePaymentInvoice() {
                 page: 1,
                 limit: 10000,
                 name: search,
-                is_disabled: false
+                is_disabled: false,
+                sub_category: 4
 
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)

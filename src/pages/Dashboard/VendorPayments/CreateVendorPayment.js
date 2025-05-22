@@ -638,6 +638,7 @@ function CreateVendorPayment() {
                 page: 1,
                 limit: 10000,
                 name: search,
+                sub_category: 4,
                 is_disabled: false
 
             }
