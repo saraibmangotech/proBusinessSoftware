@@ -165,7 +165,7 @@ function EmployeeSalesSummary() {
             };
 
             const { data } = await CustomerServices.getCategoryList(params);
-            setCategories([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+            setCategories([{ id: 'All', name: 'All' }, ...(data?.categories || [])]);
             setSelectedCategory({ id: 'All', name: 'All' })
 
         } catch (error) {
@@ -358,15 +358,13 @@ function EmployeeSalesSummary() {
             accessorKey: "netCharges",
             accessorFn: (row) => {
                 const net = parseFloat(row?.netCharges || 0);
-                const pro = parseFloat(row?.proCommission || 0);
-                const typist = parseFloat(row?.typistCommission || 0);
-                return (net - pro - typist).toFixed(2);
+
+                return (net).toFixed(2);
             },
             cell: ({ row }) => {
                 const net = parseFloat(row?.original?.netCharges || 0);
-                const pro = parseFloat(row?.original?.proCommission || 0);
-                const typist = parseFloat(row?.original?.typistCommission || 0);
-                const total = net - pro - typist;
+            
+                const total = net ;
                 return (
                     <Box
                         variant="contained"
@@ -382,18 +380,30 @@ function EmployeeSalesSummary() {
         ,
         {
             header: "Gross Invoice Amount",
-            accessorKey: "netCharges",
-            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.netCharges || 0).toFixed(2)}
-                </Box>
-            ),
+            accessorKey: "netCharges", // you can keep this or remove if not required
+            accessorFn: (row) => {
+                const net = parseFloat(row?.netCharges || 0);
+                const pro = parseFloat(row?.proCommission || 0);
+                const typist = parseFloat(row?.typistCommission || 0);
+                return (net + pro + typist).toFixed(2);
+            },
+            cell: ({ row }) => {
+                const net = parseFloat(row?.original?.netCharges || 0);
+                const pro = parseFloat(row?.original?.proCommission || 0);
+                const typist = parseFloat(row?.original?.typistCommission || 0);
+                const gross = net + pro + typist;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {gross.toFixed(2)}
+                    </Box>
+                );
+            },
         },
+        
 
     ];
 

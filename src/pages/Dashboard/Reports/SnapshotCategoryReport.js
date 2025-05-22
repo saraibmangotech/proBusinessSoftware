@@ -277,17 +277,12 @@ function SnapshotCategoryReport() {
     };
 
     const columns = [
-
         {
             header: "Category",
             accessorKey: "category",
             accessorFn: (row) => row?.category,
             cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {row?.original?.category}
                 </Box>
             ),
@@ -299,84 +294,89 @@ function SnapshotCategoryReport() {
         {
             header: "Total Govt. Charges",
             accessorKey: "totalGovernmentCharges",
-            accessorFn: (row) => parseFloat(row?.totalGovernmentCharges || 0),
+            accessorFn: (row) => parseFloat(row?.totalGovernmentCharges || 0).toFixed(2),
             cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {parseFloat(row?.original?.totalGovernmentCharges || 0).toFixed(2)}
                 </Box>
             ),
         },
         {
             header: "Total Service Charges",
-            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0),
             accessorKey: "totalCenterFee",
+            accessorFn: (row) => parseFloat(row?.totalCenterFee || 0).toFixed(2),
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {parseFloat(row?.original?.totalCenterFee || 0).toFixed(2)}
+                </Box>
+            ),
         },
-
         {
             header: "Tax",
-            accessorFn: (row) => parseFloat(row?.totalVat || 0),
             accessorKey: "totalVat",
+            accessorFn: (row) => parseFloat(row?.totalVat || 0).toFixed(2),
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {parseFloat(row?.original?.totalVat || 0).toFixed(2)}
+                </Box>
+            ),
         },
-
         {
             header: "Typist Commission",
-            accessorFn: (row) => parseFloat(row?.typistCommission || 0),
             accessorKey: "typistCommission",
+            accessorFn: (row) => parseFloat(row?.typistCommission || 0).toFixed(2),
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {parseFloat(row?.original?.typistCommission || 0).toFixed(2)}
+                </Box>
+            ),
         },
         {
             header: "Customer Commission",
-            accessorFn: (row) => parseFloat(row?.proCommission || 0),
             accessorKey: "proCommission",
+            accessorFn: (row) => parseFloat(row?.proCommission || 0).toFixed(2),
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {parseFloat(row?.original?.proCommission || 0).toFixed(2)}
+                </Box>
+            ),
         },
-
-
         {
             header: "Net service charge",
             accessorKey: "netCharges",
+            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
+            cell: ({ row }) => {
+                const net = parseFloat(row?.original?.netCharges || 0);
+                return (
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {net.toFixed(2)}
+                    </Box>
+                );
+            },
+        },
+        {
+            header: "Gross Invoice Amount",
+            accessorKey: "grossInvoiceAmount", // Use a unique key to avoid conflict
             accessorFn: (row) => {
                 const net = parseFloat(row?.netCharges || 0);
                 const pro = parseFloat(row?.proCommission || 0);
                 const typist = parseFloat(row?.typistCommission || 0);
-                return (net - pro - typist).toFixed(2);
+                return (net + pro + typist).toFixed(2);
             },
             cell: ({ row }) => {
                 const net = parseFloat(row?.original?.netCharges || 0);
                 const pro = parseFloat(row?.original?.proCommission || 0);
                 const typist = parseFloat(row?.original?.typistCommission || 0);
-                const total = net - pro - typist;
+                const gross = net + pro + typist;
                 return (
-                    <Box
-                        variant="contained"
-                        color="primary"
-                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                    >
-                        {total.toFixed(2)}
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {gross.toFixed(2)}
                     </Box>
                 );
             },
-        }
-        
-,
-        {
-            header: "Gross Invoice Amount",
-            accessorKey: "netCharges",
-            accessorFn: (row) => parseFloat(row?.netCharges || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.netCharges || 0).toFixed(2)}
-                </Box>
-            ),
         },
-       
     ];
+    
 
 
     useEffect(() => {
