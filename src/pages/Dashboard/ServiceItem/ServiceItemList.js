@@ -27,7 +27,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
-import { PrimaryButton } from 'components/Buttons';
+import { PrimaryButton, SwitchButton } from 'components/Buttons';
 import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -40,6 +40,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import FinanceServices from 'services/Finance';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -134,7 +135,7 @@ function CategoryList() {
 
   // *For Customer Queue
   const [customerQueue, setCustomerQueue] = useState([]);
-const [data, setData] = useState([])
+  const [data, setData] = useState([])
 
 
   const [totalCount, setTotalCount] = useState(0);
@@ -166,14 +167,15 @@ const [data, setData] = useState([])
       let params = {
         page: 1,
         limit: 1000,
-      
+        all: true
+
 
       }
       params = { ...params, ...Filter }
       const { data } = await CustomerServices.getServiceItem(params)
       setData(data?.rows);
-     
-     
+
+
       setPermissions(formatPermissionData(data?.permissions))
       console.log(formatPermissionData(data?.permissions));
 
@@ -204,7 +206,40 @@ const [data, setData] = useState([])
     Debounce(() => getCustomerQueue(1, '', data));
   }
 
+  // *For Update Account Status
+  const updateServiceStatus = async (id, status) => {
+    const shallowCopy = [...data];
+    let accountIndex = shallowCopy.findIndex(item => item.id == id);
 
+    if (accountIndex != -1) {
+      shallowCopy[accountIndex].is_deleted = status;
+    }
+
+    setData(shallowCopy)
+
+
+    try {
+      let obj = {
+        id: id,
+        is_deleted: status
+      }
+
+
+      const promise = CustomerServices.UpdateServiceItem(obj);
+
+      showPromiseToast(
+        promise,
+        'Saving...',
+        'Added Successfully',
+        'Something Went Wrong'
+      );
+
+
+      // getAccounts()
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
 
   // *For Handle Filter
 
@@ -215,22 +250,22 @@ const [data, setData] = useState([])
     Debounce(() => getCustomerQueue(1, '', data));
   }
   const handleDelete = async (item) => {
- 
+
 
     try {
-        let params = { service_id: selectedData?.id }
+      let params = { service_id: selectedData?.id }
 
 
-        const { message } = await CustomerServices.DeleteServiceItem(params)
+      const { message } = await CustomerServices.DeleteServiceItem(params)
 
-        SuccessToaster(message);
-        getCustomerQueue()
+      SuccessToaster(message);
+      getCustomerQueue()
     } catch (error) {
-        showErrorToast(error)
+      showErrorToast(error)
     } finally {
-        // setLoader(false)
+      // setLoader(false)
     }
-}
+  }
   const UpdateStatus = async () => {
     try {
       let obj = {
@@ -287,7 +322,7 @@ const [data, setData] = useState([])
     {
       header: "Category",
       accessorKey: "category",
-       accessorFn: (row) => row?.category?.name,
+      accessorFn: (row) => row?.category?.name,
 
 
     },
@@ -315,16 +350,36 @@ const [data, setData] = useState([])
 
 
     },
-    
+    {
+      header: "Is Active",
+      accessorKey: "is_deleted",
+      cell: ({ row }) => (
+
+
+        <SwitchButton
+          sx={{
+            '& .MuiSwitch-thumb': {
+              width: '27px !important',
+              height: '27px !important'
+            }
+          }}
+          isChecked={row?.original?.is_deleted}
+          setIsChecked={() => updateServiceStatus(row?.original?.id, !row?.original?.is_deleted)}
+        />
+
+
+      ),
+    },
+
     {
       header: "Actions",
       cell: ({ row }) => (
 
-        <Box sx={{display:'flex',gap:1}}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/service-item-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/service-item-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
           {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-service/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-service') }} src={Images.editIcon} width={'35px'}></Box>}
           <Box>
-            {true && <Box sx={{cursor:'pointer'}} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+            {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
             {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
           </Box>
@@ -414,7 +469,7 @@ const [data, setData] = useState([])
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Item List</Typography>
         {true && <PrimaryButton
-         bgcolor={'#001f3f'}
+          bgcolor={'#001f3f'}
           title="Create"
           onClick={() => { navigate('/create-service-item'); localStorage.setItem("currentUrl", '/create-customer') }}
           loading={loading}
