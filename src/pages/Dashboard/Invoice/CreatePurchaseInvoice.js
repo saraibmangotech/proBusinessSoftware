@@ -20,6 +20,7 @@ import {
     TableHead,
     TextField,
     Paper,
+    Switch,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RegisterContainer from "container/Register";
@@ -93,6 +94,7 @@ function CreatePurchaseInvoice() {
     const [cards, setCards] = useState([])
     const [selectedCard, setSelectedCard] = useState(null)
     const [payments, setPayments] = useState([])
+    const [isVatApplicable, setIsVatApplicable] = useState(true);
 
     console.log(rows, "data");
     const [items, setItems] = useState([
@@ -383,6 +385,7 @@ function CreatePurchaseInvoice() {
                     vendor_account_id: selectedVendor?.account_id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
+                    vat_enabled :isVatApplicable,
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
@@ -745,6 +748,7 @@ function CreatePurchaseInvoice() {
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
+        setPayments([])
         setEditState(false);
     };
 
@@ -920,6 +924,20 @@ function CreatePurchaseInvoice() {
             console.error("Error fetching location:", error);
         }
     };
+    useEffect(() => {
+        const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
+        const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+      
+        const totalWithVat = isVatApplicable
+          ? parseFloat((grandTotal * 0.05) + grandTotal)
+          : grandTotal;
+      
+        setValue1('total', totalWithVat.toFixed(2));
+        setValue1('finalTotal', totalWithVat.toFixed(2));
+        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
+      }, [isVatApplicable, rows, payments]);
+      
+    
     return (
         <>
             <Box m={3} sx={{ backgroundColor: "white", borderRadius: "12px" }}>
@@ -1313,28 +1331,41 @@ function CreatePurchaseInvoice() {
                                 </TableRow>
 
                                 <TableRow>
+                                    
                                     <TableCell colSpan={7} align="right">
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                                        <Box sx={{display:'flex',gap:1,justifyContent:'flex-end',alignItems:'center'}}>
+                                            <Switch
+                                                checked={isVatApplicable}
+                                                onChange={(e) => setIsVatApplicable(e.target.checked)}
+                                                color="primary"
+                                            />
+                                            <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                                        </Box>
                                     </TableCell>
+
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{
-                                            parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)}
-                                        </Typography> {/* Display the Sub-total */}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                                            {isVatApplicable
+                                                ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
+                                                : "0.00"}
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
-                                {/* Amount Total Row (optional, if needed for the final sum) */}
+
                                 <TableRow>
                                     <TableCell colSpan={7} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{
-                                            parseFloat(subTotal) +
-                                            (parseFloat(subTotal) * 0.05)
-                                        }
-                                        </Typography> {/* This can be the same as Sub-total */}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                                            {(
+                                                parseFloat(subTotal) +
+                                                (isVatApplicable ? parseFloat(subTotal) * 0.05 : 0)
+                                            ).toFixed(2)}
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
+
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
@@ -1507,12 +1538,12 @@ function CreatePurchaseInvoice() {
                                             onSelect={(value) => {
                                                 setSelectedAccount(value)
                                                 console.log(value);
-                                                setValue('AccountCode', value?.account_code)
+                                               
                                                 getChildAccounts(value?.id)
 
                                             }}
-                                            error={errors?.service?.message}
-                                            register={register("service", {
+                                            error={errors?.account?.message}
+                                            register={register("account", {
                                                 required: false,
                                             })}
                                         />

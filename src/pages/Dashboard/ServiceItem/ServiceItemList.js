@@ -363,7 +363,7 @@ function CategoryList() {
               height: '27px !important'
             }
           }}
-          isChecked={row?.original?.is_deleted}
+          isChecked={!row?.original?.is_deleted}
           setIsChecked={() => updateServiceStatus(row?.original?.id, !row?.original?.is_deleted)}
         />
 
