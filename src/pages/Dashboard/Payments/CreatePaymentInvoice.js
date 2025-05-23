@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -90,6 +91,7 @@ function CreatePaymentInvoice() {
     const [chargesDisabled, setChargesDisabled] = useState(false)
     const [buttonDisabled, setButtonDisabled] = useState(false)
     console.log(errors, 'watchwatchwatch');
+    const [date, setDate] = useState(null)
 
     // *For Customer Booking
     const [customers, setCustomers] = useState([]);
@@ -439,6 +441,7 @@ function CreatePaymentInvoice() {
                 invoices: selectedInvoice,
                 narration: formData?.narration,
                 notes: formData?.notes,
+                payment_date:moment(date).format('MM-DD-YYYY'),
                 payment_mode: paymentModesString,
             };
             console.log(obj);
@@ -874,13 +877,29 @@ function CreatePaymentInvoice() {
 
                         <Box sx={{ my: 4, py: 2, bgcolor: Colors.whiteSmoke }}>
                             <Grid container spacing={1} p={2} justifyContent={'space-between'} alignItems={'center'}>
-                                <Grid item md={6} sm={12} xs={12}>
+                                <Grid item md={4} sm={12} xs={12}>
                                     <InputField
                                         label="Notes"
                                         size="small"
                                         placeholder="Notes"
                                         register={register("notes")}
                                         error={errors?.notes?.message}
+                                    />
+                                </Grid>
+                                <Grid item md={4} sm={12} xs={12}>
+                                    <DatePicker
+                                        label={"Payment Date:*"}
+                                        value={date}
+                                        size={"small"}
+                                        error={errors?.paidAt?.message}
+                                        register={register("paidAt", {
+                                            required: date ? false : 'Date is required'
+                                        })}
+                                        onChange={(date) => {
+                                            setValue("paidAt", date)
+                                            setDate(new Date(date))
+
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={2.5}>
