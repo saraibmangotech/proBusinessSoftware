@@ -184,7 +184,7 @@ function EmployeeSalesSummary() {
                 limit: 999999,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-                category_id:selectedCategory?.id
+                category_id: selectedCategory?.id
 
             }
 
@@ -363,8 +363,8 @@ function EmployeeSalesSummary() {
             },
             cell: ({ row }) => {
                 const net = parseFloat(row?.original?.netCharges || 0);
-            
-                const total = net ;
+
+                const total = net;
                 return (
                     <Box
                         variant="contained"
@@ -380,30 +380,23 @@ function EmployeeSalesSummary() {
         ,
         {
             header: "Gross Invoice Amount",
-            accessorKey: "netCharges", // you can keep this or remove if not required
+            accessorKey: "grossCharges", // Use a unique key to avoid conflict
             accessorFn: (row) => {
-                const net = parseFloat(row?.netCharges || 0);
-                const pro = parseFloat(row?.proCommission || 0);
-                const typist = parseFloat(row?.typistCommission || 0);
-                return (net + pro + typist).toFixed(2);
+
+                return parseFloat(row?.grossCharges || 0).toFixed(2);
             },
             cell: ({ row }) => {
-                const net = parseFloat(row?.original?.netCharges || 0);
-                const pro = parseFloat(row?.original?.proCommission || 0);
-                const typist = parseFloat(row?.original?.typistCommission || 0);
-                const gross = net + pro + typist;
+
+                const gross = parseFloat(row?.original?.grossCharges || 0)
                 return (
-                    <Box
-                        variant="contained"
-                        color="primary"
-                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                    >
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                         {gross.toFixed(2)}
                     </Box>
                 );
             },
         },
-        
+
+
 
     ];
 

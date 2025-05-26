@@ -132,7 +132,8 @@ function JournalVoucherList() {
 
     const tableHead = [{ name: 'Created At', key: '' }, { name: 'Impact Date', key: '' }, { name: 'Cost Center ', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
 
-
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
 
 
 
@@ -265,6 +266,8 @@ function JournalVoucherList() {
             let params = {
                 page: Page,
                 limit: Limit,
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
             }
             params = { ...params, ...Filter }
 
@@ -297,6 +300,32 @@ function JournalVoucherList() {
 
 
 
+  const handleFromDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setFromDate('invalid')
+        return
+      }
+      console.log(newDate, "newDate")
+      setFromDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+
+  const handleToDate = (newDate) => {
+    try {
+      // eslint-disable-next-line eqeqeq
+      if (newDate == 'Invalid Date') {
+        setToDate('invalid')
+        return
+      }
+      setToDate(new Date(newDate))
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
 
 
     // *For Handle Filter
@@ -415,9 +444,28 @@ function JournalVoucherList() {
 
             {/* Filters */}
             <Box >
-                <Grid container spacing={2} mb={4}>
-                    <Grid item xs={6} >
+                <Grid container spacing={2} mb={4} alignItems={'center'}>
+                    <Grid item xs={3} mt={3} >
                         <LabelCustomInput type={'text'} bgcolor={'#FAFAFA'} color={Colors.primary} border={'3px solid #FAFAFA'} StartLabel={'Search'} placeholder={'Search'} register={register("search")} />
+                    </Grid>
+                    <Grid item xs={3}>
+                        <DatePicker
+                            label={"From Date"}
+                            disableFuture={true}
+                            size="small"
+                            value={fromDate}
+                            onChange={(date) => handleFromDate(date)}
+                        />
+                    </Grid>
+                    <Grid item xs={3}>
+                        <DatePicker
+                            label={"To Date"}
+
+                            disableFuture={true}
+                            size="small"
+                            value={toDate}
+                            onChange={(date) => handleToDate(date)}
+                        />
                     </Grid>
                     {/* <Grid item xs={3} >
                         <LabelCustomInput type={'text'} bgcolor={'#FAFAFA'} color={Colors.primary} border={'3px solid #FAFAFA'} StartLabel={'By Customers'} placeholder={'Enter Name'}   register={register("payroll")} />
@@ -428,7 +476,7 @@ function JournalVoucherList() {
                     <Grid item xs={3} >
                         <LabelCustomInput bgcolor={'#FAFAFA'} color={Colors.primary} border={'2px solid #FAFAFA'} StartLabel={'By Date'} placeholder={'Enter Name'}   register={register("payroll")} />
                     </Grid> */}
-                    <Grid item xs={6} display={'flex'} justifyContent={'flex-end'} gap={2} >
+                    <Grid item xs={3} display={'flex'} justifyContent={'flex-end'} mt={2} gap={2} >
                         <PrimaryButton
                             bgcolor={Colors.white}
                             textcolor={Colors.primary}
@@ -438,7 +486,7 @@ function JournalVoucherList() {
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#001f3f'}
+                            bgcolor={'#001f3f'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}

@@ -223,6 +223,7 @@ function CreateReceiptVoucher() {
                 page: 1,
                 limit: 10000,
                 name: search,
+                sub_category: 4,
                 is_disabled:false
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
@@ -309,7 +310,8 @@ function CreateReceiptVoucher() {
       };
     // *For Create Journal Voucher
     const CreateReceiptVoucher = async (formData) => {
-
+        const paymentModesString = rows.map((item) => item.payment_mode).join(", ");
+  
         setLoading(true)
         try {
 
@@ -323,7 +325,7 @@ function CreateReceiptVoucher() {
                 description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
-                payment_method: 'Account',
+                payment_method: paymentModesString,
                 cost_center:selectedCostCenter?.name
             }
 
@@ -395,6 +397,7 @@ function CreateReceiptVoucher() {
             ...data,
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
+            payment_mode:selectedAccount?.name
         };
 
         let findElement = rows?.find((item) => item?.account_id === newRow?.account_id);

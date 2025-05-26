@@ -41,6 +41,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import DatePicker from 'components/DatePicker';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -140,7 +141,8 @@ function ReceiptVouchers() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
-
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
 
 
     // *For Filters
@@ -166,7 +168,9 @@ function ReceiptVouchers() {
             let params = {
                 page: 1,
                 limit: 999999,
-                type: 'receipt_voucher'
+                type: 'receipt_voucher',
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
 
             }
@@ -190,6 +194,33 @@ function ReceiptVouchers() {
         }
     }
 
+
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
 
 
 
@@ -290,45 +321,45 @@ function ReceiptVouchers() {
 
         },
         {
-                   header: "Created At",
-                   accessorKey: 'date', // optional, used for column ID purposes
-                   accessorFn: (row) => {
-                       const dateValue = row?.created_at;
-                       return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
-                   },
-                   cell: ({ row }) => {
-                       const dateValue = row?.original?.created_at;
-                       return (
-                           <Box
-                               variant="contained"
-                               color="primary"
-                               sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                           >
-                               {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
-                           </Box>
-                       );
-                   },
-               },
-               {
-                   header: "Impact Date",
-                   accessorKey: 'date', // optional, used for column ID purposes
-                   accessorFn: (row) => {
-                       const dateValue = row?.date;
-                       return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
-                   },
-                   cell: ({ row }) => {
-                       const dateValue = row?.original?.date ;
-                       return (
-                           <Box
-                               variant="contained"
-                               color="primary"
-                               sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                           >
-                               {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
-                           </Box>
-                       );
-                   },
-               },
+            header: "Created At",
+            accessorKey: 'date', // optional, used for column ID purposes
+            accessorFn: (row) => {
+                const dateValue = row?.created_at;
+                return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
+            },
+            cell: ({ row }) => {
+                const dateValue = row?.original?.created_at;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
+                    </Box>
+                );
+            },
+        },
+        {
+            header: "Impact Date",
+            accessorKey: 'date', // optional, used for column ID purposes
+            accessorFn: (row) => {
+                const dateValue = row?.date;
+                return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
+            },
+            cell: ({ row }) => {
+                const dateValue = row?.original?.date;
+                return (
+                    <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                    >
+                        {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
+                    </Box>
+                );
+            },
+        },
 
         {
             header: "Creator",
@@ -460,18 +491,57 @@ function ReceiptVouchers() {
                 </Box>
             </SimpleDialog>
 
+            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={12} display={'flex'} mt={2.7}  justifyContent={"space-between"} >
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Receipt Voucher List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-receipt-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
+                    <Box><Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Receipt Voucher List</Typography></Box>
+                    <Box><PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create"
+                        onClick={() => { navigate('/create-receipt-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />
+                    </Box>
 
 
-            </Box>
+                </Grid>
+                <Grid item xs={8}>
+                    <Grid container spacing={1}>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"From Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={fromDate}
+                                onChange={(date) => handleFromDate(date)}
+                            />
+                        </Grid>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"To Date"}
+
+                                disableFuture={true}
+                                size="small"
+                                value={toDate}
+                                onChange={(date) => handleToDate(date)}
+                            />
+                        </Grid>
+
+                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                            <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                            />
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+            </Grid>
+
 
             {/* Filters */}
             <Box >

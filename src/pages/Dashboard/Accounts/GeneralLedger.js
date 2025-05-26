@@ -292,7 +292,14 @@ function GeneralLedger() {
   };
 
   const downloadExcel = () => {
+    const rows = [];
+  
+    const accountNameRow = [
+      `Ledger : ${selectedAccount?.name || "-"}`, "", "", "", "", "", "", "", "", ""
+    ];
+  
     const headers = tableHead.filter((item) => item !== "Action");
+  
     const data = accountLedgers2;
   
     let totalDebit = 0;
@@ -300,10 +307,6 @@ function GeneralLedger() {
     let runningBalance = 0;
   
     const accountNature = data[0]?.account?.nature || "debit"; // default to debit if undefined
-  
-    const rows = [];
-  
-
   
     data.forEach((item) => {
       const debit = parseFloat(item?.debit || 0);
@@ -335,28 +338,37 @@ function GeneralLedger() {
   
     // Totals row
     rows.push([
-      "Total", "", "", "", "", "", "", 
+      "Total", "", "", "", "", "", "",
       totalDebit.toFixed(2),
       totalCredit.toFixed(2),
       ""
     ]);
-      // Opening Balance row
-      rows.push([
-        "Opening Balance", "", "", "", "", "", "", 
-        "", "", parseFloat(openingBal).toFixed(2)
-      ]);
-    // Closing Balance row (final running balance)
+  
+    // Opening Balance row
     rows.push([
-      "Closing Balance", "", "", "", "", "", "", 
+      "Opening Balance", "", "", "", "", "", "",
+      "", "", parseFloat(openingBal).toFixed(2)
+    ]);
+  
+    // Closing Balance row
+    rows.push([
+      "Closing Balance", "", "", "", "", "", "",
       "", "", runningBalance.toFixed(2)
     ]);
   
-    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    // Now build the worksheet with the account name row + header + data
+    const ws = XLSX.utils.aoa_to_sheet([
+      accountNameRow,
+      headers,
+      ...rows
+    ]);
+  
     const csv = XLSX.utils.sheet_to_csv(ws);
   
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, 'General_Ledger.csv');
   };
+  
   
 
   const getCostCenters = async () => {
@@ -675,7 +687,7 @@ function GeneralLedger() {
                     </Typography>
                     <Typography variant="body1" >
                       {/* Replace with actual value or variable */}
-                      {openingBal}
+                      {parseFloat(openingBal).toFixed(2)}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} display={'flex'} gap={1} alignItems={'center'}>
@@ -684,7 +696,7 @@ function GeneralLedger() {
                     </Typography>
                     <Typography variant="body1" >
                       {/* Replace with actual value or variable */}
-                     {Balance}
+                     {parseFloat(Balance).toFixed(2)}
                     </Typography>
                   </Grid>
                 </Grid>
