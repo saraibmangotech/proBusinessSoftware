@@ -163,7 +163,7 @@ function PurchaseInvoicePaymentList() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 id: getValues2('invoiceNumber')
 
 

@@ -137,7 +137,7 @@ function UpdatePrepaidInvoices() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }
@@ -192,7 +192,7 @@ function UpdatePrepaidInvoices() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }

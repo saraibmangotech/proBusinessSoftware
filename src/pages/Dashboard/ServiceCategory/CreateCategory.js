@@ -291,7 +291,7 @@ function CreateCategory() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
             }
 
@@ -314,7 +314,7 @@ function CreateCategory() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }

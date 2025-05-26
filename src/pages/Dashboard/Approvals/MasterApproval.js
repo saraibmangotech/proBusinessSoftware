@@ -88,7 +88,7 @@ function MasterApproval() {
   const [approvalRequestDialog, setApprovalRequestDialog] = useState(false);
 
   // *For Approval List
-  const [approvalList, setApprovalList] = useState([{ code: 'A1-10001', name: 'Plant & Machinery', unit: 'Shipping', major: 'Asset', sub: 'Fixed Asset', balance: '1000' }]);
+  const [approvalList, setApprovalList] = useState([{ code: 'A1-10001', name: 'Plant & Machinery', unit: 'Shipping', major: 'Asset', sub: 'Fixed Asset', balance: '999999' }]);
   const [approvalDetail, setApprovalDetail] = useState();
   const [bookingId, setBookingId] = useState();
   const [approvalId, setApprovalId] = useState();

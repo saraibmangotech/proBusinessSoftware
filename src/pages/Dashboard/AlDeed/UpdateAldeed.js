@@ -325,7 +325,7 @@ function UpdateAldeed() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getServiceItem(params);
@@ -365,7 +365,7 @@ function UpdateAldeed() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await FinanceServices.getAccounts(params);
@@ -383,7 +383,7 @@ function UpdateAldeed() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await FinanceServices.getTax(params);
@@ -401,7 +401,7 @@ function UpdateAldeed() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getCategoryList(params);

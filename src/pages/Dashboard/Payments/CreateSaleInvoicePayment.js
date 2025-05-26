@@ -147,7 +147,7 @@ function CreateSaleInvoicePayment() {
         setCopied(true);
         setTimeout(() => {
             setCopied(false);
-        }, 1000);
+        }, 999999);
     }
 
     // *For Vault Low Balance 
@@ -188,7 +188,7 @@ function CreateSaleInvoicePayment() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }
@@ -212,7 +212,7 @@ function CreateSaleInvoicePayment() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 customer_id: selectedVendor?.id,
                 receivable_account_id: selectedVendor?.receivable_account_id,
                 customer_name: selectedVendor?.name,
@@ -308,7 +308,7 @@ function CreateSaleInvoicePayment() {
         try {
             let params = {
                 page: 1,
-                limit: 1000
+                limit: 999999
             }
             const { data } = await FinanceServices.getPaymentAccounts(params)
             // *Filter only vehicle account
@@ -342,7 +342,7 @@ function CreateSaleInvoicePayment() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 customer_id: id
             }
             const { data } = await FinanceServices.getVaultCustomers(params)
@@ -595,7 +595,7 @@ function CreateSaleInvoicePayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getBanks(params)
@@ -613,7 +613,7 @@ function CreateSaleInvoicePayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getCards(params)

@@ -251,7 +251,7 @@ function UpdateShippingVehicle() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       }
       const { data } = await SystemServices.getGalaxyYards(params)
       setGalaxyYards(data?.yards?.rows)

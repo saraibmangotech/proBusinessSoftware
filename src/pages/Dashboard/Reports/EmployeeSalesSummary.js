@@ -161,7 +161,7 @@ function EmployeeSalesSummary() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getCategoryList(params);
@@ -181,7 +181,7 @@ function EmployeeSalesSummary() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                 category_id:selectedCategory?.id

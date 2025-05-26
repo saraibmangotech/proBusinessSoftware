@@ -116,17 +116,17 @@ const SystemServices = {
     return data;
   },
   getCountries: async () => {
-    let params = { page: 1, limit: 1000 }
+    let params = { page: 1, limit: 999999 }
     const data = await get(routes.getCountries, params);
     return data;
   },
   getStates: async (countryId) => {
-    let params = { page: 1, limit: 1000, country_id: countryId }
+    let params = { page: 1, limit: 999999, country_id: countryId }
     const data = await get(routes.getStates, params);
     return data;
   },
   getCities: async (stateId) => {
-    let params = { page: 1, limit: 1000, state_id: stateId }
+    let params = { page: 1, limit: 999999, state_id: stateId }
     const data = await get(routes.getCities, params);
     return data;
   },
@@ -231,7 +231,7 @@ const SystemServices = {
     return data;
   },
   getBusinessLocation: async (countryId) => {
-    let params = { page: 1, limit: 1000, country_id: countryId }
+    let params = { page: 1, limit: 999999, country_id: countryId }
     const data = await get(routes.getBusinessLocation, params);
     return data;
   },

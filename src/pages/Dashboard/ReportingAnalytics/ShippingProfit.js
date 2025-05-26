@@ -310,7 +310,7 @@ function ShippingProfit() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
             const { data } = await FinanceServices.getPaymentAccounts(params);
             // *Filter only vehicle account

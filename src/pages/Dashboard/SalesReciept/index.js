@@ -432,7 +432,7 @@ function SalesReciept() {
       console.log(categoryIds, "cats");
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         category_id: categoryIds,
       };
 
@@ -531,7 +531,7 @@ function SalesReciept() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await FinanceServices.getAccounts(params);
@@ -574,7 +574,7 @@ function SalesReciept() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await FinanceServices.getTax(params);
@@ -592,7 +592,7 @@ function SalesReciept() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await CustomerServices.getCategoryList(params);

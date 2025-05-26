@@ -119,7 +119,7 @@ function VccRefundedList() {
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
-    }, 1000);
+    }, 999999);
   }
 
   // *For Get VCC Refunded List

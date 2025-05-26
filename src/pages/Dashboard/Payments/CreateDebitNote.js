@@ -66,7 +66,7 @@ const CreateDebitNote = () => {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getVendors(params);
@@ -80,7 +80,7 @@ const CreateDebitNote = () => {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 type: 'debit_note'
             };
 
@@ -96,7 +96,7 @@ const CreateDebitNote = () => {
         try {
           let params = {
             page: 1,
-            limit: 1000,
+            limit: 999999,
           };
     
           const { data } = await CustomerServices.getCostCenters(params);

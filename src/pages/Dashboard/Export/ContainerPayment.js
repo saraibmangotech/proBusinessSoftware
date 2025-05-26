@@ -240,7 +240,7 @@ function ContainerPayment() {
     // *For Clients
     const getClientDropdown = async () => {
         let params = {
-            limit: 1000
+            limit: 999999
         }
         try {
             const { data } = await ExportServices.getExportCustomers(params);
@@ -353,7 +353,7 @@ function ContainerPayment() {
     const getVendorCenter = async () => {
         setLoader(true)
         let params = {
-            limit: 1000
+            limit: 999999
         }
         try {
             const { data } = await ExportServices.getVendorCenter(params)
@@ -395,7 +395,7 @@ function ContainerPayment() {
         try {
             let params = {
                 page: 1,
-                limit: 1000
+                limit: 999999
             }
             const { data } = await ExportServices.getPaymentAccounts(params)
             // *Filter only vehicle account

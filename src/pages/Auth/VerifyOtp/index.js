@@ -111,7 +111,7 @@ function VerifyOtp() {
           setResendOtpTimer(false)
           clearInterval(timeInterval)
         }
-      }, 1000);
+      }, 999999);
     } catch (error) {
       ErrorToaster(error)
     }
@@ -153,7 +153,7 @@ function VerifyOtp() {
           setStorageItem('journey', result?.data?.journey)
           dispatch(addNavigation(addChildRoutes(result?.data?.modules)))
           dispatch(setPermission(getPermissionsRoutes(result?.data?.modules)))
-        }, 1000);
+        }, 999999);
       }
       else if( state?.screen=='link'){
         let obj = {

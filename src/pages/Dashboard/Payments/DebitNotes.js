@@ -166,7 +166,7 @@ function DebitNotes() {
             setFilters(Filter)
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 type: 'debit_note'
 
 

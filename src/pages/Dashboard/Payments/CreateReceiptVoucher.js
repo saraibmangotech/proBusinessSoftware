@@ -298,7 +298,7 @@ function CreateReceiptVoucher() {
         try {
           let params = {
             page: 1,
-            limit: 1000,
+            limit: 999999,
           };
     
           const { data } = await CustomerServices.getCostCenters(params);
@@ -354,7 +354,7 @@ function CreateReceiptVoucher() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 type: 'receipt_voucher'
             };
 
@@ -442,7 +442,7 @@ function CreateReceiptVoucher() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getBanks(params)
@@ -458,7 +458,7 @@ function CreateReceiptVoucher() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getCards(params)

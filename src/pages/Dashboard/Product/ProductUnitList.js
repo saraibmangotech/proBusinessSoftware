@@ -168,7 +168,7 @@ function ProductUnitList() {
             setFilters(Filter)
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 product_id: state?.id
 
 

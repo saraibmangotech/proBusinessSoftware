@@ -197,7 +197,7 @@ function ShippingList() {
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
-    }, 1000);
+    }, 999999);
   }
 
   const handleClickOpen = async (item) => {
