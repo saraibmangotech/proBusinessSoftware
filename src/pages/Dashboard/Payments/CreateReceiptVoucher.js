@@ -193,7 +193,12 @@ function CreateReceiptVoucher() {
                 sub_category: 4,
             }
             const { data } = await FinanceServices.getAccountBySubCategory(params)
-            setParentAccounts(data?.accounts?.rows)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+            setParentAccounts(updatedAccounts)
         } catch (error) {
             showErrorToast(error)
         }
@@ -223,7 +228,7 @@ function CreateReceiptVoucher() {
                 page: 1,
                 limit: 10000,
                 name: search,
-                sub_category: 4,
+                
                 is_disabled:false
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
@@ -325,7 +330,7 @@ function CreateReceiptVoucher() {
                 description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
-                payment_method: paymentModesString,
+                payment_method: selectedParentAccount?.name,
                 cost_center:selectedCostCenter?.name
             }
 
