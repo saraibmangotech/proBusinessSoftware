@@ -132,6 +132,10 @@ const FinanceServices = {
     const data = await get(routes.getAccountsApprovals, params);
     return data;
   },
+  UpdateFundTransferVoucher: async (obj) => {
+    const data = await patch(routes.UpdateFundTransferVoucher, obj);
+    return data;
+  },
   approveAccount: async (obj) => {
     const data = await post(routes.approveAccount, obj);
     return data;
@@ -214,6 +218,10 @@ const FinanceServices = {
   },
   UpdateJournalVoucher: async (obj) => {
     const data = await patch(routes.UpdateJournalVoucher, obj);
+    return data;
+  },
+  UpdatePaymentVoucher: async (obj) => {
+    const data = await patch(routes.UpdatePaymentVoucher, obj);
     return data;
   },
   getJournalVouchers: async (params) => {

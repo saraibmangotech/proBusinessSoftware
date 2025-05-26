@@ -139,7 +139,9 @@ const routes = {
   deleteFixedAssets:"/purchases/fixedAssets/delete",
   getEmployeeSalesReport:'/reports/employeeSalesSummary',
   getUnits:'products/inventory/units',
-  unitStatusUpdate:'/products/inventory/units/mark'
+  unitStatusUpdate:'/products/inventory/units/mark',
+  getPaymentVoucherDetail:'/accounts/vouchers/details',
+  getFundTransferDetail:'accounts/iftVouchers/details',
 
 
 };

@@ -52,7 +52,8 @@ const routes = {
   getShippingAging:'export/accounts/aging',
   getCostProfit:'export/costing/country',
   getUnpaidInvoices:'export/vehicles',
-  getContainerPayments:'export/containers'
+  getContainerPayments:'export/containers',
+  UpdateFundTransferVoucher:'/accounts/iftVouchers/edit'
 };
 
 export default routes
