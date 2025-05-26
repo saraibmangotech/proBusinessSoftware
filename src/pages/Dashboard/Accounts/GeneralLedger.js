@@ -353,7 +353,7 @@ function GeneralLedger() {
     // Closing Balance row
     rows.push([
       "Closing Balance", "", "", "", "", "", "",
-      "", "", runningBalance.toFixed(2)
+      "", "", parseFloat(closingBal).toFixed(2)
     ]);
   
     // Now build the worksheet with the account name row + header + data
@@ -696,7 +696,7 @@ function GeneralLedger() {
                     </Typography>
                     <Typography variant="body1" >
                       {/* Replace with actual value or variable */}
-                     {parseFloat(Balance).toFixed(2)}
+                     {parseFloat(closingBal).toFixed(2)}
                     </Typography>
                   </Grid>
                 </Grid>
