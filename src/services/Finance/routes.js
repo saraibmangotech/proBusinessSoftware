@@ -61,7 +61,9 @@ const routes = {
   getVendorPaymentDetail:'payments/vendor/details',
   CreateVoucher:'/accounts/vouchers/add',
 getNewAccountLedgers:'accounts/ledger/primary',
-getAccountReportsDetail:'accounts/reports/tb'
+getAccountReportsDetail:'accounts/reports/tb',
+UpdatePaymentVoucher:'/accounts/vouchers/edit',
+UpdateFundTransferVoucher:'/accounts/iftVouchers/edit'
 
 };
 

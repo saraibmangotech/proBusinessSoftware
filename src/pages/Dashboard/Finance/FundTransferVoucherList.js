@@ -372,7 +372,7 @@ function PreSalesList() {
 
 
 
-  },
+    },
     {
       header: "From Account",
       accessorKey: "from_account",
@@ -383,7 +383,7 @@ function PreSalesList() {
       accessorKey: "to_account",
       accessorFn: (row) => row?.to_account?.name || ""
     },
-    
+
     {
       header: "Transfer Amount",
       accessorKey: "to_amount",
@@ -392,44 +392,44 @@ function PreSalesList() {
       header: "Created At",
       accessorKey: 'date', // optional, used for column ID purposes
       accessorFn: (row) => {
-          const dateValue = row?.createdAt;
-          return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
+        const dateValue = row?.createdAt;
+        return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
       },
       cell: ({ row }) => {
-          const dateValue = row?.original?.createdAt;
-          return (
-              <Box
-                  variant="contained"
-                  color="primary"
-                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-              >
-                  {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
-              </Box>
-          );
+        const dateValue = row?.original?.createdAt;
+        return (
+          <Box
+            variant="contained"
+            color="primary"
+            sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+          >
+            {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
+          </Box>
+        );
       },
-  },
-  {
+    },
+    {
       header: "Impact Date",
       accessorKey: 'date', // optional, used for column ID purposes
       accessorFn: (row) => {
-          const dateValue = row?.date;
-          return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
+        const dateValue = row?.date;
+        return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
       },
       cell: ({ row }) => {
-          const dateValue = row?.original?.date ;
-          return (
-              <Box
-                  variant="contained"
-                  color="primary"
-                  sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-              >
-                  {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
-              </Box>
-          );
+        const dateValue = row?.original?.date;
+        return (
+          <Box
+            variant="contained"
+            color="primary"
+            sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+          >
+            {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
+          </Box>
+        );
       },
-  },
-   
-    
+    },
+
+
 
     {
       header: "Created By",
@@ -445,12 +445,22 @@ function PreSalesList() {
         </Box>
       ),
     },
-  
+
 
     {
       header: "Actions",
       cell: ({ row }) => (
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          {<Box
+            component={"img"}
+            sx={{ cursor: "pointer" }}
+            onClick={() => {
+              navigate(`/update-fund-transfer-voucher/${row?.original?.id}`);
+              localStorage.setItem("currentUrl", "/update-customer");
+            }}
+            src={Images.editIcon}
+            width={"35px"}
+          ></Box>}
           {<Box
             component={"img"}
             sx={{ cursor: "pointer" }}
@@ -475,11 +485,11 @@ function PreSalesList() {
               ></Box>
             )}
           </Box>
-       
 
-         
 
-         
+
+
+
         </Box>
       ),
     },

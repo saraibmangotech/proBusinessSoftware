@@ -451,6 +451,15 @@ const InventoryList= lazy(() =>
 const ProductUnitList= lazy(() =>
   import("pages/Dashboard/Product/ProductUnitList")
 );
+const UpdatePaymentVoucher= lazy(() =>
+  import("pages/Dashboard/Payments/UpdatePaymentVoucher")
+);
+const UpdateReceiptVoucher= lazy(() =>
+  import("pages/Dashboard/Payments/UpdateReceiptVoucher")
+);
+const UpdateFundTransferVoucher= lazy(() =>
+  import("pages/Dashboard/Finance/UpdateFundTransferVoucher")
+);
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
@@ -514,6 +523,18 @@ const AdminRoutes = [
   {
     path: "/product-unit-list",
     component: <ProductUnitList />,
+  },
+  {
+    path: "/update-payment-voucher/:id",
+    component: <UpdatePaymentVoucher />,
+  },
+  {
+    path: "/update-fund-transfer-voucher/:id",
+    component: <UpdateFundTransferVoucher />,
+  },
+  {
+    path: "/update-receipt-voucher/:id",
+    component: <UpdateReceiptVoucher />,
   },
   {
     path: "/vendor-list",

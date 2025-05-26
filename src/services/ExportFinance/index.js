@@ -190,6 +190,10 @@ const ExportFinanceServices = {
     const data = await post(routes.createFundTransferVoucher, obj);
     return data;
   },
+  UpdateFundTransferVoucher: async (obj) => {
+    const data = await post(routes.UpdateFundTransferVoucher, obj);
+    return data;
+  },
   getFundTransferVouchers: async (params) => {
     const data = await get(routes.getFundTransferVouchers, params);
     return data;

@@ -166,9 +166,10 @@ function ReceiptVouchers() {
             setPageLimit(Limit)
             setFilters(Filter)
             let params = {
+                type: 'receipt_voucher',
                 page: 1,
                 limit: 999999,
-                type: 'receipt_voucher',
+             
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
@@ -384,6 +385,16 @@ function ReceiptVouchers() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                    {<Box
+                        component={"img"}
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => {
+                            navigate(`/update-receipt-voucher/${row?.original?.id}`);
+                            localStorage.setItem("currentUrl", "/update-customer");
+                        }}
+                        src={Images.editIcon}
+                        width={"35px"}
+                    ></Box>}
                     <Tooltip title="PDF">
                         <IconButton
                             onClick={() => {
@@ -492,7 +503,7 @@ function ReceiptVouchers() {
             </SimpleDialog>
 
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={12} display={'flex'} mt={2.7}  justifyContent={"space-between"} >
+                <Grid item xs={12} display={'flex'} mt={2.7} justifyContent={"space-between"} >
 
                     <Box><Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Receipt Voucher List</Typography></Box>
                     <Box><PrimaryButton

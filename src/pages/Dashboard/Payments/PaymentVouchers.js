@@ -210,33 +210,33 @@ function PaymentVouchers() {
     }
 
 
-    
-  const handleFromDate = (newDate) => {
-    try {
-      // eslint-disable-next-line eqeqeq
-      if (newDate == 'Invalid Date') {
-        setFromDate('invalid')
-        return
-      }
-      console.log(newDate, "newDate")
-      setFromDate(new Date(newDate))
-    } catch (error) {
-      ErrorToaster(error)
-    }
-  }
 
-  const handleToDate = (newDate) => {
-    try {
-      // eslint-disable-next-line eqeqeq
-      if (newDate == 'Invalid Date') {
-        setToDate('invalid')
-        return
-      }
-      setToDate(new Date(newDate))
-    } catch (error) {
-      ErrorToaster(error)
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
     }
-  }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
 
 
     // *For Handle Filter
@@ -350,7 +350,7 @@ function PaymentVouchers() {
                 return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
             },
             cell: ({ row }) => {
-                const dateValue = row?.original?.date ;
+                const dateValue = row?.original?.date;
                 return (
                     <Box
                         variant="contained"
@@ -385,7 +385,16 @@ function PaymentVouchers() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-
+                    {<Box
+                        component={"img"}
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => {
+                            navigate(`/update-payment-voucher/${row?.original?.id}`);
+                            localStorage.setItem("currentUrl", "/update-customer");
+                        }}
+                        src={Images.editIcon}
+                        width={"35px"}
+                    ></Box>}
                     <Tooltip title="PDF">
                         <IconButton
                             onClick={() => {
@@ -406,6 +415,7 @@ function PaymentVouchers() {
                         </IconButton>
                     </Tooltip>
                     <Box>
+
                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
                         {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
@@ -492,16 +502,16 @@ function PaymentVouchers() {
                 </Box>
             </SimpleDialog>
 
-      <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={12} display={'flex'} mt={2.7}  justifyContent={"space-between"} >
+            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={12} display={'flex'} mt={2.7} justifyContent={"space-between"} >
 
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Voucher List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
+                    <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Payment Voucher List</Typography>
+                    {true && <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create"
+                        onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />}
 
 
                 </Grid>
@@ -542,7 +552,7 @@ function PaymentVouchers() {
 
             </Grid>
 
-          
+
 
             {/* Filters */}
             <Box >
