@@ -331,10 +331,10 @@ function ServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category,
+      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category ,
       cell: () => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {agencyType[process.env.REACT_APP_TYPE].category}
+          {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' :agencyType[process.env.REACT_APP_TYPE].category}
         </Box>
       ),
     },

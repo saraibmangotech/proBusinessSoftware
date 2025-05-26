@@ -512,7 +512,16 @@ function GeneralJournalLedger() {
 
 						<PrimaryButton
 							title={"Download Excel"}
-							onClick={() => downloadExcel()}
+							onClick={async () => {
+								try {
+								  await getGeneralJournalLedgers2(); // Wait for this to finish
+								  downloadExcel(); // Then run this
+								} catch (error) {
+								  console.error("Error getting data:", error);
+								  // Optionally show a user alert here
+								}
+							  }}
+							  
 						/>
 					</Box>
 				)}

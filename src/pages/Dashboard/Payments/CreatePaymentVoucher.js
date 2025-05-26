@@ -237,6 +237,7 @@ function CreatePaymentVoucher() {
             let params = {
                 page: 1,
                 limit: 10000,
+                sub_category: 4,
                 name: search,
                 is_disabled:false
 
@@ -313,7 +314,7 @@ function CreatePaymentVoucher() {
     // *For Create Journal Voucher
     const CreatePaymentVoucher = async (formData) => {
         console.log(formData);
-
+        const paymentModesString = rows.map((item) => item.payment_mode).join(", ");
         setLoading(true)
         try {
 
@@ -327,7 +328,7 @@ function CreatePaymentVoucher() {
                 description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
-                payment_method: 'Account',
+                payment_method: paymentModesString,
                 cost_center:selectedCostCenter?.name
             }
 
@@ -398,6 +399,7 @@ function CreatePaymentVoucher() {
             ...data,
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
+            payment_mode:selectedAccount?.name
         };
 
         let findElement = rows?.find((item) => item?.account_id === newRow?.account_id);
