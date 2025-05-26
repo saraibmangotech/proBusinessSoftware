@@ -238,7 +238,7 @@ function GeneralLedger() {
       setAccountLedgers(data?.statement?.rows);
       setTotalCount(data?.statement?.count);
       setOpeningBal(data?.statement?.opening_balance)
-      setClosingBal(data?.state?.rows[data?.state?.rows?.length - 1]?.opening_balance)
+      setClosingBal(data?.statement?.closing_balance_aed)
       setTotalBalance(data?.statement?.opening_balance_aed);
     } catch (error) {
       showErrorToast(error);
