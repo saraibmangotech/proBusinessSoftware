@@ -41,6 +41,8 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import { DatePickerToolbar } from '@mui/x-date-pickers';
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -117,6 +119,8 @@ function DebitNotes() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
     const {
         register,
         handleSubmit,
@@ -167,7 +171,9 @@ function DebitNotes() {
             let params = {
                 page: 1,
                 limit: 999999,
-                type: 'debit_note'
+                type: 'debit_note',
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
 
             }
@@ -263,6 +269,35 @@ function DebitNotes() {
             console.log(error);
         }
     };
+
+
+
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
     const columns = [
         {
             header: "SR No.",
@@ -324,7 +359,7 @@ function DebitNotes() {
                 return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
             },
             cell: ({ row }) => {
-                const dateValue = row?.original?.date ;
+                const dateValue = row?.original?.date;
                 return (
                     <Box
                         variant="contained"
@@ -336,7 +371,7 @@ function DebitNotes() {
                 );
             },
         },
-          
+
         {
             header: "Creator",
             accessorKey: "address",
@@ -467,18 +502,56 @@ function DebitNotes() {
                 </Box>
             </SimpleDialog>
 
+            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={12} display={'flex'} mt={2.7} justifyContent={"space-between"} >
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Debit Note List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-debit-note'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
+                    <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Debit Note List</Typography>
+                    {true && <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create"
+                        onClick={() => { navigate('/create-debit-note'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />}
 
 
-            </Box>
+                </Grid>
+                <Grid item xs={8}>
+                    <Grid container spacing={1}>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"From Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={fromDate}
+                                onChange={(date) => handleFromDate(date)}
+                            />
+                        </Grid>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"To Date"}
+
+                                disableFuture={true}
+                                size="small"
+                                value={toDate}
+                                onChange={(date) => handleToDate(date)}
+                            />
+                        </Grid>
+
+                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                            <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                            />
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+            </Grid>
+
 
             {/* Filters */}
             <Box >

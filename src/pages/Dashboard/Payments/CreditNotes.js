@@ -41,6 +41,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -141,6 +142,8 @@ function CreditNotes() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
 
 
 
@@ -152,6 +155,35 @@ function CreditNotes() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
+
+    
+
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
 
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
@@ -167,7 +199,9 @@ function CreditNotes() {
             let params = {
                 page: 1,
                 limit: 999999,
-                type: 'credit_note'
+                type: 'credit_note',
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
 
             }
@@ -271,13 +305,13 @@ function CreditNotes() {
 
 
         },
-    {
-        header: "Cost Center",
-        accessorKey: "cost_center",
+        {
+            header: "Cost Center",
+            accessorKey: "cost_center",
 
 
 
-    },
+        },
         {
             header: "Amount",
             accessorKey: "amount",
@@ -324,7 +358,7 @@ function CreditNotes() {
                 return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
             },
             cell: ({ row }) => {
-                const dateValue = row?.original?.date ;
+                const dateValue = row?.original?.date;
                 return (
                     <Box
                         variant="contained"
@@ -465,8 +499,9 @@ function CreditNotes() {
                 </Box>
             </SimpleDialog>
 
+            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={12} display={'flex'} mt={2.7} justifyContent={"space-between"} >
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Credit Note List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#001f3f'}
@@ -476,7 +511,44 @@ function CreditNotes() {
                 />}
 
 
-            </Box>
+                </Grid>
+                <Grid item xs={8}>
+                    <Grid container spacing={1}>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"From Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={fromDate}
+                                onChange={(date) => handleFromDate(date)}
+                            />
+                        </Grid>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"To Date"}
+
+                                disableFuture={true}
+                                size="small"
+                                value={toDate}
+                                onChange={(date) => handleToDate(date)}
+                            />
+                        </Grid>
+
+                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                            <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                            />
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+            </Grid>
+       
 
             {/* Filters */}
             <Box >
