@@ -260,7 +260,7 @@ function CreateCategory() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await FinanceServices.getAccounts(params);
@@ -278,7 +278,7 @@ function CreateCategory() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await FinanceServices.getTax(params);
@@ -296,7 +296,7 @@ function CreateCategory() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await CustomerServices.getCategoryList(params);

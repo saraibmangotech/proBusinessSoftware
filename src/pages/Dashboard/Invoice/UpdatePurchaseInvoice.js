@@ -544,7 +544,7 @@ function UpdatePurchaseInvoice() {
             console.log(categoryIds, "cats");
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 category_id: categoryIds,
             };
 
@@ -623,7 +623,7 @@ function UpdatePurchaseInvoice() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await FinanceServices.getAccounts(params);
@@ -666,7 +666,7 @@ function UpdatePurchaseInvoice() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await FinanceServices.getTax(params);
@@ -684,7 +684,7 @@ function UpdatePurchaseInvoice() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getCategoryList(params);
@@ -761,7 +761,7 @@ function UpdatePurchaseInvoice() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }
@@ -781,7 +781,7 @@ function UpdatePurchaseInvoice() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }
@@ -800,7 +800,7 @@ function UpdatePurchaseInvoice() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getBanks(params)
@@ -816,7 +816,7 @@ function UpdatePurchaseInvoice() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getCards(params)

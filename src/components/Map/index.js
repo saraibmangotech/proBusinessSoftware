@@ -67,7 +67,7 @@ function MapComponent({ data,dataexport }) {
 					{ lat: location2.lat, lng: location2.lng },
 				];
 				setMarkerCoordinates(routeCoordinates);
-				const numberOfPoints = 1000;
+				const numberOfPoints = 999999;
 				const pointsArray = generatePointsBetweenTwoPoints(
 					{ lat: location1.lat, lng: location1.lng },
 					{ lat: location2.lat, lng: location2.lng },
@@ -75,9 +75,9 @@ function MapComponent({ data,dataexport }) {
 				);
 				var a = moment(data?.details?.tracking?.loaded);
 				var b = moment(data?.details?.tracking?.expected_arrival);
-				const result = !data?.details?.tracking?.loaded && !data?.details?.tracking?.expected_arrival ? 1000 : b.diff(a, 'days');
+				const result = !data?.details?.tracking?.loaded && !data?.details?.tracking?.expected_arrival ? 999999 : b.diff(a, 'days');
 				if (data?.tracking?.loaded && data?.tracking?.expected_arrival) {
-					setCurrentLocation(pointsArray[Math?.round(1000 / result)]);
+					setCurrentLocation(pointsArray[Math?.round(999999 / result)]);
 				} else {
 					setCurrentLocation(pointsArray[0]);
 				}
@@ -124,7 +124,7 @@ function MapComponent({ data,dataexport }) {
 						{ lat: location2.lat, lng: location2.lng },
 					];
 					setMarkerCoordinates(routeCoordinates);
-					const numberOfPoints = 1000;
+					const numberOfPoints = 999999;
 					const pointsArray = generatePointsBetweenTwoPoints(
 						{ lat: location1.lat, lng: location1.lng },
 						{ lat: location2.lat, lng: location2.lng },
@@ -132,9 +132,9 @@ function MapComponent({ data,dataexport }) {
 					);
 					var a = moment(dataexport?.tracking?.booked);
 					var b = moment(dataexport?.tracking?.eta);
-					const result = !dataexport?.tracking?.booked && !dataexport?.tracking?.eta ? 1000 : b.diff(a, 'days');
+					const result = !dataexport?.tracking?.booked && !dataexport?.tracking?.eta ? 999999 : b.diff(a, 'days');
 					if (dataexport?.tracking?.booked && dataexport?.tracking?.eta) {
-						setCurrentLocation(pointsArray[Math?.round(1000 / result)]);
+						setCurrentLocation(pointsArray[Math?.round(999999 / result)]);
 					} else {
 						setCurrentLocation(pointsArray[0]);
 					}

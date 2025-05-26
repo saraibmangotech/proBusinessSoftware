@@ -158,7 +158,7 @@ function VehicleTTApprovalList() {
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
-    }, 1000);
+    }, 999999);
   }
 
   // *For Handle Date

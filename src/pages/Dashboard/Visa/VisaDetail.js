@@ -1605,7 +1605,7 @@ function VisaDetail() {
                           setValue3('2yearInsideRate', getValues('2yearInsideRate'))
                           setValue3('2yearOutsideRate', getValues('2yearOutsideRate'))
                           console.log(getValues('1yearInsideRate'), 'asdasdasdasd');
-                        }, 1000);
+                        }, 999999);
                       }}
                     >
                       <FormControlLabel

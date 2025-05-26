@@ -1352,7 +1352,7 @@ const AddVisa = () => {
             setFilters(Filter)
             let params = {
                 page: Page,
-                limit: 1000,
+                limit: 999999,
             }
             params = { ...params, ...Filter }
             const { data } = await CustomerServices.getCustomerQueue(params)
@@ -1458,7 +1458,7 @@ const AddVisa = () => {
                                                     setValue('1yearInsideRate', getValues('1yearInsideRate'))
                                                     setValue('1yearOutsideRate', getValues('1yearOutsideRate'))
                                                     console.log(getValues('1yearInsideRate'), 'asdasdasdasd');
-                                                }, 1000);
+                                                }, 999999);
 
 
 
@@ -1986,7 +1986,7 @@ const AddVisa = () => {
                                                     setValue2('2yearInsideRate', getValues('2yearInsideRate'))
                                                     setValue2('2yearOutsideRate', getValues('2yearOutsideRate'))
                                                     console.log(getValues('1yearInsideRate'), 'asdasdasdasd');
-                                                }, 1000);
+                                                }, 999999);
                                             }}
                                         >
                                             <FormControlLabel

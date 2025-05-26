@@ -163,7 +163,7 @@ function SnapshotCategoryReport() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
@@ -356,18 +356,14 @@ function SnapshotCategoryReport() {
         },
         {
             header: "Gross Invoice Amount",
-            accessorKey: "grossInvoiceAmount", // Use a unique key to avoid conflict
+            accessorKey: "grossCharges", // Use a unique key to avoid conflict
             accessorFn: (row) => {
-                const net = parseFloat(row?.netCharges || 0);
-                const pro = parseFloat(row?.proCommission || 0);
-                const typist = parseFloat(row?.typistCommission || 0);
-                return (net + pro + typist).toFixed(2);
+                
+                return parseFloat(row?.grossCharges || 0).toFixed(2);
             },
             cell: ({ row }) => {
-                const net = parseFloat(row?.original?.netCharges || 0);
-                const pro = parseFloat(row?.original?.proCommission || 0);
-                const typist = parseFloat(row?.original?.typistCommission || 0);
-                const gross = net + pro + typist;
+                
+                const gross = parseFloat(row?.original?.grossCharges || 0)
                 return (
                     <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                         {gross.toFixed(2)}

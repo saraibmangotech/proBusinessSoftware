@@ -261,7 +261,7 @@ function CreateCustomerPayment() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
 
 
             }
@@ -321,7 +321,7 @@ function CreateCustomerPayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getBanks(params)
@@ -339,7 +339,7 @@ function CreateCustomerPayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getCards(params)
@@ -508,7 +508,7 @@ function CreateCustomerPayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getServiceItem(params)
@@ -600,7 +600,7 @@ function CreateCustomerPayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await FinanceServices.getTax(params)
@@ -699,7 +699,7 @@ function CreateCustomerPayment() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getCategoryList(params)

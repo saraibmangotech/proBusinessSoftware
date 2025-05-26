@@ -89,7 +89,7 @@ function CreateUser() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         search: search,
       };
       const { data } = await SystemServices.getRoles(params);
@@ -149,7 +149,7 @@ function CreateUser() {
 
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
 
 
       }

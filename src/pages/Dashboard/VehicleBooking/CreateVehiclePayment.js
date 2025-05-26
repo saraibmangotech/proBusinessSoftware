@@ -131,7 +131,7 @@ function CreateVehiclePayment() {
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
-    }, 1000);
+    }, 999999);
   }
 
   // *For Vault Low Balance 
@@ -256,7 +256,7 @@ function CreateVehiclePayment() {
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await FinanceServices.getPaymentAccounts(params)
       // *Filter only vehicle account
@@ -287,7 +287,7 @@ function CreateVehiclePayment() {
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await BankServices.getBanks(params)
       setBankAccounts(data?.banks?.rows)
@@ -301,7 +301,7 @@ function CreateVehiclePayment() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         customer_id: id
       }
       const { data } = await FinanceServices.getVaultCustomers(params)

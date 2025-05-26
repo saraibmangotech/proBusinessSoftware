@@ -1182,7 +1182,7 @@ function UpdateExportVehicles() {
 														isHintEnabled: true,
 														shouldHideHintAfterFirstActivation: false,
 														style: {
-															zIndex: 1000,
+															zIndex: 999999,
 															marginRight: "20%",
 														},
 													}}
@@ -1192,7 +1192,7 @@ function UpdateExportVehicles() {
 														position: "absolute",
 														left: "10px",
 														bottom: "10px",
-														zIndex: 1000,
+														zIndex: 999999,
 													}}
 												>
 													<Box sx={{ mb: 1 }}>

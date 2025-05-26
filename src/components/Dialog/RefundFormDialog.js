@@ -36,7 +36,7 @@ function RefundFormDialog({ open, onClose, onSubmit, loading, customerId, deposi
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await FinanceServices.getPaymentAccounts(params)
       // *Filter only shipping account
@@ -68,7 +68,7 @@ function RefundFormDialog({ open, onClose, onSubmit, loading, customerId, deposi
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await BankServices.getBanks(params)
       setBankAccounts(data?.banks?.rows)
@@ -82,7 +82,7 @@ function RefundFormDialog({ open, onClose, onSubmit, loading, customerId, deposi
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         customer_id: customerId
       }
       const { data } = await FinanceServices.getVaultCustomers(params)

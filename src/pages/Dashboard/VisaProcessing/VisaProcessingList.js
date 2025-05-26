@@ -447,7 +447,7 @@ function VisaList() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         sort_order: sort,
       };
 
@@ -1605,7 +1605,7 @@ function VisaList() {
                             "2yearOutsideRate",
                             getValues("2yearOutsideRate")
                           );
-                        }, 1000);
+                        }, 999999);
                       }}
                     >
                       <FormControlLabel

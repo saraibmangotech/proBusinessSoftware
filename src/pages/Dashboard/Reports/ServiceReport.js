@@ -9,6 +9,7 @@ import {
   Checkbox,
   InputAdornment,
   Button,
+  Input,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -138,6 +139,7 @@ function ServiceReport() {
 
   // *For Customer Queue
   const [customerQueue, setCustomerQueue] = useState([]);
+  const [Totals, setTotals] = useState(null)
 
 
 
@@ -167,7 +169,7 @@ function ServiceReport() {
 
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
@@ -175,6 +177,24 @@ function ServiceReport() {
 
       const { data } = await CustomerServices.getServiceReport(params)
       setCustomerQueue(data?.rows)
+
+      const result = data?.rows?.reduce((acc, item) => {
+        acc.totalQuantity += item.quantity;
+        acc.totalServiceCharges += (item.center_fee * item.quantity);
+        acc.totalVat += (item.center_fee * item.quantity) * 0.05;
+        acc.totalGovtFee += ((parseFloat(item.govt_fee) + parseFloat(item?.bank_charge)) * item.quantity);
+        acc.invoiceTotal += (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat));
+        return acc;
+      }, {
+        totalQuantity: 0,
+        totalServiceCharges: 0,
+        totalVat:0,
+        totalGovtFee:0,
+        invoiceTotal:0
+      });
+
+      console.log(result,'result');
+      setTotals(result)
 
     } catch (error) {
       showErrorToast(error)
@@ -479,7 +499,7 @@ function ServiceReport() {
         );
       },
     },
-    
+
     {
       header: "Transaction ID",
       accessorKey: "transaction_id",
@@ -548,97 +568,97 @@ function ServiceReport() {
       ),
     },
   ];
-  
+
   const headers = [
-    "SR No.", 
-    "Inv No.", 
-    "Inv Date", 
-    "Department", 
-    "Stock ID", 
-    "Service Name", 
-    "Category", 
-    "Customer Ref", 
-    "Display Customer", 
-    "Customer Mobile", 
-    "Customer Email", 
-    "Quantity", 
-    "Service Charge", 
-    "Total Service Charge", 
-    "Total VAT", 
-    "Govt. Fee", 
-    "Bank Service Charge", 
-    "Other Charge", 
-    "Total Govt. Fee", 
-    "Transaction ID", 
-    "Application/Case ID", 
-    "Ref Name", 
-    "Payment Status", 
-    "Employee ID", 
-    "Employee Name", 
-    "Line Total", 
+    "SR No.",
+    "Inv No.",
+    "Inv Date",
+    "Department",
+    "Stock ID",
+    "Service Name",
+    "Category",
+    "Customer Ref",
+    "Display Customer",
+    "Customer Mobile",
+    "Customer Email",
+    "Quantity",
+    "Service Charge",
+    "Total Service Charge",
+    "Total VAT",
+    "Govt. Fee",
+    "Bank Service Charge",
+    "Other Charge",
+    "Total Govt. Fee",
+    "Transaction ID",
+    "Application/Case ID",
+    "Ref Name",
+    "Payment Status",
+    "Employee ID",
+    "Employee Name",
+    "Line Total",
     "Invoice Total"
-];
+  ];
 
-const prepareCSVData = (data) => {
- 
+  const prepareCSVData = (data) => {
 
-  // Map each entry into the desired CSV format based on your provided columns
-  const csvRows = data.map((item) => {
-    const quantity = parseFloat(item?.quantity) || 0;
-    const centerFee = parseFloat(item?.center_fee) || 0;
-    const govtFee = parseFloat(item?.govt_fee) || 0;
-    const bankCharge = parseFloat(item?.bank_charge) || 0;
-    const totalServiceCharge = centerFee * quantity;
-    const totalVAT = totalServiceCharge * 0.05;
-    const totalGovtFee = (govtFee + bankCharge) * quantity;
-  
-    return {
-      "SR No.": item.id || "",
-      "Inv No.": item?.receipt?.invoice_number || "",
-      "Inv Date": item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
-      "Department": agencyType[process.env.REACT_APP_TYPE]?.category || "",
-      "Stock ID": item?.service?.item_code || "",
-      "Service Name": item?.service?.name || "",
-      "Category": item?.service?.category?.name || "",
-      "Customer Ref": item?.receipt?.customer?.name || "",
-      "Display Customer": item?.receipt?.customer_name || "",
-      "Customer Mobile": item?.receipt?.customer_mobile || "",
-      "Customer Email": item?.receipt?.customer_email || "",
-      "Quantity": quantity,
-      "Service Charge": centerFee.toFixed(2),
-      "Total Service Charge": totalServiceCharge.toFixed(2),
-      "Total VAT": totalVAT.toFixed(2),
-      "Govt. Fee": govtFee.toFixed(2),
-      "Bank Service Charge": bankCharge.toFixed(2),
-      "Other Charge": "0", // Static
-      "Total Govt. Fee": totalGovtFee.toFixed(2),
-      "Transaction ID": item.transaction_id || "",
-      "Application/Case ID": item.application_id || "",
-      "Ref Name": item.ref_no || "",
-      "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
-      "Employee ID": item?.receipt?.creator?.employee_id || "",
-      "Employee Name": item?.receipt?.creator?.name || "",
-      "Line Total": (parseFloat(item?.total) + totalVAT).toFixed(2),
-      "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(2),
-    };
-  });
-  
 
-  // Calculate totals for Debit and Credit
-  const totalServiceCharge = data.reduce((sum, item) => sum + (parseFloat(item?.center_fee) * parseFloat(item?.quantity)), 0);
-  const totalVat = data.reduce((sum, item) => sum + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05), 0);
-  const totalGovtFee = data.reduce((sum, item) => {
-    const govtFee = parseFloat(item?.govt_fee) || 0;
-    const bankCharge = parseFloat(item?.bank_charge) || 0;
-    const quantity = parseFloat(item?.quantity) || 0;
-    return sum + ((govtFee + bankCharge) * quantity);
-  }, 0);
-  
-  const totalLineTotal = data.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
-  const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
+    // Map each entry into the desired CSV format based on your provided columns
+    const csvRows = data.map((item) => {
+      const quantity = parseFloat(item?.quantity) || 0;
+      const centerFee = parseFloat(item?.center_fee) || 0;
+      const govtFee = parseFloat(item?.govt_fee) || 0;
+      const bankCharge = parseFloat(item?.bank_charge) || 0;
+      const totalServiceCharge = centerFee * quantity;
+      const totalVAT = totalServiceCharge * 0.05;
+      const totalGovtFee = (govtFee + bankCharge) * quantity;
 
-  // Append totals row
-  csvRows.push({
+      return {
+        "SR No.": item.id || "",
+        "Inv No.": item?.receipt?.invoice_number || "",
+        "Inv Date": item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
+        "Department": agencyType[process.env.REACT_APP_TYPE]?.category || "",
+        "Stock ID": item?.service?.item_code || "",
+        "Service Name": item?.service?.name || "",
+        "Category": item?.service?.category?.name || "",
+        "Customer Ref": item?.receipt?.customer?.name || "",
+        "Display Customer": item?.receipt?.customer_name || "",
+        "Customer Mobile": item?.receipt?.customer_mobile || "",
+        "Customer Email": item?.receipt?.customer_email || "",
+        "Quantity": quantity,
+        "Service Charge": centerFee.toFixed(2),
+        "Total Service Charge": totalServiceCharge.toFixed(2),
+        "Total VAT": totalVAT.toFixed(2),
+        "Govt. Fee": govtFee.toFixed(2),
+        "Bank Service Charge": bankCharge.toFixed(2),
+        "Other Charge": "0", // Static
+        "Total Govt. Fee": totalGovtFee.toFixed(2),
+        "Transaction ID": item.transaction_id || "",
+        "Application/Case ID": item.application_id || "",
+        "Ref Name": item.ref_no || "",
+        "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
+        "Employee ID": item?.receipt?.creator?.employee_id || "",
+        "Employee Name": item?.receipt?.creator?.name || "",
+        "Line Total": (parseFloat(item?.total) + totalVAT).toFixed(2),
+        "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(2),
+      };
+    });
+
+
+    // Calculate totals for Debit and Credit
+    const totalServiceCharge = data.reduce((sum, item) => sum + (parseFloat(item?.center_fee) * parseFloat(item?.quantity)), 0);
+    const totalVat = data.reduce((sum, item) => sum + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05), 0);
+    const totalGovtFee = data.reduce((sum, item) => {
+      const govtFee = parseFloat(item?.govt_fee) || 0;
+      const bankCharge = parseFloat(item?.bank_charge) || 0;
+      const quantity = parseFloat(item?.quantity) || 0;
+      return sum + ((govtFee + bankCharge) * quantity);
+    }, 0);
+
+    const totalLineTotal = data.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
+    const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
+
+    // Append totals row
+    csvRows.push({
       "SR No.": "",
       "Inv No.": "",
       "Inv Date": "",
@@ -666,13 +686,13 @@ const prepareCSVData = (data) => {
       "Employee Name": "",
       "Line Total": totalLineTotal.toFixed(2),
       "Invoice Total": totalInvoiceTotal.toFixed(2),
-  });
+    });
 
-  // Ensure data is formatted properly as an array of objects
-  const finalData = [ ...csvRows.map(row => Object.values(row))];
+    // Ensure data is formatted properly as an array of objects
+    const finalData = [...csvRows.map(row => Object.values(row))];
 
-  return finalData;
-};
+    return finalData;
+  };
 
 
 
@@ -754,32 +774,32 @@ const prepareCSVData = (data) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
-   <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
-               {customerQueue?.length > 0 &&  <CSVLink
-                    data={prepareCSVData(customerQueue)}
-                    headers={headers}
-                    filename="service_report.csv"
-                >
-                <Button
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          {customerQueue?.length > 0 && <CSVLink
+            data={prepareCSVData(customerQueue)}
+            headers={headers}
+            filename="service_report.csv"
+          >
+            <Button
 
-                    startIcon={<FileDownload />}
-                   
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                        padding: '10px',
-                        textTransform: 'capitalize !important',
-                        backgroundColor: "#001f3f !important",
-                        fontSize: "12px",
-                        ":hover": {
-                            backgroundColor: "#001f3f !important",
-                        },
-                    }}
-                >
-                    Export to Excel
-                </Button>
-                </CSVLink>}
-                </Box>
+              startIcon={<FileDownload />}
+
+              variant="contained"
+              color="primary"
+              sx={{
+                padding: '10px',
+                textTransform: 'capitalize !important',
+                backgroundColor: "#001f3f !important",
+                fontSize: "12px",
+                ":hover": {
+                  backgroundColor: "#001f3f !important",
+                },
+              }}
+            >
+              Export to Excel
+            </Button>
+          </CSVLink>}
+        </Box>
 
 
       </Box>
@@ -831,7 +851,76 @@ const prepareCSVData = (data) => {
       <Box >
 
 
-        {<DataTable loading={loader} total={true}  csvName={'service_report'} data={customerQueue} columns={columns} />}
+        {<DataTable loading={loader} csvName={'service_report'} data={customerQueue} columns={columns} />}
+
+          <Grid container spacing={2} mt={1}>
+              <Grid item xs={4}>
+                <Input
+                sx={{
+                  "& .MuiInputBase-input":{
+                    WebkitTextFillColor: "Black !important"
+        
+                  }
+                }}
+                  fullWidth
+                  disabled
+                  value={`Total Quantity: ${parseFloat(Totals?.totalQuantity).toFixed(2)}`}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Input
+                sx={{
+                  "& .MuiInputBase-input":{
+                    WebkitTextFillColor: "Black !important"
+        
+                  }
+                }}
+                  fullWidth
+                  disabled
+                  value={`Total Govt Fee: ${parseFloat(Totals?.totalGovtFee).toFixed(2)}`}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Input
+                sx={{
+                  "& .MuiInputBase-input":{
+                    WebkitTextFillColor: "Black !important"
+        
+                  }
+                }}
+                  fullWidth
+                  disabled
+                  value={`Total Service Charges: ${parseFloat(Totals?.totalServiceCharges).toFixed(2)}`}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Input
+                sx={{
+                  "& .MuiInputBase-input":{
+                    WebkitTextFillColor: "Black !important"
+        
+                  }
+                }}
+                  fullWidth
+                  disabled
+                  value={`Total Vat: ${parseFloat(Totals?.totalVat).toFixed(2)}`}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Input
+                sx={{
+                  "& .MuiInputBase-input":{
+                    WebkitTextFillColor: "Black !important"
+        
+                  }
+                }}
+                  fullWidth
+                  disabled
+                  value={`Total Invoice Amount: ${parseFloat(Totals?.invoiceTotal).toFixed(2)}`}
+                />
+              </Grid>
+         
+            </Grid>
       </Box>
 
     </Box>

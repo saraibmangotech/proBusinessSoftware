@@ -93,7 +93,7 @@ function ExportTT() {
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await ExportServices.getPaymentAccounts(params)
       // *Filter only vehicle account
@@ -116,7 +116,7 @@ function ExportTT() {
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await ExportFinanceServices.getBanks(params)
       setBankAccounts(data?.banks?.rows)

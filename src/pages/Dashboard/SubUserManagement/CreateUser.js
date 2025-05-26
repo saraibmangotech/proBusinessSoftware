@@ -51,7 +51,7 @@ function CreateUser() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         search: search,
         customer_id:user?.customer_id
       };

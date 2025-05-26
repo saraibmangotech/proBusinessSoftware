@@ -172,7 +172,7 @@ function CreatePaymentVoucher() {
         try {
           let params = {
             page: 1,
-            limit: 1000,
+            limit: 999999,
           };
     
           const { data } = await CustomerServices.getCostCenters(params);
@@ -358,7 +358,7 @@ function CreatePaymentVoucher() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 type: 'payment_voucher'
             };
 
@@ -445,7 +445,7 @@ function CreatePaymentVoucher() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getBanks(params)
@@ -461,7 +461,7 @@ function CreatePaymentVoucher() {
         try {
             const params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
 
             const { data } = await CustomerServices.getCards(params)

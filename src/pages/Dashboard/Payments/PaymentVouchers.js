@@ -166,7 +166,7 @@ function PaymentVouchers() {
             setFilters(Filter)
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 type: 'payment_voucher'
 
 

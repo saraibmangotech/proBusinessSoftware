@@ -302,7 +302,7 @@ function CreatePurchaseReceipt() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getServiceItem(params);
@@ -342,7 +342,7 @@ function CreatePurchaseReceipt() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await FinanceServices.getAccounts(params);
@@ -360,7 +360,7 @@ function CreatePurchaseReceipt() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await FinanceServices.getTax(params);
@@ -378,7 +378,7 @@ function CreatePurchaseReceipt() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getCategoryList(params);

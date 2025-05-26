@@ -330,7 +330,7 @@ function BusinessCountriesList() {
       setFilters(Filter);
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
       params = { ...params, ...Filter };
 

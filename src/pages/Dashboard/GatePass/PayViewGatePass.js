@@ -94,7 +94,7 @@ function PayViewGatePass() {
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await FinanceServices.getPaymentAccounts(params)
       // *Filter only shipping account
@@ -123,7 +123,7 @@ function PayViewGatePass() {
     try {
       let params = {
         page: 1,
-        limit: 1000
+        limit: 999999
       }
       const { data } = await BankServices.getBanks(params)
       setBankAccounts(data?.banks?.rows)
@@ -145,7 +145,7 @@ function PayViewGatePass() {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         customer_id: id
       }
       const { data } = await FinanceServices.getVaultCustomers(params)

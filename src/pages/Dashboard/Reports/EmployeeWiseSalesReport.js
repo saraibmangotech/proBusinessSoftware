@@ -170,7 +170,7 @@ function EmployeeWiseSalesReport() {
             setFilters(Filter)
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
             params = { ...params, ...Filter }
 
@@ -194,7 +194,7 @@ function EmployeeWiseSalesReport() {
 
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                 created_by: selectedUser?.id
@@ -382,11 +382,29 @@ function EmployeeWiseSalesReport() {
                 </Box>
             ),
         },
+        
+                {
+                    header: "Gross Invoice Amount",
+                    accessorKey: "grossCharges", // Use a unique key to avoid conflict
+                    accessorFn: (row) => {
+                        
+                        return parseFloat(row?.grossCharges || 0).toFixed(2);
+                    },
+                    cell: ({ row }) => {
+                        
+                        const gross = parseFloat(row?.original?.grossCharges || 0)
+                        return (
+                            <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                                {gross.toFixed(2)}
+                            </Box>
+                        );
+                    },
+                },
 
     ];
 
     useEffect(() => {
-        if (user?.role_id != 1000) {
+        if (user?.role_id != 999999) {
             setFieldDisabled(true)
             setSelectedUser(user)
         

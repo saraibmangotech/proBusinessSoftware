@@ -231,7 +231,7 @@ function CustomerLedgers() {
         try {
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             };
 
             const { data } = await CustomerServices.getCostCenters(params);
@@ -252,7 +252,7 @@ function CustomerLedgers() {
 
                 let params = {
                     page: 1,
-                    limit: 1000,
+                    limit: 999999,
                     from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                     to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                     account_id: selectedUser?.receivable_account_id,
@@ -292,7 +292,7 @@ function CustomerLedgers() {
             setFilters(Filter)
             let params = {
                 page: 1,
-                limit: 1000,
+                limit: 999999,
             }
             params = { ...params, ...Filter }
 
@@ -691,7 +691,7 @@ function CustomerLedgers() {
         getCostCenters()
     }, []);
     useEffect(() => {
-        if (user?.role_id != 1000) {
+        if (user?.role_id != 999999) {
             setFieldDisabled(true)
             setSelectedUser(user)
 

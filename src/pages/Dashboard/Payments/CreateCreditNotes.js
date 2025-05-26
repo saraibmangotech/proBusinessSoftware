@@ -66,7 +66,7 @@ const CreateCreditNote = () => {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await CustomerServices.getCustomerQueue(params);
@@ -80,7 +80,7 @@ const CreateCreditNote = () => {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
       };
 
       const { data } = await CustomerServices.getCostCenters(params);
@@ -93,7 +93,7 @@ const CreateCreditNote = () => {
     try {
       let params = {
         page: 1,
-        limit: 1000,
+        limit: 999999,
         type: 'credit_note'
       };
 

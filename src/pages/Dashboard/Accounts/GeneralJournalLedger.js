@@ -473,13 +473,16 @@ function GeneralJournalLedger() {
 
 	useEffect(() => {
 		getGeneralJournalLedgers2()
-		getGeneralJournalLedgers()
+	
 		getAccountsDropDown()
 		getMajorCategories()
 		getSubCategories()
 		if (state) {
 			setValue('search', state)
 			handleFilter({ search: state })
+		}
+		else{
+			getGeneralJournalLedgers()
 		}
 
 	}, []);
