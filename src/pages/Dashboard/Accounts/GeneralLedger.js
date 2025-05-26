@@ -237,7 +237,7 @@ function GeneralLedger() {
       const { data } = await FinanceServices.getAccountLedgers(params);
       setAccountLedgers(data?.statement?.rows);
       setTotalCount(data?.statement?.count);
-      setOpeningBal(data?.statement?.opening_balance)
+      setOpeningBal(data?.statement?.opening_balance_aed)
       setClosingBal(data?.statement?.closing_balance_aed)
       setTotalBalance(data?.statement?.opening_balance_aed);
     } catch (error) {
