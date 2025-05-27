@@ -306,8 +306,12 @@ function CreateJournalVoucher() {
   }
   // *For Create Journal Voucher
   const createJournalVoucher = async (formData) => {
+   console.log(rows,'rows');
    
 
+   const uniqueCostCenters = [...new Set(rows.map(item => item.cost_center))].join(', ');
+
+   console.log(uniqueCostCenters); 
     setLoading(true);
     try {
       let obj = {
@@ -315,6 +319,8 @@ function CreateJournalVoucher() {
         notes: getValues('note'),
         entries: rows,
         created_at: moment(fromDate).format('MM-DD-YYYY'),
+        cost_center:uniqueCostCenters
+        
 
       };
 

@@ -336,10 +336,9 @@ function UpadateJournalVoucher() {
   }
   // *For Create Journal Voucher
   const UpadateJournalVoucher = async (formData) => {
-    if (!selectedCostCenter?.name) {
-      showErrorToast('Cost Center is required');
-      return;
-    }
+    const uniqueCostCenters = [...new Set(rows.map(item => item.cost_center))].join(', ');
+
+    console.log(uniqueCostCenters);
 
     setLoading(true);
     try {
@@ -349,7 +348,7 @@ function UpadateJournalVoucher() {
         notes: getValues1('note'),
         entries: rows,
         created_at: getYearMonthDateFormate(fromDate),
-        cost_center: selectedCostCenter.name
+        cost_center: uniqueCostCenters
       };
 
       const promise = FinanceServices.UpdateJournalVoucher(obj);

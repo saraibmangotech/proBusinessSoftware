@@ -130,7 +130,7 @@ function JournalVoucherList() {
     const [confirmationDialog, setConfirmationDialog] = useState(false)
 
 
-    const tableHead = [{ name: 'Created At', key: '' }, { name: 'Impact Date', key: '' }, { name: 'Cost Center ', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'Created At', key: '' },  { name: 'Cost Center ', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
 
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
@@ -529,11 +529,7 @@ function JournalVoucherList() {
                                                                         "DD/MM/YYYY"
                                                                     )}
                                                                 </Cell >
-                                                                <Cell className='pdf-table' >
-                                                                    {item?.date ? moment(item?.date).format(
-                                                                        "DD/MM/YYYY"
-                                                                    ) : 'N/A'}
-                                                                </Cell >
+                                                        
                                                                 <Cell className='pdf-table' >
                                                                     {item?.cost_center}
                                                                 </Cell >
