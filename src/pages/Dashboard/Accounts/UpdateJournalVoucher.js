@@ -193,9 +193,9 @@ function UpadateJournalVoucher() {
       }
       const { data } = await FinanceServices.getJournalVoucherDetail(params)
       setVoucherDetail(data.voucher)
-      if (data?.voucher?.cost_center) {
-        setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
-      }
+      // if (data?.voucher?.cost_center) {
+      //   setSelectedCostCenter({ id: data?.voucher?.cost_center, name: data?.voucher?.cost_center })
+      // }
 
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
@@ -414,7 +414,9 @@ function UpadateJournalVoucher() {
     setSelectedChildAccount(null);
     setChildAccounts([])
     setSelectedCostCenter(null)
-    reset();
+    setValue('description', '')
+    setValue('debit', '')
+    setValue('credit', '')
   };
 
   const updateItem = (data) => {
@@ -461,7 +463,9 @@ function UpadateJournalVoucher() {
     setSelectedAccount(null);
     setSelectedRow(null);
     setEditState(false)
-    reset();
+    setValue('description', '')
+    setValue('debit', '')
+    setValue('credit', '')
   };
   // *For Get Account
   const getChildAccounts = async (accountId) => {
@@ -763,6 +767,7 @@ function UpadateJournalVoucher() {
                         setSelectedRow(item?.unique_id)
                         setEditState(true)
                         console.log(item);
+                        setValue('costcenter',{id:item?.cost_center,name:item?.cost_center})
                         setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
                         setSelectedAccount(item?.selectedAccount)
                         setValue('service', item?.selectedAccount?.name)
