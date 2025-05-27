@@ -272,6 +272,7 @@ function CreatePaidReceipt() {
         id: detail?.id,
         customer: selectedCustomer?.id,
         total_amount: subTotal,
+        paid_date: moment(paidAt).format('MM-DD-YYYY'),
         final_amount: (
           Number.parseFloat(subTotal) +
           rows?.reduce((total, item) => {
