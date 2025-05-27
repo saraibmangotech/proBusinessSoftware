@@ -20,8 +20,8 @@ function UpdateFundTransferVoucher() {
     const navigate = useNavigate();
     const { usdExchangeRate } = useSelector((state) => state.navigationReducer);
 
-    const { register, handleSubmit, formState: { errors }, setValue,watch } = useForm();
-    console.log(watch(),'watchwatch')
+    const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm();
+    console.log(watch(), 'watchwatch')
 
     const [loading, setLoading] = useState(false);
     const { id } = useParams()
@@ -96,13 +96,13 @@ function UpdateFundTransferVoucher() {
                 return
             }
 
-          
 
-           
 
-        
+
+
+
             let obj = {
-                id:id,
+                id: id,
                 date: moment(vaultDate).format('MM-DD-YYYY'),
                 from_account_id: selectedFromAccount?.id,
                 to_account_id: selectedToAccount?.id,
@@ -110,11 +110,13 @@ function UpdateFundTransferVoucher() {
                 from_amount: formData?.transferAmount,
                 to_currency: selectedToAccount?.currency,
                 to_amount: formData?.transferAmount,
+                bank_charges: formData?.bankCharge,
+                input_vat: formData?.Vat,
                 exchange_rate: updateExchangeRate,
                 exchange_loss: formData.exchangeLoss,
                 ref_no: formData.ref,
                 notes: formData.note,
-      
+
                 cost_center: selectedCostCenter?.name
             }
 
@@ -237,7 +239,9 @@ function UpdateFundTransferVoucher() {
             setVaultDate(new Date(detail?.date))
             setSelectedToAccount(detail?.to_account)
             setValue('transferAmount', detail?.from_amount)
-            setValue('costcenter',detail?.cost_center ? { id: detail?.cost_center, name: detail?.cost_center } : '')
+            setValue('bankCharge', detail?.bank_charges)
+            setValue('Vat', detail?.input_vat)
+            setValue('costcenter', detail?.cost_center ? { id: detail?.cost_center, name: detail?.cost_center } : '')
             setSelectedCostCenter(detail?.cost_center ? { id: detail?.cost_center, name: detail?.cost_center } : '')
             setValue('ref', detail?.ref_no)
             setValue('note', detail?.notes)
@@ -314,6 +318,30 @@ function UpdateFundTransferVoucher() {
                             register={register("transferAmount", {
                                 required: 'Please enter transfer amount',
                                 onChange: e => setTransferAmount(e.target.value)
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                        <InputField
+                            size={'small'}
+                            label={'Bank Charge'}
+                            placeholder={'Amount'}
+                            error={errors?.bankCharge?.message}
+                            register={register("bankCharge", {
+                                required: 'Please enter bank charges',
+
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                        <InputField
+                            size={'small'}
+                            label={' Vat'}
+                            placeholder={'Amount'}
+                            error={errors?.Vat?.message}
+                            register={register("Vat", {
+                                required: 'Please enter vat ',
+
                             })}
                         />
                     </Grid>
