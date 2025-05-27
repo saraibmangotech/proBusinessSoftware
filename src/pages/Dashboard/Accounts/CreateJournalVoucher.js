@@ -80,7 +80,7 @@ function CreateJournalVoucher() {
   const navigate = useNavigate();
   const [isDebitDisabled, setIsDebitDisabled] = useState(false);
   const [isCreditDisabled, setIsCreditDisabled] = useState(false);
-
+  const [errorDisplay, setErrorDisplay] = useState(false)
   const { usdExchangeRate, cadExchangeRate } = useSelector((state) => state.navigationReducer);
 
   const { register, handleSubmit, formState: { errors }, setValue, reset, getValues } = useForm();
@@ -129,9 +129,9 @@ function CreateJournalVoucher() {
 
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
-    // *For Accounts
-    const [childAccounts, setChildAccounts] = useState([]);
-    const [selectedChildAccount, setSelectedChildAccount] = useState(null);
+  // *For Accounts
+  const [childAccounts, setChildAccounts] = useState([]);
+  const [selectedChildAccount, setSelectedChildAccount] = useState(null);
 
   // *For Total of Credit & Debit
   let TotalDebit = 0
@@ -197,20 +197,20 @@ function CreateJournalVoucher() {
     }
   }
 
-   // *For Get Account
-    const getChildAccounts = async (accountId) => {
-      try {
-        let params = {
-          page: 1,
-          limit: 50,
-          primary_account_id: accountId ?? selectedAccount?.id,
-        };
-        const { data } = await FinanceServices.getAccounts(params);
-        setChildAccounts(data?.accounts?.rows);
-      } catch (error) {
-        showErrorToast(error);
-      }
-    };
+  // *For Get Account
+  const getChildAccounts = async (accountId) => {
+    try {
+      let params = {
+        page: 1,
+        limit: 50,
+        primary_account_id: accountId ?? selectedAccount?.id,
+      };
+      const { data } = await FinanceServices.getAccounts(params);
+      setChildAccounts(data?.accounts?.rows);
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
   const getCostCenters = async () => {
     try {
       let params = {
@@ -231,7 +231,7 @@ function CreateJournalVoucher() {
         page: 1,
         limit: 10000,
         name: search,
-        is_disabled:false
+        is_disabled: false
 
       }
       const { data } = await FinanceServices.getAccountsDropDown(params)
@@ -239,7 +239,7 @@ function CreateJournalVoucher() {
         ...account,
         name: ` ${account.account_code} ${account.name}`
       }));
-      console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
 
       setAccounts(updatedAccounts)
     } catch (error) {
@@ -306,11 +306,8 @@ function CreateJournalVoucher() {
   }
   // *For Create Journal Voucher
   const createJournalVoucher = async (formData) => {
-    if (!selectedCostCenter || !selectedCostCenter.name) {
-      showErrorToast("Cost center is required.");
-      return;
-    }
-  
+   
+
     setLoading(true);
     try {
       let obj = {
@@ -318,37 +315,37 @@ function CreateJournalVoucher() {
         notes: getValues('note'),
         entries: rows,
         created_at: moment(fromDate).format('MM-DD-YYYY'),
-        cost_center: selectedCostCenter.name,
+
       };
-  
+
       const promise = FinanceServices.createJournalVoucher(obj);
-  
+
       showPromiseToast(
         promise,
         'Saving...',
         'Added Successfully',
         'Something Went Wrong'
       );
-  
+
       const response = await promise;
       if (response?.responseCode === 200) {
         navigate('/journal-voucher-list');
       }
-  
+
     } catch (error) {
       showErrorToast(error);
     } finally {
       setLoading(false);
     }
   };
-  
+
 
   const addItem = (data) => {
     if (childAccounts?.length > 0) {
       showErrorToast("Cannot use this account because it has child accounts.");
       return
     }
-    
+
     console.log(data);
     const debit = parseFloat(data?.debit || 0);
     const credit = parseFloat(data?.credit || 0);
@@ -365,7 +362,8 @@ function CreateJournalVoucher() {
         unique_id: Date.now() + Math.random(), // Ensure unique key
         account_id: selectedAccount?.id,
         name: selectedAccount?.name,
-        selectedAccount: selectedAccount
+        selectedAccount: selectedAccount,
+        cost_center: selectedCostCenter?.name
       };
 
       const updatedRows = [...prevRows, newRow];
@@ -384,13 +382,14 @@ function CreateJournalVoucher() {
     setSelectedAccount(null);
     setSelectedChildAccount(null);
     setChildAccounts([])
+    setSelectedCostCenter(null)
     reset();
   };
 
   const updateItem = (data) => {
-    
-    
-    
+
+
+
     if (!selectedRow) {
       showErrorToast('No row selected to update');
       return;
@@ -412,6 +411,7 @@ function CreateJournalVoucher() {
             ...data,
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
+            cost_center: selectedCostCenter?.name
           }
           : row
       );
@@ -432,6 +432,42 @@ function CreateJournalVoucher() {
     setEditState(false)
     reset();
   };
+
+  useEffect(() => {
+    const costCenterTotals = {};
+
+    rows.forEach((row) => {
+      const center = row.cost_center || row.costcenter; // handle both spellings
+      const debit = parseFloat(row.debit || 0);
+      const credit = parseFloat(row.credit || 0);
+
+      if (!costCenterTotals[center]) {
+        costCenterTotals[center] = { debit: 0, credit: 0 };
+      }
+
+      costCenterTotals[center].debit += debit;
+      costCenterTotals[center].credit += credit;
+    });
+
+    for (let i = 0; i < Object.entries(costCenterTotals).length; i++) {
+      const obj = Object.entries(costCenterTotals)[i];
+      let center = obj[0];
+      let totals = obj[1];
+      if (totals.debit !== totals.credit) {
+        setErrorDisplay(`${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`)
+        console.log(
+          `${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`
+        );
+        break;
+      }
+      else{
+        setErrorDisplay(false)
+      }
+    }
+
+   
+  }, [rows]);
+
 
 
 
@@ -472,20 +508,7 @@ function CreateJournalVoucher() {
               register={register1("Journal")}
             />
           </Grid>
-          <Grid item xs={3}>
-            <SelectField
-              size="small"
-              label="Select Cost Center"
-              options={costCenters}
-              selected={selectedCostCenter}
-              onSelect={(value) => {
-                setSelectedCostCenter(value)
 
-              }}
-              register={register1("costcenter", { required: "costcenter is required" })}
-              error={errors1?.costcenter?.message}
-            />
-          </Grid>
         </Grid>
 
 
@@ -501,11 +524,11 @@ function CreateJournalVoucher() {
               <TableRow>
 
                 <TableCell sx={{ width: "400px" }}>Accounts</TableCell>
-          
+
                 <TableCell sx={{ width: "150px" }}>Debit</TableCell>
                 <TableCell sx={{ width: "150px" }}>Credit</TableCell>
-                <TableCell sx={{ width: "150px" }}>Description</TableCell>
-
+                <TableCell sx={{ width: "250px" }}>Description</TableCell>
+                <TableCell sx={{ width: "250px" }}>Cost Center</TableCell>
                 <TableCell sx={{ width: "150px" }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -607,59 +630,75 @@ function CreateJournalVoucher() {
                   />
                   {errors.desc && <span style={{ color: "red" }}>{errors.desc.message}</span>}
                 </TableCell>
-
                 <TableCell>
-                  <Box sx={{display:'flex',gap:2}}>
-                  {!editState && <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    sx={{
-                      textTransform: 'capitalize',
-                      backgroundColor: "#001f3f",
-                      fontSize: "12px",
-                      ":hover": {
-                        backgroundColor: "#001f3f",
-                      },
+                  <SelectField
+                    size="small"
+
+                    options={costCenters}
+                    selected={selectedCostCenter}
+                    onSelect={(value) => {
+                      setSelectedCostCenter(value)
+
                     }}
-                  >
-                    <AddIcon />
-                  </Button>}
-                  {editState && <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    sx={{
-                      textTransform: 'capitalize',
-                      backgroundColor: "#001f3f",
-                      fontSize: "12px",
-                      ":hover": {
+                    register={register("costcenter", { required: " required" })}
+
+
+                  />
+                  {errors.costcenter && <span style={{ color: "red" }}>{errors.costcenter.message}</span>}
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    {!editState && <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{
+                        textTransform: 'capitalize',
                         backgroundColor: "#001f3f",
-                      },
-                    }}
-                  >
-                    Update
-                  </Button>}
-                  {editState && <Button
-                    variant="contained"
-                    color="primary"
-                  onClick={()=> {
-                    setSelectedAccount(null)
-                    setValue('debit','')
-                    setValue('credit','')
-                    setValue('description','')
-                    setEditState(false)}}
-                    sx={{
-                      textTransform: 'capitalize',
-                      backgroundColor: "#001f3f",
-                      fontSize: "12px",
-                      ":hover": {
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "#001f3f",
+                        },
+                      }}
+                    >
+                      <AddIcon />
+                    </Button>}
+                    {editState && <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{
+                        textTransform: 'capitalize',
                         backgroundColor: "#001f3f",
-                      },
-                    }}
-                  >
-                    Cancel
-                  </Button>}
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "#001f3f",
+                        },
+                      }}
+                    >
+                      Update
+                    </Button>}
+                    {editState && <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        setSelectedAccount(null)
+                        setValue('debit', '')
+                        setValue('credit', '')
+                        setValue('description', '')
+                        setEditState(false)
+                      }}
+                      sx={{
+                        textTransform: 'capitalize',
+                        backgroundColor: "#001f3f",
+                        fontSize: "12px",
+                        ":hover": {
+                          backgroundColor: "#001f3f",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>}
                   </Box>
                 </TableCell>
               </TableRow>}
@@ -672,6 +711,7 @@ function CreateJournalVoucher() {
                   <TableCell>{item?.debit}</TableCell>
                   <TableCell>{item?.credit}</TableCell>
                   <TableCell>{item?.description}</TableCell>
+                  <TableCell>{item?.cost_center}</TableCell>
                   <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
 
@@ -680,11 +720,12 @@ function CreateJournalVoucher() {
                         setSelectedRow(item?.unique_id)
                         setEditState(true)
                         console.log(item);
+                        setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
                         setSelectedAccount(item?.selectedAccount)
-                        setValue('service',item?.selectedAccount?.name)
-                        setValue('debit',item?.debit)
-                        setValue('credit',item?.credit)
-                        setValue('description',item?.description)
+                        setValue('service', item?.selectedAccount?.name)
+                        setValue('debit', item?.debit)
+                        setValue('credit', item?.credit)
+                        setValue('description', item?.description)
                       }} src={Images.editIcon} width={'35px'}></Box>}
                       {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
@@ -739,9 +780,9 @@ function CreateJournalVoucher() {
         </TableContainer>
         <Grid container spacing={2} >
           <Grid item xs={12} sm={12}>
-            {parseFloat(totalCredit).toFixed(2) != parseFloat(totalDebit).toFixed(2) &&
+            {(rows?.length > 0 && errorDisplay) &&
               <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
-                Debit and Credit are not equal.
+                {errorDisplay}
               </Typography>
             }
           </Grid>
@@ -755,7 +796,7 @@ function CreateJournalVoucher() {
         </Grid>
         <Box sx={{ mt: 2, textAlign: 'right' }}>
           <PrimaryButton
-            disabled={parseFloat(totalCredit).toFixed(2) != parseFloat(totalDebit).toFixed(2)}
+            disabled={rows?.length == 0 || errorDisplay}
             title="Submit"
             loading={loading}
             onClick={() => createJournalVoucher()}

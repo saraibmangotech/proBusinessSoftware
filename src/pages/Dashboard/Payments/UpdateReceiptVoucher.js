@@ -580,6 +580,7 @@ function UpdateReceiptVoucher() {
 
             setValue1('Voucher', 'PV-' + detail?.voucher_number)
             setValue('note', detail?.description)
+            setFromDate(new Date(detail?.date))
             const updatedAccounts = detail?.entries?.map(account => ({
                 ...account,
                 id: account?.account?.id,
@@ -614,7 +615,7 @@ function UpdateReceiptVoucher() {
         getAccounts()
         getMajorCategories()
         getSubCategories()
-        setFromDate(new Date())
+        // setFromDate(new Date())
         getJournalVouchers()
     }, []);
 
