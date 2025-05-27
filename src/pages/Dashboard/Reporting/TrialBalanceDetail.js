@@ -1170,7 +1170,7 @@ function TrialBalanceDetailed() {
                                                                                                                     {parseFloat(
                                                                                                                         account.nature === "debit"
                                                                                                                             ? parseFloat(account.total_debit) - parseFloat(account.total_credit)
-                                                                                                                            : parseFloat(account.total_credit) - parseFloat(account.total_debit)
+                                                                                                                            : -1 *  ( parseFloat(account.total_credit) - parseFloat(account.total_debit))
                                                                                                                     ).toFixed(2)}
                                                                                                                 </TableCell>
 

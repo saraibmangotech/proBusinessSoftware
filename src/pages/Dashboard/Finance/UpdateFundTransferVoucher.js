@@ -37,7 +37,7 @@ function UpdateFundTransferVoucher() {
     const [selectedChildAccount, setSelectedChildAccount] = useState(null);
 
     // *For Handle Date
-    const [vaultDate, setVaultDate] = useState(new Date());
+    const [vaultDate, setVaultDate] = useState();
 
     // *For Exchange Rate Disabled
     const [disabledExchangeRate, setDisabledExchangeRate] = useState(false);
@@ -234,6 +234,7 @@ function UpdateFundTransferVoucher() {
             setValue('from', detail?.from_account)
             setValue('to', detail?.to_account)
             setSelectedFromAccount(detail?.from_account)
+            setVaultDate(new Date(detail?.date))
             setSelectedToAccount(detail?.to_account)
             setValue('transferAmount', detail?.from_amount)
             setValue('costcenter',detail?.cost_center ? { id: detail?.cost_center, name: detail?.cost_center } : '')
