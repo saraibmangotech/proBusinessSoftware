@@ -1414,7 +1414,15 @@ function CreatePaidReceipt() {
                             console.log(value?.id, 'value?.id');
 
                             setValue1('percentage', 1);
-                            const percentageValue = parseFloat(1 || 0);
+                            let percentageValue = parseFloat(1 || 0);
+                            if(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && getValues1('invoiceID')?.includes('DED')){
+                              setValue1('percentage',0);
+                             percentageValue = parseFloat(0 || 0);
+                            }
+                            if(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && getValues1('invoiceID')?.includes('TYP')){
+                              setValue1('percentage',1);
+                             percentageValue = parseFloat(1 || 0);
+                            }
                             const amount = parseFloat(getValues1("payamount") || 0);
                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 

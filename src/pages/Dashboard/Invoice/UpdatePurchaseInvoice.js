@@ -20,6 +20,7 @@ import {
     TableHead,
     TextField,
     Paper,
+    Switch,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RegisterContainer from "container/Register";
@@ -93,6 +94,7 @@ function UpdatePurchaseInvoice() {
     const [cards, setCards] = useState([])
     const [selectedCard, setSelectedCard] = useState(null)
     const [payments, setPayments] = useState([])
+    const [isVatApplicable, setIsVatApplicable] = useState(false);
 
     console.log(rows, "data");
     const [items, setItems] = useState([
@@ -173,27 +175,39 @@ function UpdatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
+    useEffect(() => {
+        const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
+        const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+
+        const totalWithVat = isVatApplicable
+            ? parseFloat((grandTotal * 0.05) + grandTotal)
+            : grandTotal;
+
+        setValue1('total', totalWithVat.toFixed(2));
+        setValue1('finalTotal', totalWithVat.toFixed(2));
+        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
+    }, [isVatApplicable, rows, payments]);
 
     const addItem = (item, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
-    
+
         // Parse numeric inputs
         const parsedQuantity = parseFloat(quantity);
         const parsedCharges = parseFloat(charges);
         const parsedTotal = parseFloat(total);
-    
+
         // Basic required field validation
         if (!item || quantity === "" || charges === "") {
             showErrorToast("Item, quantity, and charges are required!");
             return;
         }
-    
+
         // Check for negative values
         if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
             showErrorToast("Quantity, charges, and total must be 0 or greater!");
             return;
         }
-    
+
         // Check for consistent impact account ID
         if (rows.length > 0) {
             let firstImpactAccountId = rows[0].item?.impact_account_id;
@@ -206,14 +220,14 @@ function UpdatePurchaseInvoice() {
                 return;
             }
         }
-    
+
         // Check for duplicate product
         const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
         if (isDuplicate) {
             showErrorToast("This product has already been added.");
             return;
         }
-    
+
         // Create a new row
         const newRow = {
             product_id: serviceItem?.id,
@@ -226,7 +240,7 @@ function UpdatePurchaseInvoice() {
             selectedService: serviceItem
         };
         console.log(newRow);
-    
+
         // Update rows and subtotal
         setRows((prevRows) => {
             const updatedRows = [...prevRows, newRow];
@@ -237,11 +251,11 @@ function UpdatePurchaseInvoice() {
             setSubTotal(parseFloat(newSubTotal.toFixed(2)));
             return updatedRows;
         });
-    
+
         setPayments([]);
         setServiceItem("");
     };
-    
+
 
     const { id } = useParams()
     const [activeStep, setActiveStep] = React.useState(1);
@@ -376,6 +390,7 @@ function UpdatePurchaseInvoice() {
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     items: rows,
+                    vat_enabled:isVatApplicable,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
@@ -895,6 +910,7 @@ function UpdatePurchaseInvoice() {
             //setCategories(data?.categories)
 
             console.log(detail);
+            setIsVatApplicable(detail?.vat_enabled)
             const updatedItems = detail?.invoice_items?.map(item => ({
                 ...item,
                 selectedService: item.product,
@@ -906,7 +922,7 @@ function UpdatePurchaseInvoice() {
 
             console.log("Grand Total:", grandTotal.toFixed(2));
             setSubTotal(grandTotal.toFixed(2))
-            console.log(updatedItems,"updatedItems");
+            console.log(updatedItems, "updatedItems");
             setRows(updatedItems)
             setSelectedVendor(detail?.vendor)
             setValue1('vendor', detail?.vendor)
@@ -1326,29 +1342,23 @@ function UpdatePurchaseInvoice() {
                                     </TableCell>
                                 </TableRow>
 
-                                <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                <TableCell colSpan={7} align="right">
+                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
+                                        <Switch
+                                            checked={isVatApplicable}
+                                            onChange={(e) => setIsVatApplicable(e.target.checked)}
+                                            color="primary"
+                                        />
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{
-                                            parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)}
-                                        </Typography> {/* Display the Sub-total */}
-                                    </TableCell>
-                                </TableRow>
-                                {/* Amount Total Row (optional, if needed for the final sum) */}
-                                <TableRow>
-                                    <TableCell colSpan={7} align="right">
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{
-                                            parseFloat(subTotal) +
-                                            (parseFloat(subTotal) * 0.05)
-                                        }
-                                        </Typography> {/* This can be the same as Sub-total */}
-                                    </TableCell>
-                                </TableRow>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                                        {isVatApplicable
+                                            ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
+                                            : "0.00"}
+                                    </Typography>
+                                </TableCell>
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>

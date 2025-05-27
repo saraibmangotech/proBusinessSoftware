@@ -124,6 +124,8 @@ function CreateFundTransferVoucher() {
         to_amount: formData?.receivedAmount,
         exchange_rate: updateExchangeRate,
         exchange_loss: formData.exchangeLoss,
+        bank_charges:formData?.bankCharge,
+        input_vat:formData?.Vat,
         ref_no: formData.ref,
         notes: formData.note,
         cashier: cashier,
@@ -234,6 +236,10 @@ function CreateFundTransferVoucher() {
       }
     }
   }, [transferAmount, updateExchangeRate, selectedFromAccount, selectedToAccount]);
+useEffect(() => {
+  setValue('bankCharge',0)
+  setValue('Vat',0)
+}, [])
 
   return (
     <Box sx={{ m: 4, p: 5, bgcolor: Colors.white, borderRadius: 3, boxShadow: '0px 8px 18px 0px #9B9B9B1A' }}>
@@ -299,6 +305,30 @@ function CreateFundTransferVoucher() {
               register={register("transferAmount", {
                 required: 'Please enter transfer amount',
                 onChange: e => setTransferAmount(e.target.value)
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <InputField
+              size={'small'}
+              label={'Bank Charge'}
+              placeholder={'Amount'}
+              error={errors?.bankCharge?.message}
+              register={register("bankCharge", {
+                required: 'Please enter bank charges',
+                
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <InputField
+              size={'small'}
+              label={' Vat'}
+              placeholder={'Amount'}
+              error={errors?.Vat?.message}
+              register={register("Vat", {
+                required: 'Please enter vat ',
+               
               })}
             />
           </Grid>
