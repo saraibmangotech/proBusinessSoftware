@@ -170,17 +170,17 @@ function CreatePaymentVoucher() {
     };
     const getCostCenters = async () => {
         try {
-          let params = {
-            page: 1,
-            limit: 999999,
-          };
-    
-          const { data } = await CustomerServices.getCostCenters(params);
-          setCostCenters(data?.cost_centers);
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
         } catch (error) {
-          showErrorToast(error);
+            showErrorToast(error);
         }
-      };
+    };
 
     // *For Get Sub Categories
     const getSubCategories = async (id) => {
@@ -220,21 +220,21 @@ function CreatePaymentVoucher() {
     }
     const getChildAccounts = async (accountId) => {
         try {
-          let params = {
-            page: 1,
-            limit: 50,
-            primary_account_id: accountId,
-          };
-          const { data } = await FinanceServices.getAccounts(params);
-          if(data?.accounts?.rows?.length > 0){
-            setSelectedAccount(null)
-            showErrorToast('Cannot use this account because it has child accounts.')
-          }
-          setChildAccounts(data?.accounts?.rows);
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+            if (data?.accounts?.rows?.length > 0) {
+                setSelectedAccount(null)
+                showErrorToast('Cannot use this account because it has child accounts.')
+            }
+            setChildAccounts(data?.accounts?.rows);
         } catch (error) {
-          showErrorToast(error);
+            showErrorToast(error);
         }
-      };
+    };
 
     // *For Get Account
     const getAccounts = async (search, accountId) => {
@@ -242,9 +242,9 @@ function CreatePaymentVoucher() {
             let params = {
                 page: 1,
                 limit: 10000,
-          
+
                 name: search,
-                is_disabled:false
+                is_disabled: false
 
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
@@ -326,7 +326,7 @@ function CreatePaymentVoucher() {
             let obj = {
                 date: moment(fromDate).format('MM-DD-YYYY'),
                 type: "payment_voucher",    // or "receipt_voucher"
-
+                voucher_number: getValues1('Voucher'),
                 amount: total,
                 payment_mode: selectedMode?.id,   // or "cash"
                 account_id: selectedParentAccount?.id,
@@ -334,7 +334,7 @@ function CreatePaymentVoucher() {
                 authorization_code: formData?.remarks,
                 entries: rows,
                 payment_method: selectedParentAccount?.name,
-                cost_center:selectedCostCenter?.name
+                cost_center: selectedCostCenter?.name
             }
 
             console.log(obj, 'objobj');
@@ -404,7 +404,7 @@ function CreatePaymentVoucher() {
             ...data,
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
-            payment_mode:selectedAccount?.name
+            payment_mode: selectedAccount?.name
         };
 
         let findElement = rows?.find((item) => item?.account_id === newRow?.account_id);

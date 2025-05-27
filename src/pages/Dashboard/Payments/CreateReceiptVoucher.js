@@ -330,6 +330,7 @@ function CreateReceiptVoucher() {
                 description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
+                voucher_number: getValues1('Voucher'),
                 payment_method: selectedParentAccount?.name,
                 cost_center:selectedCostCenter?.name
             }
