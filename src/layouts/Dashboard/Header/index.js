@@ -428,11 +428,11 @@ function Header() {
               order_by: 33,
             },
 
-            
-            
-           
-            
-           
+
+
+
+
+
           ],
         },
 
@@ -599,11 +599,11 @@ function Header() {
               order_by: 33,
             },
 
-            
-            
-           
-            
-           
+
+
+
+
+
           ],
         },
 
@@ -738,6 +738,17 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
+            {
+              id: 33,
+              name: "Customer Payments",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/customer-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
           ],
         },
         {
@@ -819,7 +830,7 @@ function Header() {
     }
     else {
       setNavigationData([
-      
+
         {
           id: 2,
           name: "Receptions",
@@ -964,7 +975,7 @@ function Header() {
               navigation: true,
               order_by: 1,
             },
-           
+
             {
               id: 1502,
               name: "Products Management",
@@ -1042,8 +1053,8 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-           
-           
+
+
           ],
           childRoute: [
             "/purchase-orders",
@@ -1424,7 +1435,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-           
+
 
 
 
@@ -1581,7 +1592,7 @@ function Header() {
               children: [],
               childRoute: [],
             }
-          
+
           ],
         },
 
@@ -1636,118 +1647,121 @@ function Header() {
         </ListItem>
 
         {/* Navigation Items */}
-        {navigationData?.map((item) => (
+        {navigationData.map((item, index) => (
           <React.Fragment key={item.id}>
+            {index > 0 && (
+              <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
+            )}
+
             {item.children ? (
-              <>
-                <ListItem
-                  button
-                  onClick={() => handleSubmenuToggle(item.id)}
-                  selected={isChildActive(item.childRoute)}
+              // Item with dropdown
+              <Box>
+                <Button
+                  onClick={(e) => handleDropdownOpen(e, item.id)}
                   sx={{
-                    backgroundColor: isChildActive(item.childRoute) ? "rgba(52, 152, 219, 0.08)" : "transparent",
-                    "&.Mui-selected": {
-                      backgroundColor: "rgba(52, 152, 219, 0.08)",
-                      color: "#3498db",
-                      "&:hover": {
-                        backgroundColor: "rgba(52, 152, 219, 0.12)",
-                      },
-                    },
+                    color: isChildActive(item.childRoute) ? "#6092d5" : "white",
+                    fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
+                    textTransform: "none",
+                    fontSize: "14px",
+                    px: 2,
+                    py: 1.5,
+                    borderRadius: 0,
                     "&:hover": {
-                      backgroundColor: "rgba(52, 152, 219, 0.04)",
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
                     },
                   }}
+                  startIcon={navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
+                  endIcon={<KeyboardArrowDown />}
                 >
-                  <ListItemIcon>
-                    {navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2" sx={{ fontWeight: isChildActive(item.childRoute) ? 500 : 400 }}>
-                        {item.name}
-                      </Typography>
-                    }
-                  />
-                  {openSubmenu === item.id ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
+                  {item.name.toUpperCase()}
+                </Button>
 
-                <Collapse in={openSubmenu === item.id} timeout="auto">
-                  <List component="div" disablePadding>
-                    {item.children.map((child) => (
-                      <ListItem
-                        key={child.id}
-                        button
-                        onClick={() => {
-                          if (child.route) {
-                            navigate(child.route);
-                            setMobileOpen(false);
-                          }
-                        }}
-                        selected={isActive(child.route)}
+                <Popper
+                  open={openDropdownId === item.id}
+                  anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
+                  role={undefined}
+                  placement="bottom-start"
+                  transition
+                  disablePortal={true}
+                  style={{ zIndex: 111 }}
+                >
+                  {({ TransitionProps, placement }) => (
+                    <Grow
+                      {...TransitionProps}
+                      timeout={300}
+                      style={{
+                        transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
+                      }}
+                    >
+                      <Paper
+                        elevation={2}
                         sx={{
-                          pl: 4,
-                          backgroundColor: isActive(child.route) ? "rgba(52, 152, 219, 0.08)" : "transparent",
-                          "&.Mui-selected": {
-                            backgroundColor: "rgba(52, 152, 219, 0.08)",
-                            color: "#3498db",
-                            "&:hover": {
-                              backgroundColor: "rgba(52, 152, 219, 0.12)",
-                            },
+                          "&.MuiPaper-root": {
+                            maxHeight: "350px !important", 
+                           
+                            overflowY: "scroll",
                           },
-                          "&:hover": {
-                            backgroundColor: "rgba(52, 152, 219, 0.04)",
-                          },
+                          mt: 10,
                         }}
                       >
-                        <ListItemIcon>{getChildIcon(child.name)}</ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2" sx={{ fontWeight: isActive(child.route) ? 500 : 400 }}>
+                        <MenuList autoFocusItem={openDropdownId === item.id}
+                        >
+                          {item.children.map((child) => (
+                            <MenuItem
+                              key={child.id}
+                              component="a"
+                              href={child.route}
+                              target="_self"
+                              sx={{
+                                backgroundColor: isActive(child.route)
+                                  ? "rgba(52, 152, 219, 0.08)"
+                                  : "transparent",
+                                color: isActive(child.route) ? "#6092d5" : "#5d6778",
+                                fontWeight: isActive(child.route) ? 500 : 400,
+                                fontSize: "14px",
+                                py: 1,
+                                whiteSpace: "normal", // 👈 Allows wrapping
+                                wordBreak: "break-word", // 👈 Prevents overflow
+                                "&:hover": {
+                                  backgroundColor: "rgba(52, 152, 219, 0.04)",
+                                },
+                              }}
+                            >
+                              <ListItemIcon>{getChildIcon(child.name)}</ListItemIcon>
                               {child.name}
-                            </Typography>
-                          }
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
-              </>
+                            </MenuItem>
+                          ))}
+                        </MenuList>
+                      </Paper>
+                    </Grow>
+                  )}
+                </Popper>
+              </Box>
             ) : (
-              <ListItem
-                button
-                onClick={() => {
-                  if (item.route) {
-                    navigate(item.route);
-                    setMobileOpen(false);
-                  }
-                }}
-                selected={isActive(item.route)}
+              // Single item
+              <Button
+                component="a"
+                href={item.route}
                 sx={{
-                  backgroundColor: isActive(item.route) ? "rgba(52, 152, 219, 0.08)" : "transparent",
-                  "&.Mui-selected": {
-                    backgroundColor: "rgba(52, 152, 219, 0.08)",
-                    color: "#3498db",
-                    "&:hover": {
-                      backgroundColor: "rgba(52, 152, 219, 0.12)",
-                    },
-                  },
+                  color: isActive(item.route) ? "#6092d5" : "white",
+                  fontWeight: isActive(item.route) ? "bold" : 400,
+                  textTransform: "none",
+                  fontSize: "14px",
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: 0,
                   "&:hover": {
-                    backgroundColor: "rgba(52, 152, 219, 0.04)",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
                   },
                 }}
+                startIcon={navIcons[item.name.toLowerCase()] || <People fontSize="small" />}
               >
-                <ListItemIcon>{navIcons[item.name.toLowerCase()] || <People fontSize="small" />}</ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="body2" sx={{ fontWeight: isActive(item.route) ? 500 : 400 }}>
-                      {item.name}
-                    </Typography>
-                  }
-                />
-              </ListItem>
+                {item.name.toUpperCase()}
+              </Button>
             )}
           </React.Fragment>
         ))}
+
 
       </List>
     </Box>
@@ -1833,7 +1847,7 @@ function Header() {
           backgroundColor: "#001f3f", // Exact Navy Blue
           boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)",
         }}
-        
+
       >
         <ClickAwayListener onClickAway={handleDropdownClose}>
 
@@ -1884,12 +1898,12 @@ function Header() {
 
                   <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
 
-                  {/* Navigation Items */}
                   {navigationData.map((item, index) => (
                     <React.Fragment key={item.id}>
                       {index > 0 && (
                         <Divider orientation="vertical" flexItem sx={{ mx: 0, backgroundColor: "#5a6785" }} />
                       )}
+
                       {item.children ? (
                         // Item with dropdown
                         <Box>
@@ -1912,6 +1926,7 @@ function Header() {
                           >
                             {item.name.toUpperCase()}
                           </Button>
+
                           <Popper
                             open={openDropdownId === item.id}
                             anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
@@ -1919,9 +1934,7 @@ function Header() {
                             placement="bottom-start"
                             transition
                             disablePortal={true}
-                            style={{
-                              zIndex: 111,
-                            }}
+                            style={{ zIndex: 111 }}
                           >
                             {({ TransitionProps, placement }) => (
                               <Grow
@@ -1935,22 +1948,19 @@ function Header() {
                                   elevation={2}
                                   sx={{
                                     mt: 1,
-                                    width: "fit-content", // 👈 This makes it adjust to content
-                                    minWidth: 150,         // 👈 Optional: prevent it from getting too small
+                                    width: "fit-content",
+                                    maxHeight: 350,
                                     borderRadius: "8px",
-                                    overflow: "hidden",
+                                    overflow: "auto",
                                   }}
                                 >
                                   <MenuList autoFocusItem={openDropdownId === item.id}>
                                     {item.children.map((child) => (
                                       <MenuItem
                                         key={child.id}
-                                        onClick={() => {
-                                          if (child.route) {
-                                            navigate(child.route);
-                                            handleDropdownClose();
-                                          }
-                                        }}
+                                        component="a"
+                                        href={child.route}
+                                        target="_self"
                                         sx={{
                                           backgroundColor: isActive(child.route)
                                             ? "rgba(52, 152, 219, 0.08)"
@@ -1959,7 +1969,7 @@ function Header() {
                                           fontWeight: isActive(child.route) ? 500 : 400,
                                           fontSize: "14px",
                                           py: 1,
-                                          whiteSpace: "nowrap", // 👈 This ensures text stays in one line
+                                          whiteSpace: "nowrap",
                                           "&:hover": {
                                             backgroundColor: "rgba(52, 152, 219, 0.04)",
                                           },
@@ -1971,8 +1981,6 @@ function Header() {
                                     ))}
                                   </MenuList>
                                 </Paper>
-
-                                {/* </ClickAwayListener> */}
                               </Grow>
                             )}
                           </Popper>
@@ -1980,11 +1988,8 @@ function Header() {
                       ) : (
                         // Single item
                         <Button
-                          onClick={() => {
-                            if (item.route) {
-                              navigate(item.route)
-                            }
-                          }}
+                          component="a"
+                          href={item.route}
                           sx={{
                             color: isActive(item.route) ? "#6092d5" : "white",
                             fontWeight: isActive(item.route) ? "bold" : 400,
@@ -2004,6 +2009,8 @@ function Header() {
                       )}
                     </React.Fragment>
                   ))}
+
+
 
 
                 </Box>

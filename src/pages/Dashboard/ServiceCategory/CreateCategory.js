@@ -45,7 +45,7 @@ function CreateCategory() {
     const [submit, setSubmit] = useState(false)
     const [excludeFromSales, setExcludeFromSales] = useState('no');
     const [excludeFromPurchase, setExcludeFromPurchase] = useState('no');
-
+    const [costCenters, setCostCenters] = useState([])
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register1,
@@ -363,7 +363,21 @@ function CreateCategory() {
         }
     };
 
+    const getCostCenters = async () => {
+        try {
+          let params = {
+            page: 1,
+            limit: 999999,
+          };
+    
+          const { data } = await CustomerServices.getCostCenters(params);
+          setCostCenters(data?.cost_centers);
+        } catch (error) {
+          showErrorToast(error);
+        }
+      };
     useEffect(() => {
+        getCostCenters()
         getAccounts()
         getTax()
     }, [])
@@ -658,7 +672,7 @@ function CreateCategory() {
                                         size={'small'}
                                         label={'Cost Center *:'}
 
-                                        options={[{ id: 'Tasheel', name: 'Tasheel' }, { id: 'DED', name: 'DED' }, { id: 'Typing', name: 'Typing' }, { id: 'General', name: 'General' }]}
+                                        options={costCenters}
                                         selected={center}
                                         onSelect={(value) => {
                                             setCenter(value)

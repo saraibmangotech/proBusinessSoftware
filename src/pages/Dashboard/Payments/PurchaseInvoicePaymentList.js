@@ -468,12 +468,6 @@ function PurchaseInvoicePaymentList() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>  Invoice History</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-payment-voucher'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
 
 
             </Box>

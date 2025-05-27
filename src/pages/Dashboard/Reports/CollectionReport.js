@@ -290,16 +290,12 @@ function CollectionReport() {
       header: "Category",
       accessorKey: "category",
       total: false,
-      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE]?.category,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {agencyType[process.env.REACT_APP_TYPE]?.category}
-        </Box>
-      ),
+       accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category ,
+           cell: () => (
+             <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+               {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' :agencyType[process.env.REACT_APP_TYPE].category}
+             </Box>
+           ),
     },
     {
       header: "Receipt Date",
