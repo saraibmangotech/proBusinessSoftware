@@ -460,6 +460,12 @@ const UpdateReceiptVoucher= lazy(() =>
 const UpdateFundTransferVoucher= lazy(() =>
   import("pages/Dashboard/Finance/UpdateFundTransferVoucher")
 );
+const CreateEmployee= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/CreateEmployee")
+);
+const CreateLeave= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/CreateLeave")
+);
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
@@ -483,6 +489,14 @@ const AdminRoutes = [
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
+  },
+  {
+    path: "/create-employee",
+    component: <CreateEmployee />,
+  },
+  {
+    path: "/create-leave",
+    component: <CreateLeave />,
   },
   {
     path: "/create-credit-note",
