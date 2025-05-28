@@ -212,7 +212,7 @@ function CreatePaidReceipt() {
     const totalAdditionalCharges = payments.reduce((sum, p) => sum + parseFloat(p.additional_charges_value || 0), 0);
     console.log(paymentModesString); // Output: "Cash, Bank, Card"
     getValues1('total')
-    if (existingTotal == getValues1('finalTotal')) {
+    if (parseFloat(existingTotal.toFixed(2)) == parseFloat(getValues1('finalTotal').toFixed(2))) {
 
       setButtonDisabled(true)
       try {
