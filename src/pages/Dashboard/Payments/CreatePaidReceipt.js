@@ -586,8 +586,17 @@ function CreatePaidReceipt() {
     const total = parseFloat(getValues1("total")) || 0;
     const currentAmount = parseFloat(amount) || 0;
     const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    let sum = existingTotal + currentAmount;
 
-    if (existingTotal + currentAmount > total) {
+    // Convert to fixed decimals and parse back to numbers
+    let formattedSum = parseFloat(sum.toFixed(2));
+    let formattedTotal = parseFloat(total.toFixed(2));
+    
+    console.log("Formatted Sum:", formattedSum);
+    console.log("Formatted Total:", formattedTotal);
+    console.log("Comparison:", formattedSum > formattedTotal);
+    
+    if (formattedSum > formattedTotal) {
       showErrorToast("Total payment exceeds the required amount.");
       return;
     }

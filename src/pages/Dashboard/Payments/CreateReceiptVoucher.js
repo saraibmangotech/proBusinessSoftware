@@ -134,6 +134,7 @@ function CreateReceiptVoucher() {
     const [selectedBank, setSelectedBank] = useState(null)
     const [costCenters, setCostCenters] = useState([])
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [editState, setEditState] = useState(false)
 
     // *For Total of Credit & Debit
     let TotalDebit = 0
@@ -203,23 +204,23 @@ function CreateReceiptVoucher() {
             showErrorToast(error)
         }
     }
-        const getChildAccounts = async (accountId) => {
-            try {
-              let params = {
+    const getChildAccounts = async (accountId) => {
+        try {
+            let params = {
                 page: 1,
                 limit: 50,
                 primary_account_id: accountId,
-              };
-              const { data } = await FinanceServices.getAccounts(params);
-              if(data?.accounts?.rows?.length > 0){
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+            if (data?.accounts?.rows?.length > 0) {
                 setSelectedAccount(null)
                 showErrorToast('Cannot use this account because it has child accounts.')
-              }
-           
-            } catch (error) {
-              showErrorToast(error);
             }
-          };
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
 
     // *For Get Account
     const getAccounts = async (search, accountId) => {
@@ -228,8 +229,8 @@ function CreateReceiptVoucher() {
                 page: 1,
                 limit: 10000,
                 name: search,
-                
-                is_disabled:false
+
+                is_disabled: false
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
             const updatedAccounts = data?.accounts?.rows?.map(account => ({
@@ -302,21 +303,21 @@ function CreateReceiptVoucher() {
     }
     const getCostCenters = async () => {
         try {
-          let params = {
-            page: 1,
-            limit: 999999,
-          };
-    
-          const { data } = await CustomerServices.getCostCenters(params);
-          setCostCenters(data?.cost_centers);
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
         } catch (error) {
-          showErrorToast(error);
+            showErrorToast(error);
         }
-      };
+    };
     // *For Create Journal Voucher
     const CreateReceiptVoucher = async (formData) => {
         const paymentModesString = rows.map((item) => item.payment_mode).join(", ");
-  
+
         setLoading(true)
         try {
 
@@ -330,8 +331,9 @@ function CreateReceiptVoucher() {
                 description: getValues('note'),
                 authorization_code: formData?.remarks,
                 entries: rows,
+                voucher_number: getValues1('Voucher'),
                 payment_method: selectedParentAccount?.name,
-                cost_center:selectedCostCenter?.name
+                cost_center: selectedCostCenter?.name
             }
 
             console.log(obj);
@@ -373,6 +375,84 @@ function CreateReceiptVoucher() {
             showErrorToast(error);
         }
     };
+
+    const updateItem = (description, amount) => {
+        // Basic Validations
+        if (!selectedAccount || !selectedAccount.id) {
+            showErrorToast("Please select an account first");
+            return;
+        }
+
+        // if (!description || description.trim() === "") {
+        //     showErrorToast("Description is required");
+        //     return;
+        // }
+
+        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+            showErrorToast("Valid amount is required");
+            return;
+        }
+
+        if (!selectedAccount?.id) {
+            showErrorToast("No valid ID found for update.");
+            return;
+        }
+        console.log(selectedAccount?.id, 'selectedAccountselectedAccount');
+
+        // Prepare updated row data
+        const updatedItem = {
+            id: selectedAccount.id, // Maintain ID for match
+            description: description.trim(),
+            amount: parseFloat(amount),
+            debit: parseFloat(amount),
+            credit: 0,
+            account_id: selectedAccount?.id,
+            name: selectedAccount?.name,
+            payment_mode: selectedAccount?.name,
+            selectedAccount: selectedAccount
+        };
+        console.log(updateItem, 'updateItemupdateItem');
+
+        setRows((prevRows) => {
+            const updatedRows = prevRows.map((item) => {
+                console.log(item.account_id === selectedAccount.id);
+                return item.account_id === selectedAccount.id ? updatedItem : item;
+            });
+
+            console.log(updatedRows, 'updatedRows');
+
+            // Recalculate totals
+            const newTotalCredit = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.credit || 0),
+                0
+            );
+            const newTotalDebit = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.debit || 0),
+                0
+            );
+            const grandTotal = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.amount || 0),
+                0
+            );
+
+            setTotalCredit(newTotalCredit);
+            setTotalDebit(newTotalDebit);
+            setTotal(grandTotal);
+
+            setIsCreditDisabled(false);
+            setIsDebitDisabled(false);
+
+            return updatedRows;
+        });
+
+
+        // Reset state
+        setValue("amount", "");
+        setValue("description", "");
+        setSelectedAccount(null);
+        setSelectedAccount(null);
+        setEditState(false);
+    };
     useEffect(() => {
         getTokenNumber()
         getAccountBySubCategory()
@@ -386,10 +466,10 @@ function CreateReceiptVoucher() {
             return;
         }
 
-        if (!description || description.trim() === "") {
-            showErrorToast("Description is required");
-            return;
-        }
+        // if (!description || description.trim() === "") {
+        //     showErrorToast("Description is required");
+        //     return;
+        // }
 
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             showErrorToast("Valid amount is required");
@@ -402,7 +482,8 @@ function CreateReceiptVoucher() {
             ...data,
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
-            payment_mode:selectedAccount?.name
+            payment_mode: selectedAccount?.name,
+            selectedAccount: selectedAccount
         };
 
         let findElement = rows?.find((item) => item?.account_id === newRow?.account_id);
@@ -438,7 +519,8 @@ function CreateReceiptVoucher() {
             });
 
             setSelectedAccount(null);
-            reset();
+            setValue('description', '')
+            setValue('amount', '')
         }
     };
 
@@ -620,7 +702,7 @@ function CreateReceiptVoucher() {
 
 
                             <TableCell>
-                                {<Button
+                                {!editState && <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={() => addItem(getValues('description'), getValues('amount'))}
@@ -635,6 +717,51 @@ function CreateReceiptVoucher() {
                                 >
                                     <AddIcon />
                                 </Button>}
+                                {editState && (
+                                    <>
+                                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                type="submit"
+                                                onClick={() => updateItem(getValues('description'), getValues('amount'))}
+                                                sx={{
+                                                    textTransform: "capitalize",
+                                                    backgroundColor: "#001f3f",
+                                                    fontSize: "12px",
+                                                    ":hover": {
+                                                        backgroundColor: "#001f3f",
+                                                    },
+                                                }}
+                                            >
+                                                Update
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => {
+                                                    setEditState(false);
+                                                    setValue("id", "");
+                                                    setValue("amount", "");
+                                                    setValue("description", "");
+                                                    setSelectedAccount(null);
+                                                    setValue("quantity", "");
+                                                }}
+                                                sx={{
+
+                                                    textTransform: "capitalize",
+                                                    backgroundColor: "#001f3f",
+                                                    fontSize: "12px",
+                                                    ":hover": {
+                                                        backgroundColor: "#001f3f",
+                                                    },
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </Box>
+                                    </>
+                                )}
 
                             </TableCell>
                         </TableRow>}
@@ -651,6 +778,17 @@ function CreateReceiptVoucher() {
 
 
                                     <Box>
+                                        {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
+                                            setSelectedRow(item); setEditState(true)
+                                            console.log(item);
+
+                                            setValue("id", item?.id);
+                                            setSelectedAccount(item?.selectedAccount)
+                                            setValue("description", item?.description);
+                                            setValue("amount", item?.amount);
+                                            console.log(item?.service)
+
+                                        }} src={Images.editIcon} width={'35px'}></Box>}
                                         {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
                                             let selectedID = item?.id

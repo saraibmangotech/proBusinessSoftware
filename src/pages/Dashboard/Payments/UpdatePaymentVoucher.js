@@ -434,10 +434,10 @@ function UpdatePaymentVoucher() {
             return;
         }
 
-        if (!description || description.trim() === "") {
-            showErrorToast("Description is required");
-            return;
-        }
+        // if (!description || description.trim() === "") {
+        //     showErrorToast("Description is required");
+        //     return;
+        // }
 
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             showErrorToast("Valid amount is required");
@@ -487,7 +487,8 @@ function UpdatePaymentVoucher() {
             });
 
             setSelectedAccount(null);
-            reset();
+            setValue('description', '')
+            setValue('amount', '')
         }
     };
     const updateItem = (description, amount) => {
@@ -497,10 +498,10 @@ function UpdatePaymentVoucher() {
             return;
         }
 
-        if (!description || description.trim() === "") {
-            showErrorToast("Description is required");
-            return;
-        }
+        // if (!description || description.trim() === "") {
+        //     showErrorToast("Description is required");
+        //     return;
+        // }
 
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             showErrorToast("Valid amount is required");

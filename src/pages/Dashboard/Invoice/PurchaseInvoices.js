@@ -43,6 +43,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import DatePicker from 'components/DatePicker';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -154,6 +155,35 @@ function PurchaseInvoices() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
+
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
 
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
@@ -169,6 +199,8 @@ function PurchaseInvoices() {
             let params = {
                 page: 1,
                 limit: 999999,
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
 
             }
@@ -317,7 +349,7 @@ function PurchaseInvoices() {
                 <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
             ),
         },
-        
+
 
         {
             header: "Balance",
@@ -356,20 +388,20 @@ function PurchaseInvoices() {
                         {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     </Box>
 
-                  
-                        <PrimaryButton
-                            bgcolor={'#001f3f'}
-                            title="View Receipts"
-                            onClick={() => {
-                                localStorage.setItem("currentUrl", '/create-customer');
-                                navigate('/purchase-payment-invoice-list', {
-                                    state: { id: row?.original?.id }, // Replace 123 with your actual ID
-                                });
-                            }}
-                            loading={loading}
-                        />
 
-                    
+                    <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="View Receipts"
+                        onClick={() => {
+                            localStorage.setItem("currentUrl", '/create-customer');
+                            navigate('/purchase-payment-invoice-list', {
+                                state: { id: row?.original?.id }, // Replace 123 with your actual ID
+                            });
+                        }}
+                        loading={loading}
+                    />
+
+
 
                     <Tooltip title="Invoice">
                         <IconButton
@@ -471,19 +503,61 @@ function PurchaseInvoices() {
                     </Grid>
                 </Box>
             </SimpleDialog>
-
-
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Invoice List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-purchase-invoice'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
+              
 
 
             </Box>
+            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                <Grid item xs={8}>
+                    <Grid container spacing={1}>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"From Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={fromDate}
+                                onChange={(date) => handleFromDate(date)}
+                            />
+                        </Grid>
+                        <Grid item xs={5}>
+                            <DatePicker
+                                label={"To Date"}
+
+                                disableFuture={true}
+                                size="small"
+                                value={toDate}
+                                onChange={(date) => handleToDate(date)}
+                            />
+                        </Grid>
+
+                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                            <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                            />
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+                    <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create"
+
+                        onClick={() => {
+                            navigate("/sales-receipt");
+                            localStorage.setItem("currentUrl", "/create-customer");
+                        }}
+                        loading={loading}
+                    />
+                </Grid>
+            </Grid>
+          
 
             {/* Filters */}
             <Box >

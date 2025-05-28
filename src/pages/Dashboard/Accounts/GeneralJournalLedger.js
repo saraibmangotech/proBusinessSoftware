@@ -104,7 +104,7 @@ function GeneralJournalLedger() {
 	const { register, handleSubmit, getValues, setValue } = useForm();
 
 
-	const tableHead = ['JV#', 'Date', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments', 'Actions']
+	const tableHead = ['JV#', 'Date','Cost Center', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments', 'Actions']
 
 	const [visibleColumns, setVisibleColumns] = useState([...Array(tableHead?.length).keys()]);
 
@@ -314,8 +314,11 @@ function GeneralJournalLedger() {
 				return moment(item?.created_at).format(
 					"DD/MM/YYYY"
 				) ?? "-";
+				case 2:
+				return item?.cost_center
+				 ?? "-";
 
-			case 2:
+			case 3:
 				return <Box>
 					<Tooltip
 						className="pdf-hide"
@@ -339,22 +342,22 @@ function GeneralJournalLedger() {
 						{item.entry?.reference_no}
 					</Box>
 				</Box>
-			case 3:
-				return item?.type?.type_name ?? "-";
 			case 4:
-				return item?.account?.account_code ?? "-";
+				return item?.type?.type_name ?? "-";
 			case 5:
-				return item?.account?.name ?? "-";
+				return item?.account?.account_code ?? "-";
 			case 6:
+				return item?.account?.name ?? "-";
+			case 7:
 				return parseFloat(item?.debit).toFixed(2) ??
 					"0.00";
-			case 7:
-				return parseFloat(item?.credit).toFixed(2) ?? "0.00";
 			case 8:
+				return parseFloat(item?.credit).toFixed(2) ?? "0.00";
+			case 9:
 				return item?.description ?? "-"
 					;
 
-			case 9:
+			case 10:
 				return (
 					<Box>
 						<Tooltip
@@ -386,7 +389,7 @@ function GeneralJournalLedger() {
 						</Box>
 					</Box>
 				)
-			case 10:
+			case 11:
 				return <Box component={'div'} className='pdf-hide'
 					onClick={() => {
 						setValue('search', item?.series_id + item?.journal_id);

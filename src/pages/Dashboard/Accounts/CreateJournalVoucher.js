@@ -389,7 +389,9 @@ function CreateJournalVoucher() {
     setSelectedChildAccount(null);
     setChildAccounts([])
     setSelectedCostCenter(null)
-    reset();
+    setValue('description', '')
+    setValue('debit', '')
+    setValue('credit', '')
   };
 
   const updateItem = (data) => {
@@ -436,7 +438,9 @@ function CreateJournalVoucher() {
     setSelectedAccount(null);
     setSelectedRow(null);
     setEditState(false)
-    reset();
+    setValue('description', '')
+    setValue('debit', '')
+    setValue('credit', '')
   };
 
   useEffect(() => {
