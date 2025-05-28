@@ -466,6 +466,12 @@ const CreateEmployee= lazy(() =>
 const CreateLeave= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/CreateLeave")
 );
+const LeaveList= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/LeaveList")
+);
+const SalaryList= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/SalaryList")
+);
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
@@ -497,6 +503,14 @@ const AdminRoutes = [
   {
     path: "/create-leave",
     component: <CreateLeave />,
+  },
+  {
+    path: "/leave-list",
+    component: <LeaveList />,
+  },
+  {
+    path: "/salary-list",
+    component: <SalaryList />,
   },
   {
     path: "/create-credit-note",
