@@ -757,7 +757,7 @@ function CreatePaymentInvoice() {
 
                                                     </Cell>
                                                     <Cell>
-                                                        {moment(item?.created_at).format('DD-MMM-YYYY')}
+                                                        {item?.purchase_date ? moment(item?.purchase_date).format('DD-MMM-YYYY') : ''}
                                                     </Cell>
                                                     <Cell>
                                                         {item?.id ?? '-'}
