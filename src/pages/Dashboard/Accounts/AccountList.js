@@ -107,6 +107,7 @@ function AccountList() {
 
   // *For Accounts List
   const [accounts, setAccounts] = useState();
+  const [accounts2, setAccounts2] = useState();
 
   // *For Pagination
   const [totalCount, setTotalCount] = useState(0);
@@ -183,10 +184,33 @@ function AccountList() {
       // setLoader(false)
     }
   }
-
+  const getAccounts2 = async (page, limit, filter) => {
+    // setLoader(true)
+    try {
+      const Page = page ? page : currentPage
+      const Limit = limit ? limit : pageLimit
+      const Filter = { ...filters, ...filter }
+      setCurrentPage(Page)
+      setPageLimit(Limit)
+      setFilters(Filter)
+      let params = {
+        page: 1,
+        limit: 999999
+      }
+      params = { ...params, ...Filter }
+      const { data } = await FinanceServices.getAccounts(params)
+      setAccounts2(data?.accounts?.rows)
+    
+    } catch (error) {
+      ErrorToaster(error)
+    } finally {
+      // setLoader(false)
+    }
+  }
   // *For Handle Filter
   const handleFilter = (data) => {
-    Debounce(() => getAccounts(1, '', data));
+    Debounce(() => {getAccounts(1, '', data); getAccounts2(1, '', data)});
+    
   }
   const sortData = (e, type, item) => {
     e.preventDefault();
@@ -331,7 +355,7 @@ function AccountList() {
   const downloadExcel = () => {
     // Define headers and data separately
     const headers = tableHead.filter((item) => item !== "Status" && item !== "Actions");
-    const data = accounts;
+    const data = accounts2;
     // Extract values from objects and create an array for each row
     const rows = data.map((item, index) => [
       item?.account_code ?? '-',
@@ -362,6 +386,7 @@ function AccountList() {
 
   useEffect(() => {
     getAccounts()
+    getAccounts2()
     getMajorCategories()
     getSubCategories()
   }, []);
@@ -386,30 +411,26 @@ function AccountList() {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
           mr: 4,
           my: 4,
         }}
       >
        
-        {/* {accounts?.length > 0 && (
+        {accounts?.length > 0 && (
           <Box sx={{
-            textAlign: "right", p: 4, display: "flex", gap: 2
+            p: 4, display: "flex", gap: 2,
+            justifyContent:'flex-end'
 
           }}>
-            <PrimaryButton
-              title="Download PDF"
-              type="button"
-              style={{ backgroundColor: Colors.bluishCyan }}
-              onClick={() => handleExportWithComponent(contentRef)}
-            />
+        
             <PrimaryButton
               title={"Download Excel"}
               onClick={() => downloadExcel()}
             />
           </Box>
-        )} */}
+        )}
       </Box>
 
       {/* Filters */}
