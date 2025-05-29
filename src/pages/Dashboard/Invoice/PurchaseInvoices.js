@@ -550,7 +550,7 @@ function PurchaseInvoices() {
                         title="Create"
 
                         onClick={() => {
-                            navigate("/sales-receipt");
+                            navigate("/create-purchase-invoice");
                             localStorage.setItem("currentUrl", "/create-customer");
                         }}
                         loading={loading}
