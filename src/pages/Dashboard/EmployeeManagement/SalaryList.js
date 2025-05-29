@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, tableCellClasses, IconButton, CircularProgress, Chip, Grid, InputLabel,
     FormControl,
@@ -10,6 +10,7 @@ import {
     InputAdornment,
     TextField,
 } from '@mui/material';
+
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -152,128 +153,15 @@ function SalaryList() {
     // *For Permissions
     const [permissions, setPermissions] = useState();
 
-    const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
 
     // *For Get Customer Queue
 
-    const [data, setData] = useState([
-        {
-          id: 1,
-          masId: "EMP001",
-          desg: "Driver",
-          cnic: "42101-1234567-1",
-          name: "Ali Khan",
-          days: 30,
-          bsSal: 30000,
-          lve: 1,
-          abs: 0,
-          salPerDay: 1000,
-          absAmt: 0,
-          ot: 5,
-          otRate: 100,
-          otAmt: 500,
-          night: 2,
-          aa: 200,
-          fuel: 1000,
-          arr: 0,
-          ded: 0,
-          grSal: 32000,
-          adv: 2000,
-          loan: 1500,
-          tax: 500,
-          netSal: 28000,
-        },
-        {
-          id: 2,
-          masId: "EMP002",
-          desg: "Helper",
-          cnic: "42101-7654321-2",
-          name: "Sara Bibi",
-          days: 28,
-          bsSal: 25000,
-          lve: 2,
-          abs: 0,
-          salPerDay: 892,
-          absAmt: 0,
-          ot: 3,
-          otRate: 100,
-          otAmt: 300,
-          night: 1,
-          aa: 100,
-          fuel: 800,
-          arr: 0,
-          ded: 0,
-          grSal: 26000,
-          adv: 1000,
-          loan: 1000,
-          tax: 300,
-          netSal: 23700,
-        }
-      ]);
-      const [data2, setData2] = useState([
-        {
-          id: 1,
-          masId: "EMP001",
-          desg: "Driver",
-          cnic: "42101-1234567-1",
-          name: "Ali Khan",
-          days: 30,
-          bsSal: 30000,
-          lve: 1,
-          abs: 0,
-          salPerDay: 1000,
-          absAmt: 0,
-          ot: 5,
-          otRate: 100,
-          otAmt: 500,
-          night: 2,
-          aa: 200,
-          fuel: 1000,
-          arr: 0,
-          ded: 0,
-          grSal: 32000,
-          adv: 2000,
-          loan: 1500,
-          tax: 500,
-          netSal: 28000,
-        },
-        {
-          id: 2,
-          masId: "EMP002",
-          desg: "Helper",
-          cnic: "42101-7654321-2",
-          name: "Sara Bibi",
-          days: 28,
-          bsSal: 25000,
-          lve: 2,
-          abs: 0,
-          salPerDay: 892,
-          absAmt: 0,
-          ot: 3,
-          otRate: 100,
-          otAmt: 300,
-          night: 1,
-          aa: 100,
-          fuel: 800,
-          arr: 0,
-          ded: 0,
-          grSal: 26000,
-          adv: 1000,
-          loan: 1000,
-          tax: 300,
-          netSal: 23700,
-        }
-      ]);
 
-      const handleInputChange = (id, key, value) => {
-        setData2(prevData =>
-          prevData.map(item =>
-            item.id === id ? { ...item, [key]: Number(value) } : item
-          )
-        );
-      };
-      
+
+
+
+
 
     const getCustomerQueue = async (page, limit, filter) => {
         setLoader(true)
@@ -366,86 +254,197 @@ function SalaryList() {
         }
     };
 
-    const columns = useMemo(() => [
-        { header: "Mas.ID", accessorKey: "masId" },
-        { header: "Desg.", accessorKey: "desg" },
-        { header: "CNIC", accessorKey: "cnic" },
-        { header: "Name", accessorKey: "name" },
-        { header: "Days", accessorKey: "days" },
-        { header: "Bs Sal", accessorKey: "bsSal" },
-        { header: "Lve", accessorKey: "lve" },
-        { header: "Abs", accessorKey: "abs" },
-        { header: "Sal/Day", accessorKey: "salPerDay" },
-        { header: "AbsAmt", accessorKey: "absAmt" },
-        { header: "OT", accessorKey: "ot" },
-        { header: "OT Rt", accessorKey: "otRate" },
-        { header: "OT Am", accessorKey: "otAmt" },
-        { header: "Nght", accessorKey: "night" },
-        { header: "AA", accessorKey: "aa" },
-        { header: "Fuel", accessorKey: "fuel" },
+    const initialData = [
         {
-          header: "Arr.",
-          cell: ({ row }) => (
-            <TextField
-              type="number"
-              variant="standard"
-              value={row.original.arr}
-              onChange={(e) =>
-                handleInputChange(row.original.id, "arr", e.target.value)
-              }
-            />
-          ),
+            id: "1",
+            masId: "EMP001",
+            desg: "Manager",
+            cnic: "12345-1234567-1",
+            name: "John Doe",
+            days: 30,
+            bsSal: 50000,
+            lve: 2,
+            abs: 1,
+            salPerDay: 1667,
+            absAmt: 1667,
+            ot: 5,
+            otRate: 200,
+            otAmt: 1000,
+            night: 0,
+            aa: 2000,
+            fuel: 1500,
+            arr: 0,
+            ded: 0,
+            loan: 0,
+            tax: 5000,
+            grSal: 52500,
+            adv: 0,
+            netSal: 47500,
         },
         {
-          header: "Ded.",
-          cell: ({ row }) => (
-            <TextField
-              type="number"
-              variant="standard"
-              value={row.original.ded}
-              onChange={(e) =>
-                handleInputChange(row.original.id, "ded", e.target.value)
-              }
-            />
-          ),
+            id: "2",
+            masId: "EMP002",
+            desg: "Developer",
+            cnic: "12345-1234567-2",
+            name: "Jane Smith",
+            days: 30,
+            bsSal: 45000,
+            lve: 1,
+            abs: 0,
+            salPerDay: 1500,
+            absAmt: 0,
+            ot: 8,
+            otRate: 180,
+            otAmt: 1440,
+            night: 2,
+            aa: 1800,
+            fuel: 1200,
+            arr: 0,
+            ded: 0,
+            loan: 0,
+            tax: 4500,
+            grSal: 48240,
+            adv: 0,
+            netSal: 43740,
         },
-        {
-          header: "Loan",
-          cell: ({ row }) => (
-            <TextField
-              type="number"
-              variant="standard"
-              value={row.original.loan}
-              onChange={(e) =>
-                handleInputChange(row.original.id, "loan", e.target.value)
-              }
-            />
-          ),
-        },
-        {
-          header: "Tax",
-          cell: ({ row }) => (
-            <TextField
-              type="number"
-              variant="standard"
-              value={row.original.tax}
-              onChange={(e) =>
-                handleInputChange(row.original.id, "tax", e.target.value)
-              }
-            />
-          ),
-        },
-        { header: "GrSal", accessorKey: "grSal" },
-        { header: "Adv", accessorKey: "adv" },
-        { header: "NetSal", accessorKey: "netSal" },
-      ], [handleInputChange]); // Add dependency only if it's recreated, else just wrap in []
-      
-      
+    ]
+    const [data, setData] = useState(initialData)
+    const [loading] = useState(false)
+    const [selectedRows, setSelectedRows] = useState(new Set())
 
+    // Memoize the handleInputChange function to prevent unnecessary re-renders
+    const handleInputChange = useCallback((id, field, value) => {
+        const numericValue = Number.parseFloat(value) || 0
+    
+        setData((prevData) =>
+          prevData.map((row) => {
+            if (row.id === id) {
+              // Update the changed field
+              const updatedRow = { ...row, [field]: numericValue }
+    
+              // Recalculate net salary if any of the calculation fields changed
+              if (["arr", "ded", "loan", "tax"].includes(field)) {
+                // NetSal = GrSal + Arr - Ded - Loan - Tax
+                const newNetSal = updatedRow.grSal + updatedRow.arr - updatedRow.ded - updatedRow.loan - updatedRow.tax
+                updatedRow.netSal = newNetSal
+              }
+    
+              return updatedRow
+            }
+            return row
+          }),
+        )
+      }, [])
+    
+
+    // Handle individual row selection
+    const handleRowSelect = useCallback((rowId, checked) => {
+        setSelectedRows((prev) => {
+            const newSet = new Set(prev)
+            if (checked) {
+                newSet.add(rowId)
+            } else {
+                newSet.delete(rowId)
+            }
+            return newSet
+        })
+    }, [])
+
+    // Handle select all functionality
+    const handleSelectAll = useCallback(
+        (checked) => {
+            if (checked) {
+                setSelectedRows(new Set(data.map((row) => row.id)))
+            } else {
+                setSelectedRows(new Set())
+            }
+        },
+        [data],
+    )
+
+    // Bulk actions for selected rows
+    const handleDeleteSelected = useCallback(() => {
+        setData((prevData) => prevData.filter((row) => !selectedRows.has(row.id)))
+        setSelectedRows(new Set())
+    }, [selectedRows])
+
+    const handleDuplicateSelected = useCallback(() => {
+        const selectedData = data.filter((row) => selectedRows.has(row.id))
+        const duplicatedRows = selectedData.map((row) => ({
+            ...row,
+            id: `${row.id}_copy_${Date.now()}`,
+            masId: `${row.masId}_COPY`,
+        }))
+        setData((prevData) => [...prevData, ...duplicatedRows])
+        setSelectedRows(new Set())
+    }, [data, selectedRows])
+
+    // Memoize the columns array to prevent table re-rendering
+    const columns = useMemo(
+        () => [
+            // Selection column
+            {
+                header: "Select",
+                accessorKey: "select",
+                isSelection: true,
+            },
+            { header: "Mas.ID", accessorKey: "masId" },
+            { header: "Desg.", accessorKey: "desg" },
+            { header: "CNIC", accessorKey: "cnic" },
+            { header: "Name", accessorKey: "name" },
+            { header: "Days", accessorKey: "days" },
+            { header: "Bs Sal", accessorKey: "bsSal" },
+            { header: "Lve", accessorKey: "lve" },
+            { header: "Abs", accessorKey: "abs" },
+            { header: "Sal/Day", accessorKey: "salPerDay" },
+            { header: "AbsAmt", accessorKey: "absAmt" },
+            { header: "OT", accessorKey: "ot" },
+            { header: "OT Rt", accessorKey: "otRate" },
+            { header: "OT Am", accessorKey: "otAmt" },
+            { header: "Nght", accessorKey: "night" },
+            { header: "AA", accessorKey: "aa" },
+            { header: "Fuel", accessorKey: "fuel" },
+
+            // Editable input columns
+            {
+                header: "Arr.",
+                accessorKey: "arr",
+                isEditable: true,
+            },
+            {
+                header: "Ded.",
+                accessorKey: "ded",
+                isEditable: true,
+            },
+            {
+                header: "Loan",
+                accessorKey: "loan",
+                isEditable: true,
+            },
+            {
+                header: "Tax",
+                accessorKey: "tax",
+                isEditable: true,
+            },
+
+            { header: "GrSal", accessorKey: "grSal" },
+            { header: "Adv", accessorKey: "adv" },
+            { header: "NetSal", accessorKey: "netSal" },
+        ],
+        [],
+    )
 
     useEffect(() => {
         getCustomerQueue()
     }, []);
+
+    if (loading) {
+        return <div className="flex justify-center p-4">Loading...</div>
+    }
+
+
+
+
 
     return (
         <Box sx={{ p: 3 }}>
@@ -575,7 +574,7 @@ function SalaryList() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salary List</Typography>
-          
+
 
 
             </Box>
@@ -584,7 +583,79 @@ function SalaryList() {
             <Box >
 
 
-                {<DataTable loading={loader} data={data} columns={columns} />}
+            <Box sx={{ width: "100%" }}>
+   
+
+      <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+        <Table stickyHeader aria-label="employee data table" size="small">
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.header}
+                  align="left"
+                  sx={{
+                    minWidth: column.isSelection ? 70 : 100,
+                    backgroundColor: "#f5f5f5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {column.isSelection ? (
+                    <Checkbox
+                      color="primary"
+                      checked={selectedRows.size === data.length && data.length > 0}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      inputProps={{ "aria-label": "select all rows" }}
+                    />
+                  ) : (
+                    column.header
+                  )}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row) => (
+              <TableRow
+                key={row.id}
+                hover
+                selected={selectedRows.has(row.id)}
+                sx={{ "&.Mui-selected": { backgroundColor: "rgba(25, 118, 210, 0.08)" } }}
+              >
+                {columns.map((column) => (
+                  <TableCell key={`${row.id}-${column.header}`} padding="normal">
+                    {column.isSelection ? (
+                      <Checkbox
+                        color="primary"
+                        checked={selectedRows.has(row.id)}
+                        onChange={(e) => handleRowSelect(row.id, e.target.checked)}
+                        inputProps={{ "aria-labelledby": row.id }}
+                      />
+                    ) : column.isEditable ? (
+                      <TextField
+                        type="number"
+                        variant="standard"
+                        value={row[column.accessorKey] || 0}
+                        onChange={(e) => handleInputChange(row.id, column.accessorKey, e.target.value)}
+                        InputProps={{ disableUnderline: false }}
+                        sx={{ width: "100%" }}
+                        inputProps={{ step: "0.01" }}
+                      />
+                    ) : (
+                      <Typography variant="body2">
+                        {typeof row[column.accessorKey] === "number"
+                          ? row[column.accessorKey].toLocaleString()
+                          : row[column.accessorKey]}
+                      </Typography>
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
             </Box>
 
         </Box>
