@@ -43,6 +43,7 @@ import DatePicker from 'components/DatePicker';
 import VisaServices from 'services/Visa';
 import FinanceServices from 'services/Finance';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import DataTable from 'components/DataTable';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -161,6 +162,142 @@ function JournalVoucherList() {
     const [permissions, setPermissions] = useState();
 
     const [loading, setLoading] = useState(false)
+
+    const columns = [
+          
+            {
+                id: "created_at",
+                header: "Registration Date",
+                // Remove accessorKey and fix accessorFn to use row directly
+                accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
+                cell: ({ row }) => (
+                  <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.created_at).format("MM-DD-YYYY")}
+                  </Box>
+                ),
+              
+      
+      
+          },
+          {
+            header: "Cost Center",
+            accessorKey: "cost_center",
+      
+      
+          },
+          {
+            header: "JV#",
+            accessorKey: "id",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                 JV-{row?.original?.id ?? '-'}
+                </Box>
+              ),
+      
+      
+          },
+          {
+            header: "Entry No.",
+            accessorKey: "entry_no",
+      
+      
+          },
+          {
+            header: "Amount",
+            accessorKey: "total_amount",
+      
+      
+          },
+          {
+            header: "Note",
+            accessorKey: "notes",
+      
+      
+          },
+          {
+            header: "User",
+            accessorKey: "name",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                 {row?.original?.creator?.name ?? '-'}
+                </Box>
+              ),
+      
+      
+          },
+          // {
+          //   header: "Type",
+          //   accessorKey: "cost_center",
+          //   cell: ({ row }) => (
+          //     <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          //       {row?.original?.is_company ? 'Company' : "Individual"}
+          //     </Box>
+          //   ),
+      
+          // },
+          {
+            id: "created_at",
+            header: "Registration Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+              <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                {moment(row.original.created_at).format("DD/MM/YYYY")}
+              </Box>
+            ),
+          },
+      
+         
+          {
+            header: "Actions",
+            cell: ({ row }) => (
+      
+               <Box component={'div'}  sx={{ display: 'flex', gap: '20px', }}>
+
+              
+                    <IconButton
+                        onClick={() =>
+
+                            navigate('/general-journal-ledger', {
+                                state: row?.original?.entry_id
+                            })
+                        }
+                        sx={{
+                            width:'35px',
+                            height:'35px',
+                            bgcolor:
+                                Colors.primary,
+                            "&:hover": {
+                                bgcolor:
+                                    Colors.primary,
+                            },
+                        }}
+                    >
+                        <EyeIcon />
+                    </IconButton>
+              
+                <Box
+                    onClick={() =>
+                        navigate(
+                            `/journal-voucher-detail/${row?.original?.id}`
+                        )
+                    }
+                >
+                   
+                        <Box component={'img'} src={Images.detailIcon} onClick={() => navigate(`/journal-voucher-detail/${row?.original?.id}`)} width={'35px'}></Box>
+                    
+                </Box>
+                {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'} height={'35px'}></Box>}
+                <Box>
+                
+                        <Box component={'img'} src={Images.deleteIcon} onClick={() => { setConfirmationDialog(true); setSelectedVisa(row?.original) }} width={'35px'}></Box>
+                    
+                </Box>
+            </Box>
+            ),
+          },
+      
+        ]
 
     const UpdateStatus = async () => {
         try {
@@ -445,9 +582,7 @@ function JournalVoucherList() {
             {/* Filters */}
             <Box >
                 <Grid container spacing={2} mb={4} alignItems={'center'}>
-                    <Grid item xs={3} mt={3} >
-                        <LabelCustomInput type={'text'} bgcolor={'#FAFAFA'} color={Colors.primary} border={'3px solid #FAFAFA'} StartLabel={'Search'} placeholder={'Search'} register={register("search")} />
-                    </Grid>
+                  
                     <Grid item xs={3}>
                         <DatePicker
                             label={"From Date"}
@@ -494,218 +629,8 @@ function JournalVoucherList() {
                     </Grid>
                 </Grid>
 
-                <Grid item md={11}>
-                    {vouchers ? (
-                        <Fragment>
-                            <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
-                                fileName="Journal Vouchers"
-                            >
-                                <Box className='pdf-show' sx={{ display: 'none' }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}>
-                                            Booked Container
-                                        </Typography>
-                                        <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('DD/MM/YYYY')}</Box>
-                                    </Box>
-                                </Box>
-                                {/* ========== Table ========== */}
-                                <TableContainer component={Paper} sx={{ boxShadow: '0px 8px 18px 0px #9B9B9B1A', borderRadius: 2, maxHeight: 'calc(100vh - 190px)' }} className="table-box">
-                                    <Table stickyHeader sx={{ minWidth: 500 }}>
-                                        <TableHead>
-                                            <TableRow>
-                                                {tableHead.map((item, index) => (
-                                                    <Cell className='pdf-table' key={index}>{item?.name}</Cell>
-                                                ))}
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {!loader ? (
-                                                vouchers?.length > 0 ? (
-                                                    <Fragment>
-                                                        {vouchers.map((item, index) => (
-                                                            <Row key={index} sx={{ bgcolor: index % 2 !== 0 && '#EEFBEE' }}>
-                                                                <Cell className='pdf-table' >
-                                                                    {moment(item?.created_at).format(
-                                                                        "DD/MM/YYYY"
-                                                                    )}
-                                                                </Cell >
-                                                        
-                                                                <Cell className='pdf-table' >
-                                                                    {item?.cost_center}
-                                                                </Cell >
-                                                                <Cell className='pdf-table'>
-                                                                    JV-{item?.id ?? '-'}
-                                                                </Cell>
-                                                                <Cell className='pdf-table'>
-                                                                    {item?.entry_no ?? '-'}
-                                                                </Cell>
-                                                                <Cell className='pdf-table'>
-                                                                    {item?.total_amount ?? '-'}
-                                                                </Cell>
-                                                                <Cell className='pdf-table'>
-                                                                    <Tooltip
-                                                                        className='pdf-hide'
-                                                                        title={item?.notes ?? "-"}
-                                                                        arrow
-                                                                        placement="top"
-                                                                        slotProps={{
-                                                                            popper: {
-                                                                                modifiers: [
-                                                                                    {
-                                                                                        name: "offset",
-                                                                                        options: {
-                                                                                            offset: [10, -2],
-                                                                                        },
-                                                                                    },
-                                                                                ],
-                                                                            },
-                                                                        }}
-                                                                    >
-                                                                        {
-                                                                            item?.notes?.length > 12
-                                                                                ? item?.notes?.slice(0, 8) + "..." : item?.notes
-                                                                        }
-                                                                    </Tooltip>
-                                                                    <Box
-                                                                        component={"div"}
-                                                                        className='pdf-show'
-                                                                        sx={{ display: "none !important" }}
-                                                                    >
-                                                                        {item?.notes ?? "-"}
-                                                                    </Box>
-                                                                </Cell>
-                                                                <Cell className='pdf-table'>
-                                                                    <Tooltip
-                                                                        className='pdf-hide'
-                                                                        title={item?.creator?.name ?? "-"}
-                                                                        arrow
-                                                                        placement="top"
-                                                                        slotProps={{
-                                                                            popper: {
-                                                                                modifiers: [
-                                                                                    {
-                                                                                        name: "offset",
-                                                                                        options: {
-                                                                                            offset: [10, -2],
-                                                                                        },
-                                                                                    },
-                                                                                ],
-                                                                            },
-                                                                        }}
-                                                                    >
-                                                                        {
-                                                                            item?.creator?.name?.length > 12
-                                                                                ? item?.creator?.name?.slice(0, 8) + "..." : item?.creator?.name
-                                                                        }
-                                                                        <Box
-                                                                            component={"div"}
-                                                                            className='pdf-show'
-                                                                            sx={{ display: "none !important" }}
-                                                                        >
-                                                                            {item?.creator?.name ?? "-"}
-                                                                        </Box>
-                                                                    </Tooltip>
-                                                                </Cell>
-                                                                <Cell >
-                                                                    {true && <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', gap: '20px', justifyContent: 'space-between' }}>
-
-                                                                        <Cell className="pdf-table">
-                                                                            <IconButton
-                                                                                onClick={() =>
-
-                                                                                    navigate('/general-journal-ledger', {
-                                                                                        state: item?.entry_id
-                                                                                    })
-                                                                                }
-                                                                                sx={{
-                                                                                    bgcolor:
-                                                                                        Colors.primary,
-                                                                                    "&:hover": {
-                                                                                        bgcolor:
-                                                                                            Colors.primary,
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                <EyeIcon />
-                                                                            </IconButton>
-                                                                        </Cell>
-                                                                        <Box
-                                                                            onClick={() =>
-                                                                                navigate(
-                                                                                    `/journal-voucher-detail/${item?.id}`
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            <IconButton
-                                                                                sx={{
-                                                                                    bgcolor: Colors.primary,
-                                                                                    "&:hover": {
-                                                                                        bgcolor:
-                                                                                            Colors.primary,
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                <Box component={'img'} src={Images.detailIcon} onClick={() => navigate(`/journal-voucher-detail/${item?.id}`)} width={'35px'}></Box>
-                                                                            </IconButton>
-                                                                        </Box>
-                                                                        {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${item?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                                                                        <Box>
-                                                                            <IconButton
-                                                                                sx={{
-                                                                                    bgcolor: Colors.primary,
-                                                                                    "&:hover": {
-                                                                                        bgcolor:
-                                                                                            Colors.primary,
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                <Box component={'img'} src={Images.deleteIcon} onClick={() => { setConfirmationDialog(true); setSelectedVisa(item) }} width={'35px'}></Box>
-                                                                            </IconButton>
-                                                                        </Box>
-                                                                    </Box>}
-                                                                </Cell>
-                                                            </Row>
-                                                        ))}
-                                                    </Fragment>
-                                                ) : (
-                                                    <Row>
-                                                        <Cell colSpan={tableHead.length + 1} align="center" sx={{ fontWeight: 600 }}>
-                                                            No Data Found
-                                                        </Cell>
-                                                    </Row>
-                                                )) : (
-                                                <Row>
-                                                    <Cell colSpan={tableHead.length + 2} align="center" sx={{ fontWeight: 600 }}>
-                                                        <Box className={classes.loaderWrap}>
-                                                            <CircularProgress />
-                                                        </Box>
-                                                    </Cell>
-                                                </Row>
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </PDFExport>
-                            {/* ========== Pagination ========== */}
-                            <Pagination
-                                currentPage={currentPage}
-                                pageSize={pageLimit}
-                                onPageSizeChange={(size) => getVouchers(1, size.target.value)}
-                                tableCount={vouchers?.length}
-                                totalCount={totalCount}
-                                onPageChange={(page) => getVouchers(page, '')}
-                            />
-
-                        </Fragment>
-                    ) : (
-                        <CircleLoading />
-                    )}
-
-
-
-
-
-                </Grid>
+              
+                   {<DataTable loading={loader} data={vouchers} columns={columns} />}
             </Box>
 
         </Box>

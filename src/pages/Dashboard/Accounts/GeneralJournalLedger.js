@@ -9,6 +9,8 @@ import {
 	InputAdornment
 } from '@mui/material';
 import styled from '@emotion/styled';
+import EditIcon from '@mui/icons-material/Edit';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { EyeIcon, FontFamily, SearchIcon } from 'assets';
 import Colors from 'assets/Style/Colors';
 import { CircleLoading } from 'components/Loaders';
@@ -104,7 +106,7 @@ function GeneralJournalLedger() {
 	const { register, handleSubmit, getValues, setValue } = useForm();
 
 
-	const tableHead = ['JV#', 'Date','Cost Center', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments', 'Actions']
+	const tableHead = ['JV#', 'Date', 'Cost Center', 'Particular#', 'Type', 'COA Code', 'COA Name', 'Debit (AED)', 'Credit (AED)', 'Description', 'Comments', 'Actions']
 
 	const [visibleColumns, setVisibleColumns] = useState([...Array(tableHead?.length).keys()]);
 
@@ -251,7 +253,7 @@ function GeneralJournalLedger() {
 			params = { ...params, ...Filter }
 			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
 			setGeneralJournalAccounts2(data?.statement?.rows)
-			
+
 		} catch (error) {
 			ErrorToaster(error)
 		} finally {
@@ -314,9 +316,9 @@ function GeneralJournalLedger() {
 				return moment(item?.created_at).format(
 					"DD/MM/YYYY"
 				) ?? "-";
-				case 2:
+			case 2:
 				return item?.cost_center
-				 ?? "-";
+					?? "-";
 
 			case 3:
 				return <Box>
@@ -391,6 +393,7 @@ function GeneralJournalLedger() {
 				)
 			case 11:
 				return <Box component={'div'} className='pdf-hide'
+				sx={{display:'flex',gap:1}}
 					onClick={() => {
 						setValue('search', item?.series_id + item?.journal_id);
 						handleFilter({ search: item?.journal_id })
@@ -408,6 +411,47 @@ function GeneralJournalLedger() {
 					>
 						<EyeIcon />
 					</IconButton>
+					{(
+						item?.entry?.reference_module === 'payment_voucher' ||
+						item?.entry?.reference_module === 'receipt_voucher' ||
+						item?.entry?.reference_module === 'journal_voucher' ||
+						item?.entry?.reference_module === 'ift_voucher'
+					) && (
+							<IconButton
+								onClick={() => {
+									const module = item?.entry?.reference_module;
+									let route = '';
+
+									switch (module) {
+										case 'payment_voucher':
+											route = `/update-payment-voucher/${item?.entry?.reference_id}`;
+											break;
+										case 'receipt_voucher':
+											route = `/update-receipt-voucher/${item?.entry?.reference_id}`;
+											break;
+										case 'journal_voucher':
+											route = `/update-journal-voucher/${item?.entry?.reference_id}`;
+											break;
+										case 'ift_voucher':
+											route = `/update-fund-transfer-voucher/${item?.entry?.reference_id}`;
+											break;
+										default:
+											return;
+									}
+
+									window.open(route, '_blank'); // Opens the route in a new tab
+								}}
+								sx={{
+									bgcolor: Colors.primary,
+									"&:hover": {
+										bgcolor: Colors.primary,
+									},
+								}}
+							>
+									<EditOutlinedIcon sx={{color:'white',fontSize:'12px !important'}}  />
+							</IconButton>
+						)}
+
 
 				</Box>;
 
@@ -420,63 +464,63 @@ function GeneralJournalLedger() {
 		// Define headers and data separately
 		const headers = tableHead.filter((item) => item !== "Action");
 		const data = generalJournalAccounts2;
-		console.log(generalJournalAccounts2?.length,'length');
-		
-	  
+		console.log(generalJournalAccounts2?.length, 'length');
+
+
 		let totalDebit = 0;
 		let totalCredit = 0;
-	  
+
 		// Extract values from objects and create an array for each row
 		const rows = data.map((item, index) => {
-		  const debit = parseFloat(item?.debit || 0);
-		  const credit = parseFloat(item?.credit || 0);
-		  totalDebit += debit;
-		  totalCredit += credit;
-	  
-		  return [
-			item?.journal_id ? item?.series_id + item?.journal_id : "-",
-			moment(item?.created_at).format("DD/MM/YYYY") ?? "-",
-			item.entry?.reference_no ?? "-",
-			item?.type?.type_name ?? "-",
-			item?.account?.account_code ?? "-",
-			item?.account?.name ?? "-",
-			debit.toFixed(2),
-			credit.toFixed(2),
-			item?.description ?? "-",
-			item?.comment ?? "-"
-		  ];
+			const debit = parseFloat(item?.debit || 0);
+			const credit = parseFloat(item?.credit || 0);
+			totalDebit += debit;
+			totalCredit += credit;
+
+			return [
+				item?.journal_id ? item?.series_id + item?.journal_id : "-",
+				moment(item?.created_at).format("DD/MM/YYYY") ?? "-",
+				item.entry?.reference_no ?? "-",
+				item?.type?.type_name ?? "-",
+				item?.account?.account_code ?? "-",
+				item?.account?.name ?? "-",
+				debit.toFixed(2),
+				credit.toFixed(2),
+				item?.description ?? "-",
+				item?.comment ?? "-"
+			];
 		});
-	  
+
 		// Add totals row (place "Total" label in the appropriate column)
 		const totalRow = [
-		  "Total", "", "", "", "", "",
-		  totalDebit.toFixed(2),
-		  totalCredit.toFixed(2),
-		  "", ""
+			"Total", "", "", "", "", "",
+			totalDebit.toFixed(2),
+			totalCredit.toFixed(2),
+			"", ""
 		];
 		rows.push(totalRow);
-	  
+
 		// Create the worksheet and workbook
 		const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
 		const wb = XLSX.utils.book_new();
 		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-	  
+
 		// Convert the workbook to an array buffer
 		const buf = XLSX.write(wb, {
-		  bookType: "xlsx",
-		  type: "array",
-		  mimeType:
-			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			bookType: "xlsx",
+			type: "array",
+			mimeType:
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		});
-	  
+
 		// Save the file
 		saveAs(new Blob([buf]), "data.xlsx");
-	  };
-	  
+	};
+
 
 	useEffect(() => {
 		getGeneralJournalLedgers2()
-	
+
 		getAccountsDropDown()
 		getMajorCategories()
 		getSubCategories()
@@ -484,7 +528,7 @@ function GeneralJournalLedger() {
 			setValue('search', state)
 			handleFilter({ search: state })
 		}
-		else{
+		else {
 			getGeneralJournalLedgers()
 		}
 
@@ -517,14 +561,14 @@ function GeneralJournalLedger() {
 							title={"Download Excel"}
 							onClick={async () => {
 								try {
-								  await getGeneralJournalLedgers2(); // Wait for this to finish
-								  downloadExcel(); // Then run this
+									await getGeneralJournalLedgers2(); // Wait for this to finish
+									downloadExcel(); // Then run this
 								} catch (error) {
-								  console.error("Error getting data:", error);
-								  // Optionally show a user alert here
+									console.error("Error getting data:", error);
+									// Optionally show a user alert here
 								}
-							  }}
-							  
+							}}
+
 						/>
 					</Box>
 				)}
