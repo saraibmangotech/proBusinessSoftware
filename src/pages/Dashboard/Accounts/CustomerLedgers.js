@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, tableCellClasses, IconButton, CircularProgress, Chip, Grid, InputLabel,
     FormControl,
@@ -171,7 +171,7 @@ function CustomerLedgers() {
     const [fieldDisabled, setFieldDisabled] = useState(false)
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     const [costCenters, setCostCenters] = useState([])
-
+    const [closingBal, setClosingBal] = useState(0)
     // *For Filters
     const [filters, setFilters] = useState({});
 
@@ -181,39 +181,56 @@ function CustomerLedgers() {
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
 
-    const prepareCSVData = (data) => {
-        // Map each entry into the desired CSV format
-        const csvRows = data.map((item) => ({
-            Reference: item.entry.reference_no || "",
-            Date:  item?.created_at ? moment(item?.created_at ).format('DD/MM/YYYY') :  '',
-            JV: `JV-${item.id} ` || "",
-            Description: item.description || "",
-            Type: item.type?.type_name || "",
-            Cost_Center: item.cost_center || "",
-            Account: item.account?.name || "",
-            Debit: parseFloat(item.debit || 0).toFixed(2),
-            Credit: parseFloat(item.credit || 0).toFixed(2),
-        }));
-
-        // Calculate totals
-        const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
-        const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
-
-        // Append totals row
-        csvRows.push({
-            JV: "",
-            Date: "",
-            Reference: "",
-            Description: "",
-            Type: "",
-            Cost_Center: "",
-            Account: "Total",
-            Debit: totalDebit.toFixed(2),
-            Credit: totalCredit.toFixed(2),
-        });
-
-        return csvRows;
-    };
+  const prepareCSVData = (data) => {
+    let runningBalance = 0;
+  
+    // Map each entry into the desired CSV format with Balance
+    const csvRows = data.map((item) => {
+      const credit = parseFloat(item.credit || 0);
+      const debit = parseFloat(item.debit || 0);
+      const nature = item.account?.nature;
+  
+      // Calculate balance based on nature of account
+      if (nature === "debit") {
+        runningBalance += debit - credit;
+      } else {
+        runningBalance += credit - debit;
+      }
+  
+      return {
+        Reference: item.entry?.reference_no || "",
+        Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
+        JV: `JV-${item.id}` || "",
+        Description: item.description || "",
+        Type: item.type?.type_name || "",
+        Cost_Center: item?.cost_center || "",
+        Account: item.account?.name || "",
+        Debit: debit.toFixed(2),
+        Credit: credit.toFixed(2),
+        Balance: runningBalance.toFixed(2),
+      };
+    });
+  
+    // Calculate totals
+    const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
+    const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
+  
+    // Append totals row with closing balance
+    csvRows.push({
+      JV: "",
+      Date: "",
+      Reference: "",
+      Description: "",
+      Type: "",
+      Cost_Center: "",
+      Account: "Total",
+      Debit: totalDebit.toFixed(2),
+      Credit: totalCredit.toFixed(2),
+      Balance: runningBalance.toFixed(2), // Final closing balance
+    });
+  
+    return csvRows;
+  };
     const headers = [
         { label: "Date", key: "Date" },
         { label: "JV #", key: "JV" },
@@ -225,7 +242,186 @@ function CustomerLedgers() {
 
         { label: "Debit", key: "Debit" },
         { label: "Credit", key: "Credit" },
+        { label: "Balance", key: "Balance" },
     ];
+
+    const computeRunningBalance = (data, setClosingBal) => {
+        let runningBalance = 0;
+
+        const processedData = data.map((row) => {
+            const credit = parseFloat(row.credit) || 0;
+            const debit = parseFloat(row.debit) || 0;
+            const nature = row.account?.nature;
+
+            if (nature === "debit") {
+                runningBalance += debit - credit;
+            } else {
+                runningBalance += credit - debit;
+            }
+
+            return {
+                ...row,
+                runningBalance: runningBalance.toFixed(2),
+            };
+        });
+
+        // Set the last closing balance
+        setClosingBal(runningBalance.toFixed(2));
+
+        return processedData;
+    };
+
+
+    // Example: in your component before rendering table
+    const tableData = useMemo(() => computeRunningBalance(customerQueue, setClosingBal), [customerQueue]);
+
+
+    const columns = [
+
+        {
+            id: "created_at",
+            header: " Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.created_at).format("MM-DD-YYYY")}
+                </Box>
+            ),
+
+
+
+        },
+        {
+            header: "JV#",
+            accessorKey: "journal_id",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.journal_id
+                        ? row?.original?.series_id + row?.original?.journal_id
+                        : "-"}
+                </Box>
+            ),
+
+
+        },
+        {
+            header: "Account Name",
+            accessorKey: "id",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.account?.name ?? '-'}
+                </Box>
+            ),
+
+
+        },
+        {
+            header: "Particular#.",
+            accessorKey: "reference_no",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.entry?.reference_no ?? '-'}
+                </Box>
+            ),
+
+        },
+        {
+            header: "Type",
+            accessorKey: "type_name",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.type?.type_name ?? '-'}
+                </Box>
+            ),
+
+        },
+        {
+            header: "Cost Center",
+            accessorKey: "cost_center",
+
+
+        },
+        {
+            header: "Description",
+            accessorKey: "description",
+
+
+
+        },
+        {
+            header: "Debit",
+            accessorKey: "debit",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {parseFloat(row?.original?.debit).toFixed(2) ?? '-'}
+                </Box>
+            ),
+
+        },
+        {
+            header: "Credit",
+            accessorKey: "credit",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {parseFloat(row?.original?.credit).toFixed(2) ?? '-'}
+                </Box>
+            ),
+
+        },
+
+        {
+            header: "Balance",
+            accessorKey: "runningBalance",
+            cell: ({ row }) => (
+                <Box
+                    sx={{
+                        cursor: "pointer",
+                        display: "flex",
+                        gap: 2,
+                        fontWeight: 500,
+                        color: parseFloat(row.original.runningBalance) >= 0 ? "green" : "red",
+                    }}
+                >
+                    {row.original.runningBalance}
+                </Box>
+            ),
+        },
+
+
+
+
+        {
+            header: "Actions",
+            cell: ({ row }) => (
+
+                <Box component={'div'} sx={{ display: 'flex', gap: '20px', }}>
+                    <IconButton
+                        onClick={() =>
+
+                            navigate('/general-journal-ledger', {
+                                state: row?.original?.journal_id
+                            })
+                        }
+                        sx={{
+                            width: '30px',
+                            height: '30px',
+                            bgcolor:
+                                Colors.primary,
+                            "&:hover": {
+                                bgcolor:
+                                    Colors.primary,
+                            },
+                        }}
+                    >
+                        <EyeIcon />
+                    </IconButton>
+                </Box>
+            ),
+        },
+
+    ]
+
 
     const getCostCenters = async () => {
         try {
@@ -402,285 +598,7 @@ function CustomerLedgers() {
         }
     };
 
-    const columns = [
-        {
-            header: "SR No.",
-            accessorKey: "id",
-        },
-        {
-            header: "Name",
-            accessorKey: "name",
-            accessorFn: (row) => row?.name,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.name}
-                </Box>
-            ),
-        },
-        {
-            header: "Email",
-            accessorKey: "email",
-            accessorFn: (row) => row?.email,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.email}
-                </Box>
-            ),
-        },
-        {
-            header: "Mobile",
-            accessorKey: "mobile",
-            accessorFn: (row) => row?.mobile,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.mobile}
-                </Box>
-            ),
-        },
-        {
-            header: "Inv Date",
-            accessorKey: "invoice_date",
-            accessorFn: (row) => moment(row?.receipt?.invoice_date).format("DD/MM/YYYY"),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY")}
-                </Box>
-            ),
-        },
 
-        {
-            header: "Stock ID",
-            accessorKey: "stock_id",
-            accessorFn: (row) => row?.service?.item_code,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.service?.item_code}
-                </Box>
-            ),
-        },
-        {
-            header: "Service Name",
-            accessorKey: "service_name",
-            accessorFn: (row) => row?.service?.name,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.service?.name}
-                </Box>
-            ),
-        },
-        {
-            header: "Category",
-            accessorKey: "category",
-            accessorFn: (row) => row?.service.category?.name,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.service?.category?.name}
-                </Box>
-            ),
-        },
-        {
-            header: "Customer Ref",
-            accessorFn: (row) => 'Walk-In Customer',
-
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    Walk-In Customer
-                </Box>
-            ),
-        },
-        {
-            header: "Display Customer",
-            accessorKey: "customer_name",
-            accessorFn: (row) => row?.receipt?.customer_name,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.receipt?.customer_name}
-                </Box>
-            ),
-        },
-        {
-            header: "Customer Mobile",
-            accessorKey: "customer_mobile",
-            accessorFn: (row) => row?.receipt?.customer_mobile,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.receipt?.customer_mobile}
-                </Box>
-            ),
-        },
-        {
-            header: "Customer Email",
-            accessorKey: "customer_email",
-            accessorFn: (row) => row?.receipt?.customer_email,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.receipt?.customer_email}
-                </Box>
-            ),
-        },
-        {
-            header: "Quantity",
-            accessorKey: "quantity",
-        },
-        {
-            header: "Service Charge",
-            accessorKey: "center_fee",
-        },
-        {
-            header: "Total Service Charge",
-            accessorKey: "total_service_charge",
-            accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)).toFixed(2),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)).toFixed(2)}
-                </Box>
-            ),
-        },
-        {
-            header: "Total VAT",
-            accessorKey: "total_vat",
-            accessorFn: (row) => (parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {(parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05}
-                </Box>
-            ),
-        },
-        {
-            header: "Govt. Fee",
-            accessorKey: "govt_fee",
-        },
-
-        {
-            header: "Bank Service Charge",
-            accessorKey: "bank_charge",
-        },
-        {
-            header: "Other Charge",
-            accessorKey: "other_charge",
-            accessorFn: (row) => 0,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    0
-                </Box>
-            ),
-        },
-        {
-            header: "Total Govt. Fee",
-            accessorKey: "govt_fee",
-        },
-        {
-            header: "Transaction ID",
-            accessorKey: "transaction_id",
-        },
-        {
-            header: "Application/Case ID",
-            accessorKey: "application_id",
-        },
-        {
-            header: "Ref Name",
-            accessorKey: "ref_no",
-        },
-        {
-            header: "Payment Status",
-            accessorKey: "payment_status",
-            accessorFn: (row) => row?.receipt?.payment_status,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.receipt?.is_paid ? "Paid" : "UnPaid"}
-                </Box>
-            ),
-        },
-
-        {
-            header: "Line Total",
-            accessorKey: "total",
-            accessorFn: (row) => parseFloat(row?.total) + ((parseFloat(row?.center_fee) * parseFloat(row?.quantity)) * 0.05),
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.total) + ((parseFloat(row?.original?.center_fee) * parseFloat(row?.original?.quantity)) * 0.05)}
-                </Box>
-            ),
-        },
-        {
-            header: "Invoice Total",
-            accessorKey: "inv_total",
-            accessorFn: (row) => row?.receipt?.total_amount,
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {parseFloat(row?.original?.receipt?.total_amount)}
-                </Box>
-            ),
-        },
-    ];
 
 
     useEffect(() => {
@@ -691,7 +609,7 @@ function CustomerLedgers() {
         getCostCenters()
     }, []);
     useEffect(() => {
-        if (user?.role_id != 999999) {
+        if (user?.role_id != 1000) {
             setFieldDisabled(true)
             setSelectedUser(user)
 
@@ -855,218 +773,49 @@ function CustomerLedgers() {
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                     {customerQueue?.length > 0 && <CSVLink
-                        data={prepareCSVData(customerQueue)}
+                        data={prepareCSVData(tableData)}
                         headers={headers}
                         filename="customer_ledgers.csv"
                     >
                         <Button
 
-                    startIcon={<FileDownload />}
-                   
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                        padding: '10px',
-                        textTransform: 'capitalize !important',
-                        backgroundColor: "#001f3f !important",
-                        fontSize: "12px",
-                        ":hover": {
-                            backgroundColor: "#001f3f !important",
-                        },
-                    }}
-                >
-                    Export to Excel
-                </Button>
-                </CSVLink>}
-                </Box>
-                {customerQueue?.length > 0 && (
-                    <Fragment>
-                        <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
-                            fileName="General Ledger"
+                            startIcon={<FileDownload />}
+
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                                padding: '10px',
+                                textTransform: 'capitalize !important',
+                                backgroundColor: "#001f3f !important",
+                                fontSize: "12px",
+                                ":hover": {
+                                    backgroundColor: "#001f3f !important",
+                                },
+                            }}
                         >
-                            <Box className='pdf-show' sx={{ display: 'none' }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}>
-                                        Vehicle Sales Agreement Reversals
-                                    </Typography>
-                                    <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('MM-DD-YYYY')}</Box>
-                                </Box>
-                            </Box>
-                            {/* ========== Table ========== */}
-                            <TableContainer
-                                component={Paper}
-                                sx={{
-                                    boxShadow: "0px 8px 18px 0px #9B9B9B1A",
-                                    borderRadius: 2,
-                                    maxHeight: "calc(100vh - 330px)",
-                                }}
-                                className="table-box"
-                            >
-                                <Table stickyHeader sx={{ minWidth: 500 }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            {tableHead.map((item, index) => (
-                                                <Cell className="pdf-table" key={index}>{item}</Cell>
-                                            ))}
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {!loader ? (
-                                            customerQueue?.length > 0 ? (
-                                                <Fragment>
-                                                    {customerQueue.map((item, index) => {
-
-                                                        const balance =
-                                                            selectedUser?.nature === "debit"
-                                                                ? (
-                                                                    parseFloat(item?.debit) -
-                                                                    parseFloat(item?.credit)
-                                                                ).toFixed(2)
-                                                                : (
-                                                                    parseFloat(item?.credit) -
-                                                                    parseFloat(item?.debit)
-                                                                ).toFixed(2);
-                                                        Balance += parseFloat(balance);
-                                                        return (
-                                                            <Row
-                                                                key={index}
-                                                                sx={{
-                                                                    bgcolor: index % 2 !== 0 && "#EFF8E7",
-                                                                }}
-                                                            >
-                                                                <Cell className="pdf-table">
-                                                                    {item?.created_at
-                                                                        ? moment(item?.created_at).format("DD/MM/YYYY")
-                                                                        : "-"}
-                                                                </Cell>
-                                                                <Cell className="pdf-table">
-                                                                    {item?.journal_id
-                                                                        ? item?.series_id + item?.journal_id
-                                                                        : "-"}
-                                                                </Cell>
-                                                                <Cell className="pdf-table">{item?.account?.name ?? "-"}</Cell>
-                                                                <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
-                                                                <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
-                                                                <Cell className="pdf-table">{item?.cost_center ?? "-"}</Cell>
-                                                                <Cell className="pdf-table">
-                                                                    <Tooltip
-                                                                        className="pdf-hide"
-                                                                        title={item?.description ?? '-'}
-                                                                        arrow
-                                                                        placement="top"
-                                                                        slotProps={{
-                                                                            popper: {
-                                                                                modifiers: [
-                                                                                    {
-                                                                                        name: "offset",
-                                                                                        options: {
-                                                                                            offset: [10, -2],
-                                                                                        },
-                                                                                    },
-                                                                                ],
-                                                                            },
-                                                                        }}
-                                                                    >
-                                                                        {item?.description}
-                                                                    </Tooltip>
-                                                                    <Box
-                                                                        component={"div"}
-                                                                        className='pdf-show'
-                                                                        sx={{ display: "none !important" }}
-                                                                    >
-                                                                        {item?.description ?? '-'}
-                                                                    </Box>
-                                                                </Cell>
-
-                                                                <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
-                                                                <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
-                                                                <Cell className="pdf-table">
-                                                                    <IconButton
-                                                                    onClick={()=>
-
-                                                                        navigate('/general-journal-ledger', {
-                                                                            state:  item?.journal_id
-                                                                          })
-                                                                    }
-                                                                        sx={{
-                                                                            bgcolor:
-                                                                                Colors.primary,
-                                                                            "&:hover": {
-                                                                                bgcolor:
-                                                                                    Colors.primary,
-                                                                            },
-                                                                        }}
-                                                                    >
-                                                                        <EyeIcon />
-                                                                    </IconButton>
-                                                                </Cell>
-                                                                {/* <Cell><Box className="pdf-hide"
-                                  onClick={page ? () =>
-                                    navigate(`/${page}/${item?.journal_id}`)
-                                    : () => {
-                                      navigate(`/general-journal-ledger`, { state: item?.series_id + item?.journal_id })
-                                    }}
-                                >
-                                  <IconButton
-                                    sx={{
-                                      bgcolor:
-                                        Colors.primary,
-                                      "&:hover": {
-                                        bgcolor:
-                                          Colors.primary,
-                                      },
-                                    }}
-                                  >
-                                    <EyeIcon />
-                                  </IconButton>
-
-                                </Box></Cell> */}
-                                                            </Row>
-                                                        );
-                                                    })}
-                                                </Fragment>
-                                            ) : (
-                                                <Row>
-                                                    <Cell
-                                                        colSpan={tableHead.length + 1}
-                                                        align="center"
-                                                        sx={{ fontWeight: 600 }}
-                                                    >
-                                                        No Data Found
-                                                    </Cell>
-                                                </Row>
-                                            )
-                                        ) : (
-                                            <Row>
-                                                <Cell
-                                                    colSpan={tableHead.length + 2}
-                                                    align="center"
-                                                    sx={{ fontWeight: 600 }}
-                                                >
-                                                    <Box className={classes.loaderWrap}>
-                                                        <CircularProgress />
-                                                    </Box>
-                                                </Cell>
-                                            </Row>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </PDFExport>
-                        {/* ========== Pagination ========== */}
-                        <Pagination
-                            currentPage={currentPage}
-                            pageSize={pageLimit}
-                            onPageSizeChange={(size) => getCustomerQueue(1, size.target.value)}
-                            tableCount={customerQueue?.length}
-                            totalCount={totalCount}
-                            onPageChange={(page) => getCustomerQueue(page, "")}
-                        />
-                    </Fragment>
-                )}
+                            Export to Excel
+                        </Button>
+                    </CSVLink>}
+                </Box>
+             
 
                 {loader && <CircleLoading />}
-                {/* {<DataTable loading={loader} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />} */}
+                {<DataTable loading={loader} data={tableData} columns={columns} />}
+
+                <Box sx={{ mt: 4 }}>
+                    <Grid container spacing={2}>
+
+                        <Grid item xs={12} sm={6} display={'flex'} gap={1} alignItems={'center'}>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                Closing Balance
+                            </Typography>
+                            <Typography variant="body1" >
+                                {/* Replace with actual value or variable */}
+                                {parseFloat(closingBal).toFixed(2)}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </Box>
             </Box>
 
         </Box>

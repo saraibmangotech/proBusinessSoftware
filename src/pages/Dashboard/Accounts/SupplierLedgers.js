@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, tableCellClasses, IconButton, CircularProgress, Chip, Grid, InputLabel,
   FormControl,
@@ -150,24 +150,40 @@ function SupplierLedgers() {
 
   ];
   const prepareCSVData = (data) => {
-    // Map each entry into the desired CSV format
-    const csvRows = data.map((item) => ({
-      Reference: item.entry.reference_no || "",
-      Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
-      JV: `JV-${item.id} ` || "",
-      Description: item.description || "",
-      Type: item.type?.type_name || "",
-      Cost_Center: item?.cost_center || "",
-      Account: item.account?.name || "",
-      Debit: parseFloat(item.debit || 0).toFixed(2),
-      Credit: parseFloat(item.credit || 0).toFixed(2),
-    }));
-
+    let runningBalance = 0;
+  
+    // Map each entry into the desired CSV format with Balance
+    const csvRows = data.map((item) => {
+      const credit = parseFloat(item.credit || 0);
+      const debit = parseFloat(item.debit || 0);
+      const nature = item.account?.nature;
+  
+      // Calculate balance based on nature of account
+      if (nature === "debit") {
+        runningBalance += debit - credit;
+      } else {
+        runningBalance += credit - debit;
+      }
+  
+      return {
+        Reference: item.entry?.reference_no || "",
+        Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
+        JV: `JV-${item.id}` || "",
+        Description: item.description || "",
+        Type: item.type?.type_name || "",
+        Cost_Center: item?.cost_center || "",
+        Account: item.account?.name || "",
+        Debit: debit.toFixed(2),
+        Credit: credit.toFixed(2),
+        Balance: runningBalance.toFixed(2),
+      };
+    });
+  
     // Calculate totals
     const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
     const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
-
-    // Append totals row
+  
+    // Append totals row with closing balance
     csvRows.push({
       JV: "",
       Date: "",
@@ -178,10 +194,12 @@ function SupplierLedgers() {
       Account: "Total",
       Debit: totalDebit.toFixed(2),
       Credit: totalCredit.toFixed(2),
+      Balance: runningBalance.toFixed(2), // Final closing balance
     });
-
+  
     return csvRows;
   };
+  
   const headers = [
     { label: "Date", key: "Date" },
     { label: "JV #", key: "JV" },
@@ -192,6 +210,7 @@ function SupplierLedgers() {
     { label: "Cost Center", key: "Cost_Center" },
     { label: "Debit", key: "Debit" },
     { label: "Credit", key: "Credit" },
+    { label: "Balance", key: "Balance" },
   ];
 
 
@@ -216,6 +235,7 @@ function SupplierLedgers() {
 
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const [costCenters, setCostCenters] = useState([])
+  const [closingBal, setClosingBal] = useState(0)
 
   // *For Filters
   const [filters, setFilters] = useState({});
@@ -225,6 +245,182 @@ function SupplierLedgers() {
 
   const [loading, setLoading] = useState(false)
   const [sort, setSort] = useState('desc')
+  const computeRunningBalance = (data, setClosingBal) => {
+    let runningBalance = 0;
+  
+    const processedData = data.map((row) => {
+      const credit = parseFloat(row.credit) || 0;
+      const debit = parseFloat(row.debit) || 0;
+      const nature = row.account?.nature;
+  
+      if (nature === "debit") {
+        runningBalance += debit - credit;
+      } else {
+        runningBalance += credit - debit;
+      }
+  
+      return {
+        ...row,
+        runningBalance: runningBalance.toFixed(2),
+      };
+    });
+  
+    // Set the last closing balance
+    setClosingBal(runningBalance.toFixed(2));
+  
+    return processedData;
+  };
+  
+  
+  // Example: in your component before rendering table
+  const tableData = useMemo(() => computeRunningBalance(customerQueue, setClosingBal), [customerQueue]);
+  
+
+  const columns = [
+
+    {
+      id: "created_at",
+      header: " Date",
+      // Remove accessorKey and fix accessorFn to use row directly
+      accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {moment(row.original.created_at).format("MM-DD-YYYY")}
+        </Box>
+      ),
+
+
+
+    },
+    {
+      header: "JV#",
+      accessorKey: "journal_id",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.journal_id
+            ? row?.original?.series_id + row?.original?.journal_id
+            : "-"}
+        </Box>
+      ),
+
+
+    },
+    {
+      header: "Account Name",
+      accessorKey: "id",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.account?.name  ?? '-'}
+        </Box>
+      ),
+
+
+    },
+    {
+      header: "Particular#.",
+      accessorKey: "reference_no",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.entry?.reference_no ?? '-'}
+        </Box>
+      ),
+
+    },
+    {
+      header: "Type",
+      accessorKey: "type_name",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.type?.type_name ?? '-'}
+        </Box>
+      ),
+
+    },
+    {
+      header: "Cost Center",
+      accessorKey: "cost_center",
+    
+
+    },
+    {
+      header: "Description",
+      accessorKey: "description",
+    
+
+
+    },
+    {
+      header: "Debit",
+      accessorKey: "debit",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {parseFloat(row?.original?.debit).toFixed(2) ?? '-'}
+        </Box>
+      ),
+
+    },
+    {
+      header: "Credit",
+      accessorKey: "credit",
+      cell: ({ row }) => (
+        <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {parseFloat(row?.original?.credit).toFixed(2) ?? '-'}
+        </Box>
+      ),
+
+    },
+
+    {
+      header: "Balance",
+      accessorKey: "runningBalance",
+      cell: ({ row }) => (
+        <Box
+          sx={{
+            cursor: "pointer",
+            display: "flex",
+            gap: 2,
+            fontWeight: 500,
+            color: parseFloat(row.original.runningBalance) >= 0 ? "green" : "red",
+          }}
+        >
+          {row.original.runningBalance}
+        </Box>
+      ),
+    },
+
+  
+
+
+    {
+      header: "Actions",
+      cell: ({ row }) => (
+
+        <Box component={'div'} sx={{ display: 'flex', gap: '20px', }}>
+          <IconButton
+            onClick={() =>
+
+              navigate('/general-journal-ledger', {
+                state: row?.original?.journal_id
+              })
+            }
+            sx={{
+              width:'30px',
+              height:'30px',
+              bgcolor:
+                Colors.primary,
+              "&:hover": {
+                bgcolor:
+                  Colors.primary,
+              },
+            }}
+          >
+            <EyeIcon />
+          </IconButton>
+        </Box>
+      ),
+    },
+
+  ]
 
   // *For Get Customer Queue
   const getCustomerQueue = async (page, limit, filter) => {
@@ -409,7 +605,7 @@ function SupplierLedgers() {
 
   }, []);
   useEffect(() => {
-    if (user?.role_id != 999999) {
+    if (user?.role_id != 1000) {
       setFieldDisabled(true)
       setSelectedUser(user)
 
@@ -572,7 +768,7 @@ function SupplierLedgers() {
       <Box >
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           {customerQueue?.length > 0 && <CSVLink
-            data={prepareCSVData(customerQueue)}
+            data={prepareCSVData(tableData)}
             headers={headers}
             filename="supplier_ledgers.csv"
           >
@@ -596,194 +792,25 @@ function SupplierLedgers() {
             </Button>
           </CSVLink>}
         </Box>
-        {customerQueue?.length > 0 && (
-          <Fragment>
-            <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
-              fileName="General Ledger"
-            >
-              <Box className='pdf-show' sx={{ display: 'none' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}>
-                    Supplier Ledger
-                  </Typography>
-                  <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey, }}><span>Date: &nbsp;&nbsp;</span>{moment().format('MM-DD-YYYY')}</Box>
-                </Box>
-              </Box>
-              {/* ========== Table ========== */}
-              <TableContainer
-                component={Paper}
-                sx={{
-                  boxShadow: "0px 8px 18px 0px #9B9B9B1A",
-                  borderRadius: 2,
-                  maxHeight: "calc(100vh - 330px)",
-                }}
-                className="table-box"
-              >
-                <Table stickyHeader sx={{ minWidth: 500 }}>
-                  <TableHead>
-                    <TableRow>
-                      {tableHead.map((item, index) => (
-                        <Cell className="pdf-table" key={index}>{item}</Cell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {!loader ? (
-                      customerQueue?.length > 0 ? (
-                        <Fragment>
-                          {customerQueue.map((item, index) => {
-
-                            const balance =
-                              selectedUser?.nature === "debit"
-                                ? (
-                                  parseFloat(item?.debit) -
-                                  parseFloat(item?.credit)
-                                ).toFixed(2)
-                                : (
-                                  parseFloat(item?.credit) -
-                                  parseFloat(item?.debit)
-                                ).toFixed(2);
-                            Balance += parseFloat(balance);
-                            return (
-                              <Row
-                                key={index}
-                                sx={{
-                                  bgcolor: index % 2 !== 0 && "#EFF8E7",
-                                }}
-                              >
-                                <Cell className="pdf-table">
-                                  {item?.created_at
-                                    ? moment(item?.created_at).format("DD/MM/YYYY")
-                                    : "-"}
-                                </Cell>
-                                <Cell className="pdf-table">
-                                  {item?.journal_id
-                                    ? item?.series_id + item?.journal_id
-                                    : "-"}
-                                </Cell>
-                                <Cell className="pdf-table">{item?.account?.name ?? "-"}</Cell>
-                                <Cell className="pdf-table">{item?.entry?.reference_no ?? "-"}</Cell>
-                                <Cell className="pdf-table">{item?.type?.type_name ?? "-"}</Cell>
-                                <Cell className="pdf-table">{item?.cost_center ?? "-"}</Cell>
-                                <Cell className="pdf-table" sx={{ width: '250px' }}>
-                                  <Tooltip
-                                    className="pdf-hide"
-                                    title={item?.description ?? '-'}
-                                    arrow
-                                    placement="top"
-                                    slotProps={{
-                                      popper: {
-                                        modifiers: [
-                                          {
-                                            name: "offset",
-                                            options: {
-                                              offset: [10, -2],
-                                            },
-                                          },
-                                        ],
-                                      },
-                                    }}
-                                  >
-                                    {item?.description}
-                                  </Tooltip>
-                                  <Box
-                                    component={"div"}
-                                    className='pdf-show'
-                                    sx={{ display: "none !important" }}
-                                  >
-                                    {item?.description ?? '-'}
-                                  </Box>
-                                </Cell>
-
-                                <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
-                                <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
-                                <Cell className="pdf-table">
-                                  <IconButton
-                                    onClick={() =>
-
-                                      navigate('/general-journal-ledger', {
-                                        state: item?.journal_id
-                                      })
-                                    }
-                                    sx={{
-                                      bgcolor:
-                                        Colors.primary,
-                                      "&:hover": {
-                                        bgcolor:
-                                          Colors.primary,
-                                      },
-                                    }}
-                                  >
-                                    <EyeIcon />
-                                  </IconButton>
-                                </Cell>
-                                {/* <Cell><Box className="pdf-hide"
-                                  onClick={page ? () =>
-                                    navigate(`/${page}/${item?.journal_id}`)
-                                    : () => {
-                                      navigate(`/general-journal-ledger`, { state: item?.series_id + item?.journal_id })
-                                    }}
-                                >
-                                  <IconButton
-                                    sx={{
-                                      bgcolor:
-                                        Colors.primary,
-                                      "&:hover": {
-                                        bgcolor:
-                                          Colors.primary,
-                                      },
-                                    }}
-                                  >
-                                    <EyeIcon />
-                                  </IconButton>
-
-                                </Box></Cell> */}
-                              </Row>
-                            );
-                          })}
-                        </Fragment>
-                      ) : (
-                        <Row>
-                          <Cell
-                            colSpan={tableHead.length + 1}
-                            align="center"
-                            sx={{ fontWeight: 600 }}
-                          >
-                            No Data Found
-                          </Cell>
-                        </Row>
-                      )
-                    ) : (
-                      <Row>
-                        <Cell
-                          colSpan={tableHead.length + 2}
-                          align="center"
-                          sx={{ fontWeight: 600 }}
-                        >
-                          <Box className={classes.loaderWrap}>
-                            <CircularProgress />
-                          </Box>
-                        </Cell>
-                      </Row>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </PDFExport>
-            {/* ========== Pagination ========== */}
-            <Pagination
-              currentPage={currentPage}
-              pageSize={pageLimit}
-              onPageSizeChange={(size) => getCustomerQueue(1, size.target.value)}
-              tableCount={customerQueue?.length}
-              totalCount={totalCount}
-              onPageChange={(page) => getCustomerQueue(page, "")}
-            />
-          </Fragment>
-        )}
+  
 
         {loader && <CircleLoading />}
-        {/* {<DataTable loading={loader} csv={true} csvName={'service_report'} data={customerQueue} columns={columns} />} */}
+        {<DataTable loading={loader} data={tableData} columns={columns} />}
+
+           <Box sx={{ mt: 4 }}>
+                        <Grid container spacing={2}>
+                     
+                          <Grid item xs={12} sm={6} display={'flex'} gap={1} alignItems={'center'}>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                              Closing Balance
+                            </Typography>
+                            <Typography variant="body1" >
+                              {/* Replace with actual value or variable */}
+                             {parseFloat(closingBal).toFixed(2)}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Box>
       </Box>
 
     </Box>
