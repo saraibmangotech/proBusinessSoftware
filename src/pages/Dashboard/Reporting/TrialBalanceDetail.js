@@ -1159,7 +1159,7 @@ function TrialBalanceDetailed() {
                                                                                                                     {account.account_name}
                                                                                                                 </TableCell>
 
-                                                                                                                <TableCell className="text-right">{parseFloat(account.opening_balance) || 0.0}</TableCell>
+                                                                                                                <TableCell className="text-right">{account.opening_balance ? -1 *  parseFloat(account.opening_balance) || 0.0 : parseFloat(account.opening_balance) || 0.0 }</TableCell>
                                                                                                                 <TableCell className="text-right">
                                                                                                                     {formatAmount(account.total_debit)}
                                                                                                                 </TableCell>
@@ -1195,7 +1195,7 @@ function TrialBalanceDetailed() {
                                                                                                 <TableCell className="pl-6" style={{ fontWeight: 'bold' }}>Total - {subcategoryType}</TableCell>
 
                                                                                                 <TableCell></TableCell>
-                                                                                                <TableCell>{formatAmount(group?.openingBalanceTotal)}</TableCell>
+                                                                                                <TableCell>{group?.openingBalanceTotal ? formatAmount(-1 *  parseFloat(group?.openingBalanceTotal)) : formatAmount( parseFloat(group?.openingBalanceTotal)) }</TableCell>
                                                                                                 <TableCell className="text-right">{formatAmount(group.debitTotal)}</TableCell>
                                                                                                 <TableCell className="text-right">{formatAmount(group.creditTotal)}</TableCell>
                                                                                                 <TableCell className="text-right">
