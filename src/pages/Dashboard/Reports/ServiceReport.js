@@ -183,22 +183,16 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
             (t) => t.receipt?.invoice_number === item.receipt?.invoice_number
           )
       );
-      
-      const totalSum = uniqueData?.reduce((acc, item) => {
-        const amount = parseFloat(item?.receipt?.total_amount) || 0;
-        const vat = parseFloat(item?.receipt?.total_vat) || 0;
-        return acc + amount + vat;
-      }, 0);
-      
-      console.log("Total:", totalSum);
+    
+      const totalLineTotal = data?.rows?.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
      
-      setInvoiceTotal(totalSum)
+      setInvoiceTotal(totalLineTotal)
       const result = data?.rows?.reduce((acc, item) => {
         acc.totalQuantity += item.quantity;
         acc.totalServiceCharges += (item.center_fee * item.quantity);
         acc.totalVat += (item.center_fee * item.quantity) * 0.05;
         acc.totalGovtFee += ((parseFloat(item.govt_fee) + parseFloat(item?.bank_charge)) * item.quantity);
-        acc.invoiceTotal += (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat));
+        acc.invoiceTotal += (parseFloat(item?.total || 0) + ((parseFloat(item?.center_fee || 0) * parseFloat(item?.quantity || 1)) * 0.05)).toFixed(2);
         return acc;
       }, {
         totalQuantity: 0,
