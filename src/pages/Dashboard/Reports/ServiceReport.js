@@ -160,7 +160,7 @@ function ServiceReport() {
 
   const [loading, setLoading] = useState(false)
   const [sort, setSort] = useState('desc')
-
+const [invoiceTotal, setInvoiceTotal] = useState(0)
   // *For Get Customer Queue
   const getCustomerQueue = async (page, limit, filter) => {
     setLoader(true)
@@ -177,7 +177,22 @@ function ServiceReport() {
 
       const { data } = await CustomerServices.getServiceReport(params)
       setCustomerQueue(data?.rows)
-
+      const uniqueData = data?.rows?.filter(
+        (item, index, self) =>
+          index === self.findIndex(
+            (t) => t.receipt?.invoice_number === item.receipt?.invoice_number
+          )
+      );
+      
+      const totalSum = uniqueData?.reduce((acc, item) => {
+        const amount = parseFloat(item?.receipt?.total_amount) || 0;
+        const vat = parseFloat(item?.receipt?.total_vat) || 0;
+        return acc + amount + vat;
+      }, 0);
+      
+      console.log("Total:", totalSum);
+     
+      setInvoiceTotal(totalSum)
       const result = data?.rows?.reduce((acc, item) => {
         acc.totalQuantity += item.quantity;
         acc.totalServiceCharges += (item.center_fee * item.quantity);
@@ -188,12 +203,12 @@ function ServiceReport() {
       }, {
         totalQuantity: 0,
         totalServiceCharges: 0,
-        totalVat:0,
-        totalGovtFee:0,
-        invoiceTotal:0
+        totalVat: 0,
+        totalGovtFee: 0,
+        invoiceTotal: 0
       });
 
-      console.log(result,'result');
+      console.log(result, 'result');
       setTotals(result)
 
     } catch (error) {
@@ -331,10 +346,10 @@ function ServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category ,
+      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category,
       cell: () => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' :agencyType[process.env.REACT_APP_TYPE].category}
+          {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category}
         </Box>
       ),
     },
@@ -853,74 +868,74 @@ function ServiceReport() {
 
         {<DataTable loading={loader} csvName={'service_report'} data={customerQueue} columns={columns} />}
 
-          <Grid container spacing={2} mt={1}>
-              <Grid item xs={4}>
-                <Input
-                sx={{
-                  "& .MuiInputBase-input":{
-                    WebkitTextFillColor: "Black !important"
-        
-                  }
-                }}
-                  fullWidth
-                  disabled
-                  value={`Total Quantity: ${parseFloat(Totals?.totalQuantity).toFixed(2)}`}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Input
-                sx={{
-                  "& .MuiInputBase-input":{
-                    WebkitTextFillColor: "Black !important"
-        
-                  }
-                }}
-                  fullWidth
-                  disabled
-                  value={`Total Govt Fee: ${parseFloat(Totals?.totalGovtFee).toFixed(2)}`}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Input
-                sx={{
-                  "& .MuiInputBase-input":{
-                    WebkitTextFillColor: "Black !important"
-        
-                  }
-                }}
-                  fullWidth
-                  disabled
-                  value={`Total Service Charges: ${parseFloat(Totals?.totalServiceCharges).toFixed(2)}`}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Input
-                sx={{
-                  "& .MuiInputBase-input":{
-                    WebkitTextFillColor: "Black !important"
-        
-                  }
-                }}
-                  fullWidth
-                  disabled
-                  value={`Total Vat: ${parseFloat(Totals?.totalVat).toFixed(2)}`}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Input
-                sx={{
-                  "& .MuiInputBase-input":{
-                    WebkitTextFillColor: "Black !important"
-        
-                  }
-                }}
-                  fullWidth
-                  disabled
-                  value={`Total Invoice Amount: ${parseFloat(Totals?.invoiceTotal).toFixed(2)}`}
-                />
-              </Grid>
-         
-            </Grid>
+        <Grid container spacing={2} mt={1}>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
+
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Quantity: ${parseFloat(Totals?.totalQuantity).toFixed(2)}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
+
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Govt Fee: ${parseFloat(Totals?.totalGovtFee).toFixed(2)}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
+
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Service Charges: ${parseFloat(Totals?.totalServiceCharges).toFixed(2)}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
+
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Vat: ${parseFloat(Totals?.totalVat).toFixed(2)}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
+
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Invoice Amount: ${parseFloat(invoiceTotal).toFixed(2)}`}
+            />
+          </Grid>
+
+        </Grid>
       </Box>
 
     </Box>
