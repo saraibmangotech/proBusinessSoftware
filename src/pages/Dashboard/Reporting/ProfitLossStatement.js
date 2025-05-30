@@ -120,6 +120,7 @@ function ProfitLossStatement() {
   const [totalAdminExpenses, setTotalAdminExpenses] = useState(0)
   const [costCenters, setCostCenters] = useState([])
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [adminOpTotal, setAdminOpTotal] = useState(0)
 
   // *For Collapse
   const [expand, setExpand] = useState([]);
@@ -169,7 +170,11 @@ function ProfitLossStatement() {
       setProfitLossStatement(data?.detail.slice(3))
       setFilteredProfitLossStatement(data?.detail.slice(3))
       let myData = data?.detail.slice(3)
-
+      const e2Total = myData.flatMap(category => category.sub || []).flatMap(sub => sub.accounts || []).filter(account => account.type_code === 'E2').reduce((sum, account) => sum + (parseFloat(account.total_debit || 0) - parseFloat(account.total_credit || 0)), 0);
+      setAdminOpTotal(parseFloat(e2Total))
+      console.log(`Corrected Total of all E2 (Indirect Expense) accounts: ${e2Total.toLocaleString()}`);
+      console.log(`Expected value: 2,488,381.94`);
+      console.log(`Match: ${Math.abs(e2Total - 2488381.94) < 0.01 ? 'YES' : 'NO'}`);
       const calculateTotal = (data, category) => {
         let total = 0;
 
@@ -532,7 +537,7 @@ function ProfitLossStatement() {
         "Net Profit",
         "",
         "",
-        CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses)).toFixed(2))
+        CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal)).toFixed(2))
       ])
     )
 
@@ -863,7 +868,7 @@ function ProfitLossStatement() {
                                                       </Typography>
                                                     </Cell>
                                                   </Row>
-                                                  {filters === 'all' && subItem?.name === 'Cost of Sales' &&
+                                                  {filters === 'all'  &&
                                                     <Row sx={{ bgcolor: Colors.primary }}>
                                                       <Cell colSpan={5}>
                                                         <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
@@ -921,7 +926,7 @@ function ProfitLossStatement() {
                                           {console.log(parseFloat(parseFloat(totalRevenue) - parseFloat(totalExpenses)).toFixed(2), 'asdasd')}
 
                                           <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
-                                            {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses)).toFixed(2))}
+                                            {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal)).toFixed(2))}
                                           </Typography>
                                         </Cell>
                                       </Row>

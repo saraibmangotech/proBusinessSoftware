@@ -339,7 +339,7 @@ function PurchaseInvoices() {
             header: "Tax",
             accessorKey: "tax",
             cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.tax || 0).toFixed(2)}</Box>
+                <Box>{row?.original?.vat_enabled ? parseFloat(row?.original?.tax || 0).toFixed(2) : parseFloat(0).toFixed(2)}</Box>
             ),
         },
         {

@@ -404,7 +404,7 @@ function EmployeeWiseSalesReport() {
     ];
 
     useEffect(() => {
-        if (user?.role_id != 999999) {
+        if (user?.role_id != 1000) {
             setFieldDisabled(true)
             setSelectedUser(user)
         
