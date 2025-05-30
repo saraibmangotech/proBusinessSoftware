@@ -475,7 +475,7 @@ function ProfitLossStatement() {
                 account.account_category ?? '-',
                 account.account_subcategory ?? '-',
                 '',
-                childTotal
+                parseFloat(childTotal)
               ]);
 
               if (account.childAccounts) {
@@ -490,7 +490,7 @@ function ProfitLossStatement() {
                     child.account_name ?? '-',
                     child.account_category ?? '-',
                     child.account_subcategory ?? '-',
-                    subTotal,
+                    parseFloat(subTotal),
                     ''
                   ]);
                 });
@@ -504,10 +504,10 @@ function ProfitLossStatement() {
               `Total of ${subItem?.name}`,
               "",
               "",
-              Total
+              parseFloat(Total)
             ])
           )
-          subItem?.name === 'Cost of Sales' && (
+        
             rows.push([
               "",
               "",
@@ -516,7 +516,7 @@ function ProfitLossStatement() {
               "",
               parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)).toFixed(2)
             ])
-          )
+          
         });
         item?.sub?.length > 0 && (
           rows.push([

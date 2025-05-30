@@ -188,7 +188,7 @@ function UpdatePurchaseInvoice() {
         setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
     }, [isVatApplicable, rows, payments]);
 
-    const addItem = (item, quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -197,8 +197,8 @@ function UpdatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Basic required field validation
-        if (!item || quantity === "" || charges === "") {
-            showErrorToast("Item, quantity, and charges are required!");
+        if (!item || !cost_center || quantity === "" || charges === "") {
+            showErrorToast("Item, quantity,cost center and charges are required!");
             return;
         }
 
@@ -210,14 +210,10 @@ function UpdatePurchaseInvoice() {
 
         // Check for consistent impact account ID
         if (rows.length > 0) {
-            let firstImpactAccountId = rows[0].item?.impact_account_id;
-            if (!firstImpactAccountId) {
-                firstImpactAccountId = rows[0].product?.impact_account_id
-            }
-            console.log("🚀 ~ addItem ~ firstImpactAccountId:", rows)
+            const firstImpactAccountId = rows[0].item?.impact_account_id;
             if (item?.impact_account_id !== firstImpactAccountId) {
-                showErrorToast("You cannot add items with a different impact account.");
-                return;
+                // showErrorToast("You cannot add items with a different impact account.");
+                // return;
             }
         }
 
@@ -237,7 +233,8 @@ function UpdatePurchaseInvoice() {
             description,
             ref,
             total: parsedTotal,
-            selectedService: serviceItem
+            selectedService: serviceItem,
+            cost_center: selectedCostCenter?.name
         };
         console.log(newRow);
 
@@ -254,6 +251,7 @@ function UpdatePurchaseInvoice() {
 
         setPayments([]);
         setServiceItem("");
+        setSelectedCostCenter('')
     };
 
 
@@ -274,7 +272,7 @@ function UpdatePurchaseInvoice() {
     const [stepFormData, setStepFormData] = useState();
     const [step1FormData, setStep1FormData] = useState();
     const [selectedType, setSelectedType] = useState(null);
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState();
     const [balanceType, setBalanceType] = useState(null);
     const [imageURL, setImageURL] = useState(null);
     const fileInputRef = useRef(null);
@@ -302,6 +300,8 @@ function UpdatePurchaseInvoice() {
     const [vendors, setVendors] = useState([])
     const [selectedVendor, setSelectedVendor] = useState(null)
     const [products, setProducts] = useState([])
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     // const [fieldsDisabled, setFieldsDisabled] = useState(false)
 
     //documents array
@@ -390,7 +390,7 @@ function UpdatePurchaseInvoice() {
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     items: rows,
-                    vat_enabled:isVatApplicable,
+                    vat_enabled: isVatApplicable,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
@@ -632,7 +632,19 @@ function UpdatePurchaseInvoice() {
 
     };
 
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
 
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
     const getAccounts = async (page, limit, filter) => {
         // setLoader(true)
         try {
@@ -711,13 +723,23 @@ function UpdatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2, quantity, charges, description, ref, total) => {
-
+    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
         console.log("Current serviceItem:", serviceItem);
 
+        // Parse numeric values
+        const parsedQuantity = parseFloat(quantity);
+        const parsedCharges = parseFloat(charges);
+        const parsedTotal = parseFloat(total);
+
         // Validation
-        if (!item2 || !quantity || !charges) {
-            showErrorToast("Item, quantity, and charges are required!");
+        if (!item2 || !cost_center || quantity === "" || charges === "") {
+            showErrorToast("Item, quantity,cost center  and charges are required!");
+            return;
+        }
+
+        // Negative value validation
+        if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
+            showErrorToast("Quantity, charges, and total must be 0 or greater!");
             return;
         }
 
@@ -728,16 +750,16 @@ function UpdatePurchaseInvoice() {
 
         // Updated item using current form data and serviceItem
         const updatedItem = {
-
             id: item2.id, // Ensure ID is retained
             item: item2.item || '',
-            quantity,
-            charge: charges,
+            quantity: parsedQuantity,
+            charge: parsedCharges,
             description,
             ref,
-            total,
+            total: parsedTotal,
             product_id: serviceItem?.id,
-            selectedService: item2
+            selectedService: item2,
+            cost_center: selectedCostCenter?.name
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -765,6 +787,8 @@ function UpdatePurchaseInvoice() {
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
+        setSelectedCostCenter(null)
+        setPayments([])
         setEditState(false);
     };
 
@@ -856,6 +880,7 @@ function UpdatePurchaseInvoice() {
         }
     }
     useEffect(() => {
+        getCostCenters()
         getProducts()
         getCards()
         getBanks()
@@ -919,7 +944,7 @@ function UpdatePurchaseInvoice() {
             const grandTotal = updatedItems.reduce((sum, item) => {
                 return sum + (parseFloat(item.total) || 0);
             }, 0);
-
+            setDate(new Date(detail?.purchase_date))
             console.log("Grand Total:", grandTotal.toFixed(2));
             setSubTotal(grandTotal.toFixed(2))
             console.log(updatedItems, "updatedItems");
@@ -1106,6 +1131,7 @@ function UpdatePurchaseInvoice() {
                                 <TableRow>
                                     <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
                                     <TableCell sx={{ width: "400px" }}>Product</TableCell>
+                                    <TableCell sx={{ width: "400px" }}>Cost Center</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Qty</TableCell>
 
                                     <TableCell sx={{ width: "150px" }}> Charges</TableCell>
@@ -1148,6 +1174,22 @@ function UpdatePurchaseInvoice() {
                                             })}
                                         />
                                         {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                                    </TableCell>
+                                    <TableCell>
+                                        <SelectField
+                                            size="small"
+
+                                            options={costCenters}
+                                            selected={selectedCostCenter}
+                                            onSelect={(value) => {
+                                                setSelectedCostCenter(value)
+
+                                            }}
+                                            register={register("costcenter", { required: " required" })}
+
+
+                                        />
+                                        {errors.costcenter && <span style={{ color: "red" }}>{errors.costcenter.message}</span>}
                                     </TableCell>
                                     <TableCell>
                                         <InputField
@@ -1217,7 +1259,7 @@ function UpdatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1232,7 +1274,7 @@ function UpdatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1260,6 +1302,7 @@ function UpdatePurchaseInvoice() {
                                                     setValue("application_id", '');
                                                     setValue("ref_no", '');
                                                     setServiceItem(null);
+                                                    setSelectedCostCenter(null)
                                                     setValue("quantity", '');
                                                 }}
                                                 sx={{
@@ -1281,7 +1324,9 @@ function UpdatePurchaseInvoice() {
                                     <TableRow key={index}>
                                         <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
                                         <TableCell>{item?.product_id}</TableCell>
+
                                         <TableCell>{item?.selectedService?.name}</TableCell>
+                                        <TableCell>{item?.cost_center}</TableCell>
                                         <TableCell>{item?.quantity}</TableCell>
 
                                         <TableCell>{item?.charge}</TableCell>

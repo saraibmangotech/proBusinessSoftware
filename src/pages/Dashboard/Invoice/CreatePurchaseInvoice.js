@@ -175,7 +175,7 @@ function CreatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
-    const addItem = (item, quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center,quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -184,8 +184,8 @@ function CreatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Basic required field validation
-        if (!item || quantity === "" || charges === "") {
-            showErrorToast("Item, quantity, and charges are required!");
+        if (!item  || !cost_center || quantity === "" || charges === "") {
+            showErrorToast("Item, quantity,cost center and charges are required!");
             return;
         }
 
@@ -220,7 +220,8 @@ function CreatePurchaseInvoice() {
             description,
             ref,
             total: parsedTotal,
-            selectedService: serviceItem
+            selectedService: serviceItem,
+            cost_center:selectedCostCenter?.name
         };
         console.log(newRow);
 
@@ -237,6 +238,7 @@ function CreatePurchaseInvoice() {
 
         setPayments([]);
         setServiceItem("");
+        setSelectedCostCenter('')
     };
 
     const getTokenNumber = async () => {
@@ -298,6 +300,8 @@ function CreatePurchaseInvoice() {
     const [vendors, setVendors] = useState([])
     const [selectedVendor, setSelectedVendor] = useState(null)
     const [products, setProducts] = useState([])
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     // const [fieldsDisabled, setFieldsDisabled] = useState(false)
 
     //documents array
@@ -385,7 +389,7 @@ function CreatePurchaseInvoice() {
                     vendor_account_id: selectedVendor?.account_id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
-                    vat_enabled :isVatApplicable,
+                    vat_enabled: isVatApplicable,
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
@@ -685,7 +689,7 @@ function CreatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2, quantity, charges, description, ref, total) => {
+    const updateItem = (item2,cost_center, quantity, charges, description, ref, total) => {
         console.log("Current serviceItem:", serviceItem);
 
         // Parse numeric values
@@ -694,8 +698,8 @@ function CreatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Validation
-        if (!item2 || quantity === "" || charges === "") {
-            showErrorToast("Item, quantity, and charges are required!");
+        if (!item2 || !cost_center ||  quantity === "" || charges === "") {
+            showErrorToast("Item, quantity,cost center  and charges are required!");
             return;
         }
 
@@ -720,7 +724,8 @@ function CreatePurchaseInvoice() {
             ref,
             total: parsedTotal,
             product_id: serviceItem?.id,
-            selectedService: item2
+            selectedService: item2,
+            cost_center:selectedCostCenter?.name
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -748,6 +753,7 @@ function CreatePurchaseInvoice() {
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
+        setSelectedCostCenter(null)
         setPayments([])
         setEditState(false);
     };
@@ -882,7 +888,21 @@ function CreatePurchaseInvoice() {
             showErrorToast(error);
         }
     };
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
     useEffect(() => {
+        getCostCenters()
         getTokenNumber()
         getProducts()
         getCards()
@@ -927,17 +947,17 @@ function CreatePurchaseInvoice() {
     useEffect(() => {
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
-      
+
         const totalWithVat = isVatApplicable
-          ? parseFloat((grandTotal * 0.05) + grandTotal)
-          : grandTotal;
-      
+            ? parseFloat((grandTotal * 0.05) + grandTotal)
+            : grandTotal;
+
         setValue1('total', totalWithVat.toFixed(2));
         setValue1('finalTotal', totalWithVat.toFixed(2));
         setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
-      }, [isVatApplicable, rows, payments]);
-      
-    
+    }, [isVatApplicable, rows, payments]);
+
+
     return (
         <>
             <Box m={3} sx={{ backgroundColor: "white", borderRadius: "12px" }}>
@@ -1094,6 +1114,7 @@ function CreatePurchaseInvoice() {
                                 <TableRow>
                                     <TableCell sx={{ width: "150px" }}>Item Code</TableCell>
                                     <TableCell sx={{ width: "400px" }}>Product</TableCell>
+                                    <TableCell sx={{ width: "400px" }}>Cost Center</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Qty</TableCell>
 
                                     <TableCell sx={{ width: "150px" }}> Charges</TableCell>
@@ -1136,6 +1157,22 @@ function CreatePurchaseInvoice() {
                                             })}
                                         />
                                         {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                                    </TableCell>
+                                    <TableCell>
+                                        <SelectField
+                                            size="small"
+
+                                            options={costCenters}
+                                            selected={selectedCostCenter}
+                                            onSelect={(value) => {
+                                                setSelectedCostCenter(value)
+
+                                            }}
+                                            register={register("costcenter", { required: " required" })}
+
+
+                                        />
+                                        {errors.costcenter && <span style={{ color: "red" }}>{errors.costcenter.message}</span>}
                                     </TableCell>
                                     <TableCell>
                                         <InputField
@@ -1205,7 +1242,7 @@ function CreatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1220,7 +1257,7 @@ function CreatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1270,6 +1307,7 @@ function CreatePurchaseInvoice() {
                                         <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
                                         <TableCell>{item?.product_id}</TableCell>
                                         <TableCell>{item?.selectedService?.name}</TableCell>
+                                        <TableCell>{item?.cost_center}</TableCell>
                                         <TableCell>{item?.quantity}</TableCell>
 
                                         <TableCell>{item?.charge}</TableCell>
@@ -1331,9 +1369,9 @@ function CreatePurchaseInvoice() {
                                 </TableRow>
 
                                 <TableRow>
-                                    
+
                                     <TableCell colSpan={7} align="right">
-                                        <Box sx={{display:'flex',gap:1,justifyContent:'flex-end',alignItems:'center'}}>
+                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
                                             <Switch
                                                 checked={isVatApplicable}
                                                 onChange={(e) => setIsVatApplicable(e.target.checked)}
@@ -1538,7 +1576,7 @@ function CreatePurchaseInvoice() {
                                             onSelect={(value) => {
                                                 setSelectedAccount(value)
                                                 console.log(value);
-                                               
+
                                                 getChildAccounts(value?.id)
 
                                             }}
