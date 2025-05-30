@@ -187,15 +187,19 @@ function JournalVoucherList() {
           },
           {
             header: "JV#",
-            accessorKey: "id",
+            accessorFn: (row) => `JV-${row?.id ?? ''}`, // use formatted value
+            id: "jvId", // unique column ID for filtering/sorting
             cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                 JV-{row?.original?.id ?? '-'}
-                </Box>
-              ),
-      
-      
+              <Box
+                variant="contained"
+                color="primary"
+                sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+              >
+                {`JV-${row?.original?.id ?? '-'}`}
+              </Box>
+            ),
           },
+          
           {
             header: "Entry No.",
             accessorKey: "entry_no",
