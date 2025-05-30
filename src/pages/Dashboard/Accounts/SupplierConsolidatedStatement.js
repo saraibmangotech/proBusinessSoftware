@@ -117,7 +117,7 @@ const useStyles = makeStyles({
     }
 })
 
-function ConsolidatedProStatement() {
+function SupplierConsolidatedProStatement() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -662,7 +662,7 @@ function ConsolidatedProStatement() {
             }
             params = { ...params, ...Filter }
 
-            const { data } = await CustomerServices.getCustomerQueue(params)
+            const { data } = await CustomerServices.getVendors(params)
             setUsers(data?.rows)
 
 
@@ -901,7 +901,7 @@ function ConsolidatedProStatement() {
 
                         <Grid item xs={2.5}>
 
-                            <InputLabel id="demo-multiple-name-label" sx={{ fontWeight: 'bold',color:'#434343' }}>Select Users</InputLabel>
+                            <InputLabel id="demo-multiple-name-label" sx={{ fontWeight: 'bold',color:'#434343' }}>Select Suppliers</InputLabel>
                             <FormControl fullWidth size="small" sx={{ pt: 1 }}>
                                 <Select
                                     multiple
@@ -1143,4 +1143,4 @@ function ConsolidatedProStatement() {
     );
 }
 
-export default ConsolidatedProStatement;
+export default SupplierConsolidatedProStatement;
