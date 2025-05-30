@@ -218,8 +218,16 @@ const CustomerServices = {
     const data = await get(routes.getFundTransferDetail, params);
     return data;
   },
+  getEmployees: async (params) => {
+    const data = await get(routes.getEmployees, params);
+    return data;
+  },
   getPaymentVoucherDetail: async (params) => {
     const data = await get(routes.getPaymentVoucherDetail, params);
+    return data;
+  },
+  getEmployeeDetail: async (params) => {
+    const data = await get(routes.getEmployeeDetail, params);
     return data;
   },
   getEmployeeSalesReport: async (params) => {

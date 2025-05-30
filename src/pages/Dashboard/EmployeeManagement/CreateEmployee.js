@@ -25,6 +25,7 @@ import DatePicker from "components/DatePicker";
 import { TextField } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import moment from "moment";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -127,13 +128,15 @@ function CreateEmployee() {
         password: getValues('password'),
         permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
         role_id: selectedRole?.id,
-        employee_info: {
+        employee_detail: {
           date_of_joining: doj,
+          date_of_birth: dob,
           probation_period_months: formData?.probation,
           probation_end_date: probEndDate,
           employment_status: formData?.status,
-          shift_start: formData?.shiftStartTime,
-          shift_end: formData?.shiftEndTime,
+          shift_start: moment(formData?.shiftStartTime).format('HH:mm'),
+          shift_end: moment(formData?.shiftEndTime).format('HH:mm'),
+
           grace_period_minutes: formData?.graceMonths,
           minimum_required_hours: formData?.minHours,
           short_time_deduction_type: formData?.shortTimeDec,
@@ -166,7 +169,7 @@ function CreateEmployee() {
       );
       const response = await promise;
       if (response?.responseCode === 200) {
-        navigate('/user-list')
+        navigate('/employee-list')
       }
 
 
@@ -312,7 +315,7 @@ function CreateEmployee() {
 
 
           </Grid>
-      
+
 
 
 
@@ -512,7 +515,14 @@ function CreateEmployee() {
                         }
                       }}
                       value={value}
-                      onChange={onChange}
+                      onChange={(newValue) => {
+                        if (newValue && newValue.isValid && newValue.isValid()) {
+                          console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"));
+                        } else {
+                          console.log("Invalid time selected");
+                        }
+                        onChange(newValue);
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -535,6 +545,7 @@ function CreateEmployee() {
                     />
                   )}
                 />
+
                 <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
                   {errors.shiftStartTime?.message}
                 </Typography>
@@ -565,7 +576,14 @@ function CreateEmployee() {
                           }
                         }
                       }}
-                      onChange={onChange}
+                      onChange={(newValue) => {
+                        if (newValue && newValue.isValid && newValue.isValid()) {
+                          console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"));
+                        } else {
+                          console.log("Invalid time selected");
+                        }
+                        onChange(newValue);
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}

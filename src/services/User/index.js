@@ -6,8 +6,16 @@ const UserServices = {
     const data = await post(routes.CreateSubUser, obj);
     return data;
   },
+  CreateEmployee: async (obj) => {
+    const data = await post(routes.CreateEmployee, obj);
+    return data;
+  },
   CreateUser: async (obj) => {
     const data = await post(routes.CreateUser, obj);
+    return data;
+  },
+  UpdateEmployee: async (obj) => {
+    const data = await patch(routes.UpdateEmployee, obj);
     return data;
   },
   getUsers: async (params) => {

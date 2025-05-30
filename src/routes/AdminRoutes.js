@@ -472,6 +472,12 @@ const LeaveList= lazy(() =>
 const SalaryList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/SalaryList")
 );
+const EmployeeList= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/EmployeeList")
+);
+const UpdateEmployee= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/UpdateEmployee")
+);
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
@@ -487,6 +493,10 @@ const AdminRoutes = [
   {
     path: "/prepaid-invoices",
     component: <PrepaidInvoices />,
+  },
+  {
+    path: "/employee-list",
+    component: <EmployeeList />,
   },
   {
     path: "/fixed-assets",
@@ -555,6 +565,10 @@ const AdminRoutes = [
   {
     path: "/update-payment-voucher/:id",
     component: <UpdatePaymentVoucher />,
+  },
+  {
+    path: "/update-employee/:id",
+    component: <UpdateEmployee />,
   },
   {
     path: "/update-fund-transfer-voucher/:id",

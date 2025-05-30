@@ -142,6 +142,8 @@ const routes = {
   unitStatusUpdate:'/products/inventory/units/mark',
   getPaymentVoucherDetail:'/accounts/vouchers/details',
   getFundTransferDetail:'accounts/iftVouchers/details',
+  getEmployees:"/hrms/employees",
+  getEmployeeDetail:'/hrms/employees/details'
 
 
 };
