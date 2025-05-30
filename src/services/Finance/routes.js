@@ -63,7 +63,8 @@ const routes = {
 getNewAccountLedgers:'accounts/ledger/primary',
 getAccountReportsDetail:'accounts/reports/tb',
 UpdatePaymentVoucher:'/accounts/vouchers/edit',
-UpdateFundTransferVoucher:'/accounts/iftVouchers/edit'
+UpdateFundTransferVoucher:'/accounts/iftVouchers/edit',
+updateEmployee:'/hrms/employees/disable'
 
 };
 

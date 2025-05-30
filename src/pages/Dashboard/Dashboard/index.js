@@ -228,8 +228,8 @@ function Dashboard() {
 
   const statsData = [
     {
-      title: "Total Sales",
-      value: statsDetail?.totalSales,
+      title: "Total Service Charges",
+      value: parseFloat(statsDetail?.totalServiceCharges).toFixed(2),
       icon: <PeopleAltIcon />,
       color: THEME.accent1,
       bgColor: THEME.accent1,

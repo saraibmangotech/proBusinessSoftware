@@ -69,6 +69,9 @@ function CreateEmployee() {
   const [airFareDueDate, setAirFareDueDate] = useState(null)
   const [probEndDate, setProbEndDate] = useState(null)
   const [leavingDate, setLeavingDate] = useState(null)
+  const [isActive, setIsActive] = useState('');
+  const [leftJob, setLeftJob] = useState('');
+  const [overtime, setOvertime] = useState('');
   const theme = useTheme();
   function getStyles(name, personName, theme) {
     return {
@@ -148,9 +151,9 @@ function CreateEmployee() {
           basic_salary: formData?.basicSalary,
           designation: formData?.designation,
           department: formData?.department,
-          is_active: formData?.isActive == 'yes' ? true : false,
-          is_overtime_eligible: formData?.overtime == 'yes' ? true : false,
-          has_left_job: formData?.leftJob == 'yes' ? true : false,
+          is_active: isActive == 'yes' ? true : false,
+          is_overtime_eligible:overtime == 'yes' ? true : false,
+          has_left_job: leftJob == 'yes' ? true : false,
           date_of_leaving: leavingDate,
           leaving_reason: formData?.reason,
         }
@@ -707,123 +710,79 @@ function CreateEmployee() {
 
 
 
-          <Grid item xs={12} sm={2.8}>
-            <InputLabel
-              sx={{
-                textTransform: "capitalize",
-                textAlign: "left",
-                fontWeight: 700,
-                color: Colors.gray,
-                mb: 1,
+        <Grid item xs={12} sm={2.8}>
+        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Active :*</InputLabel>
+        <Controller
+          name="isActive"
+          control={control}
+          rules={{ required: "Please select an option" }}
+          render={({ field }) => (
+            <RadioGroup
+              row
+              {...field}
+              value={isActive}
+              onChange={(e) => {
+                setIsActive(e.target.value);
+                field.onChange(e);
               }}
-              error={!!errors?.eligibleForAirfare}
             >
-              is Active :*
-            </InputLabel>
+              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+            </RadioGroup>
+          )}
+        />
+        {errors.isActive && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isActive.message}</Typography>}
+      </Grid>
 
-            <FormControl component="fieldset" error={!!errors?.eligibleForAirfare}>
-              <RadioGroup row>
-                <FormControlLabel
-                  value="yes"
-                  control={<Radio size="small" />}
-                  label="Yes"
-                  {...register("isActive", {
-                    required: "Please select an option",
-                  })}
-                />
-                <FormControlLabel
-                  value="no"
-                  control={<Radio size="small" />}
-                  label="No"
-                  {...register("isActive", {
-                    required: "Please select an option",
-                  })}
-                />
-              </RadioGroup>
-
-              <Typography color="error" sx={{ fontSize: 12, textAlign: "left", mt: 0.5 }}>
-                {errors?.isActive?.message}
-              </Typography>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={2.8}>
-            <InputLabel
-              sx={{
-                textTransform: "capitalize",
-                textAlign: "left",
-                fontWeight: 700,
-                color: Colors.gray,
-                mb: 1,
+      {/* Has Left Job */}
+      <Grid item xs={12} sm={2.8}>
+        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Has Left Job :*</InputLabel>
+        <Controller
+          name="leftJob"
+          control={control}
+          rules={{ required: "Please select an option" }}
+          render={({ field }) => (
+            <RadioGroup
+              row
+              {...field}
+              value={leftJob}
+              onChange={(e) => {
+                setLeftJob(e.target.value);
+                field.onChange(e);
               }}
-              error={!!errors?.eligibleForAirfare}
             >
-              Has Left job :*
-            </InputLabel>
+              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+            </RadioGroup>
+          )}
+        />
+        {errors.leftJob && <Typography color="error" sx={{ fontSize: 12 }}>{errors.leftJob.message}</Typography>}
+      </Grid>
 
-            <FormControl component="fieldset" error={!!errors?.eligibleForAirfare}>
-              <RadioGroup row>
-                <FormControlLabel
-                  value="yes"
-                  control={<Radio size="small" />}
-                  label="Yes"
-                  {...register("leftJob", {
-                    required: "Please select an option",
-                  })}
-                />
-                <FormControlLabel
-                  value="no"
-                  control={<Radio size="small" />}
-                  label="No"
-                  {...register("leftJob", {
-                    required: "Please select an option",
-                  })}
-                />
-              </RadioGroup>
-
-              <Typography color="error" sx={{ fontSize: 12, textAlign: "left", mt: 0.5 }}>
-                {errors?.leftJob?.message}
-              </Typography>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={2.8}>
-            <InputLabel
-              sx={{
-                textTransform: "capitalize",
-                textAlign: "left",
-                fontWeight: 700,
-                color: Colors.gray,
-                mb: 1,
+      {/* Overtime */}
+      <Grid item xs={12} sm={2.8}>
+        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Overtime Eligible :*</InputLabel>
+        <Controller
+          name="overtime"
+          control={control}
+          rules={{ required: "Please select an option" }}
+          render={({ field }) => (
+            <RadioGroup
+              row
+              {...field}
+              value={overtime}
+              onChange={(e) => {
+                setOvertime(e.target.value);
+                field.onChange(e);
               }}
-              error={!!errors?.eligibleForAirfare}
             >
-              Overtime Eligible :*
-            </InputLabel>
-
-            <FormControl component="fieldset" error={!!errors?.eligibleForAirfare}>
-              <RadioGroup row>
-                <FormControlLabel
-                  value="yes"
-                  control={<Radio size="small" />}
-                  label="Yes"
-                  {...register("overtime", {
-                    required: "Please select an option",
-                  })}
-                />
-                <FormControlLabel
-                  value="no"
-                  control={<Radio size="small" />}
-                  label="No"
-                  {...register("overtime", {
-                    required: "Please select an option",
-                  })}
-                />
-              </RadioGroup>
-
-              <Typography color="error" sx={{ fontSize: 12, textAlign: "left", mt: 0.5 }}>
-                {errors?.overtime?.message}
-              </Typography>
-            </FormControl>
-          </Grid>
+              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+            </RadioGroup>
+          )}
+        />
+        {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
+      </Grid>
           <Grid item xs={12} sm={2.8}></Grid>
           <Grid item xs={12} sm={2.8}>
             <DatePicker

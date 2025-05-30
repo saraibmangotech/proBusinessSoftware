@@ -27,7 +27,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
-import { PrimaryButton } from 'components/Buttons';
+import { PrimaryButton, SwitchButton } from 'components/Buttons';
 import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -41,6 +41,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import { useAuth } from 'context/UseContext';
+import FinanceServices from 'services/Finance';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -128,7 +129,40 @@ function EmployeeList() {
     } = useForm();
 
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+    // *For Update Account Status
+    const updateAccountStatus = async (id, status) => {
+        const shallowCopy = [...customerQueue];
+        let accountIndex = shallowCopy.findIndex(item => item.id == id);
 
+        if (accountIndex != -1) {
+            shallowCopy[accountIndex].is_active = status;
+        }
+
+        setCustomerQueue(shallowCopy)
+
+
+        try {
+            let obj = {
+                user_id: id,
+                is_active: status
+            }
+
+
+            const promise = FinanceServices.updateEmployee(obj);
+
+            showPromiseToast(
+                promise,
+                'Saving...',
+                'Added Successfully',
+                'Something Went Wrong'
+            );
+
+
+            // getAccounts()
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
 
     const [loader, setLoader] = useState(false);
 
@@ -290,7 +324,7 @@ function EmployeeList() {
             ),
 
         },
-    
+
         {
             header: "Designation",
             accessorKey: "designation",
@@ -308,6 +342,26 @@ function EmployeeList() {
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {row?.original?.department}
+                </Box>
+            ),
+
+        },
+
+        {
+            header: "Status",
+            accessorKey: "department",
+            cell: ({ row }) => (
+                <Box component={'div'} className='pdf-hide' sx={{display:'flex',justifyContent:'center'}}>
+                    <SwitchButton
+                        sx={{
+                            '& .MuiButtonBase-root':{
+                                width:'28px',
+                                height:'28px'
+                            }
+                        }}
+                        isChecked={row?.original?.is_active}
+                        setIsChecked={() => updateAccountStatus(row?.original?.id, !row?.original?.is_active)}
+                    />
                 </Box>
             ),
 

@@ -136,6 +136,10 @@ const FinanceServices = {
     const data = await patch(routes.UpdateFundTransferVoucher, obj);
     return data;
   },
+  updateEmployee: async (obj) => {
+    const data = await patch(routes.updateEmployee, obj);
+    return data;
+  },
   approveAccount: async (obj) => {
     const data = await post(routes.approveAccount, obj);
     return data;
