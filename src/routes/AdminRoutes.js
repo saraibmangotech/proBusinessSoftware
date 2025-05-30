@@ -472,6 +472,9 @@ const LeaveList= lazy(() =>
 const SalaryList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/SalaryList")
 );
+const ConsolidatedProStatement= lazy(() =>
+  import("pages/Dashboard/Accounts/ConsulatedProStatement")
+);
 const EmployeeList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/EmployeeList")
 );
@@ -565,6 +568,10 @@ const AdminRoutes = [
   {
     path: "/update-payment-voucher/:id",
     component: <UpdatePaymentVoucher />,
+  },
+  {
+    path: "/consolidated-pro-statement",
+    component: <ConsolidatedProStatement />,
   },
   {
     path: "/update-employee/:id",

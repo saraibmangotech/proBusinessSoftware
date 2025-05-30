@@ -64,7 +64,8 @@ getNewAccountLedgers:'accounts/ledger/primary',
 getAccountReportsDetail:'accounts/reports/tb',
 UpdatePaymentVoucher:'/accounts/vouchers/edit',
 UpdateFundTransferVoucher:'/accounts/iftVouchers/edit',
-updateEmployee:'/hrms/employees/disable'
+updateEmployee:'/hrms/employees/disable',
+getConsolidatedProStatement:'/accounts/ledger/accumulated'
 
 };
 
