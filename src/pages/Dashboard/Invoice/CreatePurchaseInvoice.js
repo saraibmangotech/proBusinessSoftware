@@ -205,11 +205,11 @@ function CreatePurchaseInvoice() {
         }
 
         // Check for duplicate product
-        const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
-        if (isDuplicate) {
-            showErrorToast("This product has already been added.");
-            return;
-        }
+        // const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
+        // if (isDuplicate) {
+        //     showErrorToast("This product has already been added.");
+        //     return;
+        // }
 
         // Create a new row
         const newRow = {
