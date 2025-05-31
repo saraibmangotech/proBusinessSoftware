@@ -19,6 +19,7 @@ import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
 import CustomerServices from "services/Customer";
 import moment from "moment";
+import HierarchicalSelectField from "components/Select2";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -234,14 +235,14 @@ function CreateJournalVoucher() {
         is_disabled: false
 
       }
-      const { data } = await FinanceServices.getAccountsDropDown(params)
+      const { data } = await FinanceServices.getChartOfAccount(params)
       const updatedAccounts = data?.accounts?.rows?.map(account => ({
         ...account,
         name: ` ${account.account_code} ${account.name}`
       }));
 
 
-      setAccounts(updatedAccounts)
+      setAccounts(data?.COA)
     } catch (error) {
       showErrorToast(error)
     }
@@ -306,12 +307,12 @@ function CreateJournalVoucher() {
   }
   // *For Create Journal Voucher
   const createJournalVoucher = async (formData) => {
-   console.log(rows,'rows');
-   
+    console.log(rows, 'rows');
 
-   const uniqueCostCenters = [...new Set(rows.map(item => item.cost_center))].join(', ');
 
-   console.log(uniqueCostCenters); 
+    const uniqueCostCenters = [...new Set(rows.map(item => item.cost_center))].join(', ');
+
+    console.log(uniqueCostCenters);
     setLoading(true);
     try {
       let obj = {
@@ -319,8 +320,8 @@ function CreateJournalVoucher() {
         notes: getValues('note'),
         entries: rows,
         created_at: moment(fromDate).format('MM-DD-YYYY'),
-        cost_center:uniqueCostCenters
-        
+        cost_center: uniqueCostCenters
+
 
       };
 
@@ -367,7 +368,7 @@ function CreateJournalVoucher() {
         ...data,
         unique_id: Date.now() + Math.random(), // Ensure unique key
         account_id: selectedAccount?.id,
-        name: selectedAccount?.name,
+        name: selectedAccount?.account_code + ' ' + selectedAccount?.account_name,
         selectedAccount: selectedAccount,
         cost_center: selectedCostCenter?.name
       };
@@ -394,6 +395,16 @@ function CreateJournalVoucher() {
     setValue('credit', '')
   };
 
+  const [error, setError] = useState("")
+
+  const handleAccountSelect = (account) => {
+    console.log(account);
+    
+    setSelectedAccount(account)
+    setError("")
+    console.log("Selected Account:", account)
+  }
+
   const updateItem = (data) => {
 
 
@@ -418,7 +429,7 @@ function CreateJournalVoucher() {
             ...row,
             ...data,
             account_id: selectedAccount?.id,
-            name: selectedAccount?.name,
+            name: selectedAccount?.account_code + ' ' + selectedAccount?.account_name,
             cost_center: selectedCostCenter?.name
           }
           : row
@@ -475,20 +486,20 @@ function CreateJournalVoucher() {
   //     }
   //   }
 
-   
+
   // }, [rows]);
   useEffect(() => {
     let totalDebit = 0;
     let totalCredit = 0;
-  
+
     rows.forEach((row) => {
       const debit = parseFloat(row.debit || 0);
       const credit = parseFloat(row.credit || 0);
-  
+
       totalDebit += debit;
       totalCredit += credit;
     });
-  
+
     if (totalDebit !== totalCredit) {
       setErrorDisplay(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
       console.log(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
@@ -496,7 +507,7 @@ function CreateJournalVoucher() {
       setErrorDisplay(false);
     }
   }, [rows]);
-  
+
 
 
 
@@ -547,7 +558,7 @@ function CreateJournalVoucher() {
 
 
       <form onSubmit={handleSubmit(editState ? updateItem : addItem)}>
-        <TableContainer component={Paper}>
+        <TableContainer sx={{overflowX:'visible'}} component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
@@ -565,24 +576,14 @@ function CreateJournalVoucher() {
               {<TableRow>
 
                 <TableCell>
-                  <SelectField
-                    size="small"
-                    options={accounts}
+                  <HierarchicalSelectField
                     disabled={editState}
                     selected={selectedAccount}
-                    onSelect={(value) => {
-                      setSelectedAccount(value)
-                      console.log(value);
-                      setValue('AccountCode', value?.account_code)
-                      getChildAccounts(value?.id)
-
-                    }}
-                    //  error={errors?.service?.message}
-                    register={register("service", {
-                      required: "Please select a service.",
-                    })}
+                    onSelect={handleAccountSelect}
+                    data={accounts}
+                    error={error}
+                    placeholder="Select Account"
                   />
-                  {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
                 </TableCell>
                 {/* <TableCell>
                   <SelectField
@@ -749,7 +750,7 @@ function CreateJournalVoucher() {
                         setSelectedRow(item?.unique_id)
                         setEditState(true)
                         console.log(item);
-                        setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
+                        setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                         setSelectedAccount(item?.selectedAccount)
                         setValue('service', item?.selectedAccount?.name)
                         setValue('debit', item?.debit)
