@@ -844,6 +844,7 @@ function UpdatePaymentVoucher() {
                                             console.log(item);
 
                                             setValue("id", item?.id);
+                                            setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
                                             setSelectedAccount(item?.account)
                                             setValue("description", item?.description);
                                             setValue("amount", item?.amount);

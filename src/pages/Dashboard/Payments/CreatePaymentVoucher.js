@@ -799,6 +799,7 @@ function CreatePaymentVoucher() {
 
                                             setValue("id", item?.id);
                                             setSelectedAccount(item?.selectedAccount)
+                                            setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
                                             setValue("description", item?.description);
                                             setValue("amount", item?.amount);
                                             console.log(item?.service)
