@@ -1003,7 +1003,7 @@ function UpdatePurchaseInvoice() {
                                         label={"Purchase Date "}
                                         value={date}
                                         size={"small"}
-                                        disabled={true}
+                                     
                                         error={errors1?.paidAt?.message}
                                         register={register1("paidAt", {
                                             required: date ? false : 'Date is required'

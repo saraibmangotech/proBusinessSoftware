@@ -223,7 +223,9 @@ const ServiceReport = lazy(() =>
 const CollectionReport = lazy(() =>
   import("pages/Dashboard/Reports/CollectionReport")
 );
-
+const CollectionDetailedReport = lazy(() =>
+  import("pages/Dashboard/Reports/CollectionDetailedReport")
+);
 const CreateReception = lazy(() =>
   import("pages/Dashboard/Reception/CreateReception")
 );
@@ -1249,6 +1251,10 @@ const AdminRoutes = [
   {
     path: "/collection-report",
     component: <CollectionReport />,
+  },
+  {
+    path: "/collection-detailed-report",
+    component: <CollectionDetailedReport />,
   },
  
 ];

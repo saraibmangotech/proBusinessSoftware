@@ -18,6 +18,7 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import AddIcon from "@mui/icons-material/Add";
 import CustomerServices from "services/Customer";
+import HierarchicalSelectField from "components/Select2";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -205,7 +206,7 @@ function UpadateJournalVoucher() {
         unique_id: Date.now() + Math.random(), // Ensure unique key
 
       }));
-     
+
 
       setRows(updatedAccounts)
       setFromDate(new Date(data?.voucher?.created_at))
@@ -392,7 +393,7 @@ function UpadateJournalVoucher() {
         ...data,
         unique_id: Date.now() + Math.random(), // Ensure unique key
         account_id: selectedAccount?.id,
-        name: selectedAccount?.name,
+        name: selectedAccount?.account_code + ' ' + selectedAccount?.account_name,
         selectedAccount: selectedAccount,
         cost_center: selectedCostCenter?.name
       };
@@ -443,7 +444,7 @@ function UpadateJournalVoucher() {
             ...row,
             ...data,
             account_id: selectedAccount?.id,
-            name: selectedAccount?.name,
+            name: selectedAccount?.account_code + ' ' + selectedAccount?.account_name,
             cost_center: selectedCostCenter?.name
           }
           : row
@@ -467,6 +468,16 @@ function UpadateJournalVoucher() {
     setValue('debit', '')
     setValue('credit', '')
   };
+
+   const [error, setError] = useState("")
+  
+    const handleAccountSelect = (account) => {
+      console.log(account);
+      
+      setSelectedAccount(account)
+      setError("")
+      console.log("Selected Account:", account)
+    }
   // *For Get Account
   const getChildAccounts = async (accountId) => {
     try {
@@ -481,42 +492,60 @@ function UpadateJournalVoucher() {
       showErrorToast(error);
     }
   };
-
-
   useEffect(() => {
-    const costCenterTotals = {};
+    let totalDebit = 0;
+    let totalCredit = 0;
 
     rows.forEach((row) => {
-      const center = row.cost_center || row.costcenter; // handle both spellings
       const debit = parseFloat(row.debit || 0);
       const credit = parseFloat(row.credit || 0);
 
-      if (!costCenterTotals[center]) {
-        costCenterTotals[center] = { debit: 0, credit: 0 };
-      }
-
-      costCenterTotals[center].debit += debit;
-      costCenterTotals[center].credit += credit;
+      totalDebit += debit;
+      totalCredit += credit;
     });
 
-    for (let i = 0; i < Object.entries(costCenterTotals).length; i++) {
-      const obj = Object.entries(costCenterTotals)[i];
-      let center = obj[0];
-      let totals = obj[1];
-      if (totals.debit !== totals.credit) {
-        setErrorDisplay(`${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`)
-        console.log(
-          `${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`
-        );
-        break;
-      }
-      else{
-        setErrorDisplay(false)
-      }
+    if (totalDebit !== totalCredit) {
+      setErrorDisplay(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
+      console.log(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
+    } else {
+      setErrorDisplay(false);
     }
-
-   
   }, [rows]);
+
+  // useEffect(() => {
+  //   const costCenterTotals = {};
+
+  //   rows.forEach((row) => {
+  //     const center = row.cost_center || row.costcenter; // handle both spellings
+  //     const debit = parseFloat(row.debit || 0);
+  //     const credit = parseFloat(row.credit || 0);
+
+  //     if (!costCenterTotals[center]) {
+  //       costCenterTotals[center] = { debit: 0, credit: 0 };
+  //     }
+
+  //     costCenterTotals[center].debit += debit;
+  //     costCenterTotals[center].credit += credit;
+  //   });
+
+  //   for (let i = 0; i < Object.entries(costCenterTotals).length; i++) {
+  //     const obj = Object.entries(costCenterTotals)[i];
+  //     let center = obj[0];
+  //     let totals = obj[1];
+  //     if (totals.debit !== totals.credit) {
+  //       setErrorDisplay(`${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`)
+  //       console.log(
+  //         `${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`
+  //       );
+  //       break;
+  //     }
+  //     else{
+  //       setErrorDisplay(false)
+  //     }
+  //   }
+
+
+  // }, [rows]);
 
   useEffect(() => {
     getAccounts()
@@ -555,7 +584,7 @@ function UpadateJournalVoucher() {
               register={register1("Journal")}
             />
           </Grid>
-       
+
         </Grid>
 
 
@@ -583,24 +612,14 @@ function UpadateJournalVoucher() {
               {<TableRow>
 
                 <TableCell>
-                  <SelectField
-                    size="small"
-                    options={accounts}
+                  <HierarchicalSelectField
                     disabled={editState}
                     selected={selectedAccount}
-                    onSelect={(value) => {
-                      setSelectedAccount(value)
-                      console.log(value);
-                      setValue('AccountCode', value?.account_code)
-                      getChildAccounts(value?.id)
-
-                    }}
-                    //  error={errors?.service?.message}
-                    register={register("service", {
-                      required: "Please select a service.",
-                    })}
+                    onSelect={handleAccountSelect}
+                    data={accounts}
+                    error={error}
+                    placeholder="Select Account"
                   />
-                  {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
                 </TableCell>
                 {/* <TableCell>
                   <SelectField
@@ -767,8 +786,8 @@ function UpadateJournalVoucher() {
                         setSelectedRow(item?.unique_id)
                         setEditState(true)
                         console.log(item);
-                        setValue('costcenter',{id:item?.cost_center,name:item?.cost_center})
-                        setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
+                        setValue('costcenter', { id: item?.cost_center, name: item?.cost_center })
+                        setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                         setSelectedAccount(item?.selectedAccount)
                         setValue('service', item?.selectedAccount?.name)
                         setValue('debit', item?.debit)

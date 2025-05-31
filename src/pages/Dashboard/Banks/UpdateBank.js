@@ -32,6 +32,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import { addMonths } from 'date-fns';
 import { useAuth } from 'context/UseContext';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import FinanceServices from 'services/Finance';
 
 
 function UpdateBank() {
@@ -52,6 +53,36 @@ function UpdateBank() {
         formState: { errors: errors1 },
 
     } = useForm();
+
+      const [accounts, setAccounts] = useState([])
+    
+      //documents array
+    
+      // *For Get Account
+      const getAccounts = async (search, accountId) => {
+        try {
+          let params = {
+            page: 1,
+            limit: 10000,
+    
+            name: search,
+            is_disabled: false,
+            sub_category: 4,
+    
+          }
+          const { data } = await FinanceServices.getAccountBySubCategory(params)
+          const updatedAccounts = data?.accounts?.rows?.map(account => ({
+            ...account,
+            name: ` ${account.account_code} ${account.name}`
+          }));
+          console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+    
+          setAccounts(updatedAccounts)
+        } catch (error) {
+          showErrorToast(error)
+        }
+      }
+    
 
     // Watch all form data
     console.log(watch());
@@ -110,6 +141,7 @@ function UpdateBank() {
     const [selectedType, setSelectedType] = useState(null)
     const [date, setDate] = useState(null)
     const [balanceType, setBalanceType] = useState(null)
+    const [selectedAccount, setSelectedAccount] = useState(null)
 
     //documents array
 
@@ -135,11 +167,12 @@ function UpdateBank() {
         console.log(formData);
         try {
             let obj = {
-                id:id,
+                id: id,
                 name: formData?.name,
                 account_title: formData?.title,
                 account_number: formData?.accountnumber,
                 account_ibn: formData?.ibn,
+                account:selectedAccount?.id
 
 
 
@@ -173,10 +206,11 @@ function UpdateBank() {
             const { data } = await CustomerServices.getBankDetail(params);
 
             console.log(data?.bank);
-            setValue1('name',data?.bank?.name)
-            setValue1('title',data?.bank?.account_title)
-            setValue1('accountnumber',data?.bank?.account_number)
-            setValue1('ibn',data?.bank?.account_ibn)
+            setValue1('name', data?.bank?.name)
+            setValue1('title', data?.bank?.account_title)
+            setValue1('accountnumber', data?.bank?.account_number)
+            setValue1('ibn', data?.bank?.account_ibn)
+            setSelectedAccount(data?.account)
 
 
         } catch (error) {
@@ -184,6 +218,7 @@ function UpdateBank() {
         }
     };
     useEffect(() => {
+        getAccounts()
         getData()
     }, [])
 
@@ -266,7 +301,25 @@ function UpdateBank() {
 
                                     })}
                                 /></Grid>
+                                { <Grid item xs={2.8}>
 
+                                    <SelectField
+                                        size="small"
+                                        options={accounts}
+                                        label={'Select Account'}
+                                        selected={selectedAccount}
+                                        onSelect={(value) => {
+                                            setSelectedAccount(value)
+                                            console.log(value);
+                                            setValue('AccountCode', value?.account_code)
+                                            // getChildAccounts(value?.id)
+
+                                        }}
+                                        //  error={errors?.service?.message}
+                                        register={register("service", {
+                                            required: "Please select a account.",
+                                        })}
+                                    /></Grid>}
 
 
 

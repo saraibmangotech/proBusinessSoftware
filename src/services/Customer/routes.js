@@ -143,7 +143,8 @@ const routes = {
   getPaymentVoucherDetail:'/accounts/vouchers/details',
   getFundTransferDetail:'accounts/iftVouchers/details',
   getEmployees:"/hrms/employees",
-  getEmployeeDetail:'/hrms/employees/details'
+  getEmployeeDetail:'/hrms/employees/details',
+  getDetailedCollectionReport:'Reports/detailedCollectionReport'
 
 
 };
