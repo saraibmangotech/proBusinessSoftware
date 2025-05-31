@@ -556,8 +556,8 @@ function SupplierConsolidatedProStatement() {
                     limit: 999999,
                     from_date: fromDate ? moment(fromDate).format("MM-DD-YYYY") : "",
                     to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
-                    accounts: selectedUser.map(user => user.id).join(','),
-                    account_id: 700108,
+                    accounts: selectedUser.map(user => user.account_id).join(','),
+                    account_id: 700111,
                 }
 
                 const { data } = await FinanceServices.getConsolidatedProStatement(params)
@@ -886,7 +886,7 @@ function SupplierConsolidatedProStatement() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Consolidated Statement</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Supplier Consolidated Statement</Typography>
 
 
 

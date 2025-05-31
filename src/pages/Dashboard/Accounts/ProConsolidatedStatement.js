@@ -556,7 +556,7 @@ function ConsolidatedProStatement() {
                     limit: 999999,
                     from_date: fromDate ? moment(fromDate).format("MM-DD-YYYY") : "",
                     to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
-                    accounts: selectedUser.map(user => user.id).join(','),
+                    accounts: selectedUser.map(user => user.receivable_account_id).join(','),
                     account_id: 700108,
                 }
 
@@ -886,7 +886,7 @@ function ConsolidatedProStatement() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Consolidated Statement</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>PRO Consolidated Statement</Typography>
 
 
 
