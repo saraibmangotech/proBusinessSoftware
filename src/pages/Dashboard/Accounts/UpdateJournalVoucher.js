@@ -481,42 +481,60 @@ function UpadateJournalVoucher() {
       showErrorToast(error);
     }
   };
-
-
   useEffect(() => {
-    const costCenterTotals = {};
-
+    let totalDebit = 0;
+    let totalCredit = 0;
+  
     rows.forEach((row) => {
-      const center = row.cost_center || row.costcenter; // handle both spellings
       const debit = parseFloat(row.debit || 0);
       const credit = parseFloat(row.credit || 0);
-
-      if (!costCenterTotals[center]) {
-        costCenterTotals[center] = { debit: 0, credit: 0 };
-      }
-
-      costCenterTotals[center].debit += debit;
-      costCenterTotals[center].credit += credit;
+  
+      totalDebit += debit;
+      totalCredit += credit;
     });
-
-    for (let i = 0; i < Object.entries(costCenterTotals).length; i++) {
-      const obj = Object.entries(costCenterTotals)[i];
-      let center = obj[0];
-      let totals = obj[1];
-      if (totals.debit !== totals.credit) {
-        setErrorDisplay(`${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`)
-        console.log(
-          `${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`
-        );
-        break;
-      }
-      else{
-        setErrorDisplay(false)
-      }
+  
+    if (totalDebit !== totalCredit) {
+      setErrorDisplay(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
+      console.log(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
+    } else {
+      setErrorDisplay(false);
     }
+  }, [rows]);
+
+  // useEffect(() => {
+  //   const costCenterTotals = {};
+
+  //   rows.forEach((row) => {
+  //     const center = row.cost_center || row.costcenter; // handle both spellings
+  //     const debit = parseFloat(row.debit || 0);
+  //     const credit = parseFloat(row.credit || 0);
+
+  //     if (!costCenterTotals[center]) {
+  //       costCenterTotals[center] = { debit: 0, credit: 0 };
+  //     }
+
+  //     costCenterTotals[center].debit += debit;
+  //     costCenterTotals[center].credit += credit;
+  //   });
+
+  //   for (let i = 0; i < Object.entries(costCenterTotals).length; i++) {
+  //     const obj = Object.entries(costCenterTotals)[i];
+  //     let center = obj[0];
+  //     let totals = obj[1];
+  //     if (totals.debit !== totals.credit) {
+  //       setErrorDisplay(`${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`)
+  //       console.log(
+  //         `${center} should have equal debit and credit. Got Debit: ${totals.debit}, Credit: ${totals.credit}`
+  //       );
+  //       break;
+  //     }
+  //     else{
+  //       setErrorDisplay(false)
+  //     }
+  //   }
 
    
-  }, [rows]);
+  // }, [rows]);
 
   useEffect(() => {
     getAccounts()
