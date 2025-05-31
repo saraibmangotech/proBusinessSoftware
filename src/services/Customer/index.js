@@ -214,6 +214,10 @@ const CustomerServices = {
     const data = await get(routes.getCostCenters, params);
     return data;
   },
+  getDetailedCollectionReport: async (params) => {
+    const data = await get(routes.getDetailedCollectionReport, params);
+    return data;
+  },
   getFundTransferDetail: async (params) => {
     const data = await get(routes.getFundTransferDetail, params);
     return data;
