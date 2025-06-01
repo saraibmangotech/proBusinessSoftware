@@ -288,16 +288,21 @@ function CollectionDetailedReport() {
         cell: ({ row }) => row.index + 1,
       },
     {
-      header: "Category",
-      accessorKey: "category",
+      header: "Receipt No.",
+      accessorKey: "receipt_number",
       total: false,
-       accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category ,
-           cell: () => (
-             <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-               {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' :agencyType[process.env.REACT_APP_TYPE].category}
-             </Box>
+      accessorFn: (row) => row?.receipt_number,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.receipt_number}
+        </Box>
            ),
     },
+
     {
       header: "Receipt Date",
       accessorKey: "invoice_date",
@@ -352,7 +357,7 @@ function CollectionDetailedReport() {
    
     
     {
-        header: "Line Total",
+        header: "Sub Total",
         accessorKey: "line_total",
         accessorFn: (row) => (parseFloat(row?.line_total) ).toFixed(2),
         cell: ({ row }) => (
@@ -365,12 +370,10 @@ function CollectionDetailedReport() {
   
           </Box>
         ),
-      },
-
-   
+    },
 
     {
-      header: "Total",
+      header: "Amount",
       accessorKey: "amount",
       accessorFn: (row) => (parseFloat(row?.amount) ).toFixed(2),
       cell: ({ row }) => (
@@ -384,6 +387,58 @@ function CollectionDetailedReport() {
         </Box>
       ),
     },
+
+    {
+      header: "Additional Charges",
+      accessorKey: "additional_charges",
+      accessorFn: (row) => (parseFloat(row?.additional_charges_value) ).toFixed(2),
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {(parseFloat(row?.original?.additional_charges_value) ).toFixed(2)}
+
+        </Box>
+      ),
+    },
+    {
+      header: "Auth Code",
+      accessorKey: "auth_code",
+      total: false,
+      accessorFn: (row) => (row?.auth_code ? row?.auth_code : "-"),
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.auth_code ? row?.original?.auth_code : "-"}
+        </Box>
+      ),
+    },
+
+    {
+      header: "Total",
+      accessorKey: "line_total",
+      accessorFn: (row) => (parseFloat(row?.line_total) ).toFixed(2),
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {(parseFloat(row?.original?.line_total) ).toFixed(2)}
+
+        </Box>
+      ),
+  },
+
+
+   
+
+    
 
   ];
 
