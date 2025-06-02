@@ -650,9 +650,7 @@ function SnapshotOverviewReport() {
                                                 (parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
                                                 parseFloat(customerQueue?.totalVat) +
-                                                parseFloat(customerQueue?.totalCenterFee)) -
-                                                parseFloat(customerQueue?.proCommission) -
-                                                parseFloat(customerQueue?.typistCommission)
+                                                parseFloat(customerQueue?.totalCenterFee))
                                             ).toFixed(2)}
                                         </Cell>
                                     </Row>
