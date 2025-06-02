@@ -13,7 +13,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 
 
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DatePicker from "components/DatePicker";
 import SelectField from "components/Select";
 import InputField from "components/Input";
@@ -25,6 +25,7 @@ import { ErrorToaster } from "components/Toaster";
 const leaveTypes = [{ id: 'Sick Leave', name: "Sick Leave" }, { id: "Casual Leave", name: "Casual Leave" }, { id: "Annual Leave", name: "Annual Leave" }];
 
 function UpdateLeave() {
+    const { state } = useLocation()
     const navigate = useNavigate();
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const [startDate, setStartDate] = useState(null)
@@ -41,25 +42,25 @@ function UpdateLeave() {
         formState: { errors },
     } = useForm();
 
-  const {id}=useParams()
+    const { id } = useParams()
 
     const onSubmit = async (formData) => {
-    
+
         console.log(formData);
         try {
             const start = new Date(startDate);
             const end = new Date(endDate);
-            
+
             // Calculate the difference in milliseconds and convert to days
             const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
-            
+
             const obj = {
-                id:id,
-              user_id: selectedUser?.id,
-              start_date: startDate,
-              end_date: endDate,
-              total_days: totalDays,
-              request_reason: formData?.reason,
+                id: id,
+                user_id: selectedUser?.id,
+                start_date: startDate,
+                end_date: endDate,
+                total_days: totalDays,
+                request_reason: formData?.reason,
             };
             const promise = CustomerServices.UpdateLeave(obj);
 
@@ -78,7 +79,7 @@ function UpdateLeave() {
         } catch (error) {
             ErrorToaster(error);
         }
-      
+
     };
 
     const getUsers = async (page, limit, filter) => {
@@ -102,12 +103,25 @@ function UpdateLeave() {
             // setLoader(false)
         }
     }
-    
+
     useEffect(() => {
-  
-        
+
+
         getUsers()
     }, [])
+
+
+    useEffect(() => {
+        if (state) {
+            console.log(state, 'state');
+            setStartDate(new Date(state?.start_date))
+            setEndDate(new Date(state?.end_date))
+            setValue('user',state?.employee)
+            setSelectedUser(state?.employee)
+            setValue('reason', state?.request_reason)
+        }
+    }, [state])
+
 
 
     return (
@@ -115,10 +129,10 @@ function UpdateLeave() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
                     <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                        CREATE LEAVE
+                        Update Leave
                     </Typography>
                     <Button variant="contained" type="submit" disabled={buttonDisabled}>
-                        Submit
+                        Update
                     </Button>
                 </Box>
 

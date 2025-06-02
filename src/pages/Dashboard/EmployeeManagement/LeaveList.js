@@ -142,6 +142,7 @@ function LeaveList() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
+    const [employeeData, setEmployeeData] = useState(null)
 
 
 
@@ -220,14 +221,49 @@ function LeaveList() {
             // setLoader(false)
         }
     }
+
+    const getEmployeeDetail = async (id,newData) => {
+
+
+        try {
+            let params = { user_id: id }
+
+
+            const { data } = await CustomerServices.getEmployeeDetail(params)
+
+            console.log(data);
+            setEmployeeData(data?.employee)
+            let appliedDays = parseFloat(newData?.total_days)
+            let approvedDays = Math.floor(data?.employee?.leaves_balance)
+            console.log(appliedDays,'appliedDays');
+            
+            setValue('applied', appliedDays)
+            setValue('approved', data?.employee?.leaves_balance)
+            setValue('absent', appliedDays - approvedDays)
+            setValue('balanced', Math.floor(data?.employee?.leaves_balance) - approvedDays)
+
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            // setLoader(false)
+        }
+    }
     const UpdateStatus = async () => {
+        let appliedDays = parseFloat(selectedData?.total_days)
+        let approvedDays = Math.floor(employeeData?.leaves_balance)
         try {
             let obj = {
-                customer_id: selectedData?.id,
-                is_active: status?.id,
+                id: selectedData?.id,
+                status: status?.id,
+                hr_statement: getValues('statement'),
+                user_id: selectedData?.user_id,
+                approved_days: approvedDays,
+                absent_days: appliedDays - approvedDays,
+                balance_after: Math.floor(employeeData?.leaves_balance) - approvedDays,
             };
 
-            const promise = CustomerServices.CustomerStatus(obj);
+            const promise = CustomerServices.LeaveStatus(obj);
             console.log(promise);
 
             showPromiseToast(
@@ -300,11 +336,38 @@ function LeaveList() {
         {
             header: "Status",
             accessorKey: "status",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+                    {row?.original?.status?.toLowerCase() == 'pending' && <Box
+                        component={'div'}
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                            setSelectedData(row?.original)
+                            getEmployeeDetail(row?.original?.user_id,row?.original)
+                            if (row?.original?.status?.toLowerCase() == 'pending') {
+                                setStatusDialog(true)
+                            }
+
+                        }}
+
+                    >
+                        {row?.original?.status} </Box>}
+
+                    <Box>
+
+
+                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
+                    </Box>
+
+                </Box>
+            ),
 
 
         },
-      
-        
+
+
 
 
         {
@@ -312,8 +375,19 @@ function LeaveList() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-leave/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+
+                    {row?.original?.status?.toLowerCase() == 'pending' && <Box
+                        component={'img'}
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => {
+                            navigate(`/update-leave/${row?.original?.id}`, {
+                                state: row?.original
+                            });
+                        }}
+                        src={Images.editIcon}
+                        width={'35px'}
+                    />}
+
                     <Box>
 
 
@@ -334,63 +408,7 @@ function LeaveList() {
 
     return (
         <Box sx={{ p: 3 }}>
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={[
-                                    { id: "Pending", name: "Pending" },
-                                    { id: "In Progress", name: "In Progress" },
 
-                                    { id: "Completed", name: "Completed" },
-
-
-                                ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
-                                }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
-                            />
-                        </Grid>
-
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </SimpleDialog>
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
@@ -411,13 +429,13 @@ function LeaveList() {
                         <Grid item xs={12} sm={12}>
                             <SelectField
                                 size={"small"}
-                                label={"Select Status :"}
+                                label={"Select Status "}
                                 options={
 
                                     [
-                                        { id: false, name: "Disabled" },
-                                        { id: true, name: "Enabled" },
-
+                                        { id: 'Pending', name: "Pending" },
+                                        { id: 'Approved', name: "Approved" },
+                                        { id: 'Rejected', name: "Rejected" },
                                     ]}
                                 selected={status}
                                 onSelect={(value) => {
@@ -428,6 +446,92 @@ function LeaveList() {
                                     required: "Please select status.",
                                 })}
                             />
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"Applied Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Applied Days "}
+                                error={errors?.applied?.message}
+                                register={register("applied", {
+                                    required:
+                                        "Please enter applied."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"Approved Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Approved Days "}
+                                error={errors?.approved?.message}
+                                register={register("approved", {
+                                    required:
+                                        "Please enter approved."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"Absent Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Absent Days "}
+                                error={errors?.absent?.message}
+                                register={register("absent", {
+                                    required:
+                                        "Please enter absent."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"Balanced Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Balanced Days "}
+                                error={errors?.balanced?.message}
+                                register={register("balanced", {
+                                    required:
+                                        "Please enter balanced."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"HR Statement :*"}
+                                size={'small'}
+                                multiline
+                                rows={4}
+                                placeholder={"HR Statement "}
+                                error={errors?.statement?.message}
+                                register={register("statement", {
+                                    required:
+                                        "Please enter statement."
+
+                                })}
+                            />
+
+
                         </Grid>
                         <Grid container sx={{ justifyContent: "center" }}>
                             <Grid

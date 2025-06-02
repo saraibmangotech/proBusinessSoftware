@@ -147,7 +147,9 @@ const routes = {
   getDetailedCollectionReport:'Reports/detailedCollectionReport',
   CreateLeave:'/hrms/leaves/apply',
   getLeaves:'/hrms/leaves',
-  
+  UpdateLeave:'/hrms/leaves/update',
+  LeaveStatus:'/hrms/leaves/process',
+  adjustLeaves:'/hrms/leaves/adjust'
 
 
 };

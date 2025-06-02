@@ -111,7 +111,7 @@ function CreateLeave() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
                     <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                        CREATE LEAVE
+                        Create Leave
                     </Typography>
                     <Button variant="contained" type="submit" disabled={buttonDisabled}>
                         Submit

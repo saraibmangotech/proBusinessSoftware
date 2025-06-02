@@ -322,7 +322,7 @@ function UpdateReceiptVoucher() {
         try {
 
             let obj = {
-                id:id,
+                id: id,
                 date: moment(fromDate).format('MM-DD-YYYY'),
                 type: "receipt_voucher",    // or "receipt_voucher"
 
@@ -387,11 +387,14 @@ function UpdateReceiptVoucher() {
             showErrorToast("Please select an account first");
             return;
         }
-
-        if (!description || description.trim() === "") {
-            showErrorToast("Description is required");
+        if (!selectedCostCenter ) {
+            showErrorToast("Please select cost center");
             return;
         }
+        // if (!description || description.trim() === "") {
+        //     showErrorToast("Description is required");
+        //     return;
+        // }
 
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             showErrorToast("Valid amount is required");
@@ -405,7 +408,8 @@ function UpdateReceiptVoucher() {
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
             payment_mode: selectedAccount?.name,
-            selectedAccount: selectedAccount
+            selectedAccount: selectedAccount,
+            cost_center:selectedCostCenter?.name
         };
 
         let findElement = rows?.find((item) => item?.account_id === newRow?.account_id);
@@ -441,7 +445,9 @@ function UpdateReceiptVoucher() {
             });
 
             setSelectedAccount(null);
-            reset();
+            setSelectedCostCenter(null)
+            setValue('description', '')
+            setValue('amount', '')
         }
     };
     const updateItem = (description, amount) => {
@@ -450,11 +456,15 @@ function UpdateReceiptVoucher() {
             showErrorToast("Please select an account first");
             return;
         }
-
-        if (!description || description.trim() === "") {
-            showErrorToast("Description is required");
+        if (!selectedCostCenter ) {
+            showErrorToast("Please select cost center");
             return;
         }
+
+        // if (!description || description.trim() === "") {
+        //     showErrorToast("Description is required");
+        //     return;
+        // }
 
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             showErrorToast("Valid amount is required");
@@ -477,7 +487,8 @@ function UpdateReceiptVoucher() {
             account_id: selectedAccount?.id,
             name: selectedAccount?.name,
             payment_mode: selectedAccount?.name,
-            selectedAccount: selectedAccount
+            selectedAccount: selectedAccount,
+            cost_center:selectedCostCenter?.name
         };
         console.log(updateItem, 'updateItemupdateItem');
 
@@ -519,6 +530,7 @@ function UpdateReceiptVoucher() {
         setValue("description", "");
         setSelectedAccount(null);
         setSelectedAccount(null);
+        setSelectedCostCenter(null)
         setEditState(false);
     };
     // *For Get Customer Queue
@@ -600,14 +612,14 @@ function UpdateReceiptVoucher() {
             console.error("Error fetching location:", error);
         }
     };
-        useEffect(() => {
-            const AllTotal = rows.reduce(
-                (sum, row) => sum + parseFloat(row.amount || 0),
-                0
-            );
-            setTotal(AllTotal)
-    
-        }, [rows])
+    useEffect(() => {
+        const AllTotal = rows.reduce(
+            (sum, row) => sum + parseFloat(row.amount || 0),
+            0
+        );
+        setTotal(AllTotal)
+
+    }, [rows])
     useEffect(() => {
         getData()
         getBanks()
@@ -647,20 +659,7 @@ function UpdateReceiptVoucher() {
                             register={register1("Voucher")}
                         />
                     </Grid>
-                    <Grid item xs={3}>
-                        <SelectField
-                            size="small"
-                            label="Select Cost Center"
-                            options={costCenters}
-                            selected={selectedCostCenter}
-                            onSelect={(value) => {
-                                setSelectedCostCenter(value)
-
-                            }}
-                            register={register1("costcenter", { required: "costcenter is required" })}
-                            error={errors1?.costcenter?.message}
-                        />
-                    </Grid>
+                  
                 </Grid>
 
 
@@ -677,7 +676,7 @@ function UpdateReceiptVoucher() {
 
                             <TableCell sx={{ width: "400px" }}>Accounts</TableCell>
 
-
+                            <TableCell sx={{ width: "400px" }}>Cost Center</TableCell>
                             <TableCell sx={{ width: "150px" }}>Description</TableCell>
                             <TableCell sx={{ width: "150px" }}>Amount</TableCell>
                             <TableCell sx={{ width: "150px" }}>Action</TableCell>
@@ -705,6 +704,20 @@ function UpdateReceiptVoucher() {
                                     })}
                                 />
                                 {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
+                            </TableCell>
+                            <TableCell>
+                                <SelectField
+                                    size="small"
+
+                                    options={costCenters}
+                                    selected={selectedCostCenter}
+                                    onSelect={(value) => {
+                                        setSelectedCostCenter(value)
+
+                                    }}
+                                    register={register("costcenter", { required: "costcenter is required" })}
+                                    error={errors?.costcenter?.message}
+                                />
                             </TableCell>
                             <TableCell>
                                 <InputField
@@ -807,6 +820,7 @@ function UpdateReceiptVoucher() {
 
 
                                 <TableCell>{item?.name}</TableCell>
+                                <TableCell>{item?.cost_center}</TableCell>
                                 <TableCell>{item?.description}</TableCell>
                                 <TableCell>{item?.amount}</TableCell>
 
@@ -820,6 +834,7 @@ function UpdateReceiptVoucher() {
 
                                             setValue("id", item?.id);
                                             setSelectedAccount(item?.account)
+                                            setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
                                             setValue("description", item?.description);
                                             setValue("amount", item?.amount);
                                             console.log(item?.service)

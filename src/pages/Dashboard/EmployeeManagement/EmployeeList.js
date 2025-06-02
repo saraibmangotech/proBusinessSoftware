@@ -42,6 +42,7 @@ import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import { useAuth } from 'context/UseContext';
 import FinanceServices from 'services/Finance';
+import BuildIcon from '@mui/icons-material/Build';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -257,11 +258,13 @@ function EmployeeList() {
     const UpdateStatus = async () => {
         try {
             let obj = {
-                customer_id: selectedData?.id,
-                is_active: status?.id,
+                user_id: selectedData?.user_id,
+                adjustment_type: status?.id,
+                leave_days: getValues('leave'),
+                description: getValues('description')
             };
 
-            const promise = CustomerServices.CustomerStatus(obj);
+            const promise = CustomerServices.adjustLeaves(obj);
             console.log(promise);
 
             showPromiseToast(
@@ -277,6 +280,7 @@ function EmployeeList() {
                 setStatusDialog(false);
                 setStatus(null)
                 getCustomerQueue();
+                reset()
             }
         } catch (error) {
             console.log(error);
@@ -351,12 +355,12 @@ function EmployeeList() {
             header: "Status",
             accessorKey: "department",
             cell: ({ row }) => (
-                <Box component={'div'} className='pdf-hide' sx={{display:'flex',justifyContent:'center'}}>
+                <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', justifyContent: 'center' }}>
                     <SwitchButton
                         sx={{
-                            '& .MuiButtonBase-root':{
-                                width:'28px',
-                                height:'28px'
+                            '& .MuiButtonBase-root': {
+                                width: '28px',
+                                height: '28px'
                             }
                         }}
                         isChecked={row?.original?.is_active}
@@ -371,12 +375,22 @@ function EmployeeList() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="Adjust Leaves" arrow>
+                        <IconButton
+                            onClick={() => {
+                                setSelectedData(row?.original);
+                                setStatusDialog(true);
+                            }}
+                        >
+                            <BuildIcon sx={{ color: 'black', fontSize: '14px' }} />
+                        </IconButton>
+                    </Tooltip>
                     {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/employee-detail/${row?.original?.user_id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
                     {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-employee/${row?.original?.user_id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     <Box>
 
 
-                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
+
                     </Box>
 
                 </Box>
@@ -403,12 +417,12 @@ function EmployeeList() {
                         <Grid item xs={12} sm={12}>
                             <SelectField
                                 size={"small"}
-                                label={"Select Status :"}
+                                label={"Adjustment Type :"}
                                 options={[
-                                    { id: "Pending", name: "Pending" },
-                                    { id: "In Progress", name: "In Progress" },
+                                    { id: "add", name: "Add" },
+                                    { id: "subtract", name: "Subtract" },
 
-                                    { id: "Completed", name: "Completed" },
+
 
 
                                 ]}
@@ -422,7 +436,42 @@ function EmployeeList() {
                                 })}
                             />
                         </Grid>
+                        <Grid item xs={12} sm={12}>
 
+                            <InputField
+                                label={"Leave Days :"}
+                                size={'small'}
+
+                                placeholder={"Leave Days "}
+                                error={errors?.leave?.message}
+                                register={register("leave", {
+                                    required:
+                                        "Please enter leave."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"Description :"}
+                                size={'small'}
+                                multiline
+                                rows={4}
+
+                                placeholder={"Description "}
+                                error={errors?.description?.message}
+                                register={register("description", {
+                                    required:
+                                        "Please enter description."
+
+                                })}
+                            />
+
+
+                        </Grid>
                         <Grid container sx={{ justifyContent: "center" }}>
                             <Grid
                                 item
@@ -460,61 +509,7 @@ function EmployeeList() {
 
                 }}
             />
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={
 
-                                    [
-                                        { id: false, name: "Disabled" },
-                                        { id: true, name: "Enabled" },
-
-                                    ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
-                                }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </SimpleDialog>
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>

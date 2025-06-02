@@ -10,6 +10,14 @@ const CustomerServices = {
     const data = await post(routes.CreateLeave, obj);
     return data;
   },
+  adjustLeaves: async (obj) => {
+    const data = await post(routes.adjustLeaves, obj);
+    return data;
+  },
+  LeaveStatus: async (obj) => {
+    const data = await post(routes.LeaveStatus, obj);
+    return data;
+  },
   CreatePrepaidInvoices: async (obj) => {
     const data = await post(routes.CreatePrepaidInvoices, obj);
     return data;
@@ -128,6 +136,10 @@ const CustomerServices = {
   },
   UpdateWPStatus: async (obj) => {
     const data = await patch(routes.UpdateWPStatus, obj);
+    return data;
+  },
+  UpdateLeave: async (obj) => {
+    const data = await patch(routes.UpdateLeave, obj);
     return data;
   },
   unitStatusUpdate: async (obj) => {
