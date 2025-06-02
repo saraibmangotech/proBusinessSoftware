@@ -564,6 +564,17 @@ function Header() {
           navigation: true,
           order_by: 2,
           children: [
+            {
+              id: 33,
+              name: "Service Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
 
             {
               id: 33,
@@ -953,28 +964,7 @@ function Header() {
           navigation: true,
           order_by: 15,
           children: [
-            {
-              id: 1501,
-              name: "Prepaid Expenses",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/purchase/orders",
-              route: "/prepaid-invoices",
-              identifier: null,
-              navigation: true,
-              order_by: 1,
-            },
-            {
-              id: 1501,
-              name: "Fixed Assets",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/purchase/orders",
-              route: "/fixed-assets",
-              identifier: null,
-              navigation: true,
-              order_by: 1,
-            },
+          
             {
               id: 1501,
               name: "Vendor Management",
@@ -997,17 +987,8 @@ function Header() {
               identifier: null,
               navigation: true,
               order_by: 2,
-            },
-            {
-              id: 1502,
-              name: "Inventory List",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/suppliers",
-              route: "/inventory-list",
-              identifier: null,
-              navigation: true,
-              order_by: 2,
+             
+
             },
             {
               id: 1502,
@@ -1020,6 +1001,19 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
+            {
+              id: 1502,
+              name: "Inventory List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/inventory-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak:true,
+            },
+            
             {
               id: 1502,
               name: "Purchase  Invoices",
@@ -1063,6 +1057,77 @@ function Header() {
               identifier: null,
               navigation: true,
               order_by: 2,
+              lineBreak:true,
+            },
+            {
+              id: 1502,
+              name: "Prepaid Expenses",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/prepaid-expenses",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Add PE Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/create-prepaid-expense-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "PE Payment Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/prepaid-expense-payments",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true
+
+            },
+
+            {
+              id: 1502,
+              name: "Fixed Assets",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fixed-assets",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Add FA Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/create-fixed-asset-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "FA Payment Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fixed-asset-payments",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              
             },
 
 
@@ -1347,6 +1412,28 @@ function Header() {
               parent_id: 12,
               api: null,
               route: "/supplier-ledgers",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 360,
+              name: "Consolidated Supplier Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/supplier-consolidated-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: "Consolidated PRO Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/pro-consolidated-statement",
               identifier: null,
               navigation: true,
               order_by: 36,
@@ -1735,28 +1822,7 @@ function Header() {
           navigation: true,
           order_by: 15,
           children: [
-            {
-              id: 1501,
-              name: "Prepaid Expenses",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/purchase/orders",
-              route: "/prepaid-invoices",
-              identifier: null,
-              navigation: true,
-              order_by: 1,
-            },
-            {
-              id: 1501,
-              name: "Fixed Assets",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/purchase/orders",
-              route: "/fixed-assets",
-              identifier: null,
-              navigation: true,
-              order_by: 1,
-            },
+          
             {
               id: 1501,
               name: "Vendor Management",
@@ -1779,17 +1845,8 @@ function Header() {
               identifier: null,
               navigation: true,
               order_by: 2,
-            },
-            {
-              id: 1502,
-              name: "Inventory List",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/suppliers",
-              route: "/inventory-list",
-              identifier: null,
-              navigation: true,
-              order_by: 2,
+             
+
             },
             {
               id: 1502,
@@ -1802,6 +1859,19 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
+            {
+              id: 1502,
+              name: "Inventory List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/inventory-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak:true,
+            },
+            
             {
               id: 1502,
               name: "Purchase  Invoices",
@@ -1845,6 +1915,77 @@ function Header() {
               identifier: null,
               navigation: true,
               order_by: 2,
+              lineBreak:true,
+            },
+            {
+              id: 1502,
+              name: "Prepaid Expenses",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/prepaid-expenses",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Add PE Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/create-prepaid-expense-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "PE Payment Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/prepaid-expense-payments",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true
+
+            },
+
+            {
+              id: 1502,
+              name: "Fixed Assets",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fixed-assets",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Add FA Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/create-fixed-asset-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "FA Payment Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fixed-asset-payments",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              
             },
 
 
@@ -2078,6 +2219,7 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
+
             {
               id: 33,
               name: "IFT Vouchers",
@@ -2129,6 +2271,28 @@ function Header() {
               parent_id: 12,
               api: null,
               route: "/supplier-ledgers",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 360,
+              name: "Consolidated Supplier Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/supplier-consolidated-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: "Consolidated PRO Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/pro-consolidated-statement",
               identifier: null,
               navigation: true,
               order_by: 36,
@@ -2446,21 +2610,21 @@ function Header() {
             )}
 
             {item.children ? (
-              // Item with dropdown
-              <Box>
+                // Item with dropdown
+                <Box>
                 <Button
                   onClick={(e) => handleDropdownOpen(e, item.id)}
                   sx={{
-                    color: isChildActive(item.childRoute) ? "#6092d5" : "white",
-                    fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
-                    textTransform: "none",
-                    fontSize: "14px",
-                    px: 2,
-                    py: 1.5,
-                    borderRadius: 0,
-                    "&:hover": {
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    },
+                  color: isChildActive(item.childRoute) ? "#6092d5" : "white",
+                  fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
+                  textTransform: "none",
+                  fontSize: "14px",
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: 0,
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
                   }}
                   startIcon={navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
                   endIcon={<KeyboardArrowDown />}
@@ -2478,58 +2642,57 @@ function Header() {
                   style={{ zIndex: 111 }}
                 >
                   {({ TransitionProps, placement }) => (
-                    <Grow
-                      {...TransitionProps}
-                      timeout={300}
-                      style={{
-                        transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
-                      }}
+                  <Grow
+                    {...TransitionProps}
+                    timeout={300}
+                    style={{
+                    transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
+                    }}
+                  >
+                    <Paper
+                    elevation={2}
+                    sx={{
+                      "&.MuiPaper-root": {
+                      maxHeight: "350px !important",
+                      overflowY: "scroll",
+                      },
+                      mt: 10,
+                    }}
                     >
-                      <Paper
-                        elevation={2}
+                    <MenuList autoFocusItem={openDropdownId === item.id}>
+                      {item.children.map((child) => (
+                      <React.Fragment key={child.id}>
+                        <MenuItem
+                        component="a"
+                        href={child.route}
+                        target="_self"
                         sx={{
-                          "&.MuiPaper-root": {
-                            maxHeight: "350px !important", 
-                           
-                            overflowY: "scroll",
+                          backgroundColor: isActive(child.route)
+                          ? "rgba(52, 152, 219, 0.08)"
+                          : "transparent",
+                          color: isActive(child.route) ? "#6092d5" : "#5d6778",
+                          fontWeight: isActive(child.route) ? 500 : 400,
+                          fontSize: "14px",
+                          py: 1,
+                          whiteSpace: "normal", // 👈 Allows wrapping
+                          wordBreak: "break-word", // 👈 Prevents overflow
+                          "&:hover": {
+                          backgroundColor: "rgba(52, 152, 219, 0.04)",
                           },
-                          mt: 10,
                         }}
-                      >
-                        <MenuList autoFocusItem={openDropdownId === item.id}
                         >
-                          {item.children.map((child) => (
-                            <MenuItem
-                              key={child.id}
-                              component="a"
-                              href={child.route}
-                              target="_self"
-                              sx={{
-                                backgroundColor: isActive(child.route)
-                                  ? "rgba(52, 152, 219, 0.08)"
-                                  : "transparent",
-                                color: isActive(child.route) ? "#6092d5" : "#5d6778",
-                                fontWeight: isActive(child.route) ? 500 : 400,
-                                fontSize: "14px",
-                                py: 1,
-                                whiteSpace: "normal", // 👈 Allows wrapping
-                                wordBreak: "break-word", // 👈 Prevents overflow
-                                "&:hover": {
-                                  backgroundColor: "rgba(52, 152, 219, 0.04)",
-                                },
-                              }}
-                            >
-                              <ListItemIcon>{getChildIcon(child.name)}</ListItemIcon>
-                              {child.name}
-                            </MenuItem>
-                          ))}
-                        </MenuList>
-                      </Paper>
-                    </Grow>
+                        <ListItemIcon>{getChildIcon(child.name)}</ListItemIcon>
+                        {child.name }
+                        </MenuItem>
+                      </React.Fragment>
+                      ))}
+                    </MenuList>
+                    </Paper>
+                  </Grow>
                   )}
                 </Popper>
-              </Box>
-            ) : (
+                </Box>
+              ) : (
               // Single item
               <Button
                 component="a"
@@ -2700,84 +2863,86 @@ function Header() {
                         // Item with dropdown
                         <Box>
                           <Button
-                            onClick={(e) => handleDropdownOpen(e, item.id)}
-                            sx={{
-                              color: isChildActive(item.childRoute) ? "#6092d5" : "white",
-                              fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
-                              textTransform: "none",
-                              fontSize: "14px",
-                              px: 2,
-                              py: 1.5,
-                              borderRadius: 0,
-                              "&:hover": {
-                                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                              },
-                            }}
-                            startIcon={navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
-                            endIcon={<KeyboardArrowDown />}
+                          onClick={(e) => handleDropdownOpen(e, item.id)}
+                          sx={{
+                            color: isChildActive(item.childRoute) ? "#6092d5" : "white",
+                            fontWeight: isChildActive(item.childRoute) ? "bold" : 400,
+                            textTransform: "none",
+                            fontSize: "14px",
+                            px: 2,
+                            py: 1.5,
+                            borderRadius: 0,
+                            "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            },
+                          }}
+                          startIcon={navIcons[item.name.toLowerCase()] || <AccountBalance fontSize="small" />}
+                          endIcon={<KeyboardArrowDown />}
                           >
-                            {item.name.toUpperCase()}
+                          {item.name.toUpperCase()}
                           </Button>
 
                           <Popper
-                            open={openDropdownId === item.id}
-                            anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
-                            role={undefined}
-                            placement="bottom-start"
-                            transition
-                            disablePortal={true}
-                            style={{ zIndex: 111 }}
+                          open={openDropdownId === item.id}
+                          anchorEl={openDropdownId === item.id ? dropdownAnchorEl : null}
+                          role={undefined}
+                          placement="bottom-start"
+                          transition
+                          disablePortal={true}
+                          style={{ zIndex: 111 }}
                           >
-                            {({ TransitionProps, placement }) => (
-                              <Grow
-                                {...TransitionProps}
-                                timeout={300}
-                                style={{
-                                  transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
-                                }}
-                              >
-                                <Paper
-                                  elevation={2}
+                          {({ TransitionProps, placement }) => (
+                            <Grow
+                            {...TransitionProps}
+                            timeout={300}
+                            style={{
+                              transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
+                            }}
+                            >
+                            <Paper
+                              elevation={2}
+                              sx={{
+                              mt: 1,
+                              width: "fit-content",
+                              maxHeight: 350,
+                              borderRadius: "8px",
+                              overflow: "auto",
+                              }}
+                            >
+                              <MenuList autoFocusItem={openDropdownId === item.id}>
+                              {item.children.map((child) => (
+                                <React.Fragment key={child.id}>
+                                <MenuItem
+                                  component="a"
+                                  href={child.route}
+                                  target="_self"
                                   sx={{
-                                    mt: 1,
-                                    width: "fit-content",
-                                    maxHeight: 350,
-                                    borderRadius: "8px",
-                                    overflow: "auto",
+                                  backgroundColor: isActive(child.route)
+                                    ? "rgba(52, 152, 219, 0.08)"
+                                    : "transparent",
+                                  color: isActive(child.route) ? "#6092d5" : "#5d6778",
+                                  fontWeight: isActive(child.route) ? 500 : 400,
+                                  fontSize: "14px",
+                                  py: 1,
+                                  whiteSpace: "nowrap",
+                                  "&:hover": {
+                                    backgroundColor: "rgba(52, 152, 219, 0.04)",
+                                  },
                                   }}
                                 >
-                                  <MenuList autoFocusItem={openDropdownId === item.id}>
-                                    {item.children.map((child) => (
-                                      <MenuItem
-                                        key={child.id}
-                                        component="a"
-                                        href={child.route}
-                                        target="_self"
-                                        sx={{
-                                          backgroundColor: isActive(child.route)
-                                            ? "rgba(52, 152, 219, 0.08)"
-                                            : "transparent",
-                                          color: isActive(child.route) ? "#6092d5" : "#5d6778",
-                                          fontWeight: isActive(child.route) ? 500 : 400,
-                                          fontSize: "14px",
-                                          py: 1,
-                                          whiteSpace: "nowrap",
-                                          "&:hover": {
-                                            backgroundColor: "rgba(52, 152, 219, 0.04)",
-                                          },
-                                        }}
-                                      >
-                                        <ListItemIcon>{getChildIcon(child.name)}</ListItemIcon>
-                                        {child.name}
-                                      </MenuItem>
-                                    ))}
-                                  </MenuList>
-                                </Paper>
-                              </Grow>
-                            )}
+                                  <ListItemIcon>{getChildIcon(child.name)}</ListItemIcon>
+                                  {child.name}
+                                </MenuItem>
+                                {child.lineBreak && <hr style={{ margin: "8px 0", borderColor: "#e0e0e0" }} />}
+                                </React.Fragment>
+                              ))}
+                              </MenuList>
+                            </Paper>
+                            </Grow>
+                          )}
                           </Popper>
                         </Box>
-                      ) : (
+                        ) : (
                         // Single item
                         <Button
                           component="a"

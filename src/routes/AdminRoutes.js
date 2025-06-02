@@ -438,12 +438,8 @@ const PrepaidInvoices= lazy(() =>
 const UpdatePrepaidInvoices= lazy(() =>
   import("pages/Dashboard/Invoice/UpdatePrepaidInvoice")
 );
-const CreateFixedAssets= lazy(() =>
-  import("pages/Dashboard/Invoice/CreateFixedAssets")
-);
-const FixedAssets= lazy(() =>
-  import("pages/Dashboard/Invoice/FixedAssets")
-);
+
+
 const UpdateFixedAssets= lazy(() =>
   import("pages/Dashboard/Invoice/UpdateFixedAssets")
 );
@@ -475,7 +471,7 @@ const SalaryList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/SalaryList")
 );
 const ConsolidatedProStatement= lazy(() =>
-  import("pages/Dashboard/Accounts/ConsulatedProStatement")
+  import("pages/Dashboard/Accounts/ProConsolidatedStatement")
 );
 const SupplierConsolidatedProStatement= lazy(() =>
   import("pages/Dashboard/Accounts/SupplierConsolidatedStatement")
@@ -489,6 +485,43 @@ const UpdateEmployee= lazy(() =>
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
+
+
+// Prepaid Expense Region
+
+const CreatePrepaidExpense= lazy(() =>
+  import("pages/Dashboard/Invoice/CreatePrepaidExpenseInvoice")
+);
+const PrepaidExpenseList= lazy(() =>
+  import("pages/Dashboard/Invoice/PrepaidExpenseList")
+);
+const CreatePrepaidExpensePayment= lazy(() =>
+  import("pages/Dashboard/Payments/CreateFixedAssetPayment")
+);
+const PrepaidExpensePaymentList= lazy(() =>
+  import("pages/Dashboard/Payments/FixedAssetPayments")
+);
+
+// Fixed Asset Region
+
+const CreateFixedAsset= lazy(() =>
+  import("pages/Dashboard/Invoice/CreateFixedAssetInvoice")
+);
+const FixedAssetList= lazy(() =>
+  import("pages/Dashboard/Invoice/FixedAssetList")
+);
+const CreateFixedAssetPayment= lazy(() =>
+  import("pages/Dashboard/Payments/CreateFixedAssetPayment")
+);
+const FixedAssetPaymentList= lazy(() =>
+  import("pages/Dashboard/Payments/FixedAssetPayments")
+);
+
+const FPPaymentHistory= lazy(() =>
+  import("pages/Dashboard/Payments/FPPaymentHistory")
+);
+
+
 const AdminRoutes = [
   {
     path: "/system-settings",
@@ -506,10 +539,7 @@ const AdminRoutes = [
     path: "/employee-list",
     component: <EmployeeList />,
   },
-  {
-    path: "/fixed-assets",
-    component: <FixedAssets />,
-  },
+ 
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
@@ -575,7 +605,7 @@ const AdminRoutes = [
     component: <UpdatePaymentVoucher />,
   },
   {
-    path: "/consolidated-pro-statement",
+    path: "/pro-consolidated-statement",
     component: <ConsolidatedProStatement />,
   },
   {
@@ -863,10 +893,7 @@ const AdminRoutes = [
     path: "/create-prepaid-invoice",
     component: <CreatePrepaidInvoice />,
   },
-  {
-    path: "/create-fixed-assets",
-    component: <CreateFixedAssets />,
-  },
+
   {
     path: "/category-list",
     component: <CategoryList />,
@@ -1255,6 +1282,43 @@ const AdminRoutes = [
   {
     path: "/collection-detailed-report",
     component: <CollectionDetailedReport />,
+  },
+  {
+    path: "/prepaid-expenses",
+    component: <PrepaidExpenseList />,
+  },
+  {
+    path: "/create-prepaid-expense",
+    component: <CreatePrepaidExpense />,
+  },
+  {
+    path: "/prepaid-expense-payments",
+    component: <PrepaidExpensePaymentList />,
+  },
+  {
+    path: "/create-prepaid-expense-payment",
+    component: <CreatePrepaidExpensePayment />,
+  },
+  {
+    path: "/fixed-assets",
+    component: <FixedAssetList />,
+  },
+  {
+    path: "/create-fixed-asset",
+    component: <CreateFixedAsset />,
+  },
+  {
+    path: "/fixed-asset-payments",
+    component: <FixedAssetPaymentList />,
+  },
+  {
+    path: "/create-fixed-asset-payment",
+    component: <CreateFixedAssetPayment />,
+  },
+
+  {
+    path: "/fp-payment-history",
+    component: <FPPaymentHistory />,
   },
  
 ];

@@ -397,7 +397,7 @@ function UserList() {
                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                   <Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
 
-                                    {permissions?.edit && <Box component={'img'} src={Images.editIcon} onClick={() => navigate(
+                                    {true && <Box component={'img'} src={Images.editIcon} onClick={() => navigate(
                                       `/update-user`,
                                       { state: item }
                                     )} width={'35px'}></Box>}

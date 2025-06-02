@@ -53,7 +53,7 @@ import CustomerServices from "services/Customer";
 import CustomerService from "../DashboardPages/CustomerService";
 import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import moment from "moment";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SystemServices from "services/System";
 import UploadFileSingle from "components/UploadFileSingle";
 import { Images } from "assets";
@@ -68,9 +68,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import Barcode from "react-barcode";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import FPInvoiceServices from "services/FPInvoice";
 // import { TableBody, TableHead } from "mui-datatables";
 
-function UpdatePurchaseInvoice() {
+function CreatePurchaseInvoice() {
     const theme = useTheme();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -94,7 +95,7 @@ function UpdatePurchaseInvoice() {
     const [cards, setCards] = useState([])
     const [selectedCard, setSelectedCard] = useState(null)
     const [payments, setPayments] = useState([])
-    const [isVatApplicable, setIsVatApplicable] = useState(false);
+    const [isVatApplicable, setIsVatApplicable] = useState(true);
 
     console.log(rows, "data");
     const [items, setItems] = useState([
@@ -157,13 +158,14 @@ function UpdatePurchaseInvoice() {
     }, [govtFee, centerFee, bankCharges, qty]);
     useEffect(() => {
         console.log(rows, 'rowsrowsrows');
-        const grandTotal = rows?.reduce((acc, item) => acc + parseFloat(item.total), 0);
+        const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
 
         console.log(grandTotal); // Output: 100
         setValue1('total', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('paidamount', 0)
+        setValue1('amortization_months', 0)
     }, [rows]);
     useEffect(() => {
         console.log(payments, 'paymentspaymentspayments');
@@ -175,20 +177,7 @@ function UpdatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
-    useEffect(() => {
-        const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
-        const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
-
-        const totalWithVat = isVatApplicable
-            ? parseFloat((grandTotal * 0.05) + grandTotal)
-            : grandTotal;
-
-        setValue1('total', totalWithVat.toFixed(2));
-        setValue1('finalTotal', totalWithVat.toFixed(2));
-        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
-    }, [isVatApplicable, rows, payments]);
-
-    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center,quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -197,7 +186,7 @@ function UpdatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Basic required field validation
-        if (!item || !cost_center || quantity === "" || charges === "") {
+        if (!item  || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center and charges are required!");
             return;
         }
@@ -234,7 +223,7 @@ function UpdatePurchaseInvoice() {
             ref,
             total: parsedTotal,
             selectedService: serviceItem,
-            cost_center: selectedCostCenter?.name
+            cost_center:selectedCostCenter?.name
         };
         console.log(newRow);
 
@@ -254,8 +243,20 @@ function UpdatePurchaseInvoice() {
         setSelectedCostCenter('')
     };
 
+    const getTokenNumber = async () => {
+        try {
 
-    const { id } = useParams()
+
+            const { data } = await CustomerServices.getInvoiceNumberToken({type: "PE"});
+            console.log(data);
+            setValue1('invoiceNumber', "PE-" + data?.number)
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+
     const [activeStep, setActiveStep] = React.useState(1);
 
     // const [fieldsDisabled, setFieldsDisabled] = useState({
@@ -272,7 +273,7 @@ function UpdatePurchaseInvoice() {
     const [stepFormData, setStepFormData] = useState();
     const [step1FormData, setStep1FormData] = useState();
     const [selectedType, setSelectedType] = useState(null);
-    const [date, setDate] = useState();
+    const [date, setDate] = useState(new Date());
     const [balanceType, setBalanceType] = useState(null);
     const [imageURL, setImageURL] = useState(null);
     const fileInputRef = useRef(null);
@@ -292,6 +293,7 @@ function UpdatePurchaseInvoice() {
     const [governmentAccount, setGovernmnentAccount] = useState(null);
     const [description, setDescription] = useState(null);
     const [ownGovBank, setOwnGovBank] = useState(null);
+    const [selectedAccount, setSelectedAccount] = useState(null);
     const [services, setServices] = useState([]);
     const [serviceItem, setServiceItem] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -306,114 +308,51 @@ function UpdatePurchaseInvoice() {
 
     //documents array
 
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
-
-
-    const generatePDF = async () => {
-        if (!invoiceRef.current) return;
-
-        // Temporarily show the content while generating the PDF
-        const invoiceElement = invoiceRef.current;
-        invoiceElement.style.display = "block"; // Show the element
-
-        // Capture the content using html2canvas
-        const canvas = await html2canvas(invoiceElement, {
-            scale: 2, // Higher scale for better quality
-            useCORS: true,
-            logging: false,
-        });
-
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4",
-        });
-
-        // A4 dimensions: 210mm × 297mm
-        const pageWidth = 210;
-        const pageHeight = 297;
-
-        // Calculate dimensions to fit content on page with margins
-        const margin = 14; // 14mm margins
-        const contentWidth = pageWidth - (margin * 2);
-
-        // Calculate height while maintaining aspect ratio
-        const contentHeight = (canvas.height * contentWidth) / canvas.width;
-
-        // Check if content would exceed page height and scale if necessary
-        const availableHeight = pageHeight - (margin * 2);
-        const scale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
-
-        // Calculate final dimensions
-        const finalWidth = contentWidth * scale;
-        const finalHeight = contentHeight * scale;
-
-        // Add image to the PDF with margins
-        pdf.addImage(imgData, "PNG", margin, margin, finalWidth, finalHeight);
-
-        const blob = pdf.output("blob");
-
-        // Create a blob URL
-        const blobUrl = URL.createObjectURL(blob);
-
-        // Open the PDF in a new tab
-        window.open(blobUrl);
-        navigate('/pre-sales')
-        // Restore the content visibility after generating the PDF
-        invoiceElement.style.display = "none"; // Hide the element again
-    };
-
-    console.log(errors1, 'watch1watch1');
-
     const submitForm1 = async (formData) => {
-        console.log(formData, "objobjj")
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
         const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
 
-        console.log(paymentModesString); // Output: "Cash, Bank, Card"
         getValues1('total')
-        console.log(existingTotal, 'existingTotal');
-        console.log(getValues1('finalTotal'), 'existingTotal');
         let newTotal = parseFloat(getValues1('finalTotal'))
-        console.log(newTotal, 'existingTotal');
         if (existingTotal <= newTotal) {
-            console.log('existingTotalexistingTotalexistingTotal');
 
             setButtonDisabled(true)
             try {
                 const obj = {
-                    id: id,
                     vendor_id: selectedVendor?.id,
+                    vendor_account_id: selectedVendor?.account_id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
-                    items: rows,
                     vat_enabled: isVatApplicable,
+                    items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
-                    ref_invoice_number: formData?.refInvoiceNumber,
-                    invoice_prefix: formData?.invoicePrefix,
+                    total_months: formData?.amortization_months,
+                    months_recorded: 0,
+                    invoice_type: "Prepaid Expense",
+                    invoice_prefix: "PE",
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
                     paid_amount: existingTotal,
                     total_amount: getValues1('finalTotal'),
                     payment_mode: paymentModesString,
-                    payment_status: existingTotal == newTotal ? 'Paid' : 'Partial',
+                    payment_status: parseFloat(existingTotal) === 0
+                        ? 'Unpaid'
+                        : parseFloat(existingTotal) === parseFloat(newTotal)
+                            ? 'Paid'
+                            : 'Partial',
                     is_paid: existingTotal == newTotal ? true : false,
                     payment_methods: payments
                 }
 
-                console.log(obj, "objobj")
                 if (detail?.is_paid == true) {
                     ErrorToaster("Already paid")
                 } else {
-                    const promise = CustomerServices.UpdatePurchaseInvoice(obj)
+                    const promise = FPInvoiceServices.createFPInvoice(obj)
                     const response = await promise
                     showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
                     if (response?.responseCode === 200) {
-                        navigate('/purchase-invoices')
+                        navigate('/prepaid-expenses')
                     }
                 }
             } catch (error) {
@@ -428,168 +367,62 @@ function UpdatePurchaseInvoice() {
         }
     }
 
-    const addPayments = (amount, mode, bank, card, code, submit = null) => {
-        const total = parseFloat(getValues1("finalTotal")) || 0;
 
-
-        // Convert amount to number for calculation
+    const addPayments = (amount, account, submit = null) => {
+        const total = parseFloat(getValues1("total")) || 0;
         const currentAmount = parseFloat(amount) || 0;
-
-        // Calculate current total of payments
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
 
-        // Check if new total will exceed
         if (existingTotal + currentAmount > total) {
             showErrorToast("Total payment exceeds the required amount.");
             return;
         }
 
-        // Validation
         if (!amount) {
             showErrorToast("Amount is required");
             return;
         }
 
-        if (parseFloat(amount) == 0) {
+        if (parseFloat(amount) === 0) {
             showErrorToast("Amount is 0");
             return;
         }
 
 
-        if (!mode) {
-            showErrorToast("Payment mode is required");
+
+        if (!account) {
+            showErrorToast("Account is required");
             return;
         }
 
-        if (mode === "Bank" && !bank) {
-            showErrorToast("Bank is required for Bank mode");
-            return;
-        }
 
-        if (mode === "Card" && !card) {
-            showErrorToast("Card is required for Card mode");
-            return;
-        }
-        if (mode === "Card" && !code) {
-            showErrorToast("Authorization code is required for Card mode");
-            return;
-        }
+
+
         const paymentObj = {
             amount: currentAmount,
-            payment_mode: mode,
-            account_id: mode === "Bank" ? bank?.account_id : mode === "Card" ? card?.account_id : mode === "Cash" ? 700117 : 700171,
-            ref_id: mode === "Bank" ? bank?.id : mode === "Card" ? card?.id : null,
-            ref_name: mode === "Bank" ? bank?.name : mode === "Card" ? card?.name : null,
+            payment_mode: account?.name,
+            account_id: account?.id
+
+
 
         };
 
         setPayments((prev) => [...prev, paymentObj]);
-        //setValue1('payamount', '')
 
-        setSelectedBank(null)
-        setSelectedCard(null)
-        setValue1('authCode', '')
-        // setValue1("payment", { id: "Cash", name: "Cash" })
-        // setSelectedMode({ id: "Cash", name: "Cash" })
+        // Reset form fields
+        setSelectedBank(null);
+        setSelectedCard(null);
+        setValue1("payamount", "");
+        setValue1("percentage", "");
+        setValue1("additionalCharges", "");
+        setValue1("remarks", "");
+        setValue1("authCode", "");
+        // Optionally reset payment mode
+        // setValue1("payment", { id: "Cash", name: "Cash" });
+        // setSelectedMode({ id: "Cash", name: "Cash" });
     };
 
 
-
-    // *For Get Account
-    const getReceptionDetail = async (value) => {
-        setFieldsDisabled(true);
-
-        try {
-            let params =
-                value === "token"
-                    ? { token_number: getValues1("token") }
-                    : { mobile: getValues1("mobileValue") };
-
-            const { data } = await CustomerServices.getReceptionDetail(params);
-            if (!data.token) {
-                ErrorToaster("Token might be expired or invalid");
-                return;
-
-            }
-            if (data?.token?.created_at) {
-                const tokenDate = moment(data.token.created_at);
-                const today = moment().startOf('day');
-                if (!tokenDate.isSame(today, 'day')) {
-                    ErrorToaster("Token might be expired or invalid");
-                    return;
-                }
-            }
-            console.log(data, "dataaa");
-            setDetail(data?.token);
-            setSelectedCustomer({ id: data?.token?.customer_id, name: data?.token?.customer?.name });
-            setValue1("customer", { id: data?.token?.customer_id, name: data?.token?.customer?.name });
-            //setValue1("customer", data?.token?.customer_name);
-            setValue1("invoice_date", moment().toDate());
-            setValue1("mobile", data?.token?.mobile);
-            setValue1("ref", data?.token?.reference);
-            setValue1("display_customer", data?.token?.customer_name);
-            setValue1("email", data?.token?.email);
-            setValue1("address", data?.token?.address);
-            if (value === "token") {
-                setValue1("mobileValue", data?.token?.mobile);
-            }
-            else {
-                setValue1("token", data?.token?.token_number);
-            }
-
-
-
-            setAccounts(data?.accounts?.rows);
-
-            getServiceItem(data?.token?.service_category?.id);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
-
-    const getServiceItem = async (id) => {
-        console.log(user, 'useruser');
-
-        // setLoader(true)
-        try {
-
-            const categoryIds = user?.categories?.map(category => category?.category_id).join(',');
-            console.log(categoryIds, "cats");
-            let params = {
-                page: 1,
-                limit: 999999,
-                category_id: categoryIds,
-            };
-
-            const { data } = await CustomerServices.getServiceItem(params);
-
-            const mappedServices = data?.rows?.map(item => ({
-                ...item,
-                name: `${item.name} - ${item.name_ar}`,
-            }));
-
-            setServices(mappedServices);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
-    const getInvoiceNumber = async () => {
-        // setLoader(true)
-        try {
-            const { data } = await CustomerServices.getInvoiceNumber();
-
-            console.log(data);
-            setValue1("invoice_no", `SR/${data?.next_invoice_number}`);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
 
     const getSystemSettings = async () => {
         // setLoader(true)
@@ -632,80 +465,8 @@ function UpdatePurchaseInvoice() {
 
     };
 
-    const getCostCenters = async () => {
-        try {
-            let params = {
-                page: 1,
-                limit: 999999,
-            };
 
-            const { data } = await CustomerServices.getCostCenters(params);
-            setCostCenters(data?.cost_centers);
-        } catch (error) {
-            showErrorToast(error);
-        }
-    };
-    const getAccounts = async (page, limit, filter) => {
-        // setLoader(true)
-        try {
-            let params = {
-                page: 1,
-                limit: 999999,
-            };
 
-            const { data } = await FinanceServices.getAccounts(params);
-            console.log(data?.accounts?.rows);
-
-            setAccounts(data?.accounts?.rows);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
-    // *For Get Account
-    const getReceiptDetail = async (state) => {
-        setFieldsDisabled(true);
-        try {
-            let params = {
-                token_number: getValues1("token"),
-                invoice_date: date,
-            };
-
-            const { data } = await CustomerServices.getReceiptDetail(params);
-            console.log(data);
-            if (data?.receipt) {
-                setHoldState(true);
-
-                showErrorToast("Invoice already exist with this token number");
-            } else {
-                getReceptionDetail("token");
-                setHoldState(false);
-            }
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
-    const getTax = async () => {
-        // setLoader(true)
-        try {
-            let params = {
-                page: 1,
-                limit: 999999,
-            };
-
-            const { data } = await FinanceServices.getTax(params);
-            console.log(data?.accounts?.rows);
-
-            setTaxes(data?.tax);
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            // setLoader(false)
-        }
-    };
     const getCategories = async () => {
         // setLoader(true)
         try {
@@ -723,7 +484,7 @@ function UpdatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
+    const updateItem = (item2,cost_center, quantity, charges, description, ref, total) => {
         console.log("Current serviceItem:", serviceItem);
 
         // Parse numeric values
@@ -732,7 +493,7 @@ function UpdatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Validation
-        if (!item2 || !cost_center || quantity === "" || charges === "") {
+        if (!item2 || !cost_center ||  quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center  and charges are required!");
             return;
         }
@@ -759,7 +520,7 @@ function UpdatePurchaseInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
-            cost_center: selectedCostCenter?.name
+            cost_center:selectedCostCenter?.name
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -785,12 +546,13 @@ function UpdatePurchaseInvoice() {
         });
 
         console.log("Resetting form and states...");
-        reset();
+        //reset();
         setServiceItem(null);
         setSelectedCostCenter(null)
         setPayments([])
         setEditState(false);
     };
+
 
 
     const getVendors = async (page, limit, filter) => {
@@ -879,98 +641,93 @@ function UpdatePurchaseInvoice() {
             showErrorToast(error)
         }
     }
+
+    const getAccounts = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false,
+                sub_category: 4
+
+            }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts(updatedAccounts)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
+
+    // *For Get Account
+    const getChildAccounts = async (accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId ?? selectedAccount?.id,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+
+            if (data?.accounts?.rows?.length > 0) {
+                showErrorToast('Cannot use this account because it has child accounts.')
+                setSelectedAccount(null)
+            }
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
     useEffect(() => {
         getCostCenters()
+        getTokenNumber()
         getProducts()
         getCards()
         getBanks()
         getVendors()
         console.log(user, "user");
         getAccounts();
-        getTax();
         getCategories();
         getSystemSettings();
         // getServiceItem();
-        getInvoiceNumber();
+
         setSelectedCustomer({ id: "walkin", name: "Walk-in Customer" });
         setValue1("customer", { id: "walkin", name: "Walk-in Customer" });
         setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
     }, []);
 
-    const getCustomerDetail2 = async (phone) => {
-        try {
-            let params = {
-                mobile: phone,
-            };
-
-            const { data } = await CustomerServices.getCustomerDetail(params);
-            let detail = data?.customer;
-            console.log(detail);
-            setValue1("customer", detail?.token?.customer_name);
-            setValue1("invoice_date", moment().toDate());
-            setValue1("mobile", detail?.token?.mobile);
-            setValue1("ref", detail?.token?.reference);
-            setValue1("display_customer", detail?.token?.customer_name);
-            setValue1("email", detail?.token?.email);
-            setValue1("address", detail?.token?.address);
-
-            setAccounts(detail?.accounts?.rows);
-
-            getServiceItem(detail?.token?.service_category?.id);
-        } catch (error) {
-            console.error("Error fetching location:", error);
-        }
-    };
-    const getData = async () => {
-        try {
-            let params = {
-                id: id
-            };
-
-            const { data } = await CustomerServices.getPurchaseInvoiceDetail(params);
-
-            let detail = data?.invoice
-
-
-            //setCategories(data?.categories)
-
-            console.log(detail);
-            setIsVatApplicable(detail?.vat_enabled)
-            const updatedItems = detail?.invoice_items?.map(item => ({
-                ...item,
-                selectedService: item.product,
-                total: parseFloat(item.charge) * parseInt(item.quantity)
-            }));
-            const grandTotal = updatedItems.reduce((sum, item) => {
-                return sum + (parseFloat(item.total) || 0);
-            }, 0);
-            setDate(new Date(detail?.purchase_date))
-            console.log("Grand Total:", grandTotal.toFixed(2));
-            setSubTotal(grandTotal.toFixed(2))
-            console.log(updatedItems, "updatedItems");
-            setRows(updatedItems)
-            setSelectedVendor(detail?.vendor)
-            setValue1('vendor', detail?.vendor)
-            setValue1('invoiceNumber', detail?.invoice_number)
-            setValue1('refInvoiceNumber', detail?.ref_invoice_number)
-            console.log(detail?.vendor?.name);
-
-            setValue1('name', detail?.vendor?.name)
-            setValue1('mobile', detail?.vendor?.phone)
-            setValue1('email', detail?.vendor?.email)
-            setValue1('address', detail?.vendor?.address)
-            // setCategories(detail?.commission_settings)
-
-
-
-
-        } catch (error) {
-            console.error("Error fetching location:", error);
-        }
-    };
+   
     useEffect(() => {
-        getData()
-    }, [])
+        const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
+        const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+
+        const totalWithVat = isVatApplicable
+            ? parseFloat((grandTotal * 0.05) + grandTotal)
+            : grandTotal;
+
+        setValue1('total', totalWithVat.toFixed(2));
+        setValue1('finalTotal', totalWithVat.toFixed(2));
+        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
+    }, [isVatApplicable, rows, payments]);
+
 
     return (
         <>
@@ -987,7 +744,7 @@ function UpdatePurchaseInvoice() {
                             }}
                         >
                             <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                Update Purchase Invoice
+                                Create Prepaid Expense
                             </Typography>
 
                         </Box>
@@ -1000,10 +757,9 @@ function UpdatePurchaseInvoice() {
                             <Grid container spacing={2} p={2}>
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <DatePicker
-                                        label={"Purchase Date "}
+                                        label={"Date "}
                                         value={date}
                                         size={"small"}
-                                     
                                         error={errors1?.paidAt?.message}
                                         register={register1("paidAt", {
                                             required: date ? false : 'Date is required'
@@ -1019,7 +775,7 @@ function UpdatePurchaseInvoice() {
                                     <SelectField
                                         size={"small"}
                                         label={"Select Vendor "}
-                                        disabled={true}
+
                                         options={vendors}
                                         selected={selectedVendor}
                                         onSelect={(value) => {
@@ -1031,7 +787,7 @@ function UpdatePurchaseInvoice() {
                                         }}
                                         error={errors1?.vendor?.message}
                                         register={register1("vendor", {
-                                            required: selectedVendor ? false : 'Vendor is required'
+                                            required: 'Vendor is required'
                                         })}
                                     />
                                 </Grid>
@@ -1043,23 +799,25 @@ function UpdatePurchaseInvoice() {
                                         placeholder="Invoice Number"
                                         disabled={true}
                                         register={register1("invoiceNumber", {
-                                            required: false
+                                            required: 'invoice Number is required'
                                         })}
                                         error={errors1?.invoiceNumber?.message}
                                     />
                                 </Grid>
-
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
-                                        label="Ref Invoice Number"
+                                        label="Amortization Months"
                                         size="small"
-                                        placeholder="Invoice Number"
-                                        register={register1("refInvoiceNumber", {
-                                            required: false
+                                        placeholder="Months"
+                                        type="number"
+                                      
+                                        register={register1("amortization_months", {
+                                            required: 'Amortization Months is required'
                                         })}
-                                        error={errors1?.refInvoiceNumber?.message}
+                                        error={errors1?.amortization_months?.message}
                                     />
                                 </Grid>
+
 
                             </Grid>
                             <Grid container spacing={2} p={2}>
@@ -1081,12 +839,9 @@ function UpdatePurchaseInvoice() {
                                         placeholder="Mobile No"
                                         disabled={true}
                                         register={register1("mobile", {
-                                            pattern: {
-                                                value: /^05[0-9]{8}$/,
-                                                message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                            },
+
                                         })}
-                                        error={errors1?.mobile?.message}
+
                                     />
                                 </Grid>
 
@@ -1134,7 +889,7 @@ function UpdatePurchaseInvoice() {
                                     <TableCell sx={{ width: "400px" }}>Cost Center</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Qty</TableCell>
 
-                                    <TableCell sx={{ width: "150px" }}> Charges</TableCell>
+                                    <TableCell sx={{ width: "150px" }}>Charges</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Description</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Total</TableCell>
@@ -1259,7 +1014,7 @@ function UpdatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1274,7 +1029,7 @@ function UpdatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1302,7 +1057,6 @@ function UpdatePurchaseInvoice() {
                                                     setValue("application_id", '');
                                                     setValue("ref_no", '');
                                                     setServiceItem(null);
-                                                    setSelectedCostCenter(null)
                                                     setValue("quantity", '');
                                                 }}
                                                 sx={{
@@ -1324,7 +1078,6 @@ function UpdatePurchaseInvoice() {
                                     <TableRow key={index}>
                                         <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
                                         <TableCell>{item?.product_id}</TableCell>
-
                                         <TableCell>{item?.selectedService?.name}</TableCell>
                                         <TableCell>{item?.cost_center}</TableCell>
                                         <TableCell>{item?.quantity}</TableCell>
@@ -1387,28 +1140,47 @@ function UpdatePurchaseInvoice() {
                                     </TableCell>
                                 </TableRow>
 
-                                <TableCell colSpan={7} align="right">
-                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                        <Switch
-                                            checked={isVatApplicable}
-                                            onChange={(e) => setIsVatApplicable(e.target.checked)}
-                                            color="primary"
-                                        />
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
-                                    </Box>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                                        {isVatApplicable
-                                            ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
-                                            : "0.00"}
-                                    </Typography>
-                                </TableCell>
+                                <TableRow>
+
+                                    <TableCell colSpan={7} align="right">
+                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
+                                            <Switch
+                                                checked={isVatApplicable}
+                                                onChange={(e) => setIsVatApplicable(e.target.checked)}
+                                                color="primary"
+                                            />
+                                            <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
+                                        </Box>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                                            {isVatApplicable
+                                                ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
+                                                : "0.00"}
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+
+                                <TableRow>
+                                    <TableCell colSpan={7} align="right">
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                                            {(
+                                                parseFloat(subTotal) +
+                                                (isVatApplicable ? parseFloat(subTotal) * 0.05 : 0)
+                                            ).toFixed(2)}
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
                                             <Button
-                                                type={'submit'}
+                                                onClick={() => setPayButton(true)}
                                                 disabled={rows?.length == 0}
                                                 variant="contained"
                                                 sx={{
@@ -1420,26 +1192,39 @@ function UpdatePurchaseInvoice() {
                                                     },
                                                 }}
                                             >
-                                                Update
+                                                Pay
                                             </Button>
                                             {console.log(selectedCustomer, 'selectedCustomer')
                                             }
-                                            {/* {!payButton && <Button
-                                                                                disabled={rows?.length == 0}
-                                                                                type="submit"
-                                                                                variant="contained"
-                                                                                sx={{
-                                                                                    textTransform: "capitalize",
-                                                                                    backgroundColor: "#001f3f",
-                                                                                    width: "200px",
-                                                                                    ":hover": {
-                                                                                        backgroundColor: "#001f3f",
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                Mark As Unpaid
-                                                                            </Button>} */}
-
+                                            {!payButton && <Button
+                                                disabled={rows?.length == 0}
+                                                type="submit"
+                                                variant="contained"
+                                                sx={{
+                                                    textTransform: "capitalize",
+                                                    backgroundColor: "#001f3f",
+                                                    width: "200px",
+                                                    ":hover": {
+                                                        backgroundColor: "#001f3f",
+                                                    },
+                                                }}
+                                            >
+                                                Mark As Unpaid
+                                            </Button>}
+                                            <Button
+                                                onClick={() => { setPayButton(false); setPayments([]) }}
+                                                variant="contained"
+                                                sx={{
+                                                    textTransform: "capitalize",
+                                                    backgroundColor: "#001f3f",
+                                                    width: "200px",
+                                                    ":hover": {
+                                                        backgroundColor: "#001f3f",
+                                                    },
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button>
                                         </Grid>
                                     </TableCell>
                                 </TableRow>
@@ -1460,7 +1245,7 @@ function UpdatePurchaseInvoice() {
                                     error={errors1?.total?.message}
                                 />
                             </Grid>
-                            <Grid item md={3} sm={12} xs={12}>
+                            {/* <Grid item md={3} sm={12} xs={12}>
                                 <InputField
                                     label="Additional Percentage"
                                     size="small"
@@ -1498,7 +1283,7 @@ function UpdatePurchaseInvoice() {
                                     })}
                                     error={errors1?.additionalCharges?.message}
                                 />
-                            </Grid>
+                            </Grid> */}
                             <Grid item md={3} sm={12} xs={12}>
                                 <InputField
                                     label="Final Total"
@@ -1553,75 +1338,37 @@ function UpdatePurchaseInvoice() {
                                         error={errors1?.payamount?.message}
                                     />
                                 </Grid>
-                                <Grid item md={3} sm={12} xs={12}>
-                                    <SelectField
-                                        label="Payment Mode"
-                                        size="small"
-                                        options={[
-                                            { id: "Cash", name: "Cash" },
-                                            { id: "Bank", name: "Bank" },
-                                            { id: "Card", name: "Card" },
-                                            { id: "Payment Link", name: "Payment Link" },
-                                        ]}
-                                        selected={watch1("payment")}
-                                        onSelect={(value) => {
-                                            setValue1("payment", value)
-                                            setSelectedMode(value)
-                                        }}
-                                        register={register1("payment", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.payment?.message}
-                                    />
-                                </Grid>
-                                {selectedMode?.id == "Bank" && (
-                                    <Grid item md={3} sm={12} xs={12}>
+                                {(
+                                    <Grid item xs={3.8} >
                                         <SelectField
-                                            label="Banks"
                                             size="small"
-                                            options={banks}
-                                            selected={selectedBank}
+                                            options={accounts}
+                                            label={'Select Account *:'}
+                                            selected={selectedAccount}
                                             onSelect={(value) => {
-                                                setSelectedBank(value)
+                                                setSelectedAccount(value)
+                                                console.log(value);
+
+                                                getChildAccounts(value?.id)
+
                                             }}
-                                            register={register1("bank", {
+                                            error={errors?.account?.message}
+                                            register={register("account", {
                                                 required: false,
                                             })}
-                                            error={errors1?.bank?.message}
                                         />
                                     </Grid>
                                 )}
-                                {selectedMode?.id == "Card" && (
-                                    <Grid item md={3} sm={12} xs={12}>
-                                        <SelectField
-                                            label="Card"
-                                            size="small"
-                                            options={cards}
-                                            selected={selectedCard}
-                                            onSelect={(value) => {
-                                                setSelectedCard(value)
-                                            }}
-                                            register={register1("card", {
-                                                required: false,
-                                            })}
-                                            error={errors1?.card?.message}
-                                        />
-                                    </Grid>
-                                )}
-                                {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
-                                    <InputField
-                                        label="Authorization Code"
-                                        size="small"
-                                        placeholder="Authorization Code"
-                                        register={register1("remarks", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.remarks?.message}
-                                    />
-                                </Grid>}
                                 <Grid item md={12} sm={12} xs={12}>
                                     <Button
-                                        onClick={() => addPayments(getValues1('payamount'), selectedMode?.id, selectedBank, selectedCard, getValues1('remarks'))}
+                                        onClick={() =>
+                                            addPayments(
+                                                getValues1("payamount"),
+
+
+                                                selectedAccount
+                                            )
+                                        }
 
                                         variant="contained"
                                         sx={{
@@ -1670,7 +1417,7 @@ function UpdatePurchaseInvoice() {
                                                 </IconButton>
 
                                                 <Typography variant="body1"><strong>Amount:</strong> {payment.amount}</Typography>
-                                                <Typography variant="body1"><strong>Mode:</strong> {payment.payment_mode}</Typography>
+                                                <Typography variant="body1"><strong>Account Name:</strong> {payment.payment_mode}</Typography>
                                                 {payment.mode === 'Bank' && (
                                                     <Typography variant="body1"><strong>Bank:</strong> {payment.bank?.name || payment.bank}</Typography>
                                                 )}
@@ -1713,4 +1460,4 @@ function UpdatePurchaseInvoice() {
     );
 }
 
-export default UpdatePurchaseInvoice;
+export default CreatePurchaseInvoice;
