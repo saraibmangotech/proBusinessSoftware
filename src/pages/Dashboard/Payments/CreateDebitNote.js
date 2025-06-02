@@ -9,6 +9,8 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import CustomerServices from "services/Customer";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import FinanceServices from "services/Finance";
+import HierarchicalSelectField from "components/Select2";
 
 const CreateDebitNote = () => {
     const { register, setValue, formState: { errors }, handleSubmit } = useForm();
@@ -20,45 +22,57 @@ const CreateDebitNote = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [costCenters, setCostCenters] = useState([])
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+
+    const [error, setError] = useState("")
+    // *For Accounts
+    const [accounts, setAccounts] = useState([]);
+    const [selectedAccount, setSelectedAccount] = useState(null);
     const navigate = useNavigate()
     const getReceptionDetail = (isSearchClicked) => {
         console.log("Reception detail clicked:", isSearchClicked);
     };
     const onSubmit = async (formData) => {
         console.log(formData);
-
-        try {
-            let obj = {
-                type: "debit_note",  //credit_note or debit_note
-                note_for: "refund",
-                customer_id: null, //Customer id in case of Credit Note
-                vendor_id: selectedCustomer?.id, // vendor ID in case of Debit NOte
-                related_invoice_id: formData?.originalInvoiceNumber,
-                date:  moment(date).format('MM-DD-YYYY'),
-                reason: formData?.notes,
-                amount: formData?.totalCreditAmount,
-                tax_amount: formData?.Vat,
-                total_amount: formData?.totalAmount,
-                cost_center:selectedCostCenter?.name
+        if(selectedAccount){
+            
+            try {
+                let obj = {
+                    type: "debit_note",  //credit_note or debit_note
+                    note_for: "refund",
+                    customer_id: null, //Customer id in case of Credit Note
+                    vendor_id: selectedCustomer?.id, // vendor ID in case of Debit NOte
+                    related_invoice_id: formData?.originalInvoiceNumber,
+                    date: moment(date).format('MM-DD-YYYY'),
+                    reason: formData?.notes,
+                    amount: formData?.totalCreditAmount,
+                    tax_amount: formData?.Vat,
+                    total_amount: formData?.totalAmount,
+                    cost_center: selectedCostCenter?.name,
+                    impact_account_id:selectedAccount?.id
+                }
+    
+                const promise = CustomerServices.CreateNote(obj);
+    
+                showPromiseToast(
+                    promise,
+                    'Saving...',
+                    'Added Successfully',
+                    'Something Went Wrong'
+                );
+                const response = await promise;
+                if (response?.responseCode === 200) {
+                    navigate("/debit-note-list");
+                }
+    
+    
+            } catch (error) {
+                showErrorToast(error);
             }
-
-            const promise = CustomerServices.CreateNote(obj);
-
-            showPromiseToast(
-                promise,
-                'Saving...',
-                'Added Successfully',
-                'Something Went Wrong'
-            );
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                navigate("/debit-note-list");
-            }
-
-
-        } catch (error) {
-            showErrorToast(error);
         }
+        else{
+            showErrorToast('Please Select Debit Account.')
+        }
+
 
     };
     // *For Get Customer Queue
@@ -75,6 +89,36 @@ const CreateDebitNote = () => {
             showErrorToast(error);
         }
     };
+    // *For Get Account
+    const getAccounts = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false
+
+            }
+            const { data } = await FinanceServices.getChartOfAccount(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+
+
+            setAccounts(data?.COA)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
+
+    const handleAccountSelect = (account) => {
+        console.log(account);
+
+        setSelectedAccount(account)
+        setError("")
+        console.log("Selected Account:", account)
+    }
 
     const getTokenNumber = async () => {
         try {
@@ -94,18 +138,19 @@ const CreateDebitNote = () => {
     };
     const getCostCenters = async () => {
         try {
-          let params = {
-            page: 1,
-            limit: 999999,
-          };
-    
-          const { data } = await CustomerServices.getCostCenters(params);
-          setCostCenters(data?.cost_centers);
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
         } catch (error) {
-          showErrorToast(error);
+            showErrorToast(error);
         }
-      };
+    };
     useEffect(() => {
+        getAccounts()
         getTokenNumber()
         getCustomerQueue();
         getCostCenters()
@@ -277,7 +322,17 @@ const CreateDebitNote = () => {
 
                     />
                 </Grid>
+                <Grid item xs={12} md={6}>
 
+                    <HierarchicalSelectField
+                        label={'Select Debit Account'}
+                        selected={selectedAccount}
+                        onSelect={handleAccountSelect}
+                        data={accounts}
+                        error={error}
+                        placeholder="Select Account"
+                    />
+                </Grid>
                 {/* Credit Note Details */}
                 <Grid item xs={12} md={6}>
                     <Grid container spacing={2}>
