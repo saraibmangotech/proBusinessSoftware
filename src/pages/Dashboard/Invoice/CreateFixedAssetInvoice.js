@@ -783,7 +783,7 @@ function CreateFixedAssetInvoice() {
                             }}
                         >
                             <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                Create Prepaid Expense
+                                Create Fixed Expense
                             </Typography>
 
                         </Box>
