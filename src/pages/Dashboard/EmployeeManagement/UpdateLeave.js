@@ -13,7 +13,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DatePicker from "components/DatePicker";
 import SelectField from "components/Select";
 import InputField from "components/Input";
@@ -24,7 +24,7 @@ import { ErrorToaster } from "components/Toaster";
 
 const leaveTypes = [{ id: 'Sick Leave', name: "Sick Leave" }, { id: "Casual Leave", name: "Casual Leave" }, { id: "Annual Leave", name: "Annual Leave" }];
 
-function CreateLeave() {
+function UpdateLeave() {
     const navigate = useNavigate();
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const [startDate, setStartDate] = useState(null)
@@ -41,7 +41,7 @@ function CreateLeave() {
         formState: { errors },
     } = useForm();
 
-  
+  const {id}=useParams()
 
     const onSubmit = async (formData) => {
     
@@ -54,13 +54,14 @@ function CreateLeave() {
             const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
             
             const obj = {
+                id:id,
               user_id: selectedUser?.id,
               start_date: startDate,
               end_date: endDate,
               total_days: totalDays,
               request_reason: formData?.reason,
             };
-            const promise = CustomerServices.CreateLeave(obj);
+            const promise = CustomerServices.UpdateLeave(obj);
 
             showPromiseToast(
                 promise,
@@ -101,7 +102,10 @@ function CreateLeave() {
             // setLoader(false)
         }
     }
+    
     useEffect(() => {
+  
+        
         getUsers()
     }, [])
 
@@ -157,6 +161,7 @@ function CreateLeave() {
                         <SelectField size="small"
                             label="Select User :*"
                             options={users}
+                            disabled={true}
                             selected={selectedUser}
                             onSelect={(value) => setSelectedUser(value)}
                             error={errors?.user?.message}
@@ -194,4 +199,4 @@ function CreateLeave() {
     );
 }
 
-export default CreateLeave;
+export default UpdateLeave;

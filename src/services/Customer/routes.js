@@ -144,7 +144,10 @@ const routes = {
   getFundTransferDetail:'accounts/iftVouchers/details',
   getEmployees:"/hrms/employees",
   getEmployeeDetail:'/hrms/employees/details',
-  getDetailedCollectionReport:'Reports/detailedCollectionReport'
+  getDetailedCollectionReport:'Reports/detailedCollectionReport',
+  CreateLeave:'/hrms/leaves/apply',
+  getLeaves:'/hrms/leaves',
+  
 
 
 };

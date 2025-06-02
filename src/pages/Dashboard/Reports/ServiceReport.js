@@ -188,10 +188,11 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
      
       setInvoiceTotal(totalLineTotal)
       const result = data?.rows?.reduce((acc, item) => {
+
         acc.totalQuantity += item.quantity;
-        acc.totalServiceCharges += (item.center_fee * item.quantity);
-        acc.totalVat += (item.center_fee * item.quantity) * 0.05;
-        acc.totalGovtFee += ((parseFloat(item.govt_fee) + parseFloat(item?.bank_charge)) * item.quantity);
+        acc.totalServiceCharges += (item.center_fee * parseInt(item.quantity));
+        acc.totalVat += (item.center_fee * parseInt(item.quantity || 0)) * 0.05;
+        acc.totalGovtFee += ((parseFloat(item.govt_fee || 0) + parseFloat(item?.bank_charge||0)) * parseInt(item.quantity || 0));
         acc.invoiceTotal += (parseFloat(item?.total || 0) + ((parseFloat(item?.center_fee || 0) * parseFloat(item?.quantity || 1)) * 0.05)).toFixed(2);
         return acc;
       }, {
@@ -657,6 +658,8 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
     const totalServiceCharge = data.reduce((sum, item) => sum + (parseFloat(item?.center_fee) * parseFloat(item?.quantity)), 0);
     const totalVat = data.reduce((sum, item) => sum + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05), 0);
     const totalGovtFee = data.reduce((sum, item) => {
+      console.log(item?.govt_fee);
+      
       const govtFee = parseFloat(item?.govt_fee) || 0;
       const bankCharge = parseFloat(item?.bank_charge) || 0;
       const quantity = parseFloat(item?.quantity) || 0;

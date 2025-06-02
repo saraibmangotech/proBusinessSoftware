@@ -6,6 +6,10 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+  CreateLeave: async (obj) => {
+    const data = await post(routes.CreateLeave, obj);
+    return data;
+  },
   CreatePrepaidInvoices: async (obj) => {
     const data = await post(routes.CreatePrepaidInvoices, obj);
     return data;
@@ -84,6 +88,10 @@ const CustomerServices = {
   },
   deleteFixedAssets: async (obj) => {
     const data = await deleted(routes.deleteFixedAssets, obj);
+    return data;
+  },
+  deleteLeave: async (obj) => {
+    const data = await deleted(routes.deleteLeave, obj);
     return data;
   },
   deletePrepaid: async (obj) => {
@@ -216,6 +224,10 @@ const CustomerServices = {
   },
   getDetailedCollectionReport: async (params) => {
     const data = await get(routes.getDetailedCollectionReport, params);
+    return data;
+  },
+  getLeaves: async (params) => {
+    const data = await get(routes.getLeaves, params);
     return data;
   },
   getFundTransferDetail: async (params) => {

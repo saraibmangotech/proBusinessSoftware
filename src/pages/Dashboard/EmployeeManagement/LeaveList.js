@@ -170,8 +170,8 @@ function LeaveList() {
 
             }
 
-            const { data } = await CustomerServices.getReceptionsList(params)
-            setCustomerQueue(data?.rows)
+            const { data } = await CustomerServices.getLeaves(params)
+            setCustomerQueue(data?.leaveRequests?.rows)
 
         } catch (error) {
             showErrorToast(error)
@@ -210,7 +210,7 @@ function LeaveList() {
             let params = { reception_id: selectedData?.id }
 
 
-            const { message } = await CustomerServices.deleteReception(params)
+            const { message } = await CustomerServices.deleteLeave(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -258,44 +258,53 @@ function LeaveList() {
 
         },
         {
-            header: "Token Number.",
-            accessorKey: "token_number",
-
-
-        },
-        {
-            header: "Customer",
-            accessorKey: "customer_name",
-
-
-        },
-        {
-            header: "Mobile",
-            accessorKey: "mobile",
-
-
-        },
-        // {
-        //   header: "Type",
-        //   accessorKey: "cost_center",
-        //   cell: ({ row }) => (
-        //     <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        //       {row?.original?.is_company ? 'Company' : "Individual"}
-        //     </Box>
-        //   ),
-
-        // },
-        {
-            id: "created_at",
-            header: "Registration Date",
-            // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
+            header: "Name",
+            accessorKey: "name",
+            accessorFn: (row) => row?.employee?.name,
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.created_at).format("DD/MM/YYYY")}
+                    {row?.original?.employee?.name}
+                </Box>
+            ),
+
+
+        },
+        {
+            id: "start_date",
+            header: "Start Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.start_date).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.start_date).format("DD/MM/YYYY")}
                 </Box>
             ),
         },
+        {
+            id: "end_date",
+            header: "End Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.end_date).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.end_date).format("DD/MM/YYYY")}
+                </Box>
+            ),
+        },
+        {
+            header: "Total Days",
+            accessorKey: "total_days",
+
+
+        },
+        {
+            header: "Status",
+            accessorKey: "status",
+
+
+        },
+      
+        
 
 
         {
@@ -303,10 +312,10 @@ function LeaveList() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/reception-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-reception/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                    
+                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-leave/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     <Box>
-                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+
 
                         {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
                     </Box>

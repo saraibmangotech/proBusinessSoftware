@@ -455,10 +455,23 @@ function TrialBalanceDetailed() {
               const subType = account.account_subcategory || "Uncategorized";
               if (!subcategoryTypeGroups[subType]) subcategoryTypeGroups[subType] = [];
       
-              const debit = parseFloat(account.total_debit) || 0;
-              const credit = parseFloat(account.total_credit) || 0;
-              const opening = parseFloat(account.opening_balance) || 0;
-              const periodDiff = account.nature === "debit" ? debit - credit : -1 * ( credit - debit);
+              // Calculate totals including child accounts
+              let debit = parseFloat(account.total_debit) || 0;
+              let credit = parseFloat(account.total_credit) || 0;
+              let opening = parseFloat(account.opening_balance) || 0;
+      
+              if (Array.isArray(account.childAccounts)) {
+                account.childAccounts.forEach(child => {
+                  debit += parseFloat(child.total_debit) || 0;
+                  credit += parseFloat(child.total_credit) || 0;
+                  opening += parseFloat(child.opening_balance) || 0;
+                });
+              }
+      
+              const periodDiff = account.nature === "debit"
+                ? debit - credit
+                : -1 * (credit - debit);
+      
               const closingBalance = opening + periodDiff;
       
               subcategoryTypeGroups[subType].push([
@@ -535,11 +548,11 @@ function TrialBalanceDetailed() {
         const grandTotalRow = worksheet.addRow([
           "Grand Total",
           "",
-          '',
-          parseFloat(allDebit).toFixed(2),
-          parseFloat(allCredit).toFixed(2),
-          '',
-          '',
+          grandOpening.toFixed(2),
+          grandDebit.toFixed(2),
+          grandCredit.toFixed(2),
+          grandDiff.toFixed(2),
+          grandBalance.toFixed(2),
         ]);
       
         grandTotalRow.eachCell(cell => {
@@ -566,6 +579,7 @@ function TrialBalanceDetailed() {
         const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
         saveAs(blob, "TrialBalance.xlsx");
       };
+      
       
       
       const downloadExcel2 = async () => {

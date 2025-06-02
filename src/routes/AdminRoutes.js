@@ -464,6 +464,9 @@ const CreateEmployee= lazy(() =>
 const CreateLeave= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/CreateLeave")
 );
+const UpdateLeave= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/UpdateLeave")
+);
 const LeaveList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/LeaveList")
 );
@@ -551,6 +554,10 @@ const AdminRoutes = [
   {
     path: "/create-leave",
     component: <CreateLeave />,
+  },
+  {
+    path: "/update-leave/:id",
+    component: <UpdateLeave />,
   },
   {
     path: "/leave-list",
