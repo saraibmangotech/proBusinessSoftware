@@ -165,7 +165,7 @@ function CreateFixedAssetInvoice() {
         setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('paidamount', 0)
-        setValue1('depreciation_months', 0)
+        // setValue1('depreciation_months', 0)
     }, [rows]);
     useEffect(() => {
         console.log(payments, 'paymentspaymentspayments');
@@ -241,6 +241,22 @@ function CreateFixedAssetInvoice() {
         setPayments([]);
         setServiceItem("");
         setSelectedCostCenter('')
+        setPayments([]);
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
     const getTokenNumber = async () => {
@@ -551,6 +567,22 @@ function CreateFixedAssetInvoice() {
         setSelectedCostCenter(null)
         setPayments([])
         setEditState(false);
+        setPayments([]);
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
 
@@ -1104,6 +1136,7 @@ function CreateFixedAssetInvoice() {
                                                 setServiceItem(item?.selectedService);
                                                 setValue("quantity", item?.quantity);
                                                 console.log(item?.service)
+                                                setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
 
                                             }} src={Images.editIcon} width={'35px'}></Box>}
                                             <Box>

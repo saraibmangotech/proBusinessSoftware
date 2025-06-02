@@ -165,7 +165,7 @@ function CreatePurchaseInvoice() {
         setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('paidamount', 0)
-        setValue1('amortization_months', 0)
+        // setValue1('amortization_months', 0)
     }, [rows]);
     useEffect(() => {
         console.log(payments, 'paymentspaymentspayments');
@@ -241,6 +241,19 @@ function CreatePurchaseInvoice() {
         setPayments([]);
         setServiceItem("");
         setSelectedCostCenter('')
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
     const getTokenNumber = async () => {
@@ -551,6 +564,19 @@ function CreatePurchaseInvoice() {
         setSelectedCostCenter(null)
         setPayments([])
         setEditState(false);
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
 
