@@ -1243,7 +1243,7 @@ function CreatePurchaseInvoice() {
                                                     },
                                                 }}
                                             >
-                                                Mark As Unpaid
+                                              Submit
                                             </Button>}
                                             <Button
                                                 onClick={() => { setPayButton(false); setPayments([]) }}
