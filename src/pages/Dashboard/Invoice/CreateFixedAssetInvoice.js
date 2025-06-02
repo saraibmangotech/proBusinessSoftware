@@ -167,6 +167,13 @@ function CreateFixedAssetInvoice() {
         setValue1('paidamount', 0)
         // setValue1('depreciation_months', 0)
     }, [rows]);
+
+    useEffect(() => {
+        setValue1('depreciation_months', 0)
+   
+  }, [])
+
+
     useEffect(() => {
         console.log(payments, 'paymentspaymentspayments');
         const grandTotal = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);

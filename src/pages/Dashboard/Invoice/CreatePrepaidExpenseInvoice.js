@@ -167,6 +167,7 @@ function CreatePurchaseInvoice() {
         setValue1('paidamount', 0)
         // setValue1('amortization_months', 0)
     }, [rows]);
+
     useEffect(() => {
         console.log(payments, 'paymentspaymentspayments');
         const grandTotal = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
@@ -177,6 +178,13 @@ function CreatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
+
+
+    useEffect(() => {
+          setValue1('amortization_months', 0)
+     
+    }, [])
+    
     const addItem = (item, cost_center,quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
 
