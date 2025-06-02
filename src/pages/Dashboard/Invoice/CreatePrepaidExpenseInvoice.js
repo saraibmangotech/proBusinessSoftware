@@ -1213,7 +1213,7 @@ function CreatePurchaseInvoice() {
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
-                                            <Button
+                                            {/* <Button
                                                 onClick={() => setPayButton(true)}
                                                 disabled={rows?.length == 0}
                                                 variant="contained"
@@ -1227,7 +1227,7 @@ function CreatePurchaseInvoice() {
                                                 }}
                                             >
                                                 Pay
-                                            </Button>
+                                            </Button> */}
                                             {console.log(selectedCustomer, 'selectedCustomer')
                                             }
                                             {!payButton && <Button

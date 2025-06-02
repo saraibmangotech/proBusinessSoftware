@@ -298,41 +298,41 @@ function PrepaidExpenses() {
                 <Box>{row?.original?.vat_enabled ? parseFloat(row?.original?.tax || 0).toFixed(2) : parseFloat(0).toFixed(2)}</Box>
             ),
         },
-        {
-            header: "Paid",
-            accessorKey: "paid_amount",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
-            ),
-        },
+        // {
+        //     header: "Paid",
+        //     accessorKey: "paid_amount",
+        //     cell: ({ row }) => (
+        //         <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
+        //     ),
+        // },
 
 
-        {
-            header: "Balance",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
+        // {
+        //     header: "Balance",
+        //     accessorKey: "total_amount",
+        //     cell: ({ row }) => (
 
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
+        //         <Box sx={{ display: 'flex', gap: 1 }}>
+        //             {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
 
-                </Box>
-            ),
-
-
-        },
-        {
-            header: "Payment Status",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
-
-                </Box>
-            ),
+        //         </Box>
+        //     ),
 
 
-        },
+        // },
+        // {
+        //     header: "Payment Status",
+        //     accessorKey: "total_amount",
+        //     cell: ({ row }) => (
+
+        //         <Box sx={{ display: 'flex', gap: 1 }}>
+        //             {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
+
+        //         </Box>
+        //     ),
+
+
+        // },
 
 
         {
@@ -345,7 +345,7 @@ function PrepaidExpenses() {
                     </Box>
 
 
-                    <PrimaryButton
+                    {/* <PrimaryButton
                         bgcolor={'#001f3f'}
                         title="View Receipts"
                         onClick={() => {
@@ -355,7 +355,7 @@ function PrepaidExpenses() {
                             });
                         }}
                         loading={loading}
-                    />
+                    /> */}
 
 
 
