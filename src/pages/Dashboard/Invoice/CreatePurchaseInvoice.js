@@ -175,7 +175,7 @@ function CreatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
-    const addItem = (item, cost_center,quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -184,7 +184,7 @@ function CreatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Basic required field validation
-        if (!item  || !cost_center || quantity === "" || charges === "") {
+        if (!item || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center and charges are required!");
             return;
         }
@@ -221,7 +221,7 @@ function CreatePurchaseInvoice() {
             ref,
             total: parsedTotal,
             selectedService: serviceItem,
-            cost_center:selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name
         };
         console.log(newRow);
 
@@ -239,6 +239,17 @@ function CreatePurchaseInvoice() {
         setPayments([]);
         setServiceItem("");
         setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
     const getTokenNumber = async () => {
@@ -620,7 +631,7 @@ function CreatePurchaseInvoice() {
             setValue("charges", '');
             setValue("transaction_id", '');
             setValue("application_id", '');
-            setValue("ref_no", '');
+            setValue("ref", '');
             setServiceItem(null);
             setValue("quantity", '');
         }
@@ -689,7 +700,7 @@ function CreatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2,cost_center, quantity, charges, description, ref, total) => {
+    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
         console.log("Current serviceItem:", serviceItem);
 
         // Parse numeric values
@@ -698,7 +709,7 @@ function CreatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Validation
-        if (!item2 || !cost_center ||  quantity === "" || charges === "") {
+        if (!item2 || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center  and charges are required!");
             return;
         }
@@ -725,7 +736,7 @@ function CreatePurchaseInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
-            cost_center:selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -751,11 +762,24 @@ function CreatePurchaseInvoice() {
         });
 
         console.log("Resetting form and states...");
-        reset();
+
         setServiceItem(null);
         setSelectedCostCenter(null)
         setPayments([])
         setEditState(false);
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
 
@@ -1242,7 +1266,7 @@ function CreatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1257,7 +1281,7 @@ function CreatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1326,7 +1350,7 @@ function CreatePurchaseInvoice() {
                                                 setValue("description", item?.description);
                                                 setValue("ref", item?.ref);
                                                 setValue("charges", item?.charge);
-
+                                                setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                                 setValue("ref_no", item?.ref_no);
                                                 setValue("service", item?.service);
                                                 setServiceItem(item?.selectedService);
