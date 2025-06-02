@@ -210,7 +210,10 @@ function UpdateBank() {
             setValue1('title', data?.bank?.account_title)
             setValue1('accountnumber', data?.bank?.account_number)
             setValue1('ibn', data?.bank?.account_ibn)
-            setSelectedAccount(data?.account)
+            console.log(data?.account);
+            
+            setSelectedAccount(data?.bank?.account)
+            setValue1('service',data?.bank?.account)
 
 
         } catch (error) {
