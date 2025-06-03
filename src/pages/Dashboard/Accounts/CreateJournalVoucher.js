@@ -577,7 +577,7 @@ function CreateJournalVoucher() {
 
                 <TableCell>
                   <HierarchicalSelectField
-                    disabled={editState}
+                    // disabled={editState}
                     selected={selectedAccount}
                     onSelect={handleAccountSelect}
                     data={accounts}
