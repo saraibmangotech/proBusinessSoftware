@@ -560,7 +560,7 @@ function AccountConsolidatedProStatement() {
 
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
-        if (true) {
+        if (selectedAccount) {
             setLoader(true)
             try {
                 const params = {
@@ -586,7 +586,7 @@ function AccountConsolidatedProStatement() {
                 setLoader(false)
             }
         } else {
-            showErrorToast("Select User")
+            showErrorToast("Please Select an Account")
         }
     }
 
@@ -652,9 +652,9 @@ function AccountConsolidatedProStatement() {
         return result
     }
 
-    useEffect(() => {
-        getCustomerQueue(1, 999999, {})
-    }, [fromDate, toDate])
+    // useEffect(() => {
+    //     getCustomerQueue(1, 999999, {})
+    // }, [fromDate, toDate])
 
 
 
@@ -846,7 +846,7 @@ function AccountConsolidatedProStatement() {
         setFromDate(new Date())
         setToDate(new Date())
         getAccountsDropDown();
-        getCustomerQueue()
+    
         getCostCenters()
     }, []);
     useEffect(() => {
