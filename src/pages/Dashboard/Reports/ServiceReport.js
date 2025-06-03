@@ -23,7 +23,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, CommaSeparator, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -876,7 +876,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
               }}
               fullWidth
               disabled
-              value={`Total Quantity: ${parseFloat(Totals?.totalQuantity).toFixed(2)}`}
+              value={`Total Quantity: ${CommaSeparator(parseFloat(Totals?.totalQuantity).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
@@ -889,7 +889,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
               }}
               fullWidth
               disabled
-              value={`Total Govt Fee: ${parseFloat(Totals?.totalGovtFee).toFixed(2)}`}
+              value={`Total Govt Fee: ${CommaSeparator(parseFloat(Totals?.totalGovtFee).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
@@ -902,7 +902,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
               }}
               fullWidth
               disabled
-              value={`Total Service Charges: ${parseFloat(Totals?.totalServiceCharges).toFixed(2)}`}
+              value={`Total Service Charges: ${CommaSeparator(parseFloat(Totals?.totalServiceCharges).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
@@ -915,7 +915,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
               }}
               fullWidth
               disabled
-              value={`Total Vat: ${parseFloat(Totals?.totalVat).toFixed(2)}`}
+              value={`Total Vat: ${CommaSeparator(parseFloat(Totals?.totalVat).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
@@ -928,7 +928,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
               }}
               fullWidth
               disabled
-              value={`Total Invoice Amount: ${parseFloat(invoiceTotal).toFixed(2)}`}
+              value={`Total Invoice Amount: ${CommaSeparator(parseFloat(invoiceTotal).toFixed(2))}`}
             />
           </Grid>
 

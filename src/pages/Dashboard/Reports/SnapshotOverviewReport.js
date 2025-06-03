@@ -22,7 +22,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, CommaSeparator, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -576,7 +576,7 @@ function SnapshotOverviewReport() {
                                             Invoice Count
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {customerQueue?.invoiceCount}
+                                            {CommaSeparator(customerQueue?.invoiceCount)}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -592,12 +592,12 @@ function SnapshotOverviewReport() {
                                             Total Invoice Amount
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {(
+                                            {CommaSeparator((
                                                 parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
                                                 parseFloat(customerQueue?.totalVat) +
                                                 parseFloat(customerQueue?.totalCenterFee)
-                                            ).toFixed(2)}
+                                            ).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -606,7 +606,7 @@ function SnapshotOverviewReport() {
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
                                                  
-                                                {(parseFloat(customerQueue?.totalGovernmentCharges)+parseFloat(customerQueue?.totalBankCharges)).toFixed(2)}
+                                                {CommaSeparator((parseFloat(customerQueue?.totalGovernmentCharges)+parseFloat(customerQueue?.totalBankCharges)).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -614,7 +614,7 @@ function SnapshotOverviewReport() {
                                             Total Service Charges
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalCenterFee).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.totalCenterFee).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -622,7 +622,7 @@ function SnapshotOverviewReport() {
                                             Total VAT
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalVat).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.totalVat).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -630,7 +630,7 @@ function SnapshotOverviewReport() {
                                             Total PRO Commission
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.proCommission).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.proCommission).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -638,7 +638,7 @@ function SnapshotOverviewReport() {
                                             Total Employee Commission
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.typistCommission).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.typistCommission).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -646,12 +646,12 @@ function SnapshotOverviewReport() {
                                             Net Service Charge
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {(
+                                            {CommaSeparator((
                                                 (parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
                                                 parseFloat(customerQueue?.totalVat) +
                                                 parseFloat(customerQueue?.totalCenterFee))
-                                            ).toFixed(2)}
+                                            ).toFixed(2))}
                                         </Cell>
                                     </Row>
                                 </TableBody>
@@ -725,7 +725,7 @@ function SnapshotOverviewReport() {
                                             Cash Collection
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalCash).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.totalCash).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -733,7 +733,7 @@ function SnapshotOverviewReport() {
                                             Credit Card Collection
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalCard).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.totalCard).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -741,7 +741,7 @@ function SnapshotOverviewReport() {
                                             Bank Transfer Collection
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalBank).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.totalBank).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -749,7 +749,7 @@ function SnapshotOverviewReport() {
                                             Online Payment Collection
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {parseFloat(customerQueue?.totalNetwork).toFixed(2)}
+                                            {CommaSeparator(parseFloat(customerQueue?.totalNetwork).toFixed(2))}
                                         </Cell>
                                     </Row>
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
@@ -757,12 +757,12 @@ function SnapshotOverviewReport() {
                                             Net Collection
                                         </Cell>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
-                                            {(
+                                            {CommaSeparator((
                                                 parseFloat(customerQueue?.totalCash) +
                                                 parseFloat(customerQueue?.totalCard) +
                                                 parseFloat(customerQueue?.totalBank) +
                                                 parseFloat(customerQueue?.totalNetwork)
-                                            ).toFixed(2)}
+                                            ).toFixed(2))}
                                         </Cell>
                                     </Row>
                                 </TableBody>

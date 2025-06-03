@@ -22,7 +22,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, CommaSeparator, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -674,7 +674,7 @@ function CollectionDetailedReport() {
         }}
           fullWidth
           disabled
-          value={`Total Cash: ${parseFloat(data?.totalCash).toFixed(2)}`}
+          value={`Total Cash: ${CommaSeparator(parseFloat(data?.totalCash).toFixed(2))}`}
         />
       </Grid>
       <Grid item xs={4}>
@@ -687,7 +687,7 @@ function CollectionDetailedReport() {
         }}
           fullWidth
           disabled
-          value={`Total Network: ${parseFloat(data?.totalNetwork).toFixed(2)}`}
+          value={`Total Network: ${CommaSeparator(parseFloat(data?.totalNetwork).toFixed(2))}`}
         />
       </Grid>
       <Grid item xs={4}>
@@ -700,7 +700,7 @@ function CollectionDetailedReport() {
         }}
           fullWidth
           disabled
-          value={`Total Bank: ${parseFloat(data?.totalBank).toFixed(2)}`}
+          value={`Total Bank: ${CommaSeparator(parseFloat(data?.totalBank).toFixed(2))}`}
         />
       </Grid>
       <Grid item xs={4}>
@@ -713,7 +713,7 @@ function CollectionDetailedReport() {
         }}
           fullWidth
           disabled
-          value={`Total Card: ${parseFloat(data?.totalCard).toFixed(2)}`}
+          value={`Total Card: ${CommaSeparator(parseFloat(data?.totalCard).toFixed(2))}`}
         />
       </Grid>
       <Grid item xs={4}>
@@ -726,7 +726,7 @@ function CollectionDetailedReport() {
         }}
           fullWidth
           disabled
-          value={`Total Amount: ${parseFloat(data?.totalAmount).toFixed(2)}`}
+          value={`Total Amount: ${CommaSeparator(parseFloat(data?.totalAmount).toFixed(2))}`}
         />
       </Grid>
     </Grid>
