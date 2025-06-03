@@ -214,7 +214,7 @@ function GeneralJournalLedger() {
 
 	// *For Get General Journal Ledger
 	const getGeneralJournalLedgers = async (page, limit, filter) => {
-		// setLoader(true)
+		setLoader(true)
 		try {
 			const Page = page ? page : currentPage
 			const Limit = limit ? limit : pageLimit
@@ -233,7 +233,7 @@ function GeneralJournalLedger() {
 		} catch (error) {
 			ErrorToaster(error)
 		} finally {
-			// setLoader(false)
+			setLoader(false)
 		}
 	}
 
@@ -731,7 +731,7 @@ function GeneralJournalLedger() {
 
 
 			<Grid item md={11}>
-				{generalJournalAccounts && <Box>
+				{<Box>
 
 					{/* <Grid container mb={2} >
 						<Grid item xs={5}>
@@ -766,7 +766,7 @@ function GeneralJournalLedger() {
 					</Grid> */}
 
 					{(
-						generalJournalAccounts && (
+						 (
 							<Fragment>
 								<PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
 									fileName="General Journal Entries"
@@ -841,7 +841,7 @@ function GeneralJournalLedger() {
 															align="center"
 															sx={{ fontWeight: 600 }}
 														>
-															<Box className={classes.loaderWrap}>
+															<Box sx={{display:'flex',justifyContent:'center'}} className={classes.loaderWrap}>
 																<CircularProgress />
 															</Box>
 														</TableCell>
