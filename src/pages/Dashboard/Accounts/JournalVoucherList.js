@@ -44,6 +44,7 @@ import VisaServices from 'services/Visa';
 import FinanceServices from 'services/Finance';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DataTable from 'components/DataTable';
+import LedgerModal from 'LedgerTable';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -131,10 +132,10 @@ function JournalVoucherList() {
     const [confirmationDialog, setConfirmationDialog] = useState(false)
 
 
-    const tableHead = [{ name: 'Created At', key: '' },  { name: 'Cost Center ', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'Created At', key: '' }, { name: 'Cost Center ', key: '' }, { name: 'JV#', key: 'name' }, { name: 'Entry No', key: 'created_at' }, { name: 'Amount', key: 'commission_visa' }, { name: 'Note', key: 'commission_monthly' }, { name: 'User', key: '' }, { name: 'Actions', key: '' }]
 
-  const [fromDate, setFromDate] = useState(new Date());
-  const [toDate, setToDate] = useState(new Date());
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
 
 
 
@@ -162,113 +163,120 @@ function JournalVoucherList() {
     const [permissions, setPermissions] = useState();
 
     const [loading, setLoading] = useState(false)
+    const [modalOpen, setModalOpen] = useState(false)
+    const handleOpenModal = () => {
+        setModalOpen(true)
+    }
+
+    const handleCloseModal = () => {
+        setModalOpen(false)
+    }
 
     const columns = [
-          
-            {
-                id: "created_at",
-                header: "Registration Date",
-                // Remove accessorKey and fix accessorFn to use row directly
-                accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
-                cell: ({ row }) => (
-                  <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+
+        {
+            id: "created_at",
+            header: "Registration Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {moment(row.original.created_at).format("MM-DD-YYYY")}
-                  </Box>
-                ),
-              
-      
-      
-          },
-          {
+                </Box>
+            ),
+
+
+
+        },
+        {
             header: "Cost Center",
             accessorKey: "cost_center",
-      
-      
-          },
-          {
+
+
+        },
+        {
             header: "JV#",
             accessorFn: (row) => `JV-${row?.id ?? ''}`, // use formatted value
             id: "jvId", // unique column ID for filtering/sorting
             cell: ({ row }) => (
-              <Box
-                variant="contained"
-                color="primary"
-                sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-              >
-                {`JV-${row?.original?.id ?? '-'}`}
-              </Box>
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {`JV-${row?.original?.id ?? '-'}`}
+                </Box>
             ),
-          },
-          
-          {
+        },
+
+        {
             header: "Entry No.",
             accessorKey: "entry_no",
-      
-      
-          },
-          {
+
+
+        },
+        {
             header: "Amount",
             accessorKey: "total_amount",
-      
-      
-          },
-          {
+
+
+        },
+        {
             header: "Note",
             accessorKey: "notes",
-      
-      
-          },
-          {
+
+
+        },
+        {
             header: "User",
             accessorKey: "name",
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                 {row?.original?.creator?.name ?? '-'}
+                    {row?.original?.creator?.name ?? '-'}
                 </Box>
-              ),
-      
-      
-          },
-          // {
-          //   header: "Type",
-          //   accessorKey: "cost_center",
-          //   cell: ({ row }) => (
-          //     <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          //       {row?.original?.is_company ? 'Company' : "Individual"}
-          //     </Box>
-          //   ),
-      
-          // },
-          {
+            ),
+
+
+        },
+        // {
+        //   header: "Type",
+        //   accessorKey: "cost_center",
+        //   cell: ({ row }) => (
+        //     <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        //       {row?.original?.is_company ? 'Company' : "Individual"}
+        //     </Box>
+        //   ),
+
+        // },
+        {
             id: "created_at",
             header: "Registration Date",
             // Remove accessorKey and fix accessorFn to use row directly
             accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
             cell: ({ row }) => (
-              <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                {moment(row.original.created_at).format("DD/MM/YYYY")}
-              </Box>
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.created_at).format("DD/MM/YYYY")}
+                </Box>
             ),
-          },
-      
-         
-          {
+        },
+
+
+        {
             header: "Actions",
             cell: ({ row }) => (
-      
-               <Box component={'div'}  sx={{ display: 'flex', gap: '20px', }}>
 
-              
+                <Box component={'div'} sx={{ display: 'flex', gap: '20px', }}>
+
+
                     <IconButton
                         onClick={() =>
 
-                            navigate('/general-journal-ledger', {
-                                state: row?.original?.entry_id
-                            })
+
+                            getGeneralJournalLedgers(row?.original?.entry_id)
                         }
                         sx={{
-                            width:'35px',
-                            height:'35px',
+                            width: '35px',
+                            height: '35px',
                             bgcolor:
                                 Colors.primary,
                             "&:hover": {
@@ -279,29 +287,29 @@ function JournalVoucherList() {
                     >
                         <EyeIcon />
                     </IconButton>
-              
-                <Box
-                    onClick={() =>
-                        navigate(
-                            `/journal-voucher-detail/${row?.original?.id}`
-                        )
-                    }
-                >
-                   
+
+                    <Box
+                        onClick={() =>
+                            navigate(
+                                `/journal-voucher-detail/${row?.original?.id}`
+                            )
+                        }
+                    >
+
                         <Box component={'img'} src={Images.detailIcon} onClick={() => navigate(`/journal-voucher-detail/${row?.original?.id}`)} width={'35px'}></Box>
-                    
-                </Box>
-                {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'} height={'35px'}></Box>}
-                <Box>
-                
+
+                    </Box>
+                    {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-journal-voucher/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'} height={'35px'}></Box>}
+                    <Box>
+
                         <Box component={'img'} src={Images.deleteIcon} onClick={() => { setConfirmationDialog(true); setSelectedVisa(row?.original) }} width={'35px'}></Box>
-                    
+
+                    </Box>
                 </Box>
-            </Box>
             ),
-          },
-      
-        ]
+        },
+
+    ]
 
     const UpdateStatus = async () => {
         try {
@@ -431,42 +439,63 @@ function JournalVoucherList() {
             // setLoader(false)
         }
     }
+    const [data, setData] = useState([])
+    const [loader2, setLoader2] = useState(false);
+
+    const getGeneralJournalLedgers = async (number) => {
+        setModalOpen(true)
+        setLoader2(true)
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                search: number
+            }
+
+            const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+            setData(data?.statement?.rows)
 
 
-
-
-
-
-
-
-
-
-  const handleFromDate = (newDate) => {
-    try {
-      // eslint-disable-next-line eqeqeq
-      if (newDate == 'Invalid Date') {
-        setFromDate('invalid')
-        return
-      }
-      console.log(newDate, "newDate")
-      setFromDate(new Date(newDate))
-    } catch (error) {
-      ErrorToaster(error)
+        } catch (error) {
+            ErrorToaster(error)
+        } finally {
+            setLoader2(false)
+        }
     }
-  }
 
-  const handleToDate = (newDate) => {
-    try {
-      // eslint-disable-next-line eqeqeq
-      if (newDate == 'Invalid Date') {
-        setToDate('invalid')
-        return
-      }
-      setToDate(new Date(newDate))
-    } catch (error) {
-      ErrorToaster(error)
+
+
+
+
+
+
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
     }
-  }
+
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
 
 
     // *For Handle Filter
@@ -494,6 +523,13 @@ function JournalVoucherList() {
 
     return (
         <Box sx={{ p: 3 }}>
+            <LedgerModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                generalJournalAccounts={data}
+                title=" Journal Entries"
+                loading={loader2}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
@@ -586,7 +622,7 @@ function JournalVoucherList() {
             {/* Filters */}
             <Box >
                 <Grid container spacing={2} mb={4} alignItems={'center'}>
-                  
+
                     <Grid item xs={3}>
                         <DatePicker
                             label={"From Date"}
@@ -633,8 +669,8 @@ function JournalVoucherList() {
                     </Grid>
                 </Grid>
 
-              
-                   {<DataTable loading={loader} data={vouchers} columns={columns} />}
+
+                {<DataTable loading={loader} data={vouchers} columns={columns} />}
             </Box>
 
         </Box>

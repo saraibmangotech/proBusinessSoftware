@@ -1,6 +1,6 @@
 "use client"
 
-import { Fragment, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import {
   Box,
   Paper,
@@ -15,20 +15,14 @@ import {
   IconButton,
   Dialog,
   Tooltip,
-  FormControl,
-  Checkbox,
-  Select,
-  MenuItem,
-  ListItemText,
-  InputLabel,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
+  CircularProgress,
+  Skeleton,
 } from "@mui/material"
 import styled from "@emotion/styled"
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import VisibilityIcon from "@mui/icons-material/Visibility"
 import { Close } from "@mui/icons-material"
 
 // Color constants
@@ -114,7 +108,50 @@ const PrimaryButton = ({ title, onClick, buttonStyle = {}, startIcon, ...props }
   </Button>
 )
 
-function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "General Journal Entries" }) {
+// Loading Skeleton Row Component
+const LoadingSkeletonRow = ({ visibleColumns }) => (
+  <Row>
+    {visibleColumns.map((colIndex) => (
+      <Cell key={colIndex}>
+        <Skeleton variant="text" width="100%" height={20} />
+      </Cell>
+    ))}
+  </Row>
+)
+
+// Loading Overlay Component
+const LoadingOverlay = () => (
+  <Box
+    sx={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "rgba(255, 255, 255, 0.8)",
+      zIndex: 1000,
+    }}
+  >
+    <Box sx={{ textAlign: "center" }}>
+      <CircularProgress size={40} sx={{ color: Colors.primary }} />
+      <Typography
+        variant="body2"
+        sx={{
+          mt: 2,
+          color: Colors.charcoalGrey,
+          fontFamily: FontFamily.NunitoRegular,
+        }}
+      >
+        Loading journal entries...
+      </Typography>
+    </Box>
+  </Box>
+)
+
+function LedgerModal({ open, onClose, generalJournalAccounts = [], title = " Journal Entries", loading = false }) {
   const contentRef = useRef()
 
   const tableHead = [
@@ -129,7 +166,6 @@ function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "Gene
     "Credit (AED)",
     "Description",
     "Comments",
-    "Actions",
   ]
 
   const [visibleColumns, setVisibleColumns] = useState([...Array(tableHead?.length).keys()])
@@ -194,65 +230,6 @@ function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "Gene
             </Box>
           </Box>
         )
-      case 11:
-        return (
-          <Box component={"div"} className="pdf-hide" sx={{ display: "flex", gap: 1 }}>
-            <IconButton
-              size="small"
-              sx={{
-                bgcolor: Colors.primary,
-                color: "white",
-                "&:hover": {
-                  bgcolor: Colors.primary,
-                  opacity: 0.9,
-                },
-              }}
-            >
-              <VisibilityIcon fontSize="small" />
-            </IconButton>
-            {(item?.entry?.reference_module === "payment_voucher" ||
-              item?.entry?.reference_module === "receipt_voucher" ||
-              item?.entry?.reference_module === "journal_voucher" ||
-              item?.entry?.reference_module === "ift_voucher") && (
-              <IconButton
-                size="small"
-                onClick={() => {
-                  const module = item?.entry?.reference_module
-                  let route = ""
-
-                  switch (module) {
-                    case "payment_voucher":
-                      route = `/update-payment-voucher/${item?.entry?.reference_id}`
-                      break
-                    case "receipt_voucher":
-                      route = `/update-receipt-voucher/${item?.entry?.reference_id}`
-                      break
-                    case "journal_voucher":
-                      route = `/update-journal-voucher/${item?.entry?.reference_id}`
-                      break
-                    case "ift_voucher":
-                      route = `/update-fund-transfer-voucher/${item?.entry?.reference_id}`
-                      break
-                    default:
-                      return
-                  }
-
-                  window.open(route, "_blank")
-                }}
-                sx={{
-                  bgcolor: Colors.primary,
-                  color: "white",
-                  "&:hover": {
-                    bgcolor: Colors.primary,
-                    opacity: 0.9,
-                  },
-                }}
-              >
-                <EditOutlinedIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        )
       default:
         return "-"
     }
@@ -260,6 +237,8 @@ function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "Gene
 
   // Simple CSV export function as alternative to Excel
   const downloadCSV = () => {
+    if (loading) return // Prevent export while loading
+
     const headers = tableHead.filter((item) => item !== "Actions")
     const data = generalJournalAccounts
 
@@ -321,6 +300,8 @@ function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "Gene
 
   // Alternative Excel export using native browser functionality
   const downloadExcel = () => {
+    if (loading) return // Prevent export while loading
+
     const headers = tableHead.filter((item) => item !== "Actions")
     const data = generalJournalAccounts
 
@@ -393,6 +374,7 @@ function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "Gene
   }
 
   const handlePrint = () => {
+    if (loading) return // Prevent print while loading
     window.print()
   }
 
@@ -428,96 +410,64 @@ function LedgerModal({ open, onClose, generalJournalAccounts = [], title = "Gene
         >
           {title}
         </Typography>
-        <IconButton onClick={onClose}>
+        <IconButton onClick={onClose} disabled={loading}>
           <Close />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ px: 3, py: 1 }}>
-        {generalJournalAccounts?.length > 0 && (
-          <Box sx={{ mb: 2, display: "flex", gap: 2, justifyContent: "flex-end" }}>
-            <PrimaryButton title="Print" onClick={handlePrint} buttonStyle={{ backgroundColor: Colors.bluishCyan }} />
-            <PrimaryButton title="Download Excel" onClick={downloadExcel} />
-            <PrimaryButton
-              title="Download CSV"
-              onClick={downloadCSV}
-              buttonStyle={{ backgroundColor: Colors.cloudyGrey }}
-            />
-          </Box>
-        )}
+      <DialogContent sx={{ px: 3, py: 1, position: "relative" }}>
+        {/* Loading Overlay */}
+        {loading && <LoadingOverlay />}
 
-        {/* Column Visibility Control */}
-        <Box sx={{ mb: 2 }}>
-          <FormControl size="small" sx={{ minWidth: 200 }}>
-            <InputLabel>Show/Hide Columns</InputLabel>
-            <Select
-              multiple
-              value={visibleColumns}
-              label="Show/Hide Columns"
-              onChange={handleColumnChange}
-              renderValue={() => "Show/Hide Columns"}
-            >
-              {tableHead.map((column, index) => {
-                if (column !== "Credit (AED)" && column !== "Debit (AED)") {
-                  return (
-                    <MenuItem key={index} value={index}>
-                      <Checkbox checked={visibleColumns.includes(index)} />
-                      <ListItemText primary={column} />
-                    </MenuItem>
-                  )
-                }
-                return null
-              })}
-            </Select>
-          </FormControl>
-        </Box>
+        <TableContainer
+          component={Paper}
+          sx={{
+            boxShadow: "0px 8px 18px 0px #9B9B9B1A",
+            borderRadius: 2,
+            maxHeight: "calc(70vh - 200px)",
+            overflow: "auto",
+            opacity: loading ? 0.5 : 1,
+            transition: "opacity 0.3s ease",
+          }}
+          className="table-box"
+        >
+          <Table stickyHeader sx={{ minWidth: 500 }}>
+            <TableHead>
+              <TableRow>
+                {visibleColumns.map((index) => (
+                  <Cell key={index}>{tableHead[index]}</Cell>
+                ))}
+              </TableRow>
+            </TableHead>
 
-        {generalJournalAccounts && (
-          <Fragment>
-            <TableContainer
-              component={Paper}
-              sx={{
-                boxShadow: "0px 8px 18px 0px #9B9B9B1A",
-                borderRadius: 2,
-                maxHeight: "calc(70vh - 200px)",
-                overflow: "auto",
-              }}
-              className="table-box"
-            >
-              <Table stickyHeader sx={{ minWidth: 500 }}>
-                <TableHead>
-                  <TableRow>
-                    {visibleColumns.map((index) => (
-                      <Cell key={index}>{tableHead[index]}</Cell>
+            <TableBody>
+              {loading ? (
+                // Show skeleton rows while loading
+                Array.from({ length: 5 }).map((_, index) => (
+                  <LoadingSkeletonRow key={index} visibleColumns={visibleColumns} />
+                ))
+              ) : generalJournalAccounts?.length > 0 ? (
+                generalJournalAccounts.map((item, rowIndex) => (
+                  <Row key={rowIndex} sx={{ bgcolor: rowIndex % 2 !== 0 ? "#EFF8E7" : "transparent" }}>
+                    {visibleColumns.map((colIndex) => (
+                      <Cell key={colIndex}>{renderCellContent(colIndex, item)}</Cell>
                     ))}
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {generalJournalAccounts?.length > 0 ? (
-                    generalJournalAccounts.map((item, rowIndex) => (
-                      <Row key={rowIndex} sx={{ bgcolor: rowIndex % 2 !== 0 ? "#EFF8E7" : "transparent" }}>
-                        {visibleColumns.map((colIndex) => (
-                          <Cell key={colIndex}>{renderCellContent(colIndex, item)}</Cell>
-                        ))}
-                      </Row>
-                    ))
-                  ) : (
-                    <Row>
-                      <Cell colSpan={tableHead.length} align="center" sx={{ fontWeight: 600 }}>
-                        No Data Found
-                      </Cell>
-                    </Row>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Fragment>
-        )}
+                  </Row>
+                ))
+              ) : (
+                <Row>
+                  <Cell colSpan={tableHead.length} align="center" sx={{ fontWeight: 600 }}>
+                    No Data Found
+                  </Cell>
+                </Row>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={onClose} variant="outlined">
+        <Button onClick={onClose} variant="outlined" disabled={loading}>
           Close
         </Button>
       </DialogActions>
