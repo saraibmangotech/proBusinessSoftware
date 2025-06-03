@@ -31,10 +31,28 @@ const CreateDebitNote = () => {
     const getReceptionDetail = (isSearchClicked) => {
         console.log("Reception detail clicked:", isSearchClicked);
     };
+
+    const getChildAccounts = async (accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId ?? selectedAccount?.id,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+
+            if (data?.accounts?.rows?.length > 0) {
+                setSelectedAccount(null)
+                showErrorToast("Cannot use this account because it has child accounts.");
+            }
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
     const onSubmit = async (formData) => {
         console.log(formData);
-        if(selectedAccount){
-            
+        if (selectedAccount) {
+
             try {
                 let obj = {
                     type: "debit_note",  //credit_note or debit_note
@@ -48,11 +66,11 @@ const CreateDebitNote = () => {
                     tax_amount: formData?.Vat,
                     total_amount: formData?.totalAmount,
                     cost_center: selectedCostCenter?.name,
-                    impact_account_id:selectedAccount?.id
+                    impact_account_id: selectedAccount?.id
                 }
-    
+
                 const promise = CustomerServices.CreateNote(obj);
-    
+
                 showPromiseToast(
                     promise,
                     'Saving...',
@@ -63,13 +81,13 @@ const CreateDebitNote = () => {
                 if (response?.responseCode === 200) {
                     navigate("/debit-note-list");
                 }
-    
-    
+
+
             } catch (error) {
                 showErrorToast(error);
             }
         }
-        else{
+        else {
             showErrorToast('Please Select Debit Account.')
         }
 
@@ -114,7 +132,7 @@ const CreateDebitNote = () => {
 
     const handleAccountSelect = (account) => {
         console.log(account);
-
+        getChildAccounts(account?.id)
         setSelectedAccount(account)
         setError("")
         console.log("Selected Account:", account)
@@ -325,7 +343,7 @@ const CreateDebitNote = () => {
                 <Grid item xs={12} md={6}>
 
                     <HierarchicalSelectField
-                        label={'Select Debit Account'}
+                        label={'Select Credit Account'}
                         selected={selectedAccount}
                         onSelect={handleAccountSelect}
                         data={accounts}

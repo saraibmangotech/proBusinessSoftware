@@ -42,6 +42,7 @@ import { PDFExport } from "@progress/kendo-react-pdf";
 import { showErrorToast } from "components/NewToaster";
 import { logDOM } from "@testing-library/react";
 import CustomerServices from "services/Customer";
+import LedgerModal from "LedgerTable";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -131,6 +132,8 @@ function GeneralLedger() {
   ];
 
   const [loader, setLoader] = useState(false);
+
+  const [loader2, setLoader2] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // *For Account Ledger
@@ -160,6 +163,39 @@ function GeneralLedger() {
   const [filters, setFilters] = useState({});
   const [fromDate, setFromDate] = useState();
   const [toDate, setToDate] = useState();
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [data, setData] = useState([])
+  const handleOpenModal = () => {
+    setModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+  }
+
+
+  const getGeneralJournalLedgers = async (number) => {
+    setModalOpen(true)
+    setLoader2(true)
+    try {
+
+      let params = {
+        page: 1,
+        limit: 999999,
+        search: number
+      }
+
+      const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+      setData(data?.statement?.rows)
+     
+
+    } catch (error) {
+      ErrorToaster(error)
+    } finally {
+      setLoader2(false)
+    }
+  }
 
   // *For Handle Date
   const handleFromDate = (newDate) => {
@@ -293,38 +329,38 @@ function GeneralLedger() {
 
   const downloadExcel = () => {
     const rows = [];
-  
+
     const accountNameRow = [
-      `Ledger : ${selectedAccount?.name || "-"}`, "", "", "", "", "","", "", "","",""
+      `Ledger : ${selectedAccount?.name || "-"}`, "", "", "", "", "", "", "", "", "", ""
     ];
-      
+
     const accountNameRow2 = [
-      ``, "", "", "", "", "Opening Balance", parseFloat(openingBal).toFixed(2), "", "Closing Balance", parseFloat(closingBal).toFixed(2),""
+      ``, "", "", "", "", "Opening Balance", parseFloat(openingBal).toFixed(2), "", "Closing Balance", parseFloat(closingBal).toFixed(2), ""
     ];
     const headers = tableHead.filter((item) => item !== "Action");
-  
+
     const data = accountLedgers2;
-  
+
     let totalDebit = 0;
     let totalCredit = 0;
     let runningBalance = openingBal;
-  
+
     const accountNature = data[0]?.account?.nature || "debit"; // default to debit if undefined
-  
+
     data.forEach((item) => {
       const debit = parseFloat(item?.debit || 0);
       const credit = parseFloat(item?.credit || 0);
-  
+
       totalDebit += debit;
       totalCredit += credit;
-  
+
       // Update running balance according to account nature
       if (accountNature === "debit") {
         runningBalance += debit - credit;
       } else {
         runningBalance += credit - debit;
       }
-  
+
       rows.push([
         item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "-",
         item?.journal_id ? item?.series_id + item?.journal_id : "-",
@@ -338,7 +374,7 @@ function GeneralLedger() {
         runningBalance.toFixed(2)
       ]);
     });
-  
+
     // Totals row
     rows.push([
       "Total", "", "", "", "", "", "",
@@ -346,9 +382,9 @@ function GeneralLedger() {
       totalCredit.toFixed(2),
       ""
     ]);
-  
-  
-  
+
+
+
     // Now build the worksheet with the account name row + header + data
     const ws = XLSX.utils.aoa_to_sheet([
       accountNameRow,
@@ -356,14 +392,14 @@ function GeneralLedger() {
       headers,
       ...rows
     ]);
-  
+
     const csv = XLSX.utils.sheet_to_csv(ws);
-  
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, 'General_Ledger.csv');
   };
-  
-  
+
+
 
   const getCostCenters = async () => {
     try {
@@ -388,7 +424,13 @@ function GeneralLedger() {
 
   return (
     <Box sx={{ p: 3 }}>
-
+      <LedgerModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        generalJournalAccounts={data}
+        title=" Journal Entries"
+        loading={loader2}
+      />
       {accountLedgers?.length > 0 && (
         <Box sx={{
           textAlign: "right", display: "flex",
@@ -604,10 +646,8 @@ function GeneralLedger() {
                                 <Cell className="pdf-table">
                                   <IconButton
                                     onClick={() =>
+                                      getGeneralJournalLedgers(item?.journal_id)
 
-                                      navigate('/general-journal-ledger', {
-                                        state: item?.journal_id
-                                      })
                                     }
                                     sx={{
                                       bgcolor:
@@ -690,7 +730,7 @@ function GeneralLedger() {
                     </Typography>
                     <Typography variant="body1" >
                       {/* Replace with actual value or variable */}
-                     {parseFloat(closingBal).toFixed(2)}
+                      {parseFloat(closingBal).toFixed(2)}
                     </Typography>
                   </Grid>
                 </Grid>
