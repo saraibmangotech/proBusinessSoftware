@@ -117,7 +117,7 @@ const useStyles = makeStyles({
     }
 })
 
-function SupplierConsolidatedProStatement() {
+function AccountConsolidatedProStatement() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -195,6 +195,11 @@ function SupplierConsolidatedProStatement() {
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     const [costCenters, setCostCenters] = useState([])
     const [closingBal, setClosingBal] = useState(0)
+    const [childAccounts, setChildAccounts] = useState([]);
+    const [selectedChildAccount, setSelectedChildAccount] = useState([]);
+    // *For Accounts
+    const [accounts, setAccounts] = useState([]);
+    const [selectedAccount, setSelectedAccount] = useState(null);
     // *For Filters
     const [filters, setFilters] = useState({});
 
@@ -332,6 +337,13 @@ function SupplierConsolidatedProStatement() {
         { label: "Balance", key: "Balance" },
 
     ];
+
+     const handleFilterSearch = (data) => {
+        Debounce(() => {
+          getCustomerQueue(1, "", data);
+       
+        })(); // assuming Debounce is a debounce function
+      };
 
     const computeRunningBalance = (allAccountsData, setClosingBal) => {
         const processedData = [];
@@ -548,7 +560,7 @@ function SupplierConsolidatedProStatement() {
 
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
-        if (true) {
+        if (selectedAccount) {
             setLoader(true)
             try {
                 const params = {
@@ -556,9 +568,8 @@ function SupplierConsolidatedProStatement() {
                     limit: 999999,
                     from_date: fromDate ? moment(fromDate).format("MM-DD-YYYY") : "",
                     to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
-                    accounts: selectedUser.map(user => user.account_id).join(','),
-                    account_id: 700111,
-                      type:'supplier'
+                    accounts: selectedChildAccount?.map(account => account.id).join(','),
+                    account_id: selectedAccount?.id,
                 }
 
                 const { data } = await FinanceServices.getConsolidatedProStatement(params)
@@ -575,7 +586,7 @@ function SupplierConsolidatedProStatement() {
                 setLoader(false)
             }
         } else {
-            showErrorToast("Select User")
+            showErrorToast("Please Select an Account")
         }
     }
 
@@ -641,9 +652,9 @@ function SupplierConsolidatedProStatement() {
         return result
     }
 
-    useEffect(() => {
-        getCustomerQueue(1, 999999, {})
-    }, [fromDate, toDate])
+    // useEffect(() => {
+    //     getCustomerQueue(1, 999999, {})
+    // }, [fromDate, toDate])
 
 
 
@@ -726,15 +737,15 @@ function SupplierConsolidatedProStatement() {
         } = event;
 
         // value will be an array of objects
-        setSelectedUser(typeof value === 'string' ? [] : value);
+        setSelectedChildAccount(typeof value === 'string' ? [] : value);
     };
 
     const getStyles = (user, selectedUsers, theme) => ({
         fontWeight: selectedUsers.some((u) => u.id === user.id)
-          ? theme.typography.fontWeightMedium
-          : theme.typography.fontWeightRegular,
-      });
-      
+            ? theme.typography.fontWeightMedium
+            : theme.typography.fontWeightRegular,
+    });
+
 
 
     const handleToDate = (newDate) => {
@@ -797,14 +808,45 @@ function SupplierConsolidatedProStatement() {
         }
     };
 
+    // *For Get Account
+    const getAccountsDropDown = async (search) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                name: search,
+                is_disabled: false
+            };
+            const { data } = await FinanceServices.getAccountsDropDown(params);
 
+            setAccounts(data?.accounts?.rows);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+    // *For Get Account
+    const getAccounts = async (accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 50,
+                primary_account_id: accountId ?? selectedAccount?.id,
+            };
+            const { data } = await FinanceServices.getAccounts(params);
+            setChildAccounts(data?.accounts?.rows);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
 
 
     useEffect(() => {
         getUsers()
         setFromDate(new Date())
         setToDate(new Date())
-        getCustomerQueue()
+        getAccountsDropDown();
+    
         getCostCenters()
     }, []);
     useEffect(() => {
@@ -887,26 +929,42 @@ function SupplierConsolidatedProStatement() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Supplier Consolidated Statement</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Account Consolidated Statement</Typography>
 
 
-
+                <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                            />
             </Box>
 
             {/* Filters */}
 
-
-            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={12}>
-                    <Grid container spacing={1}>
-
-                        <Grid item xs={2.5}>
-
-                            <InputLabel id="demo-multiple-name-label" sx={{ fontWeight: 'bold',color:'#434343' }}>Select Suppliers</InputLabel>
+            <Grid container spacing={1} columns={12}>
+                <Grid item xs={12} sm={2}>
+                    <SelectField
+                        size={"small"}
+                        onSearch={(v) => getAccountsDropDown(v)}
+                        label={"Account"}
+                        options={accounts}
+                        selected={selectedAccount}
+                        onSelect={(value) => {
+                            setSelectedAccount(value);
+                            getAccounts(value?.id);
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                    
+                        <InputLabel id="demo-multiple-name-label" sx={{ fontWeight: 'bold', color: '#434343' }}> Child Accounts</InputLabel>
                             <FormControl fullWidth size="small" sx={{ pt: 1 }}>
                                 <Select
                                     multiple
-                                    value={selectedUser}
+                                    value={selectedChildAccount}
                                     onChange={handleChange}
                                     input={<OutlinedInput label="Name" />}
                                     MenuProps={MenuProps}
@@ -924,64 +982,72 @@ function SupplierConsolidatedProStatement() {
                                     sx={{
                                         "&.MuiFormControl-root": {
                                             "&.MuiSelect-select": {
-                                                        borderRadius: "8px",
-                                                    },
+                                                borderRadius: "8px",
+                                            },
                                         },
                                         "&.MuiInputBase-root": {
-                                                    borderRadius: "8px",
-                                                },
+                                            borderRadius: "8px",
+                                        },
                                     }}
                                 >
-                                    {users?.map((user) => (
+                                    {childAccounts?.map((user) => (
                                         <MenuItem
                                             key={user.id}
                                             value={user}
-                                            style={getStyles(user, selectedUser, theme)}
+                                            style={getStyles(selectedChildAccount, selectedChildAccount, theme)}
                                         >
                                             {user.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
-
-
-                        </Grid>
-                        <Grid item xs={2.5}>
-                            <DatePicker
-                                label={"From Date"}
-                                disableFuture={true}
-                                size="small"
-                                value={fromDate}
-                                onChange={(date) => handleFromDate(date)}
-                            />
-                        </Grid>
-                        <Grid item xs={2.5}>
-                            <DatePicker
-                                label={"To Date"}
-
-                                disableFuture={true}
-                                size="small"
-                                value={toDate}
-                                onChange={(date) => handleToDate(date)}
-                            />
-                        </Grid>
-
-                        <Grid item xs={1} sx={{ marginTop: "30px" }}>
-                            <PrimaryButton
-                                bgcolor={"#001f3f"}
-                                icon={<SearchIcon />}
-                                title="Search"
-                                sx={{ marginTop: "30px" }}
-                                onClick={() => getCustomerQueue(null, null, null)}
-                                loading={loading}
-                            />
-                        </Grid>
-                    </Grid>
                 </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-
+                <Grid item xs={12} sm={2}>
+                    <InputField
+                        size={"small"}
+                        label={"Search"}
+                        placeholder={"Search"}
+                        register={register("search", {
+                            onChange: (e) => handleFilterSearch({ search: e.target.value }),
+                        })}
+                    />
                 </Grid>
+                <Grid item xs={12} sm={2}>
+                    <SelectField
+
+                        size={"small"}
+                        label={"Cost  Center"}
+                        options={costCenters}
+                        selected={selectedCostCenter}
+                        onSelect={(value) => {
+                            setSelectedCostCenter(value);
+                        }}
+                        register={register("costCenter")}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                    <DatePicker
+                        disableFuture={true}
+                        size="small"
+                        label={"From Date"}
+                        value={fromDate}
+                        onChange={(date) => handleFromDate(date)}
+                    />
+                </Grid>
+
+                <Grid item xs={12} sm={2}>
+                    <DatePicker
+                        disableFuture={true}
+                        size="small"
+                        minDate={fromDate}
+                        label={"To Date"}
+                        value={toDate}
+                        onChange={(date) => handleToDate(date)}
+                    />
+                </Grid>
+
             </Grid>
+        
 
 
             <Box >
@@ -1060,7 +1126,7 @@ function SupplierConsolidatedProStatement() {
                                                 <td
                                                     className={`number-cell ${Number.parseFloat(row.runningBalance || 0) >= 0 ? "positive" : "negative"}`}
                                                 >
-                                                    {row.runningBalance || "0.00"}
+                                                    {parseFloat(row.runningBalance).toFixed(2) || "0.00"}
                                                 </td>
                                             </tr>
                                         )
@@ -1144,4 +1210,4 @@ function SupplierConsolidatedProStatement() {
     );
 }
 
-export default SupplierConsolidatedProStatement;
+export default AccountConsolidatedProStatement;

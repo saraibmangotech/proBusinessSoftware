@@ -1,4 +1,5 @@
 import { TableRow, TableCell } from "@mui/material";
+import { CommaSeparator } from "utils";
 
 const TableTotalRow = ({ table, columns }) => {
   const rows = table.getRowModel().rows;
@@ -38,7 +39,7 @@ const TableTotalRow = ({ table, columns }) => {
             ? "Total"
             : col.total === false || totals[index] === null
             ? ""
-            : totals[index]?.toFixed(2)}
+            : CommaSeparator(totals[index]?.toFixed(2))}
         </TableCell>
       ))}
     </TableRow>

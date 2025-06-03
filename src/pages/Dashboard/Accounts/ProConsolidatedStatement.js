@@ -558,6 +558,7 @@ function ConsolidatedProStatement() {
                     to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
                     accounts: selectedUser.map(user => user.receivable_account_id).join(','),
                     account_id: 700108,
+                    type:'pro'
                 }
 
                 const { data } = await FinanceServices.getConsolidatedProStatement(params)

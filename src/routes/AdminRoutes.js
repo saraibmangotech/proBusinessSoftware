@@ -479,6 +479,9 @@ const ConsolidatedProStatement= lazy(() =>
 const SupplierConsolidatedProStatement= lazy(() =>
   import("pages/Dashboard/Accounts/SupplierConsolidatedStatement")
 );
+const AccountConsolidatedProStatement= lazy(() =>
+  import("pages/Dashboard/Accounts/AccountConsolidatedStatement")
+);
 const EmployeeList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/EmployeeList")
 );
@@ -558,6 +561,10 @@ const AdminRoutes = [
   {
     path: "/update-leave/:id",
     component: <UpdateLeave />,
+  },
+  {
+    path: "/account-consolidated-statement",
+    component: <AccountConsolidatedProStatement />,
   },
   {
     path: "/leave-list",
