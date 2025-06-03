@@ -500,9 +500,9 @@ function CreateJournalVoucher() {
       totalCredit += credit;
     });
 
-    if (totalDebit !== totalCredit) {
-      setErrorDisplay(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
-      console.log(`Total debit and credit must be equal. Got Debit: ${totalDebit}, Credit: ${totalCredit}`);
+    if (parseFloat(totalDebit.toFixed(2)) != parseFloat(totalCredit.toFixed(2))) {
+      setErrorDisplay(`Total debit and credit must be equal. Got Debit: ${parseFloat(totalDebit).toFixed(2)}, Credit: ${parseFloat(totalCredit).toFixed(2)}`);
+      console.log(`Total debit and credit must be equal. Got Debit: ${parseFloat(totalDebit).toFixed(2)}, Credit: ${parseFloat(totalCredit).toFixed(2)}`);
     } else {
       setErrorDisplay(false);
     }
