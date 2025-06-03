@@ -560,10 +560,10 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
     },
     {
       header: "Line Total",
-      accessorFn: (row) => (parseFloat(row?.total || 0) + ((parseFloat(row?.center_fee || 0) * parseFloat(row?.quantity || 1)) * 0.05)).toFixed(2),
+      accessorFn: (row) => (parseFloat(row?.center_fee || 0) + parseFloat(row?.bank_charge || 0) + parseFloat(row?.govt_fee || 0) + ((parseFloat(row?.center_fee || 0) ) * 0.05) * parseFloat(row?.quantity || 1)).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.total || 0) + ((parseFloat(row?.original?.center_fee || 0) * parseFloat(row?.original?.quantity || 1)) * 0.05)).toFixed(2)}
+          {(parseFloat(row?.original?.center_fee || 0) + parseFloat(row?.original?.bank_charge || 0) + parseFloat(row?.original?.govt_fee || 0) + ((parseFloat(row?.original?.center_fee || 0) ) * 0.05) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
         </Box>
       ),
     },
@@ -619,7 +619,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
       const govtFee = parseFloat(item?.govt_fee) || 0;
       const bankCharge = parseFloat(item?.bank_charge) || 0;
       const totalServiceCharge = centerFee * quantity;
-      const totalVAT = totalServiceCharge * 0.05;
+      const totalVAT = (parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05;
       const totalGovtFee = (govtFee + bankCharge) * quantity;
 
       return {
@@ -637,7 +637,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
         "Quantity": quantity,
         "Service Charge": centerFee.toFixed(2),
         "Total Service Charge": totalServiceCharge.toFixed(2),
-        "Total VAT": totalVAT.toFixed(2),
+        "Total VAT": totalVAT.toFixed(5),
         "Govt. Fee": govtFee.toFixed(2),
         "Bank Service Charge": bankCharge.toFixed(2),
         "Other Charge": "0", // Static
@@ -648,8 +648,8 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
         "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
         "Employee ID": item?.receipt?.creator?.employee_id || "",
         "Employee Name": item?.receipt?.creator?.name || "",
-        "Line Total": (parseFloat(item?.total) + totalVAT).toFixed(2),
-        "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(2),
+        "Line Total": (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)).toFixed(5),
+        "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(5),
       };
     });
 
