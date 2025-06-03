@@ -507,15 +507,17 @@ function ProfitLossStatement() {
               parseFloat(Total)
             ])
           )
-        
-            rows.push([
-              "",
-              "",
-              "Gross Profit",
-              "",
-              "",
-              parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)).toFixed(2)
-            ])
+        if( subItem?.accounts[0]?.type_code == 'E1'){
+
+          rows.push([
+            "",
+            "",
+            "Gross Profit",
+            "",
+            "",
+            parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)).toFixed(2)
+          ])
+        }
           
         });
         item?.sub?.length > 0 && (
@@ -868,7 +870,7 @@ function ProfitLossStatement() {
                                                       </Typography>
                                                     </Cell>
                                                   </Row>
-                                                  {filters === 'all'  &&
+                                                  {filters === 'all'  && subItem?.accounts[0]?.type_code == 'E1' &&
                                                     <Row sx={{ bgcolor: Colors.primary }}>
                                                       <Cell colSpan={5}>
                                                         <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>

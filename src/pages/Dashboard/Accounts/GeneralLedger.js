@@ -295,16 +295,19 @@ function GeneralLedger() {
     const rows = [];
   
     const accountNameRow = [
-      `Ledger : ${selectedAccount?.name || "-"}`, "", "", "", "", "", "", "", "", ""
+      `Ledger : ${selectedAccount?.name || "-"}`, "", "", "", "", "","", "", "","",""
     ];
-  
+      
+    const accountNameRow2 = [
+      ``, "", "", "", "", "Opening Balance", parseFloat(openingBal).toFixed(2), "", "Closing Balance", parseFloat(closingBal).toFixed(2),""
+    ];
     const headers = tableHead.filter((item) => item !== "Action");
   
     const data = accountLedgers2;
   
     let totalDebit = 0;
     let totalCredit = 0;
-    let runningBalance = 0;
+    let runningBalance = openingBal;
   
     const accountNature = data[0]?.account?.nature || "debit"; // default to debit if undefined
   
@@ -344,21 +347,12 @@ function GeneralLedger() {
       ""
     ]);
   
-    // Opening Balance row
-    rows.push([
-      "Opening Balance", "", "", "", "", "", "",
-      "", "", parseFloat(openingBal).toFixed(2)
-    ]);
   
-    // Closing Balance row
-    rows.push([
-      "Closing Balance", "", "", "", "", "", "",
-      "", "", parseFloat(closingBal).toFixed(2)
-    ]);
   
     // Now build the worksheet with the account name row + header + data
     const ws = XLSX.utils.aoa_to_sheet([
       accountNameRow,
+      accountNameRow2,
       headers,
       ...rows
     ]);
@@ -426,7 +420,7 @@ function GeneralLedger() {
                 fontFamily: FontFamily.NunitoRegular,
               }}
             >
-              General Ledger
+              Account Ledger
             </Typography>
             <PrimaryButton title="Search" type="submit" loading={loading} />
 
@@ -509,7 +503,7 @@ function GeneralLedger() {
         {accountLedgers && (
           <Fragment>
             <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
-              fileName="General Ledger"
+              fileName="Account Ledger"
             >
               <Box className='pdf-show' sx={{ display: 'none' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
