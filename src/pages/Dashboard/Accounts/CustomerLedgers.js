@@ -47,6 +47,7 @@ import UserServices from 'services/User';
 import { useAuth } from 'context/UseContext';
 import FinanceServices from 'services/Finance';
 import { CSVLink } from 'react-csv';
+import LedgerModal from 'LedgerTable';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -181,56 +182,56 @@ function CustomerLedgers() {
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
 
-  const prepareCSVData = (data) => {
-    let runningBalance = 0;
-  
-    // Map each entry into the desired CSV format with Balance
-    const csvRows = data.map((item) => {
-      const credit = parseFloat(item.credit || 0);
-      const debit = parseFloat(item.debit || 0);
-      const nature = item.account?.nature;
-  
-      // Calculate balance based on nature of account
-      if (nature === "debit") {
-        runningBalance += debit - credit;
-      } else {
-        runningBalance += credit - debit;
-      }
-  
-      return {
-        Reference: item.entry?.reference_no || "",
-        Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
-        JV: `JV-${item.id}` || "",
-        Description: item.description || "",
-        Type: item.type?.type_name || "",
-        Cost_Center: item?.cost_center || "",
-        Account: item.account?.name || "",
-        Debit: debit.toFixed(2),
-        Credit: credit.toFixed(2),
-        Balance: runningBalance.toFixed(2),
-      };
-    });
-  
-    // Calculate totals
-    const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
-    const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
-  
-    // Append totals row with closing balance
-    csvRows.push({
-      JV: "",
-      Date: "",
-      Reference: "",
-      Description: "",
-      Type: "",
-      Cost_Center: "",
-      Account: "Total",
-      Debit: totalDebit.toFixed(2),
-      Credit: totalCredit.toFixed(2),
-      Balance: runningBalance.toFixed(2), // Final closing balance
-    });
-  
-    return csvRows;
-  };
+    const prepareCSVData = (data) => {
+        let runningBalance = 0;
+
+        // Map each entry into the desired CSV format with Balance
+        const csvRows = data.map((item) => {
+            const credit = parseFloat(item.credit || 0);
+            const debit = parseFloat(item.debit || 0);
+            const nature = item.account?.nature;
+
+            // Calculate balance based on nature of account
+            if (nature === "debit") {
+                runningBalance += debit - credit;
+            } else {
+                runningBalance += credit - debit;
+            }
+
+            return {
+                Reference: item.entry?.reference_no || "",
+                Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
+                JV: `JV-${item.id}` || "",
+                Description: item.description || "",
+                Type: item.type?.type_name || "",
+                Cost_Center: item?.cost_center || "",
+                Account: item.account?.name || "",
+                Debit: debit.toFixed(2),
+                Credit: credit.toFixed(2),
+                Balance: runningBalance.toFixed(2),
+            };
+        });
+
+        // Calculate totals
+        const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
+        const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
+
+        // Append totals row with closing balance
+        csvRows.push({
+            JV: "",
+            Date: "",
+            Reference: "",
+            Description: "",
+            Type: "",
+            Cost_Center: "",
+            Account: "Total",
+            Debit: totalDebit.toFixed(2),
+            Credit: totalCredit.toFixed(2),
+            Balance: runningBalance.toFixed(2), // Final closing balance
+        });
+
+        return csvRows;
+    };
     const headers = [
         { label: "Date", key: "Date" },
         { label: "JV #", key: "JV" },
@@ -396,16 +397,15 @@ function CustomerLedgers() {
             cell: ({ row }) => (
 
                 <Box component={'div'} sx={{ display: 'flex', gap: '20px', }}>
-                    <IconButton
+                       <IconButton
                         onClick={() =>
 
-                            navigate('/general-journal-ledger', {
-                                state: row?.original?.journal_id
-                            })
+
+                            getGeneralJournalLedgers(row?.original?.journal_id)
                         }
                         sx={{
-                            width: '30px',
-                            height: '30px',
+                            width: '35px',
+                            height: '35px',
                             bgcolor:
                                 Colors.primary,
                             "&:hover": {
@@ -416,6 +416,9 @@ function CustomerLedgers() {
                     >
                         <EyeIcon />
                     </IconButton>
+
+                 
+                 
                 </Box>
             ),
         },
@@ -474,7 +477,38 @@ function CustomerLedgers() {
 
     }
 
+    const [data, setData] = useState([])
+    const [loader2, setLoader2] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false)
+    const handleOpenModal = () => {
+        setModalOpen(true)
+    }
 
+    const handleCloseModal = () => {
+        setModalOpen(false)
+    }
+
+    const getGeneralJournalLedgers = async (number) => {
+        setModalOpen(true)
+        setLoader2(true)
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                search: number
+            }
+
+            const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+            setData(data?.statement?.rows)
+
+
+        } catch (error) {
+            ErrorToaster(error)
+        } finally {
+            setLoader2(false)
+        }
+    }
 
 
     const getUsers = async (page, limit, filter) => {
@@ -619,7 +653,13 @@ function CustomerLedgers() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <LedgerModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                generalJournalAccounts={data}
+                title=" Journal Entries"
+                loading={loader2}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
@@ -797,7 +837,7 @@ function CustomerLedgers() {
                         </Button>
                     </CSVLink>}
                 </Box>
-             
+
 
                 {loader && <CircleLoading />}
                 {<DataTable loading={loader} data={tableData} columns={columns} />}

@@ -200,13 +200,15 @@ function UpadateJournalVoucher() {
 
       const updatedAccounts = data?.voucher?.entries?.map(account => ({
         ...account,
+      
         name: ` ${account?.account?.account_code} ${account?.account?.name}`,
-        selectedAccount: { id: account?.account?.id, name: ` ${account?.account?.account_code} ${account?.account?.name}` },
+        selectedAccount: { id: account?.account?.id, account_name: ` ${account?.account?.name}` ,account_code:account?.account?.account_code},
 
         unique_id: Date.now() + Math.random(), // Ensure unique key
 
       }));
 
+      console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
 
       setRows(updatedAccounts)
       setFromDate(new Date(data?.voucher?.created_at))
@@ -252,14 +254,14 @@ function UpadateJournalVoucher() {
         name: search,
 
       }
-      const { data } = await FinanceServices.getAccountsDropDown(params)
+      const { data } = await FinanceServices.getChartOfAccount(params)
       const updatedAccounts = data?.accounts?.rows?.map(account => ({
         ...account,
         name: ` ${account.account_code} ${account.name}`
       }));
       console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
 
-      setAccounts(updatedAccounts)
+      setAccounts(data?.COA)
     } catch (error) {
       showErrorToast(error)
     }
@@ -469,15 +471,15 @@ function UpadateJournalVoucher() {
     setValue('credit', '')
   };
 
-   const [error, setError] = useState("")
-  
-    const handleAccountSelect = (account) => {
-      console.log(account);
-      
-      setSelectedAccount(account)
-      setError("")
-      console.log("Selected Account:", account)
-    }
+  const [error, setError] = useState("")
+
+  const handleAccountSelect = (account) => {
+    console.log(account);
+
+    setSelectedAccount(account)
+    setError("")
+    console.log("Selected Account:", account)
+  }
   // *For Get Account
   const getChildAccounts = async (accountId) => {
     try {
@@ -613,7 +615,7 @@ function UpadateJournalVoucher() {
 
                 <TableCell>
                   <HierarchicalSelectField
-                    disabled={editState}
+
                     selected={selectedAccount}
                     onSelect={handleAccountSelect}
                     data={accounts}
@@ -784,12 +786,14 @@ function UpadateJournalVoucher() {
                     <Box>
                       {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                         setSelectedRow(item?.unique_id)
+                        console.log(item?.selectedAccount);
+
                         setEditState(true)
                         console.log(item);
                         setValue('costcenter', { id: item?.cost_center, name: item?.cost_center })
                         setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                         setSelectedAccount(item?.selectedAccount)
-                        setValue('service', item?.selectedAccount?.name)
+                        // setValue('service', item?.selectedAccount?.name)
                         setValue('debit', item?.debit)
                         setValue('credit', item?.credit)
                         setValue('description', item?.description)

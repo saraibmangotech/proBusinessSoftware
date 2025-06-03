@@ -47,6 +47,7 @@ import { useAuth } from 'context/UseContext';
 import FinanceServices from 'services/Finance';
 import { CSVLink } from 'react-csv';
 import { FileDownload } from "@mui/icons-material"
+import LedgerModal from 'LedgerTable';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -151,20 +152,20 @@ function SupplierLedgers() {
   ];
   const prepareCSVData = (data) => {
     let runningBalance = 0;
-  
+
     // Map each entry into the desired CSV format with Balance
     const csvRows = data.map((item) => {
       const credit = parseFloat(item.credit || 0);
       const debit = parseFloat(item.debit || 0);
       const nature = item.account?.nature;
-  
+
       // Calculate balance based on nature of account
       if (nature === "debit") {
         runningBalance += debit - credit;
       } else {
         runningBalance += credit - debit;
       }
-  
+
       return {
         Reference: item.entry?.reference_no || "",
         Date: item?.created_at ? moment(item?.created_at).format('DD/MM/YYYY') : '',
@@ -178,11 +179,11 @@ function SupplierLedgers() {
         Balance: runningBalance.toFixed(2),
       };
     });
-  
+
     // Calculate totals
     const totalDebit = data.reduce((sum, item) => sum + parseFloat(item.debit || 0), 0);
     const totalCredit = data.reduce((sum, item) => sum + parseFloat(item.credit || 0), 0);
-  
+
     // Append totals row with closing balance
     csvRows.push({
       JV: "",
@@ -196,10 +197,10 @@ function SupplierLedgers() {
       Credit: totalCredit.toFixed(2),
       Balance: runningBalance.toFixed(2), // Final closing balance
     });
-  
+
     return csvRows;
   };
-  
+
   const headers = [
     { label: "Date", key: "Date" },
     { label: "JV #", key: "JV" },
@@ -247,34 +248,66 @@ function SupplierLedgers() {
   const [sort, setSort] = useState('desc')
   const computeRunningBalance = (data, setClosingBal) => {
     let runningBalance = 0;
-  
+
     const processedData = data.map((row) => {
       const credit = parseFloat(row.credit) || 0;
       const debit = parseFloat(row.debit) || 0;
       const nature = row.account?.nature;
-  
+
       if (nature === "debit") {
         runningBalance += debit - credit;
       } else {
         runningBalance += credit - debit;
       }
-  
+
       return {
         ...row,
         runningBalance: runningBalance.toFixed(2),
       };
     });
-  
+
     // Set the last closing balance
     setClosingBal(runningBalance.toFixed(2));
-  
+
     return processedData;
   };
-  
-  
+  const [modalOpen, setModalOpen] = useState(false)
+  const handleOpenModal = () => {
+    setModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+  }
+  const [data, setData] = useState([])
+  const [loader2, setLoader2] = useState(false);
+
+  const getGeneralJournalLedgers = async (number) => {
+    setModalOpen(true)
+    setLoader2(true)
+    try {
+
+      let params = {
+        page: 1,
+        limit: 999999,
+        search: number
+      }
+
+      const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+      setData(data?.statement?.rows)
+
+
+    } catch (error) {
+      ErrorToaster(error)
+    } finally {
+      setLoader2(false)
+    }
+  }
+
+
   // Example: in your component before rendering table
   const tableData = useMemo(() => computeRunningBalance(customerQueue, setClosingBal), [customerQueue]);
-  
+
 
   const columns = [
 
@@ -310,7 +343,7 @@ function SupplierLedgers() {
       accessorKey: "id",
       cell: ({ row }) => (
         <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.account?.name  ?? '-'}
+          {row?.original?.account?.name ?? '-'}
         </Box>
       ),
 
@@ -339,13 +372,13 @@ function SupplierLedgers() {
     {
       header: "Cost Center",
       accessorKey: "cost_center",
-    
+
 
     },
     {
       header: "Description",
       accessorKey: "description",
-    
+
 
 
     },
@@ -388,7 +421,7 @@ function SupplierLedgers() {
       ),
     },
 
-  
+
 
 
     {
@@ -399,13 +432,12 @@ function SupplierLedgers() {
           <IconButton
             onClick={() =>
 
-              navigate('/general-journal-ledger', {
-                state: row?.original?.journal_id
-              })
+
+              getGeneralJournalLedgers(row?.original?.journal_id)
             }
             sx={{
-              width:'30px',
-              height:'30px',
+              width: '35px',
+              height: '35px',
               bgcolor:
                 Colors.primary,
               "&:hover": {
@@ -615,7 +647,13 @@ function SupplierLedgers() {
 
   return (
     <Box sx={{ p: 3 }}>
-
+      <LedgerModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        generalJournalAccounts={data}
+        title=" Journal Entries"
+        loading={loader2}
+      />
       <ConfirmationDialog
         open={confirmationDialog}
         onClose={() => setConfirmationDialog(false)}
@@ -792,25 +830,25 @@ function SupplierLedgers() {
             </Button>
           </CSVLink>}
         </Box>
-  
+
 
         {loader && <CircleLoading />}
         {<DataTable loading={loader} data={tableData} columns={columns} />}
 
-           <Box sx={{ mt: 4 }}>
-                        <Grid container spacing={2}>
-                     
-                          <Grid item xs={12} sm={6} display={'flex'} gap={1} alignItems={'center'}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                              Closing Balance
-                            </Typography>
-                            <Typography variant="body1" >
-                              {/* Replace with actual value or variable */}
-                             {parseFloat(closingBal).toFixed(2)}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Box>
+        <Box sx={{ mt: 4 }}>
+          <Grid container spacing={2}>
+
+            <Grid item xs={12} sm={6} display={'flex'} gap={1} alignItems={'center'}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Closing Balance
+              </Typography>
+              <Typography variant="body1" >
+                {/* Replace with actual value or variable */}
+                {parseFloat(closingBal).toFixed(2)}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
 
     </Box>
