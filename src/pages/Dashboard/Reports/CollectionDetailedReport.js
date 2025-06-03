@@ -304,6 +304,22 @@ function CollectionDetailedReport() {
     },
 
     {
+      header: "Invoice no.",
+      accessorKey: "invoice_number",
+      total: false,
+      accessorFn: (row) => row?.invoice_number,
+      cell: ({ row }) => (
+        <Box
+          variant="contained"
+          color="primary"
+          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+        >
+          {row?.original?.invoice_number}
+        </Box>
+           ),
+    },
+
+    {
       header: "Receipt Date",
       accessorKey: "invoice_date",
       total: false,

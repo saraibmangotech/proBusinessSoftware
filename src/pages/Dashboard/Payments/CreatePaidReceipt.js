@@ -390,6 +390,11 @@ function CreatePaidReceipt() {
           return;
         }
 
+        if (data?.receipt?.is_deleted) {
+          ErrorToaster("Receipt is voided")
+          return;
+        }
+
         setRows(data?.receipt?.sale_receipt_items)
         setOldRows(data?.receipt?.sale_receipt_items)
         setDetail(data?.receipt)
@@ -729,6 +734,10 @@ function CreatePaidReceipt() {
       const { data } = await CustomerServices.getReceiptDetail(params)
 
       if (data?.receipt) {
+        if (data?.receipt?.is_deleted) {
+          ErrorToaster("Receipt is voided")
+          return;
+        }
         setHoldState(true)
         setCreditButton(true)
         setRows(data?.receipt?.sale_receipt_items)
