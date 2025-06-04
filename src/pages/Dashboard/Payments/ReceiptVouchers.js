@@ -42,6 +42,8 @@ import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import DatePicker from 'components/DatePicker';
+import FinanceServices from 'services/Finance';
+import LedgerModal from 'LedgerTable';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -154,6 +156,40 @@ function ReceiptVouchers() {
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
 
+    const [data, setData] = useState([])
+    const [loader2, setLoader2] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false)
+    const handleOpenModal = () => {
+        setModalOpen(true)
+    }
+
+    const handleCloseModal = () => {
+        setModalOpen(false)
+    }
+
+    const getGeneralJournalLedgers = async (number) => {
+        setModalOpen(true)
+        setLoader2(true)
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                module: 'receipt_voucher',
+                id: number
+            }
+
+            const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+            setData(data?.statement?.rows)
+
+
+        } catch (error) {
+            ErrorToaster(error)
+        } finally {
+            setLoader2(false)
+        }
+    }
+
     // *For Get Customer Queue
     const getCustomerQueue = async (page, limit, filter) => {
         setLoader(true)
@@ -169,7 +205,7 @@ function ReceiptVouchers() {
                 type: 'receipt_voucher',
                 page: 1,
                 limit: 999999,
-             
+
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
 
@@ -385,6 +421,25 @@ function ReceiptVouchers() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton
+                        onClick={() =>
+
+
+                            getGeneralJournalLedgers(row?.original?.id)
+                        }
+                        sx={{
+                            width: '35px',
+                            height: '35px',
+                            bgcolor:
+                                Colors.primary,
+                            "&:hover": {
+                                bgcolor:
+                                    Colors.primary,
+                            },
+                        }}
+                    >
+                        <EyeIcon />
+                    </IconButton>
                     {<Box
                         component={"img"}
                         sx={{ cursor: "pointer" }}
@@ -435,7 +490,13 @@ function ReceiptVouchers() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <LedgerModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                generalJournalAccounts={data}
+                title=" Journal Entries"
+                loading={loader2}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}

@@ -181,11 +181,11 @@ function CreatePurchaseInvoice() {
 
 
     useEffect(() => {
-          setValue1('amortization_months', 0)
-     
+        setValue1('amortization_months', 0)
+
     }, [])
-    
-    const addItem = (item, cost_center,quantity, charges, description, ref, total) => {
+
+    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -194,7 +194,7 @@ function CreatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Basic required field validation
-        if (!item  || !cost_center || quantity === "" || charges === "") {
+        if (!item || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center and charges are required!");
             return;
         }
@@ -231,7 +231,7 @@ function CreatePurchaseInvoice() {
             ref,
             total: parsedTotal,
             selectedService: serviceItem,
-            cost_center:selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name
         };
         console.log(newRow);
 
@@ -268,7 +268,7 @@ function CreatePurchaseInvoice() {
         try {
 
 
-            const { data } = await CustomerServices.getInvoiceNumberToken({type: "PE"});
+            const { data } = await CustomerServices.getInvoiceNumberToken({ type: "PE" });
             console.log(data);
             setValue1('invoiceNumber', "PE-" + data?.number)
 
@@ -300,6 +300,7 @@ function CreatePurchaseInvoice() {
     const fileInputRef = useRef(null);
     const [hovered, setHovered] = useState(false);
     const [accounts, setAccounts] = useState([]);
+    const [accounts2, setAccounts2] = useState([]);
     const [salesAccount, setSalesAccount] = useState(null);
     const [inventoryAccount, setInventoryAccount] = useState(null);
     const [cogsAccount, setCogsAccount] = useState(null);
@@ -315,6 +316,7 @@ function CreatePurchaseInvoice() {
     const [description, setDescription] = useState(null);
     const [ownGovBank, setOwnGovBank] = useState(null);
     const [selectedAccount, setSelectedAccount] = useState(null);
+    const [selectedAccount2, setSelectedAccount2] = useState(null);
     const [services, setServices] = useState([]);
     const [serviceItem, setServiceItem] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -342,6 +344,7 @@ function CreatePurchaseInvoice() {
                 const obj = {
                     vendor_id: selectedVendor?.id,
                     vendor_account_id: selectedVendor?.account_id,
+                    debit_account_id:selectedAccount2?.id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     vat_enabled: isVatApplicable,
@@ -505,7 +508,7 @@ function CreatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2,cost_center, quantity, charges, description, ref, total) => {
+    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
         console.log("Current serviceItem:", serviceItem);
 
         // Parse numeric values
@@ -514,7 +517,7 @@ function CreatePurchaseInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Validation
-        if (!item2 || !cost_center ||  quantity === "" || charges === "") {
+        if (!item2 || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center  and charges are required!");
             return;
         }
@@ -541,7 +544,7 @@ function CreatePurchaseInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
-            cost_center:selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -698,7 +701,28 @@ function CreatePurchaseInvoice() {
             showErrorToast(error)
         }
     }
+    const getAccounts2 = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false,
+                category: 11
 
+            }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts2(updatedAccounts)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
     // *For Get Account
     const getChildAccounts = async (accountId) => {
         try {
@@ -730,6 +754,8 @@ function CreatePurchaseInvoice() {
             showErrorToast(error);
         }
     };
+
+
     useEffect(() => {
         getCostCenters()
         getTokenNumber()
@@ -738,6 +764,7 @@ function CreatePurchaseInvoice() {
         getBanks()
         getVendors()
         console.log(user, "user");
+        getAccounts2()
         getAccounts();
         getCategories();
         getSystemSettings();
@@ -748,7 +775,7 @@ function CreatePurchaseInvoice() {
         setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
     }, []);
 
-   
+
     useEffect(() => {
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
@@ -806,6 +833,55 @@ function CreatePurchaseInvoice() {
                                     />
                                 </Grid>
                                 <Grid item md={3} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="System Invoice Number"
+                                        size="small"
+                                        placeholder="Invoice Number"
+                                        disabled={true}
+                                        register={register1("invoiceNumber", {
+                                            required: 'invoice Number is required'
+                                        })}
+                                        error={errors1?.invoiceNumber?.message}
+                                    />
+                                </Grid>
+                                <Grid item md={3} sm={5.5} xs={12}>
+                                    <SelectField
+                                        size={"small"}
+                                        label={"Select Expense Account "}
+
+                                        options={accounts2}
+                                        selected={selectedAccount2}
+                                        onSelect={(value) => {
+                                            setSelectedAccount2(value)
+
+                                        }}
+                                        error={errors1?.expenseAccount?.message}
+                                        register={register1("expenseAccount", {
+                                            required: 'expense account is required'
+                                        })}
+                                    />
+                                </Grid>
+
+
+                                <Grid item md={3} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="Amortization Months"
+                                        size="small"
+                                        placeholder="Months"
+                                        type="number"
+
+                                        register={register1("amortization_months", {
+                                            required: 'Amortization Months is required'
+                                        })}
+                                        error={errors1?.amortization_months?.message}
+                                    />
+                                </Grid>
+
+
+
+                            </Grid>
+                            <Grid container spacing={2} p={2}>
+                                <Grid item md={3} sm={5.5} xs={12}>
                                     <SelectField
                                         size={"small"}
                                         label={"Select Vendor "}
@@ -825,36 +901,6 @@ function CreatePurchaseInvoice() {
                                         })}
                                     />
                                 </Grid>
-
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="System Invoice Number"
-                                        size="small"
-                                        placeholder="Invoice Number"
-                                        disabled={true}
-                                        register={register1("invoiceNumber", {
-                                            required: 'invoice Number is required'
-                                        })}
-                                        error={errors1?.invoiceNumber?.message}
-                                    />
-                                </Grid>
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="Amortization Months"
-                                        size="small"
-                                        placeholder="Months"
-                                        type="number"
-                                      
-                                        register={register1("amortization_months", {
-                                            required: 'Amortization Months is required'
-                                        })}
-                                        error={errors1?.amortization_months?.message}
-                                    />
-                                </Grid>
-
-
-                            </Grid>
-                            <Grid container spacing={2} p={2}>
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="name"
@@ -894,18 +940,6 @@ function CreatePurchaseInvoice() {
 
 
 
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="Address"
-                                        size="small"
-                                        placeholder="Address"
-
-                                        disabled={true}
-
-                                        register={register1("address")}
-                                        error={errors1?.address?.message}
-                                    />
-                                </Grid>
                             </Grid>
 
 
@@ -1048,7 +1082,7 @@ function CreatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1063,7 +1097,7 @@ function CreatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1243,7 +1277,7 @@ function CreatePurchaseInvoice() {
                                                     },
                                                 }}
                                             >
-                                              Submit
+                                                Submit
                                             </Button>}
                                             <Button
                                                 onClick={() => { setPayButton(false); setPayments([]) }}
