@@ -30,6 +30,7 @@ import {
 import { FileDownload } from "@mui/icons-material"
 import TableTotalRow from "components/TotalRow/TableTotalRow"
 
+
 const DataTable = ({
   data,
   columns,
@@ -160,130 +161,125 @@ const DataTable = ({
 
   const exportToExcel = () => {
     // Filter out selection/checkbox column
-    const exportColumns = columns.filter((col) => !col.id || col.id !== "select");
+    const exportColumns = columns.filter((col) => !col.id || col.id !== "select")
 
     // Create CSV headers
-    const headers = exportColumns
-      .map((col) => col.header || col.accessorKey || col.id)
-      .join(",");
+    const headers = exportColumns.map((col) => col.header || col.accessorKey || col.id).join(",")
 
     // Generate a row from a data object
     const generateRow = (row) => {
       return exportColumns
         .map((col) => {
-          let cellValue;
+          let cellValue
 
           // Extract value from row using accessor
           if (col.accessorFn) {
-            cellValue = col.accessorFn(row);
+            cellValue = col.accessorFn(row)
           } else if (col.accessorKey) {
-            cellValue = row[col.accessorKey];
+            cellValue = row[col.accessorKey]
           } else if (col.id && col.id !== "select") {
-            cellValue = row[col.id];
+            cellValue = row[col.id]
           } else {
-            cellValue = "";
+            cellValue = ""
           }
 
           // Handle null/undefined
           if (cellValue === null || cellValue === undefined) {
-            return "";
+            return ""
           }
 
           // Handle objects
           if (typeof cellValue === "object" && cellValue !== null) {
             if (cellValue instanceof Date) {
-              cellValue = cellValue.toISOString();
+              cellValue = cellValue.toISOString()
             } else if (Array.isArray(cellValue)) {
-              cellValue = cellValue.join(", ");
+              cellValue = cellValue.join(", ")
             } else {
-              const displayProps = ["name", "title", "label", "value", "id", "key", "text", "description"];
-              const foundProp = displayProps.find((prop) => cellValue[prop] !== undefined);
+              const displayProps = ["name", "title", "label", "value", "id", "key", "text", "description"]
+              const foundProp = displayProps.find((prop) => cellValue[prop] !== undefined)
 
               if (foundProp) {
-                cellValue = cellValue[foundProp];
+                cellValue = cellValue[foundProp]
               } else if (col.cell) {
                 try {
-                  const rendered = col.cell({ row: { original: row } });
+                  const rendered = col.cell({ row: { original: row } })
                   if (rendered && typeof rendered !== "object") {
-                    cellValue = rendered;
+                    cellValue = rendered
                   } else {
-                    cellValue = JSON.stringify(cellValue);
+                    cellValue = JSON.stringify(cellValue)
                   }
                 } catch (e) {
-                  cellValue = JSON.stringify(cellValue);
+                  cellValue = JSON.stringify(cellValue)
                 }
               } else {
-                cellValue = JSON.stringify(cellValue);
+                cellValue = JSON.stringify(cellValue)
               }
             }
           }
 
           // Convert value to string and escape if needed
-          cellValue = String(cellValue);
+          cellValue = String(cellValue)
           if (cellValue.includes(",") || cellValue.includes('"') || cellValue.includes("\n")) {
-            return `"${cellValue.replace(/"/g, '""')}"`;
+            return `"${cellValue.replace(/"/g, '""')}"`
           }
 
-          return cellValue;
+          return cellValue
         })
-        .join(",");
-    };
+        .join(",")
+    }
 
     // Generate data rows
-    const dataRows = filteredData.map(generateRow);
+    const dataRows = filteredData.map(generateRow)
 
     // Generate total row
-    const totalRowObj = {};
+    const totalRowObj = {}
     exportColumns.forEach((col, idx) => {
-      const key = col.accessorKey || col.id;
-      const shouldTotal = col.total !== false;
+      const key = col.accessorKey || col.id
+      const shouldTotal = col.total !== false
 
       if (idx === 0) {
-        totalRowObj[key] = "Total";
+        totalRowObj[key] = "Total"
       } else if (shouldTotal) {
-        let total = 0;
+        let total = 0
         filteredData.forEach((row) => {
-          let value;
+          let value
           if (col.accessorFn) {
-            value = col.accessorFn(row);
+            value = col.accessorFn(row)
           } else if (col.accessorKey) {
-            value = row[col.accessorKey];
+            value = row[col.accessorKey]
           }
           if (!isNaN(value) && value !== "" && value !== null && value !== undefined) {
-            total += parseFloat(value);
+            total += Number.parseFloat(value)
           }
-        });
-        totalRowObj[key] = total ? total.toFixed(2) : "";
+        })
+        totalRowObj[key] = total ? total.toFixed(2) : ""
       } else {
-        totalRowObj[key] = "";
+        totalRowObj[key] = ""
       }
-    });
+    })
 
-    const totalRowString = generateRow(totalRowObj);
+    const totalRowString = generateRow(totalRowObj)
 
     // Combine all parts into CSV content
-    const csvContent = `${headers}\n${dataRows.join("\n")}\n${totalRowString}`;
-    const csvWithBOM = "\uFEFF" + csvContent; // Excel needs BOM for UTF-8
+    const csvContent = `${headers}\n${dataRows.join("\n")}\n${totalRowString}`
+    const csvWithBOM = "\uFEFF" + csvContent // Excel needs BOM for UTF-8
 
     // Trigger download
-    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", csvName + ".csv");
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-
-
+    const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", csvName + ".csv")
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <div>
       <Paper sx={{ boxShadow: "none", backgroundColor: "transparent" }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <TextField
             value={globalFilter ?? ""}
             size="small"
@@ -310,14 +306,13 @@ const DataTable = ({
           />
           {csv && (
             <Button
-
               startIcon={<FileDownload />}
               onClick={exportToExcel}
               variant="contained"
               color="primary"
               sx={{
-                padding: '10px',
-                textTransform: 'capitalize !important',
+                padding: "10px",
+                textTransform: "capitalize !important",
                 backgroundColor: "#001f3f !important",
                 fontSize: "12px",
                 ":hover": {
@@ -359,8 +354,6 @@ const DataTable = ({
                 </Button>
               ))}
             </ButtonGroup>
-
-
           </Box>
         )}
         {/* {!alphabets && csv && (
@@ -401,27 +394,24 @@ const DataTable = ({
                         flexRender(header.column.columnDef.header, header.getContext())
                       ) : (
                         <TableSortLabel
-                        active={!!header.column.getIsSorted()}
-                        direction={header.column.getIsSorted() || "asc"}
-                        onClick={header.column.getToggleSortingHandler()}
-                        sx={{
-                          color: header.column.getIsSorted() ? "#6092d5 !important" : "white !important",
-                          '& .MuiTableSortLabel-icon': {
+                          active={!!header.column.getIsSorted()}
+                          direction={header.column.getIsSorted() || "asc"}
+                          onClick={header.column.getToggleSortingHandler()}
+                          sx={{
                             color: header.column.getIsSorted() ? "#6092d5 !important" : "white !important",
-                          },
-                          '&:hover': {
-                            color: "#6092d5 !important",
-                            '& .MuiTableSortLabel-icon': {
-                              color: "#6092d5 !important",
+                            "& .MuiTableSortLabel-icon": {
+                              color: header.column.getIsSorted() ? "#6092d5 !important" : "white !important",
                             },
-                          },
-                        }}
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableSortLabel>
-                      
-                      
-
+                            "&:hover": {
+                              color: "#6092d5 !important",
+                              "& .MuiTableSortLabel-icon": {
+                                color: "#6092d5 !important",
+                              },
+                            },
+                          }}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableSortLabel>
                       )}
                     </TableCell>
                   ))}
@@ -430,7 +420,15 @@ const DataTable = ({
             </TableHead>
 
             <TableBody>
-              {table.getRowModel().rows.length > 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={table.getAllColumns().length}>
+                    <Box py={3} textAlign="center">
+                      <CircularProgress sx={{ color: "#001f3f" }} size={50} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length > 0 ? (
                 <>
                   {table.getRowModel().rows.map((row) => (
                     <TableRow
@@ -460,18 +458,12 @@ const DataTable = ({
                 <TableRow>
                   <TableCell colSpan={table.getAllColumns().length}>
                     <Box py={3} textAlign="center">
-                      {!loading ? (
-                        <strong style={{ fontSize: "18px" }}>No Data Found</strong>
-                      ) : (
-                        <CircularProgress sx={{ color: "#001f3f" }} size={50} />
-                      )}
+                      <strong style={{ fontSize: "18px" }}>No Data Found</strong>
                     </Box>
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
-
-
           </Table>
         </TableContainer>
 
