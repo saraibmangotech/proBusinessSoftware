@@ -137,6 +137,7 @@ function CreatePaymentVoucher() {
     const [costCenters, setCostCenters] = useState([])
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
     const [editState, setEditState] = useState(false)
+    const [selectedIndex, setSelectedIndex] = useState(null)
 
     // *For Total of Credit & Debit
     let TotalDebit = 0
@@ -388,7 +389,7 @@ function CreatePaymentVoucher() {
             showErrorToast("Please select an account first");
             return;
         }
-        if (!selectedCostCenter ) {
+        if (!selectedCostCenter) {
             showErrorToast("Please select cost center");
             return;
         }
@@ -410,96 +411,79 @@ function CreatePaymentVoucher() {
             name: selectedAccount?.name,
             payment_mode: selectedAccount?.name,
             selectedAccount: selectedAccount,
-            cost_center:selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name
         };
 
         let findElement = rows?.find((item) => item?.account_id === newRow?.account_id);
-        if (findElement) {
-            showErrorToast("Account Already Added");
-        } else {
-            setRows((prevRows) => {
-                const updatedRows = [...prevRows, newRow];
 
-                const newTotalCredit = updatedRows.reduce(
-                    (sum, row) => sum + parseFloat(row.credit || 0),
-                    0
-                );
-                const newTotalDebit = updatedRows.reduce(
-                    (sum, row) => sum + parseFloat(row.debit || 0),
-                    0
-                );
-                const GrandTotal = updatedRows.reduce(
-                    (sum, row) => sum + parseFloat(row.amount || 0),
-                    0
-                );
+        setRows((prevRows) => {
+            const updatedRows = [...prevRows, newRow];
 
-                setTotalCredit(newTotalCredit);
-                setTotalDebit(newTotalDebit);
-                setTotal(GrandTotal);
+            const newTotalCredit = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.credit || 0),
+                0
+            );
+            const newTotalDebit = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.debit || 0),
+                0
+            );
+            const GrandTotal = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.amount || 0),
+                0
+            );
 
-                console.log(updatedRows);
+            setTotalCredit(newTotalCredit);
+            setTotalDebit(newTotalDebit);
+            setTotal(GrandTotal);
 
-                setIsCreditDisabled(false);
-                setIsDebitDisabled(false);
+            console.log(updatedRows);
 
-                return updatedRows;
-            });
+            setIsCreditDisabled(false);
+            setIsDebitDisabled(false);
 
-            setSelectedAccount(null);
-            setSelectedCostCenter(null)
-            setValue('description', '')
-            setValue('amount', '')
-        }
+            return updatedRows;
+        });
+
+        setSelectedAccount(null);
+        setSelectedCostCenter(null)
+        setValue('description', '')
+        setValue('amount', '')
+
     };
-    const updateItem = (description, amount) => {
+    const updateItem = (description, amount, index) => {
         // Basic Validations
         if (!selectedAccount || !selectedAccount.id) {
             showErrorToast("Please select an account first");
             return;
         }
-        if (!selectedCostCenter ) {
+        if (!selectedCostCenter) {
             showErrorToast("Please select cost center");
             return;
         }
-
-        // if (!description || description.trim() === "") {
-        //     showErrorToast("Description is required");
-        //     return;
-        // }
 
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             showErrorToast("Valid amount is required");
             return;
         }
 
-        if (!selectedAccount?.id) {
-            showErrorToast("No valid ID found for update.");
-            return;
-        }
-        console.log(selectedAccount?.id, 'selectedAccountselectedAccount');
-
         // Prepare updated row data
         const updatedItem = {
-            id: selectedAccount.id, // Maintain ID for match
+            id: selectedAccount.id,
             description: description.trim(),
             amount: parseFloat(amount),
             debit: parseFloat(amount),
             credit: 0,
-            account_id: selectedAccount?.id,
-            name: selectedAccount?.name,
-            payment_mode: selectedAccount?.name,
+            account_id: selectedAccount.id,
+            name: selectedAccount.name,
+            payment_mode: selectedAccount.name,
             selectedAccount: selectedAccount,
-            cost_center:selectedCostCenter?.name
+            cost_center: selectedCostCenter.name
         };
-        console.log(updateItem, 'updateItemupdateItem');
 
+        // Update rows
         setRows((prevRows) => {
-            const updatedRows = prevRows.map((item) => {
-                console.log(item.account_id === selectedAccount.id);
-                return item.account_id === selectedAccount.id ? updatedItem : item;
-            });
-
-            console.log(updatedRows, 'updatedRows');
+            const updatedRows = [...prevRows];
+            updatedRows[selectedIndex] = updatedItem;
 
             // Recalculate totals
             const newTotalCredit = updatedRows.reduce(
@@ -524,15 +508,6 @@ function CreatePaymentVoucher() {
 
             return updatedRows;
         });
-
-
-        // Reset state
-        setValue("amount", "");
-        setValue("description", "");
-        setSelectedAccount(null);
-        setSelectedAccount(null);
-        setSelectedCostCenter(null)
-        setEditState(false);
     };
 
     // *For Get Customer Queue
@@ -796,7 +771,7 @@ function CreatePaymentVoucher() {
                                         {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                             setSelectedRow(item); setEditState(true)
                                             console.log(item);
-
+                                            setSelectedIndex(index)
                                             setValue("id", item?.id);
                                             setSelectedAccount(item?.selectedAccount)
                                             setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
@@ -810,8 +785,9 @@ function CreatePaymentVoucher() {
                                             let selectedID = item?.id
                                             console.log(item?.id);
 
-                                            setRows(rows?.filter(item2 => item2?.account_id != item?.account_id))
-                                            let filteredData = rows?.filter(item2 => item2?.account_id != item?.account_id)
+                                            setRows(rows?.filter((_, index2) => index2 !== index));
+                                            let filteredData = rows?.filter((_, index2) => index2 !== index);
+
 
                                             const newTotalCredit = filteredData.reduce((sum, row) => sum + parseFloat(row.credit || 0), 0);
                                             const newTotalDebit = filteredData.reduce((sum, row) => sum + parseFloat(row.debit || 0), 0);

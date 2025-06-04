@@ -338,7 +338,8 @@ function PayReceipts() {
             let params = {
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-                is_paid: true
+                is_paid: true,
+                invoice_number:getValues('invoiceNumber')
 
 
             }
@@ -550,18 +551,18 @@ function PayReceipts() {
         {
             header: "Total Amount",
             accessorFn: (row) => {
-               
-                    return (
-                        row?.sale_receipt_items?.reduce((total2, item) => {
-                            return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                        }, 0) +
-                        row?.sale_receipt_items?.reduce((total, item) => {
-                            const fee = parseFloat(item?.center_fee ?? 0);
-                            const qty = parseFloat(item?.quantity ?? 1);
-                            return total + fee * qty;
-                        }, 0) * 0.05
-                    ).toFixed(2);
-               
+
+                return (
+                    row?.sale_receipt_items?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                    }, 0) +
+                    row?.sale_receipt_items?.reduce((total, item) => {
+                        const fee = parseFloat(item?.center_fee ?? 0);
+                        const qty = parseFloat(item?.quantity ?? 1);
+                        return total + fee * qty;
+                    }, 0) * 0.05
+                ).toFixed(2);
+
             },
             accessorKey: "total_amount",
             cell: ({ row }) => (
@@ -571,15 +572,15 @@ function PayReceipts() {
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
                     {(
-                            row?.original?.sale_receipt_items?.reduce((total2, item) => {
-                                return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                            }, 0) +
-                            row?.original?.sale_receipt_items?.reduce((total, item) => {
-                                const fee = parseFloat(item?.center_fee ?? 0);
-                                const qty = parseFloat(item?.quantity ?? 1);
-                                return total + fee * qty;
-                            }, 0) * 0.05
-                        ).toFixed(2)}
+                        row?.original?.sale_receipt_items?.reduce((total2, item) => {
+                            return parseFloat(total2) + parseFloat(item?.total ?? 0);
+                        }, 0) +
+                        row?.original?.sale_receipt_items?.reduce((total, item) => {
+                            const fee = parseFloat(item?.center_fee ?? 0);
+                            const qty = parseFloat(item?.quantity ?? 1);
+                            return total + fee * qty;
+                        }, 0) * 0.05
+                    ).toFixed(2)}
                 </Box>
             ),
         },
@@ -767,7 +768,15 @@ function PayReceipts() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid Receipt List</Typography>
+                <Box >
+                    <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create"
 
+                        onClick={() => { navigate('/create-paid-receipt'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />
+                </Box>
 
             </Box>
 
@@ -776,49 +785,51 @@ function PayReceipts() {
 
 
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
+                <Grid item xs={10}>
                     <Grid container spacing={1}>
-                    <Grid item xs={5}>
-                        <DatePicker
-                            label={"From Date"}
-                            disableFuture={true}
-                            size="small"
-                            value={fromDate}
-                            onChange={(date) => handleFromDate(date)}
-                        />
-                    </Grid>
-                    <Grid item xs={5}>
-                        <DatePicker
-                            label={"To Date"}
+                        <Grid item xs={12} sm={3}>
+                            <InputField
+                                size={'small'}
+                                label={'Invoice No.'}
+                                placeholder={'Invoice No'}
+                                register={register('invoiceNumber', {
 
-                            disableFuture={true}
-                            size="small"
-                            value={toDate}
-                            onChange={(date) => handleToDate(date)}
-                        />
-                    </Grid>
+                                })}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <DatePicker
+                                label={"From Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={fromDate}
+                                onChange={(date) => handleFromDate(date)}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <DatePicker
+                                label={"To Date"}
 
-                    <Grid item xs={2} sx={{ marginTop: "30px" }}>
-                        <PrimaryButton
-                            bgcolor={"#001f3f"}
-                            icon={<SearchIcon />}
-                            title="Search"
-                            sx={{ marginTop: "30px" }}
-                            onClick={() => getCustomerQueue(null, null, null)}
-                            loading={loading}
-                        />
-                    </Grid>
+                                disableFuture={true}
+                                size="small"
+                                value={toDate}
+                                onChange={(date) => handleToDate(date)}
+                            />
+                        </Grid>
+
+                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                            <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                icon={<SearchIcon />}
+                                title="Search"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => getCustomerQueue(null, null, null)}
+                                loading={loading}
+                            />
+                        </Grid>
                     </Grid>
                 </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                    <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="Create"
-                        
-                        onClick={() => { navigate('/create-paid-receipt'); localStorage.setItem("currentUrl", '/create-customer') }}
-                        loading={loading}
-                    />
-                </Grid>
+           
             </Grid>
 
 
