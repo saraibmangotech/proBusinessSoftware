@@ -149,7 +149,8 @@ const routes = {
   getLeaves:'/hrms/leaves',
   UpdateLeave:'/hrms/leaves/update',
   LeaveStatus:'/hrms/leaves/process',
-  adjustLeaves:'/hrms/leaves/adjust'
+  adjustLeaves:'/hrms/leaves/adjust',
+  CreateSaleReceipt2:'/sales/receipts/place/mohre'
 
 
 };

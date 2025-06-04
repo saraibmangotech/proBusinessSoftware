@@ -260,6 +260,9 @@ const BankDetail = lazy(() =>
 const SalesReciept = lazy(() =>
   import("pages/Dashboard/SalesReciept/index")
 );
+const SalesReciept2 = lazy(() =>
+  import("pages/Dashboard/SalesReciept/index2")
+);
 const PreSalesList = lazy(() =>
   import("pages/Dashboard/SalesReciept/PreSales")
 );
@@ -841,6 +844,10 @@ const AdminRoutes = [
   {
     path: "/sales-receipt",
     component: <SalesReciept />,
+  },
+  {
+    path: "/sales-receipt-copy",
+    component: <SalesReciept2 />,
   },
   {
     path: "/update-presale/:id",
