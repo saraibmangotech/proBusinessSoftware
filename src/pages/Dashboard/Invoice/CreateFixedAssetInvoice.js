@@ -749,7 +749,7 @@ function CreateFixedAssetInvoice() {
             }));
             console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
 
-            setAccounts2(updatedAccounts)
+            setAccounts3(updatedAccounts)
         } catch (error) {
             showErrorToast(error)
         }
@@ -835,7 +835,7 @@ function CreateFixedAssetInvoice() {
                             }}
                         >
                             <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>
-                                Create Fixed Expense
+                                Create Fixed Asset Invoice
                             </Typography>
 
                         </Box>
