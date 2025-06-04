@@ -445,6 +445,10 @@ function CreatePaidReceipt() {
           0,
         )
         setValue1(
+          "methodTotal",
+          0,
+        )
+        setValue1(
           "finalTotal",
           total,
         )
@@ -788,6 +792,10 @@ function CreatePaidReceipt() {
         )
         setValue1(
           "additionalCharges",
+          0,
+        )
+        setValue1(
+          "methodTotal",
           0,
         )
         setValue1(
@@ -1397,6 +1405,7 @@ function CreatePaidReceipt() {
                             const percentage = parseFloat(getValues1("percentage") || 0);
                             const additionalCharge = ((percentage / 100) * amount).toFixed(2);
                             setValue1("additionalCharges", additionalCharge);
+                            setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
                           },
                         })}
                         error={errors1?.payamount?.message}
@@ -1437,6 +1446,7 @@ function CreatePaidReceipt() {
                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                             setValue1("additionalCharges", additionalCharge);
+                            setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
 
                           } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
                             value?.id === 'Payment Link') {
@@ -1446,6 +1456,7 @@ function CreatePaidReceipt() {
                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                             setValue1("additionalCharges", additionalCharge);
+                            setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
                           }
                         }}
                         register={register1("payment", {
@@ -1517,6 +1528,7 @@ function CreatePaidReceipt() {
                                 const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                                 setValue1("additionalCharges", additionalCharge);
+                                setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
                               },
                             })}
                             error={errors1?.percentage?.message}
@@ -1536,6 +1548,17 @@ function CreatePaidReceipt() {
                           />
                         </Grid>
                         
+                        <Grid item md={3} sm={12} xs={12}>
+                          <InputField
+                            label="Method Total"
+                            size="small"
+                            placeholder="Auto calculated"
+                            disabled
+                            value={watch1("methodTotal")}
+                            register={register1("methodTotal")}
+                            error={errors1?.methodTotal?.message}
+                          />
+                        </Grid>
                       </>
                     )}
 
@@ -1624,6 +1647,12 @@ function CreatePaidReceipt() {
                               <Typography variant="body1">
                                 <strong>Additional Charges:</strong>{" "}
                                 {payment.additional_charges_value}
+                              </Typography>
+                            )}
+                              {payment.additional_charges_percentage && (
+                              <Typography variant="body1">
+                                <strong>Total:</strong>{" "}
+                                {parseFloat(payment.additional_charges_value)+parseFloat(payment?.amount)}
                               </Typography>
                             )}
                           </Box>
