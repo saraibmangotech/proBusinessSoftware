@@ -1544,6 +1544,7 @@ function CreatePaidReceipt() {
                             error={errors1?.additionalCharges?.message}
                           />
                         </Grid>
+                        
                       </>
                     )}
 
