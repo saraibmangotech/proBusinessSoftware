@@ -1931,7 +1931,7 @@ function SalesReciept2() {
                                                         {payment.bank?.name || payment.bank}
                                                     </Typography>
                                                 )}
-                                                {payment.mode === "Card" && (
+                                                {payment.mode === 700260 && (
                                                     <Typography variant="body1">
                                                         <strong>Card:</strong>{" "}
                                                         {payment.card?.name || payment.card}

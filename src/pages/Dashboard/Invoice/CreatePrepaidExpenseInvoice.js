@@ -472,7 +472,7 @@ function CreatePurchaseInvoice() {
             setValue("id", value?.id);
             setValue("item_code", value?.id);
             setValue("quantity", 1);
-
+            setValue("description", value?.description);
             setValue("charges", value?.price);
         }
         else {
