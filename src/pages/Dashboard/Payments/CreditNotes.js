@@ -42,6 +42,8 @@ import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import DatePicker from 'components/DatePicker';
+import FinanceServices from 'services/Finance';
+import LedgerModal from 'LedgerTable';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -156,7 +158,42 @@ function CreditNotes() {
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
 
-    
+    const [data, setData] = useState([])
+    const [loader2, setLoader2] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false)
+    const handleOpenModal = () => {
+        setModalOpen(true)
+    }
+
+    const handleCloseModal = () => {
+        setModalOpen(false)
+    }
+
+    const getGeneralJournalLedgers = async (number) => {
+        setModalOpen(true)
+        setLoader2(true)
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                module: 'credit_note',
+                id:number
+            }
+
+            const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+            setData(data?.statement?.rows)
+
+
+        } catch (error) {
+            ErrorToaster(error)
+        } finally {
+            setLoader2(false)
+        }
+    }
+
+
+
 
     const handleFromDate = (newDate) => {
         try {
@@ -393,6 +430,25 @@ function CreditNotes() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton
+                        onClick={() =>
+
+
+                            getGeneralJournalLedgers(row?.original?.id)
+                        }
+                        sx={{
+                            width: '35px',
+                            height: '35px',
+                            bgcolor:
+                                Colors.primary,
+                            "&:hover": {
+                                bgcolor:
+                                    Colors.primary,
+                            },
+                        }}
+                    >
+                        <EyeIcon />
+                    </IconButton>
                     <Tooltip title="PDF">
                         <IconButton
                             onClick={() => {
@@ -432,7 +488,13 @@ function CreditNotes() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <LedgerModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                generalJournalAccounts={data}
+                title=" Journal Entries"
+                loading={loader2}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
@@ -502,13 +564,13 @@ function CreditNotes() {
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
                 <Grid item xs={12} display={'flex'} mt={2.7} justifyContent={"space-between"} >
 
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Credit Note List</Typography>
-                {true && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create"
-                    onClick={() => { navigate('/create-credit-note'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
+                    <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Credit Note List</Typography>
+                    {true && <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create"
+                        onClick={() => { navigate('/create-credit-note'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />}
 
 
                 </Grid>
@@ -548,7 +610,7 @@ function CreditNotes() {
                 </Grid>
 
             </Grid>
-       
+
 
             {/* Filters */}
             <Box >

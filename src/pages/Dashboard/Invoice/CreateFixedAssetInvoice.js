@@ -302,6 +302,8 @@ function CreateFixedAssetInvoice() {
     const fileInputRef = useRef(null);
     const [hovered, setHovered] = useState(false);
     const [accounts, setAccounts] = useState([]);
+    const [accounts2, setAccounts2] = useState([]);
+    const [accounts3, setAccounts3] = useState([]);
     const [salesAccount, setSalesAccount] = useState(null);
     const [inventoryAccount, setInventoryAccount] = useState(null);
     const [cogsAccount, setCogsAccount] = useState(null);
@@ -317,6 +319,8 @@ function CreateFixedAssetInvoice() {
     const [description, setDescription] = useState(null);
     const [ownGovBank, setOwnGovBank] = useState(null);
     const [selectedAccount, setSelectedAccount] = useState(null);
+    const [selectedAccount2, setSelectedAccount2] = useState(null);
+    const [selectedAccount3, setSelectedAccount3] = useState(null);
     const [services, setServices] = useState([]);
     const [serviceItem, setServiceItem] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -351,6 +355,8 @@ function CreateFixedAssetInvoice() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     total_months: formData?.depreciation_months,
+                    debit_account_id:selectedAccount2?.id,
+                    credit_account_id:selectedAccount3?.id,
                     months_recorded: 0,
                     invoice_type: "Fixed Asset",
                     invoice_prefix: "FA",
@@ -703,7 +709,51 @@ function CreateFixedAssetInvoice() {
             showErrorToast(error)
         }
     }
+    const getAccounts2 = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false,
+                sub_category: 15
 
+            }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts2(updatedAccounts)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
+
+    const getAccounts3 = async (search, accountId) => {
+        try {
+            let params = {
+                page: 1,
+                limit: 10000,
+                name: search,
+                is_disabled: false,
+                sub_head: 2
+
+            }
+            const { data } = await FinanceServices.getAccountsDropDown(params)
+            const updatedAccounts = data?.accounts?.rows?.map(account => ({
+                ...account,
+                name: ` ${account.account_code} ${account.name}`
+            }));
+            console.log(updatedAccounts, 'updatedAccountsupdatedAccounts');
+
+            setAccounts2(updatedAccounts)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    }
     // *For Get Account
     const getChildAccounts = async (accountId) => {
         try {
@@ -743,6 +793,8 @@ function CreateFixedAssetInvoice() {
         getBanks()
         getVendors()
         console.log(user, "user");
+        getAccounts2()
+        getAccounts3()
         getAccounts();
         getCategories();
         getSystemSettings();
@@ -811,6 +863,58 @@ function CreateFixedAssetInvoice() {
                                     />
                                 </Grid>
                                 <Grid item md={3} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="System Invoice Number"
+                                        size="small"
+                                        placeholder="Invoice Number"
+                                        disabled={true}
+                                        register={register1("invoiceNumber", {
+                                            required: 'invoice Number is required'
+                                        })}
+                                        error={errors1?.invoiceNumber?.message}
+                                    />
+                                </Grid>
+                                <Grid item md={3} sm={5.5} xs={12}>
+                                    <SelectField
+                                        size={"small"}
+                                        label={" Depreciation Account "}
+
+                                        options={accounts2}
+                                        selected={selectedAccount2}
+                                        onSelect={(value) => {
+                                            setSelectedAccount2(value)
+                                   
+                                        }}
+                                        error={errors1?.description?.message}
+                                        register={register1("description", {
+                                            required: 'description account is required'
+                                        })}
+                                    />
+                                </Grid>
+                                <Grid item md={3} sm={5.5} xs={12}>
+                                    <SelectField
+                                        size={"small"}
+                                        label={" Accumulated Depreciation Account "}
+
+                                        options={accounts3}
+                                        selected={selectedAccount3}
+                                        onSelect={(value) => {
+                                            setSelectedAccount3(value)
+                                   
+                                        }}
+                                        error={errors1?.accumulated?.message}
+                                        register={register1("accumulated", {
+                                            required: 'accumulated account is required'
+                                        })}
+                                    />
+                                </Grid>
+
+                            
+
+
+                            </Grid>
+                            <Grid container spacing={2} p={2}>
+                            <Grid item md={3} sm={5.5} xs={12}>
                                     <SelectField
                                         size={"small"}
                                         label={"Select Vendor "}
@@ -830,36 +934,6 @@ function CreateFixedAssetInvoice() {
                                         })}
                                     />
                                 </Grid>
-
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="System Invoice Number"
-                                        size="small"
-                                        placeholder="Invoice Number"
-                                        disabled={true}
-                                        register={register1("invoiceNumber", {
-                                            required: 'invoice Number is required'
-                                        })}
-                                        error={errors1?.invoiceNumber?.message}
-                                    />
-                                </Grid>
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="Depreciation Months"
-                                        size="small"
-                                        placeholder="Months"
-                                        type="number"
-                                      
-                                        register={register1("depreciation_months", {
-                                            required: 'Depreciation Months is required'
-                                        })}
-                                        error={errors1?.depreciation_months?.message}
-                                    />
-                                </Grid>
-
-
-                            </Grid>
-                            <Grid container spacing={2} p={2}>
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="name"
@@ -884,14 +958,18 @@ function CreateFixedAssetInvoice() {
                                     />
                                 </Grid>
 
+                                
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
-                                        label="Email"
+                                        label="Depreciation Months"
                                         size="small"
-                                        placeholder="Email"
-                                        disabled={true}
-                                        register={register1("email")}
-                                        error={errors1?.email?.message}
+                                        placeholder="Months"
+                                        type="number"
+                                      
+                                        register={register1("depreciation_months", {
+                                            required: 'Depreciation Months is required'
+                                        })}
+                                        error={errors1?.depreciation_months?.message}
                                     />
                                 </Grid>
 
@@ -899,18 +977,7 @@ function CreateFixedAssetInvoice() {
 
 
 
-                                <Grid item md={3} sm={5.5} xs={12}>
-                                    <InputField
-                                        label="Address"
-                                        size="small"
-                                        placeholder="Address"
-
-                                        disabled={true}
-
-                                        register={register1("address")}
-                                        error={errors1?.address?.message}
-                                    />
-                                </Grid>
+                               
                             </Grid>
 
 
