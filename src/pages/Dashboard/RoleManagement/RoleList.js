@@ -149,7 +149,7 @@ function RoleList() {
 
 	// *For Get Customer Queue
 	const getRoleList = async (page, limit, filter) => {
-		// setLoader(true)
+		setLoader(true)
 		try {
 			console.log(filter);
 			
@@ -180,7 +180,7 @@ console.log(params);
 		} catch (error) {
 			showErrorToast(error)
 		} finally {
-			// setLoader(false)
+			setLoader(false)
 		}
 	}
 
@@ -320,7 +320,7 @@ console.log(params);
 				</Grid>
 
 				<Grid item md={11}>
-					{roleList && <Box>
+					{<Box>
 
 						<Grid container mb={2} >
 
@@ -329,7 +329,7 @@ console.log(params);
 
 
 						{(
-							roleList && (
+							 (
 								<Fragment>
 									<PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5} fileName='Import Customers' >
 

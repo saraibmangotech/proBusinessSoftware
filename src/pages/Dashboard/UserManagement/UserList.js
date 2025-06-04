@@ -150,7 +150,7 @@ function UserList() {
 
   // *For Get Customer Queue
   const getUserRole = async (page, limit, filter) => {
-    // setLoader(true)
+    setLoader(true)
     try {
       const Page = page ? page : currentPage
       const Limit = limit ? limit : pageLimit
@@ -178,7 +178,7 @@ function UserList() {
     } catch (error) {
       showErrorToast(error)
     } finally {
-      // setLoader(false)
+    setLoader(false)
     }
   }
 
@@ -327,7 +327,7 @@ function UserList() {
 
 
             {(
-              UserList && (
+               (
                 <Fragment>
                   <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5} fileName='Import Customers' >
 

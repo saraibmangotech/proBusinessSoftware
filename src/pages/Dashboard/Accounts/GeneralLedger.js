@@ -542,7 +542,7 @@ function GeneralLedger() {
           </Grid>
         </Box>
 
-        {accountLedgers && (
+        { (
           <Fragment>
             <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
               fileName="Account Ledger"
@@ -704,7 +704,7 @@ function GeneralLedger() {
                           align="center"
                           sx={{ fontWeight: 600 }}
                         >
-                          <Box className={classes.loaderWrap}>
+                          <Box sx={{display:'flex',justifyContent:'center'}} className={classes.loaderWrap}>
                             <CircularProgress />
                           </Box>
                         </Cell>
@@ -713,7 +713,7 @@ function GeneralLedger() {
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Box sx={{ mt: 4 }}>
+              {accountLedgers?.length > 0 && <Box sx={{ mt: 4 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6} display={'flex'} gap={1} alignItems={'center'}>
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -734,17 +734,17 @@ function GeneralLedger() {
                     </Typography>
                   </Grid>
                 </Grid>
-              </Box>
+              </Box>}
             </PDFExport>
             {/* ========== Pagination ========== */}
-            <Pagination
+           {accountLedgers?.length > 0 && <Pagination
               currentPage={currentPage}
               pageSize={pageLimit}
               onPageSizeChange={(size) => getAccountLedgers(1, size.target.value)}
               tableCount={accountLedgers?.length}
               totalCount={totalCount}
               onPageChange={(page) => getAccountLedgers(page, "")}
-            />
+            />}
           </Fragment>
         )}
 

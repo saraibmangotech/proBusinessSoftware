@@ -212,7 +212,7 @@ function CompleteTransactionReport() {
 
     // *For Get General Journal Ledger
     const getGeneralJournalLedgers = async (page, limit, filter) => {
-        // setLoader(true)
+        setLoader(true)
         try {
             const Page = page ? page : currentPage
             const Limit = limit ? limit : pageLimit
@@ -231,7 +231,7 @@ function CompleteTransactionReport() {
         } catch (error) {
             ErrorToaster(error)
         } finally {
-            // setLoader(false)
+            setLoader(false)
         }
     }
 
@@ -570,7 +570,7 @@ function CompleteTransactionReport() {
                     </Grid> */}
 
                     {(
-                        generalJournalAccounts && (
+                        (
                             <Fragment>
                                 <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5}
                                     fileName="Complete Transaction Report"
@@ -645,7 +645,7 @@ function CompleteTransactionReport() {
                                                             align="center"
                                                             sx={{ fontWeight: 600 }}
                                                         >
-                                                            <Box className={classes.loaderWrap}>
+                                                            <Box sx={{display:'flex',justifyContent:'center'}} className={classes.loaderWrap}>
                                                                 <CircularProgress />
                                                             </Box>
                                                         </TableCell>
