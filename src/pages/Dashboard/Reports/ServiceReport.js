@@ -184,8 +184,16 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
           )
       );
     
-      const totalLineTotal = data?.rows?.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
-     
+      const totalLineTotal = data?.rows?.reduce((sum, item) => {
+        const centerFee = parseFloat(item?.center_fee) || 0;
+        const govtFee = parseFloat(item?.govt_fee) || 0;
+        const bankCharge = parseFloat(item?.bank_charge) || 0;
+        const quantity = parseFloat(item?.quantity) || 0;
+      
+        const lineTotal = (centerFee + govtFee + bankCharge + (centerFee * 0.05)) * quantity;
+        return sum + lineTotal;
+      }, 0);
+           
       setInvoiceTotal(totalLineTotal)
       const result = data?.rows?.reduce((acc, item) => {
 
@@ -648,7 +656,7 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
         "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
         "Employee ID": item?.receipt?.creator?.employee_id || "",
         "Employee Name": item?.receipt?.creator?.name || "",
-        "Line Total": (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)).toFixed(5),
+        "Line Total": ((centerFee + bankCharge + govtFee + (centerFee * 0.05)) * quantity).toFixed(5),
         "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(5),
       };
     });
@@ -666,7 +674,15 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
       return sum + ((govtFee + bankCharge) * quantity);
     }, 0);
 
-    const totalLineTotal = data.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
+    const totalLineTotal = data.reduce((sum, item) => {
+      const centerFee = parseFloat(item?.center_fee) || 0;
+      const govtFee = parseFloat(item?.govt_fee) || 0;
+      const bankCharge = parseFloat(item?.bank_charge) || 0;
+      const quantity = parseFloat(item?.quantity) || 0;
+    
+      const subtotal = centerFee + govtFee + bankCharge + (centerFee * 0.05);
+      return sum + (subtotal * quantity);
+    }, 0);    
     const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
 
     // Append totals row
