@@ -151,7 +151,8 @@ const routes = {
   LeaveStatus:'/hrms/leaves/process',
   adjustLeaves:'/hrms/leaves/adjust',
   CreateSaleReceipt2:'/sales/receipts/place/mohre',
-  getVatReport:'/reports/vatRegister/Output'
+  getVatReport:'/reports/vatRegister/Output',
+  getVatInputReport:'/reports/vatRegister/Input'
 
 
 };

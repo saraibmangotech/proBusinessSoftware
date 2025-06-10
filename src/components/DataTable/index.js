@@ -48,7 +48,7 @@ const DataTable = ({
   const [sorting, setSorting] = useState([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 50,
   })
   const [rowSelection, setRowSelection] = useState({})
   const [filteredData, setFilteredData] = useState(data)
