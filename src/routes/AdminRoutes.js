@@ -223,6 +223,9 @@ const ServiceReport = lazy(() =>
 const CollectionReport = lazy(() =>
   import("pages/Dashboard/Reports/CollectionReport")
 );
+const VatOutputRegister = lazy(() =>
+  import("pages/Dashboard/Reports/VatOutputRegister")
+);
 const CollectionDetailedReport = lazy(() =>
   import("pages/Dashboard/Reports/CollectionDetailedReport")
 );
@@ -848,6 +851,10 @@ const AdminRoutes = [
   {
     path: "/sales-receipt-copy",
     component: <SalesReciept2 />,
+  },
+  {
+    path: "/vat-output-register",
+    component: <VatOutputRegister />,
   },
   {
     path: "/update-presale/:id",

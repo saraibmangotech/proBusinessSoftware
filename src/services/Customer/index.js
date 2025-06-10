@@ -242,6 +242,10 @@ const CustomerServices = {
     const data = await get(routes.getDetailedCollectionReport, params);
     return data;
   },
+  getVatReport: async (params) => {
+    const data = await get(routes.getVatReport, params);
+    return data;
+  },
   getLeaves: async (params) => {
     const data = await get(routes.getLeaves, params);
     return data;
