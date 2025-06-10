@@ -292,7 +292,7 @@ function SalesReciept2() {
 
     const round = (num) => Math.round(num * 100) / 100;
 
-    const addPayments = (amount, mode, bank, card, code, percentage = null, additionalCharges = null, submit = null) => {
+    const addPayments = (amount, mode, bank, card, code, percentage = 0, additionalCharges = null, submit = null) => {
         const total = parseFloat(getValues1("total")) || 0;
         const currentAmount = parseFloat(amount) || 0;
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
@@ -338,10 +338,10 @@ function SalesReciept2() {
             return;
         }
 
-        if ((mode === "Payment Link" || mode === 700260) && (!percentage || isNaN(percentage))) {
-            showErrorToast("Percentage is required for Bank/Card mode");
-            return;
-        }
+        // if ((mode === "Payment Link" || mode === 700260) && (!percentage || isNaN(percentage))) {
+        //     showErrorToast("Percentage is required for Bank/Card mode");
+        //     return;
+        // }
 
         const paymentObj = {
             amount: currentAmount,
@@ -1869,7 +1869,7 @@ function SalesReciept2() {
                                             selectedBank,
                                             selectedCard,
                                             getValues1("remarks"),
-                                            getValues1("percentage"),
+                                            getValues1("percentage") ? getValues1("percentage") : 0,
                                             getValues1("additionalCharges")
                                         )}
 
@@ -1937,12 +1937,12 @@ function SalesReciept2() {
                                                         {payment.card?.name || payment.card}
                                                     </Typography>
                                                 )}
-                                                {payment.additional_charges_percentage && (
+                                                { (
                                                     <Typography variant="body1">
                                                         <strong>Additional Percent:</strong> {payment.additional_charges_percentage}%
                                                     </Typography>
                                                 )}
-                                                {payment.additional_charges_percentage && (
+                                                { (
                                                     <Typography variant="body1">
                                                         <strong>Additional Charges:</strong>{" "}
                                                         {payment.additional_charges_value}
