@@ -843,7 +843,7 @@ const AdminRoutes = [
   },
   {
     path: "/sales-receipt",
-    component: <SalesReciept />,
+    component: <SalesReciept2 />,
   },
   {
     path: "/sales-receipt-copy",

@@ -575,6 +575,7 @@ function CreatePaymentInvoice() {
 
             setValue('total', totalAmount)
             setValue('finalTotal', totalAmount)
+            setValue('payAmount', totalAmount)
             setTotalAmount(totalAmount)
 
         }
