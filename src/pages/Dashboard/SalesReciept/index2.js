@@ -185,6 +185,7 @@ function SalesReciept2() {
 
         reset();
         setServiceItem("");
+        setPayments([])
     };
 
 
@@ -887,6 +888,22 @@ function SalesReciept2() {
                 return total + fee * qty;
             }, 0) * 0.05
         ).toFixed(2))
+        setValue1('balance', (
+            parseFloat(subTotal) +
+            rows?.reduce((total, item) => {
+                const fee = parseFloat(item?.center_fee ?? 0);
+                const qty = parseFloat(item?.quantity ?? 1);
+                return total + fee * qty;
+            }, 0) * 0.05
+        ).toFixed(2))
+        setValue1('payamount', (
+            parseFloat(subTotal) +
+            rows?.reduce((total, item) => {
+                const fee = parseFloat(item?.center_fee ?? 0);
+                const qty = parseFloat(item?.quantity ?? 1);
+                return total + fee * qty;
+            }, 0) * 0.05
+        ).toFixed(2))
         setValue1('finalTotal', (
             parseFloat(subTotal) +
             rows?.reduce((total, item) => {
@@ -1533,7 +1550,7 @@ function SalesReciept2() {
                                                         // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
                                                         return sum + (parseFloat(item.total) || 0);
                                                     }, 0);
-
+                                                    setPayments([])
                                                     console.log("New total after update:", total);
 
                                                     // You can update a state for total if you have one:
@@ -1730,6 +1747,7 @@ function SalesReciept2() {
                                         size="small"
                                         placeholder="Amount"
                                         type="number"
+                                        step={'any'}
                                         register={register1("payamount", {
                                             required: false,
                                             onChange: (e) => {
