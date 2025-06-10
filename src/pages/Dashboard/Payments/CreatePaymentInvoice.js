@@ -545,7 +545,7 @@ function CreatePaymentInvoice() {
         console.log(total, 'total');
         console.log(parseFloat(parseFloat(total) - parseFloat(existingTotal)), 'minusval');
 
-        setValue('amount', parseFloat(existingTotal).toFixed(2))
+        setValue('amount', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
         setValue('balance', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
         setValue('payamount', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
 
@@ -574,6 +574,7 @@ function CreatePaymentInvoice() {
             console.log(totalAmount, 'totalAmount');
 
             setValue('total', totalAmount)
+            setValue('balance', totalAmount)
             setValue('finalTotal', totalAmount)
             setValue('payAmount', totalAmount)
             setTotalAmount(totalAmount)
