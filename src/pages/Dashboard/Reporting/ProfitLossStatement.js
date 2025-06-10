@@ -13,7 +13,7 @@ import FinanceServices from 'services/Finance';
 import DatePicker from 'components/DatePicker';
 import SearchIcon from "@mui/icons-material/Search";
 import moment from 'moment';
-import { CommaSeparator, Debounce, handleExportWithComponent } from 'utils';
+import { agencyType, CommaSeparator, Debounce, handleExportWithComponent } from 'utils';
 import ExportFinanceServices from 'services/ExportFinance';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -22,7 +22,7 @@ import { PDFExport } from '@progress/kendo-react-pdf';
 import SelectField from 'components/Select';
 import CustomerServices from 'services/Customer';
 import { showErrorToast } from 'components/NewToaster';
-
+import ExcelJS from "exceljs";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -119,8 +119,8 @@ function ProfitLossStatement() {
   const [totalCost, setTotalCost] = useState(0)
   const [totalAdminExpenses, setTotalAdminExpenses] = useState(0)
   const [costCenters, setCostCenters] = useState([])
-    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
-    const [adminOpTotal, setAdminOpTotal] = useState(0)
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [adminOpTotal, setAdminOpTotal] = useState(0)
 
   // *For Collapse
   const [expand, setExpand] = useState([]);
@@ -148,7 +148,7 @@ function ProfitLossStatement() {
         return
       }
       setToDate(new Date(newDate))
-     
+
     } catch (error) {
       ErrorToaster(error)
     }
@@ -161,9 +161,9 @@ function ProfitLossStatement() {
       const Filter = { ...dateFilter, ...filter }
       setDateFilter(Filter)
       let params = {
-        cost_center:selectedCostCenter?.name,
-        to_date:toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-        from_date:fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+        cost_center: selectedCostCenter?.name,
+        to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+        from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         ...Filter
       }
       const { data } = await FinanceServices.getAccountReports(params)
@@ -228,7 +228,7 @@ function ProfitLossStatement() {
       console.log(costData, 'costDatacostData');
       console.log(costData[0]?.sub?.filter(item => item?.type_number == 1));
 
-      console.log(totalEnxpensesVal,'totalEnxpensesVal');
+      console.log(totalEnxpensesVal, 'totalEnxpensesVal');
       console.log(revenueTotal, 'revenueTotalrevenueTotalrevenueTotalrevenueTotal');
       setTotalRevenue(revenueTotal)
       setTotalExpenses(totalEnxpensesVal)
@@ -419,158 +419,488 @@ function ProfitLossStatement() {
     setFilteredProfitLossStatement(result)
   }
 
+  
   const downloadExcel = () => {
-    const headers = tableHead;
-    const rows = [];
-    // Iterate through the data and push each row to the 'rows' array
-    filteredProfitLossStatement?.forEach(item => {
-      let GrandTotal = 0
-      rows.push([
-        item.name,
-        '', // Empty cells for the columns that don't have data in this row
-        '',
-        '',
-        '',
-        ''
-      ]);
-
-      if (item.sub) {
-        item.sub.forEach(subItem => {
-          let Total = 0
-          rows.push([
-            subItem.name,
-            '',
-            '',
-            '',
-            '',
-            ''
-          ]);
-          if (subItem.accounts) {
-            subItem.accounts.forEach(account => {
-              let childFinalTotal = 0
-              let childTotal = 0
-              if (account?.childAccounts?.length > 0) {
-                const initialValue = { "credit": 0, "debit": 0 };
-
-                const result = account?.childAccounts?.reduce((accumulator, transaction) => {
-                  const credit = isNaN(transaction?.total_credit) ? 0 : transaction?.total_credit
-                  const debit = isNaN(transaction?.total_debit) ? 0 : transaction?.total_debit
-                  return {
-                    "credit": parseFloat(accumulator.credit) + parseFloat(credit),
-                    "debit": parseFloat(accumulator.debit) + parseFloat(debit),
-                  };
-                }, initialValue);
-                childTotal = account?.nature === 'debit' ? parseFloat(result?.debit) - parseFloat(result?.credit) : parseFloat(result?.credit) - parseFloat(result?.debit)
-
-              }
-              else {
-                childTotal = account?.nature === 'debit' ? parseFloat(account?.total_debit) - parseFloat(account?.total_credit) : parseFloat(account?.total_credit) - parseFloat(account?.total_debit)
-              }
-              Total += parseFloat(childTotal)
-              GrandTotal += parseFloat(childTotal)
-              // const total = account.total !== undefined && account.total !== null ? parseFloat(account.total).toFixed(2) : '';
-              rows.push([
-                account.account_code ?? '-',
-                account.account_name ?? '-',
-                account.account_category ?? '-',
-                account.account_subcategory ?? '-',
-                '',
-                parseFloat(childTotal)
-              ]);
-
-              if (account.childAccounts) {
-                account.childAccounts.forEach(child => {
-                  const credit = isNaN(child?.total_credit) ? 0 : child?.total_credit
-                  const debit = isNaN(child?.total_debit) ? 0 : child?.total_debit
-                  let subTotal = child?.nature === 'debit' ? (parseFloat(debit) - parseFloat(credit)).toFixed(2) : (parseFloat(credit) - parseFloat(debit)).toFixed(2)
-                  childFinalTotal += parseFloat(subTotal)
-                  // const childTotal = child.total !== undefined && child.total !== null ? parseFloat(child.total).toFixed(2) : '';
-                  rows.push([
-                    child.account_code ?? '-',
-                    child.account_name ?? '-',
-                    child.account_category ?? '-',
-                    child.account_subcategory ?? '-',
-                    parseFloat(subTotal),
-                    ''
-                  ]);
-                });
-              }
-            });
-          }
-          subItem?.accounts?.length > 0 && (
-            rows.push([
-              `Total of ${subItem?.accounts[0]?.type_code}`,
-              "",
-              `Total of ${subItem?.name}`,
-              "",
-              "",
-              parseFloat(Total)
-            ])
-          )
-        if( subItem?.accounts[0]?.type_code == 'E1'){
-
-          rows.push([
-            "",
-            "",
-            "Gross Profit",
-            "",
-            "",
-            parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)).toFixed(2)
-          ])
-        }
-          
-        });
-        item?.sub?.length > 0 && (
-          rows.push([
-            "Total",
-            "",
-            `Total ${item?.name}`,
-            "",
-            "",
-            parseFloat(GrandTotal).toFixed(2)
-          ])
-        )
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Profit Loss Statement");
+      
+      // Set professional header and footer
+      worksheet.headerFooter.oddHeader =
+          '&C&"Arial,Bold"&18PROFIT LOSS STATEMENT\n' +
+          '&C&"Arial,Regular"&12Your Company Name\n' +
+          '&C&"Arial,Regular"&10Period: &D - &T\n' +
+          '&L&"Arial,Regular"&8Generated on: ' +
+          new Date().toLocaleDateString() +
+          "\n" +
+          '&R&"Arial,Regular"&8Page &P of &N'
+  
+      worksheet.headerFooter.oddFooter =
+          '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+          '&C&"Arial,Regular"&8This report contains financial data as of ' +
+          new Date().toLocaleDateString() +
+          '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
+          '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+  
+      // Alternative simpler footer format
+      worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter;
+  
+      // Set page setup for professional printing
+      worksheet.pageSetup = {
+          paperSize: 9, // A4
+          orientation: "landscape",
+          fitToPage: true,
+          fitToWidth: 1,
+          fitToHeight: 0,
+          margins: {
+              left: 0.7,
+              right: 0.7,
+              top: 1.0,
+              bottom: 1.0,
+              header: 0.3,
+              footer: 0.5,
+          },
       }
-    });
-    filteredProfitLossStatement.length - 1 && (
-      rows.push([
-        "",
-        "",
-        "Net Profit",
-        "",
-        "",
-        CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal)).toFixed(2))
+  
+      // Add title section at the top of the worksheet
+      const titleRow = worksheet.addRow(["PROFIT LOSS STATEMENT"])
+      titleRow.getCell(1).font = {
+          name: "Arial",
+          size: 16,
+          bold: true,
+          color: { argb: "2F4F4F" },
+      }
+      titleRow.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A1:F1")
+      
+      let name = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC" : 'PREMIUM BUSINESSMAN  SERVICES'
+      const companyRow = worksheet.addRow([name])
+      companyRow.getCell(1).font = {
+          name: "Arial",
+          size: 14,
+          bold: true,
+          color: { argb: "4472C4" },
+      }
+      companyRow.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A2:F2")
+  
+      const dateRow = worksheet.addRow([
+          `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
       ])
-    )
-
-    // Convert the data to a worksheet
-    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-    // Convert the workbook to a binary Excel file and trigger the download
-    const buf = XLSX.write(wb, {
-      bookType: "xlsx",
-      type: "array",
-      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    saveAs(new Blob([buf]), "Profit_Loss_Statement.xlsx");
+      dateRow.getCell(1).font = {
+          name: "Arial",
+          size: 10,
+          italic: true,
+          color: { argb: "666666" },
+      }
+      dateRow.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A3:F3")
+  
+      const dateRow2 = worksheet.addRow([
+          (toDate && fromDate) ? `Period:  ${fromDate ? moment(fromDate).format('MM/DD/YYYY') : '-'} To ${toDate ? moment(toDate).format('MM/DD/YYYY') : 'Present'}` : `Period: All `,
+      ])
+      dateRow2.getCell(1).font = {
+          name: "Arial",
+          size: 10,
+          italic: true,
+          color: { argb: "666666" },
+      }
+      dateRow2.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A4:F4")
+  
+      const costCenter = worksheet.addRow([
+          `Cost Center: ${selectedCostCenter?.name}`,
+      ])
+      costCenter.getCell(1).font = {
+          name: "Arial",
+          size: 10,
+          italic: true,
+          color: { argb: "666666" },
+      }
+      costCenter.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A5:F5")
+  
+      const system = worksheet.addRow([
+          `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? 'TASHEEL' : 'Al-DHEED'}`,
+      ])
+      system.getCell(1).font = {
+          name: "Arial",
+          size: 10,
+          italic: true,
+          color: { argb: "666666" },
+      }
+      system.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A6:F6")
+  
+      // Add empty row for spacing
+      worksheet.addRow([])
+  
+      // Add headers with professional styling
+      const headerRow = worksheet.addRow(tableHead)
+      headerRow.eachCell((cell) => {
+          cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "2F4F4F" }, // Dark slate gray
+          }
+          cell.font = {
+              name: "Arial",
+              bold: true,
+              color: { argb: "FFFFFF" },
+              size: 11,
+          }
+          cell.alignment = { horizontal: "center", vertical: "middle" }
+          cell.border = {
+              top: { style: "thin", color: { argb: "000000" } },
+              left: { style: "thin", color: { argb: "000000" } },
+              bottom: { style: "thin", color: { argb: "000000" } },
+              right: { style: "thin", color: { argb: "000000" } },
+          }
+      })
+  
+      // Process data and add rows with styling
+      filteredProfitLossStatement?.forEach(item => {
+          let GrandTotal = 0
+          
+          // Main category row
+          const categoryRow = worksheet.addRow([
+              item.name,
+              '', 
+              '',
+              '',
+              '',
+              ''
+          ]);
+          categoryRow.getCell(1).fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: '4472C4' }, // Professional blue
+          };
+          categoryRow.getCell(1).font = {
+              name: "Arial",
+              bold: true,
+              color: { argb: "FFFFFF" },
+              size: 12,
+          };
+          categoryRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" };
+  
+          if (item.sub) {
+              item.sub.forEach(subItem => {
+                  let Total = 0
+                  
+                  // Subcategory row
+                  const subCategoryRow = worksheet.addRow([
+                      subItem.name,
+                      '',
+                      '',
+                      '',
+                      '',
+                      ''
+                  ]);
+                  subCategoryRow.getCell(1).fill = {
+                      type: 'pattern',
+                      pattern: 'solid',
+                      fgColor: { argb: 'E6E6FA' }, // Lavender
+                  };
+                  subCategoryRow.getCell(1).font = {
+                      name: "Arial",
+                      bold: true,
+                      size: 11,
+                      color: { argb: "2F4F4F" },
+                  };
+                  subCategoryRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" };
+  
+                  if (subItem.accounts) {
+                      subItem.accounts.forEach(account => {
+                          let childFinalTotal = 0
+                          let childTotal = 0
+                          if (account?.childAccounts?.length > 0) {
+                              const initialValue = { "credit": 0, "debit": 0 };
+  
+                              const result = account?.childAccounts?.reduce((accumulator, transaction) => {
+                                  const credit = isNaN(transaction?.total_credit) ? 0 : transaction?.total_credit
+                                  const debit = isNaN(transaction?.total_debit) ? 0 : transaction?.total_debit
+                                  return {
+                                      "credit": parseFloat(accumulator.credit) + parseFloat(credit),
+                                      "debit": parseFloat(accumulator.debit) + parseFloat(debit),
+                                  };
+                              }, initialValue);
+                              childTotal = account?.nature === 'debit' ? parseFloat(result?.debit) - parseFloat(result?.credit) : parseFloat(result?.credit) - parseFloat(result?.debit)
+                          }
+                          else {
+                              childTotal = account?.nature === 'debit' ? parseFloat(account?.total_debit) - parseFloat(account?.total_credit) : parseFloat(account?.total_credit) - parseFloat(account?.total_debit)
+                          }
+                          Total += parseFloat(childTotal)
+                          GrandTotal += parseFloat(childTotal)
+                          
+                          // Account row
+                          const accountRow = worksheet.addRow([
+                              account.account_code ?? '-',
+                              account.account_name ?? '-',
+                              account.account_category ?? '-',
+                              account.account_subcategory ?? '-',
+                              '',
+                              parseFloat(childTotal)
+                          ]);
+  
+                          // Style account rows
+                          accountRow.eachCell((cell, colNumber) => {
+                              cell.font = { name: "Arial", size: 10 }
+                              cell.alignment = {
+                                  horizontal: colNumber > 4 ? "right" : "left",
+                                  vertical: "middle",
+                              }
+                              cell.border = {
+                                  top: { style: "hair", color: { argb: "CCCCCC" } },
+                                  left: { style: "hair", color: { argb: "CCCCCC" } },
+                                  bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                                  right: { style: "hair", color: { argb: "CCCCCC" } },
+                              }
+                          })
+  
+                          if (account.childAccounts) {
+                              account.childAccounts.forEach(child => {
+                                  const credit = isNaN(child?.total_credit) ? 0 : child?.total_credit
+                                  const debit = isNaN(child?.total_debit) ? 0 : child?.total_debit
+                                  let subTotal = child?.nature === 'debit' ? (parseFloat(debit) - parseFloat(credit)).toFixed(2) : (parseFloat(credit) - parseFloat(debit)).toFixed(2)
+                                  childFinalTotal += parseFloat(subTotal)
+                                  
+                                  // Child account row
+                                  const childRow = worksheet.addRow([
+                                      child.account_code ?? '-',
+                                      child.account_name ?? '-',
+                                      child.account_category ?? '-',
+                                      child.account_subcategory ?? '-',
+                                      parseFloat(subTotal),
+                                      ''
+                                  ]);
+  
+                                  // Style child rows
+                                  childRow.eachCell((cell, colNumber) => {
+                                      cell.font = { name: "Arial", size: 9, italic: true }
+                                      cell.alignment = {
+                                          horizontal: colNumber > 4 ? "right" : "left",
+                                          vertical: "middle",
+                                      }
+                                      cell.border = {
+                                          top: { style: "hair", color: { argb: "CCCCCC" } },
+                                          left: { style: "hair", color: { argb: "CCCCCC" } },
+                                          bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                                          right: { style: "hair", color: { argb: "CCCCCC" } },
+                                      }
+                                  })
+                              });
+                          }
+                      });
+                  }
+                  
+                  // Subcategory total row
+                  if (subItem?.accounts?.length > 0) {
+                      const subTotalRow = worksheet.addRow([
+                          `Total of ${subItem?.accounts[0]?.type_code}`,
+                          "",
+                          `Total of ${subItem?.name}`,
+                          "",
+                          "",
+                          parseFloat(Total)
+                      ]);
+  
+                      subTotalRow.eachCell((cell, colNumber) => {
+                          cell.fill = {
+                              type: "pattern",
+                              pattern: "solid",
+                              fgColor: { argb: "FFD700" }, // Gold
+                          }
+                          cell.font = {
+                              name: "Arial",
+                              bold: true,
+                              size: 10,
+                              color: { argb: "2F4F4F" },
+                          }
+                          cell.alignment = {
+                              horizontal: colNumber > 4 ? "right" : "left",
+                              vertical: "middle",
+                          }
+                          cell.border = {
+                              top: { style: "medium", color: { argb: "000000" } },
+                              left: { style: "medium", color: { argb: "000000" } },
+                              bottom: { style: "medium", color: { argb: "000000" } },
+                              right: { style: "medium", color: { argb: "000000" } },
+                          }
+                      })
+                  }
+  
+                  // Gross Profit row
+                  if (subItem?.accounts[0]?.type_code == 'E1') {
+                      const grossProfitRow = worksheet.addRow([
+                          "",
+                          "",
+                          "Gross Profit",
+                          "",
+                          "",
+                          parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)).toFixed(2)
+                      ]);
+  
+                      grossProfitRow.eachCell((cell, colNumber) => {
+                          cell.fill = {
+                              type: "pattern",
+                              pattern: "solid",
+                              fgColor: { argb: "90EE90" }, // Light green
+                          }
+                          cell.font = {
+                              name: "Arial",
+                              bold: true,
+                              size: 11,
+                              color: { argb: "2F4F4F" },
+                          }
+                          cell.alignment = {
+                              horizontal: colNumber > 4 ? "right" : "center",
+                              vertical: "middle",
+                          }
+                          cell.border = {
+                              top: { style: "medium", color: { argb: "000000" } },
+                              left: { style: "medium", color: { argb: "000000" } },
+                              bottom: { style: "medium", color: { argb: "000000" } },
+                              right: { style: "medium", color: { argb: "000000" } },
+                          }
+                      })
+                  }
+              });
+              
+              // Category total row
+              if (item?.sub?.length > 0) {
+                  const categoryTotalRow = worksheet.addRow([
+                      "Total",
+                      "",
+                      `Total ${item?.name}`,
+                      "",
+                      "",
+                      parseFloat(GrandTotal).toFixed(2)
+                  ]);
+  
+                  categoryTotalRow.eachCell((cell, colNumber) => {
+                      cell.fill = {
+                          type: "pattern",
+                          pattern: "solid",
+                          fgColor: { argb: "FFA500" }, // Orange
+                      }
+                      cell.font = {
+                          name: "Arial",
+                          bold: true,
+                          size: 11,
+                          color: { argb: "FFFFFF" },
+                      }
+                      cell.alignment = {
+                          horizontal: colNumber > 4 ? "right" : "left",
+                          vertical: "middle",
+                      }
+                      cell.border = {
+                          top: { style: "medium", color: { argb: "000000" } },
+                          left: { style: "medium", color: { argb: "000000" } },
+                          bottom: { style: "medium", color: { argb: "000000" } },
+                          right: { style: "medium", color: { argb: "000000" } },
+                      }
+                  })
+              }
+          }
+      });
+  
+      // Net Profit row
+      if (filteredProfitLossStatement.length > 0) {
+          const netProfitRow = worksheet.addRow([
+              "",
+              "",
+              "Net Profit",
+              "",
+              "",
+              CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal)).toFixed(2))
+          ]);
+  
+          netProfitRow.eachCell((cell, colNumber) => {
+              cell.fill = {
+                  type: "pattern",
+                  pattern: "solid",
+                  fgColor: { argb: "000000" }, // Black
+              }
+              cell.font = {
+                  name: "Arial",
+                  bold: true,
+                  color: { argb: "FFFFFF" },
+                  size: 12,
+              }
+              cell.alignment = {
+                  horizontal: colNumber > 4 ? "right" : "center",
+                  vertical: "middle",
+              }
+              cell.border = {
+                  top: { style: "thick", color: { argb: "FFFFFF" } },
+                  left: { style: "thick", color: { argb: "FFFFFF" } },
+                  bottom: { style: "thick", color: { argb: "FFFFFF" } },
+                  right: { style: "thick", color: { argb: "FFFFFF" } },
+              }
+          })
+      }
+  
+      // Set column widths
+      worksheet.columns = [
+          { width: 15 },
+          { width: 35 },
+          { width: 20 },
+          { width: 20 },
+          { width: 18 },
+          { width: 18 },
+      ];
+  
+      // Add workbook properties
+      workbook.creator = "Finance Department"
+      workbook.lastModifiedBy = "Finance System"
+      workbook.created = new Date()
+      workbook.modified = new Date()
+      workbook.lastPrinted = new Date()
+  
+      // Set workbook properties
+      workbook.properties = {
+          title: "Profit Loss Statement",
+          subject: "Financial Report",
+          keywords: "profit loss, financial, accounting",
+          category: "Financial Reports",
+          description: "Comprehensive profit loss statement generated from accounting system",
+          company: "Your Company Name",
+      }
+      const system2 = worksheet.addRow([
+        `Powered By: MangotechDevs.ae`,
+    ])
+    system2.getCell(3).font = {
+        name: "Arial",
+        size: 10,
+        italic: true,
+        color: { argb: "666666" },
+    }
+    system2.getCell(3).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A9:G9")
+    
+    // Add empty row for spacing
+    worksheet.addRow([])
+      const download = async () => {
+          const buffer = await workbook.xlsx.writeBuffer();
+          const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+          saveAs(blob, ( toDate && fromDate )?   `Profit Loss Statement : ${fromDate  ? moment(fromDate).format('MM/DD/YYYY') : '-'} To ${toDate  ? moment(toDate).format('MM/DD/YYYY') : 'Present'}` : `Profit Loss Statement : Present ` ,);
+      }
+      download();
   };
   const getCostCenters = async () => {
     try {
-        let params = {
-            page: 1,
-            limit: 999999,
-        };
+      let params = {
+        page: 1,
+        limit: 999999,
+      };
 
-        const { data } = await CustomerServices.getCostCenters(params);
-        setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
-        setSelectedCostCenter({ id: 'All', name: 'All' })
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters([{ id: 'All', name: 'All' }, ...(data?.cost_centers || [])]);
+      setSelectedCostCenter({ id: 'All', name: 'All' })
     } catch (error) {
-        showErrorToast(error);
+      showErrorToast(error);
     }
-};
+  };
 
   useEffect(() => {
     getProfitLossStatement()
@@ -591,7 +921,7 @@ function ProfitLossStatement() {
         <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, }}>
           Profit OR Loss Statement
         </Typography>
-     
+
         {profitLossStatement?.length > 0 && (
           <Box sx={{
             textAlign: "right", p: 4, display: "flex", gap: 2
@@ -613,52 +943,52 @@ function ProfitLossStatement() {
       <Grid container spacing={2}>
 
 
-<Grid item xs={3}>
-  <SelectField
-    size="small"
-    label="Select Cost Center"
-    options={costCenters}
-    selected={selectedCostCenter}
-    onSelect={(value) => {
-      setSelectedCostCenter(value)
+        <Grid item xs={3}>
+          <SelectField
+            size="small"
+            label="Select Cost Center"
+            options={costCenters}
+            selected={selectedCostCenter}
+            onSelect={(value) => {
+              setSelectedCostCenter(value)
 
-    }}
-    
+            }}
 
-  />
-</Grid>
-<Grid item xs={3}>
-  <DatePicker
-    label={"From Date"}
-    disableFuture={true}
-    size="small"
-    value={fromDate}
-    onChange={(date) => handleFromDate(date)}
-  />
-</Grid>
-<Grid item xs={3}>
-  <DatePicker
-    label={"To Date"}
 
-    disableFuture={true}
-    size="small"
-    value={toDate}
-    onChange={(date) => handleToDate(date)}
-  />
-</Grid>
-<Grid item xs={3} mt={'30px'}>
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <DatePicker
+            label={"From Date"}
+            disableFuture={true}
+            size="small"
+            value={fromDate}
+            onChange={(date) => handleFromDate(date)}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <DatePicker
+            label={"To Date"}
 
-  <PrimaryButton
-    bgcolor={"#001f3f"}
-    icon={<SearchIcon />}
-    title="Search"
-    sx={{ marginTop: "30px" }}
-    onClick={() => getProfitLossStatement(null, null, null)}
+            disableFuture={true}
+            size="small"
+            value={toDate}
+            onChange={(date) => handleToDate(date)}
+          />
+        </Grid>
+        <Grid item xs={3} mt={'30px'}>
 
-  />
+          <PrimaryButton
+            bgcolor={"#001f3f"}
+            icon={<SearchIcon />}
+            title="Search"
+            sx={{ marginTop: "30px" }}
+            onClick={() => getProfitLossStatement(null, null, null)}
 
-</Grid>
-</Grid>
+          />
+
+        </Grid>
+      </Grid>
       {/* Filters */}
       <Grid container spacing={1}>
         {/* <Grid item xs={12} sm={3}>
@@ -671,7 +1001,7 @@ function ProfitLossStatement() {
             })}
           />
         </Grid> */}
-        
+
       </Grid>
       <Grid container spacing={1} sx={{ mb: 2 }}>
         <Grid item xs={12} sm={12}>
@@ -870,7 +1200,7 @@ function ProfitLossStatement() {
                                                       </Typography>
                                                     </Cell>
                                                   </Row>
-                                                  {filters === 'all'  && subItem?.accounts[0]?.type_code == 'E1' &&
+                                                  {filters === 'all' && subItem?.accounts[0]?.type_code == 'E1' &&
                                                     <Row sx={{ bgcolor: Colors.primary }}>
                                                       <Cell colSpan={5}>
                                                         <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
