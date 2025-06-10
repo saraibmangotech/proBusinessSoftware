@@ -300,7 +300,23 @@ function PurchaseInvoices() {
 
         },
         {
-            header: " Date",
+            header: "Created Date",
+
+
+            accessorFn: (row) => row?.created_at ? moment(row?.created_at).format("DD/MM/YYYY") : '',
+            cell: ({ row }) => (
+                <Box
+                    variant="contained"
+                    color="primary"
+                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                >
+                    {row?.original?.created_at ? moment(row?.original?.created_at).format("DD/MM/YYYY") : ''}
+                </Box>
+            ),
+            total: false,
+        },
+        {
+            header: "Purchase Date",
 
 
             accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',

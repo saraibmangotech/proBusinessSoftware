@@ -519,7 +519,7 @@ function VatRegister() {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "VAT Report");
 
-        XLSX.writeFile(workbook, "vat_output_input_register.xlsx");
+        XLSX.writeFile(workbook, "vat_register.xlsx");
     };
 
 

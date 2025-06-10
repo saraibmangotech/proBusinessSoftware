@@ -174,7 +174,14 @@ function CollectionReport() {
 
       const { data } = await CustomerServices.getCollectionReport(params)
       setCustomerQueue(data?.rows)
-      setData(data?.totals)
+      let totalData=data?.totals
+      if(agencyType[process.env.REACT_APP_TYPE]?.category != "TASHEEL"){
+
+        delete totalData?.totalMohre
+        console.log(totalData,'totalDatatotalData');
+      }
+      
+      setData(totalData)
       
 
     } catch (error) {
@@ -591,7 +598,7 @@ function CollectionReport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'customer_receipts.csv';
+    a.download = 'collection_report.csv';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -782,6 +789,19 @@ function CollectionReport() {
           value={`Total Card: ${CommaSeparator(parseFloat(data?.totalCard).toFixed(2))}`}
         />
       </Grid>
+      {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && <Grid item xs={4}>
+        <Input
+        sx={{
+          "& .MuiInputBase-input":{
+            WebkitTextFillColor: "Black !important"
+
+          }
+        }}
+          fullWidth
+          disabled
+          value={`Mohre Account Receivable: ${CommaSeparator(parseFloat(data?.totalMohre).toFixed(2))}`}
+        />
+      </Grid>}
       <Grid item xs={4}>
         <Input
         sx={{
