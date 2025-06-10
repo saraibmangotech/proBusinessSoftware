@@ -185,6 +185,7 @@ function SalesReciept2() {
 
         reset();
         setServiceItem("");
+        setPayments([])
     };
 
 
@@ -292,7 +293,7 @@ function SalesReciept2() {
 
     const round = (num) => Math.round(num * 100) / 100;
 
-    const addPayments = (amount, mode, bank, card, code, percentage = null, additionalCharges = null, submit = null) => {
+    const addPayments = (amount, mode, bank, card, code, percentage = 0, additionalCharges = null, submit = null) => {
         const total = parseFloat(getValues1("total")) || 0;
         const currentAmount = parseFloat(amount) || 0;
         const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
@@ -338,10 +339,10 @@ function SalesReciept2() {
             return;
         }
 
-        if ((mode === "Payment Link" || mode === 700260) && (!percentage || isNaN(percentage))) {
-            showErrorToast("Percentage is required for Bank/Card mode");
-            return;
-        }
+        // if ((mode === "Payment Link" || mode === 700260) && (!percentage || isNaN(percentage))) {
+        //     showErrorToast("Percentage is required for Bank/Card mode");
+        //     return;
+        // }
 
         const paymentObj = {
             amount: currentAmount,
@@ -880,6 +881,22 @@ function SalesReciept2() {
         }
         const allowedCategories = [13, 14, 15, 16, 17];
         setValue1('total', (
+            parseFloat(subTotal) +
+            rows?.reduce((total, item) => {
+                const fee = parseFloat(item?.center_fee ?? 0);
+                const qty = parseFloat(item?.quantity ?? 1);
+                return total + fee * qty;
+            }, 0) * 0.05
+        ).toFixed(2))
+        setValue1('balance', (
+            parseFloat(subTotal) +
+            rows?.reduce((total, item) => {
+                const fee = parseFloat(item?.center_fee ?? 0);
+                const qty = parseFloat(item?.quantity ?? 1);
+                return total + fee * qty;
+            }, 0) * 0.05
+        ).toFixed(2))
+        setValue1('payamount', (
             parseFloat(subTotal) +
             rows?.reduce((total, item) => {
                 const fee = parseFloat(item?.center_fee ?? 0);
@@ -1533,7 +1550,7 @@ function SalesReciept2() {
                                                         // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
                                                         return sum + (parseFloat(item.total) || 0);
                                                     }, 0);
-
+                                                    setPayments([])
                                                     console.log("New total after update:", total);
 
                                                     // You can update a state for total if you have one:
@@ -1730,6 +1747,7 @@ function SalesReciept2() {
                                         size="small"
                                         placeholder="Amount"
                                         type="number"
+                                        step={'any'}
                                         register={register1("payamount", {
                                             required: false,
                                             onChange: (e) => {
@@ -1869,7 +1887,7 @@ function SalesReciept2() {
                                             selectedBank,
                                             selectedCard,
                                             getValues1("remarks"),
-                                            getValues1("percentage"),
+                                            getValues1("percentage") ? getValues1("percentage") : 0,
                                             getValues1("additionalCharges")
                                         )}
 
@@ -1937,12 +1955,12 @@ function SalesReciept2() {
                                                         {payment.card?.name || payment.card}
                                                     </Typography>
                                                 )}
-                                                {payment.additional_charges_percentage && (
+                                                { (
                                                     <Typography variant="body1">
                                                         <strong>Additional Percent:</strong> {payment.additional_charges_percentage}%
                                                     </Typography>
                                                 )}
-                                                {payment.additional_charges_percentage && (
+                                                { (
                                                     <Typography variant="body1">
                                                         <strong>Additional Charges:</strong>{" "}
                                                         {payment.additional_charges_value}
