@@ -574,6 +574,7 @@ function CreatePaymentInvoice() {
             console.log(totalAmount, 'totalAmount');
 
             setValue('total', totalAmount)
+            setValue('payamount', parseFloat(parseFloat(totalAmount).toFixed(2)))
             setValue('balance', totalAmount)
             setValue('finalTotal', totalAmount)
             setValue('payAmount', totalAmount)
