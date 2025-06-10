@@ -666,7 +666,7 @@ function SnapshotOverviewReport() {
                                                 (parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
                                                 parseFloat(customerQueue?.totalVat) +
-                                                parseFloat(customerQueue.totalMohre ||0) +
+                                            
                                                 parseFloat(customerQueue?.totalCenterFee))
                                             ).toFixed(2))}
                                         </Cell>
@@ -786,6 +786,7 @@ function SnapshotOverviewReport() {
                                                 parseFloat(customerQueue?.totalCash) +
                                                 parseFloat(customerQueue?.totalCard) +
                                                 parseFloat(customerQueue?.totalBank) +
+                                                parseFloat(customerQueue.totalMohre ||0) +
                                                 parseFloat(customerQueue?.totalNetwork)
                                             ).toFixed(2))}
                                         </Cell>
