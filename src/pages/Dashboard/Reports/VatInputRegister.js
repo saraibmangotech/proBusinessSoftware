@@ -303,6 +303,20 @@ function VatInputRegister() {
              </Box>
            ),
     },
+        {
+            header: "Transaction Count",
+            accessorKey: "transactionCount",
+            total: true,
+            accessorFn: (row) => row?.transactionCount,
+            cell: ({ row }) => {
+              const value = parseFloat(row?.original?.transactionCount || 0).toFixed(2);
+              return (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                  {value}
+                </Box>
+              );
+            },
+          },
 
       {
         header: "Total Charges",
