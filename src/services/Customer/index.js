@@ -238,8 +238,16 @@ const CustomerServices = {
     const data = await get(routes.getCostCenters, params);
     return data;
   },
+  getVatInputReport: async (params) => {
+    const data = await get(routes.getVatInputReport, params);
+    return data;
+  },
   getDetailedCollectionReport: async (params) => {
     const data = await get(routes.getDetailedCollectionReport, params);
+    return data;
+  },
+  getVatReport: async (params) => {
+    const data = await get(routes.getVatReport, params);
     return data;
   },
   getLeaves: async (params) => {

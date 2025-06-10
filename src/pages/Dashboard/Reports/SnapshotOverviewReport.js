@@ -173,7 +173,15 @@ function SnapshotOverviewReport() {
             }
 
             const { data } = await CustomerServices.getSnapshotOverviewReport(params)
-            setCustomerQueue(data?.report)
+         
+            let totalData=data?.report
+            if(agencyType[process.env.REACT_APP_TYPE]?.category != "TASHEEL"){
+      
+              delete totalData?.totalMohre
+              console.log(totalData,'totalDatatotalData');
+            }
+            
+            setCustomerQueue(totalData)
 
         } catch (error) {
             showErrorToast(error)
@@ -369,9 +377,17 @@ function SnapshotOverviewReport() {
         { description: "Credit Card Collection", value: parseFloat(customerQueue.totalCard).toFixed(2) },
         { description: "Bank Transfer Collection", value: parseFloat(customerQueue.totalBank).toFixed(2) },
         { description: "Online Payment Collection", value: parseFloat(customerQueue.totalNetwork).toFixed(2) },
-        { description: "Net Collection", value: (parseFloat(customerQueue.totalCash) + parseFloat(customerQueue.totalCard) + parseFloat(customerQueue.totalBank) + parseFloat(customerQueue.totalNetwork)).toFixed(2) },
+       // Conditionally include Mohre
+        { description: "Net Collection", value: (parseFloat(customerQueue.totalCash) + parseFloat(customerQueue.totalCard) + parseFloat(customerQueue.totalBank) + parseFloat(customerQueue.totalMohre ||0)+ parseFloat(customerQueue.totalNetwork)).toFixed(2) },
     ];
 
+    if (agencyType[process.env.REACT_APP_TYPE]?.category == "TASHEEL") {
+        tableData.splice(tableData.length - 1, 0, {
+          description: "Mohre Account Receivable",
+          value: parseFloat(customerQueue.totalMohre).toFixed(2),
+        });
+      }
+  
     useEffect(() => {
         setFromDate(new Date())
         setToDate(new Date())
@@ -496,7 +512,7 @@ function SnapshotOverviewReport() {
 
                     <CSVLink
                         data={tableData}
-                        filename={"table-data.csv"}
+                        filename={"overview_report.csv"}
                         style={{ textDecoration: 'none' }} // Remove the default link styling
                     >
                         <Button sx={{backgroundColor:'#001f3f',textTransform:'capitalize'}} variant="contained" color="primary">
@@ -650,6 +666,7 @@ function SnapshotOverviewReport() {
                                                 (parseFloat(customerQueue?.totalGovernmentCharges) +
                                                 parseFloat(customerQueue?.totalBankCharges) +
                                                 parseFloat(customerQueue?.totalVat) +
+                                                parseFloat(customerQueue.totalMohre ||0) +
                                                 parseFloat(customerQueue?.totalCenterFee))
                                             ).toFixed(2))}
                                         </Cell>
@@ -752,6 +769,14 @@ function SnapshotOverviewReport() {
                                             {CommaSeparator(parseFloat(customerQueue?.totalNetwork).toFixed(2))}
                                         </Cell>
                                     </Row>
+                                    {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" &&<Row sx={{ border: "1px solid #EEEEEE !important" }}>
+                                        <Cell style={{ textAlign: "left" }} className="pdf-table">
+                                            Total Mohre Receivable
+                                        </Cell>
+                                        <Cell style={{ textAlign: "left" }} className="pdf-table">
+                                            {CommaSeparator(parseFloat(customerQueue?.totalMohre).toFixed(2))}
+                                        </Cell>
+                                    </Row>}
                                     <Row sx={{ border: "1px solid #EEEEEE !important" }}>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
                                             Net Collection

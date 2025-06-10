@@ -1414,7 +1414,7 @@ function CreatePaidReceipt() {
                             const percentage = parseFloat(getValues1("percentage") || 0);
                             const additionalCharge = ((percentage / 100) * amount).toFixed(2);
                             setValue1("additionalCharges", additionalCharge);
-                            setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
+                            setValue1("methodTotal",parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharge)).toFixed(2));
                           },
                         })}
                         error={errors1?.payamount?.message}
@@ -1455,7 +1455,7 @@ function CreatePaidReceipt() {
                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                             setValue1("additionalCharges", additionalCharge);
-                            setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
+                            setValue1("methodTotal",parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharge)).toFixed(2));
 
                           } else if (agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED" &&
                             value?.id === 'Payment Link') {
@@ -1465,7 +1465,7 @@ function CreatePaidReceipt() {
                             const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                             setValue1("additionalCharges", additionalCharge);
-                            setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
+                            setValue1("methodTotal",parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharge)).toFixed(2));
                           }
                         }}
                         register={register1("payment", {
@@ -1537,7 +1537,7 @@ function CreatePaidReceipt() {
                                 const additionalCharge = ((percentageValue / 100) * amount).toFixed(2);
 
                                 setValue1("additionalCharges", additionalCharge);
-                                setValue1("methodTotal",parseFloat(getValues1('total')) + parseFloat(additionalCharge));
+                                setValue1("methodTotal",parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharge)).toFixed(2));
                               },
                             })}
                             error={errors1?.percentage?.message}

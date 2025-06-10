@@ -8,7 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
-    Button,
+    Input, Drawer,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -22,7 +22,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, CommaSeparator, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -30,8 +30,6 @@ import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
 import { PrimaryButton } from 'components/Buttons';
 import SelectField from 'components/Select';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
@@ -44,6 +42,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
+
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -110,7 +109,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PurchaseInvoices() {
+function VatRegister() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -129,7 +128,7 @@ function PurchaseInvoices() {
         reset,
     } = useForm();
 
-    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
     const [loader, setLoader] = useState(false);
@@ -138,12 +137,18 @@ function PurchaseInvoices() {
 
     // *For Customer Queue
     const [customerQueue, setCustomerQueue] = useState([]);
-
+    const [customerQueue2, setCustomerQueue2] = useState([]);
+    const [customTotals, setCustomTotals] = useState({});
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
+    const [inputVat, setInputVat] = useState(0)
+    const [outputVat, setOutputVat] = useState(0)
 
 
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
+    const [data, setData] = useState(null)
 
 
 
@@ -155,8 +160,77 @@ function PurchaseInvoices() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
-    const [fromDate, setFromDate] = useState(new Date());
-    const [toDate, setToDate] = useState(new Date());
+
+    // *For Get Customer Queue
+    const getCustomerQueue = async (page, limit, filter) => {
+        setLoader(true)
+
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+
+            }
+
+            const { data } = await CustomerServices.getVatInputReport(params)
+            setCustomerQueue(data?.report)
+
+
+            const totalVat = data?.report?.reduce((sum, item) => sum + (item.totalVat || 0), 0);
+            console.log(totalVat.toFixed(2));
+            setInputVat(totalVat.toFixed(2))
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            setLoader(false)
+        }
+    }
+
+    const getCustomerQueue2 = async (page, limit, filter) => {
+        setLoader(true)
+
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
+                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+
+            }
+
+            const { data } = await CustomerServices.getVatReport(params)
+            setCustomerQueue2(data?.report)
+
+
+            const totalVat = data?.report?.reduce((sum, item) => sum + (item.totalVat || 0), 0);
+            console.log(totalVat.toFixed(2));
+            setOutputVat(totalVat.toFixed(2))
+            //   setData(data?.totals)
+
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            setLoader(false)
+        }
+    }
+
+
+
+
+
+    const handleSort = (key) => {
+        let data = {
+            sort_by: key,
+            sort_order: sort
+        }
+        Debounce(() => getCustomerQueue(1, '', data));
+    }
 
     const handleFromDate = (newDate) => {
         try {
@@ -185,52 +259,6 @@ function PurchaseInvoices() {
         }
     }
 
-    // *For Get Customer Queue
-    const getCustomerQueue = async (page, limit, filter) => {
-        setLoader(true)
-
-        try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
-            let params = {
-                page: 1,
-                limit: 999999,
-                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
-                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-
-
-            }
-
-            const { data } = await CustomerServices.getPurchaseInvoices(params)
-            console.log(data);
-
-            setCustomerQueue(data?.rows)
-
-        } catch (error) {
-            showErrorToast(error)
-        } finally {
-            setLoader(false)
-        }
-    }
-
-
-
-
-
-
-
-    const handleSort = (key) => {
-        let data = {
-            sort_by: key,
-            sort_order: sort
-        }
-        Debounce(() => getCustomerQueue(1, '', data));
-    }
-
 
 
     // *For Handle Filter
@@ -245,10 +273,10 @@ function PurchaseInvoices() {
 
 
         try {
-            let params = { id: selectedData?.id }
+            let params = { reception_id: selectedData?.id }
 
 
-            const { message } = await CustomerServices.DeleteProductCategory(params)
+            const { message } = await CustomerServices.deleteReception(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -286,170 +314,216 @@ function PurchaseInvoices() {
             console.log(error);
         }
     };
+
     const columns = [
         {
-            header: "System #",
-            accessorKey: "invoice_number",
-
-
-        },
-        {
-            header: "Invoice Number",
-            accessorKey: "ref_invoice_number",
-
-
-        },
-        {
-            header: "Created Date",
-
-
-            accessorFn: (row) => row?.created_at ? moment(row?.created_at).format("DD/MM/YYYY") : '',
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.created_at ? moment(row?.original?.created_at).format("DD/MM/YYYY") : ''}
-                </Box>
-            ),
+            header: "S.No",
+            accessorKey: "serialNo",
             total: false,
+            cell: ({ row, table }) => {
+                const index = table.getSortedRowModel().rows.findIndex(r => r.id === row.id);
+                return index + 1;
+            }
         },
+
         {
-            header: "Purchase Date",
-
-
-            accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.purchase_date ? moment(row?.original?.purchase_date).format("DD/MM/YYYY") : ''}
-                </Box>
-            ),
+            header: "Ledger Name",
+            accessorKey: "impactAccountName",
             total: false,
-        },
-        {
-            header: "Vendor Name",
-            accessorKey: "name",
+            accessorFn: (row) => row?.impactAccountName,
             cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {row?.original?.vendor?.name}
-
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.impactAccountName}
                 </Box>
             ),
-
-
         },
+
         {
             header: "Total Charges",
-            accessorKey: "total_charges",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.total_charges || 0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Tax",
-            accessorKey: "tax",
-            cell: ({ row }) => (
-                <Box>{row?.original?.vat_enabled ? parseFloat(row?.original?.tax || 0).toFixed(2) : parseFloat(0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Paid",
-            accessorKey: "paid_amount",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
-            ),
-        },
-
-
-        {
-            header: "Balance",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
-
-                </Box>
-            ),
-
-
-        },
-        {
-            header: "Payment Status",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
-
-                </Box>
-            ),
-
-
-        },
-
-
-        {
-            header: "Actions",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
-                    <Box>
-                        {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+            accessorKey: "totalCharges",
+            total: true,
+            accessorFn: (row) => row?.totalCharges,
+            cell: ({ row }) => {
+                const value = parseFloat(row?.original?.totalCharges || 0).toFixed(2);
+                return (
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {value}
                     </Box>
+                );
+            },
+        },
+        {
+            header: "Input Vat",
+            accessorKey: "totalVat",
+            total: true,
+            accessorFn: (row) => parseFloat(row?.totalVat).toFixed(2),
+            cell: ({ row }) => {
+                const value = parseFloat(row?.original?.totalVat || 0).toFixed(2);
+                return (
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {value}
+                    </Box>
+                );
+            },
+        }
 
 
-                    <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="View Receipts"
-                        onClick={() => {
-                            localStorage.setItem("currentUrl", '/create-customer');
-                            navigate('/purchase-payment-invoice-list', {
-                                state: { id: row?.original?.id }, // Replace 123 with your actual ID
-                            });
-                        }}
-                        loading={loading}
-                    />
 
 
+    ];
 
-                    <Tooltip title="Invoice">
-                        <IconButton
-                            onClick={() => {
-                                window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
-                                    '_blank'
-                                );
-                            }}
-                            sx={{
-                                backgroundColor: "#f9f9f9",
-                                borderRadius: 2,
-                                border: "1px solid #eee",
-                                width: 35,
-                                height: 35,
-                            }}
-                        >
-                            <ReceiptIcon color="black" fontSize="10px" />
-                        </IconButton>
-                    </Tooltip>
+    const columns2 = [
+        {
+            header: "S.No",
+            accessorKey: "serialNo",
+            total: false,
+            cell: ({ row, table }) => {
+                const index = table.getSortedRowModel().rows.findIndex(r => r.id === row.id);
+                return index + 1;
+            }
+        },
 
+        {
+            header: "Ledger Name",
+            accessorKey: "impactAccountName",
+            total: false,
+            accessorFn: (row) => row?.impactAccountName,
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.impactAccountName}
                 </Box>
             ),
         },
+        {
+            header: "Total Govt. Charges",
+            accessorKey: "totalGovtCharges",
+            total: true,
+            accessorFn: (row) => row?.totalGovtCharges,
+            cell: ({ row }) => {
+                const value = parseFloat(row?.original?.totalGovtCharges || 0).toFixed(2);
+                return (
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {value}
+                    </Box>
+                );
+            },
+        },
+        {
+            header: "Total Service Charge",
+            accessorKey: "totalServiceCharges",
+            total: true,
+            accessorFn: (row) => row?.totalServiceCharges,
+            cell: ({ row }) => {
+                const value = parseFloat(row?.original?.totalServiceCharges || 0).toFixed(2);
+                return (
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {value}
+                    </Box>
+                );
+            },
+        },
+        {
+            header: "Output Vat",
+            accessorKey: "totalVat",
+            total: true,
+            accessorFn: (row) => row?.totalVat,
+            cell: ({ row }) => {
+                const value = parseFloat(row?.original?.totalVat || 0).toFixed(2);
+                return (
+                    <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                        {value}
+                    </Box>
+                );
+            },
+        }
 
-    ]
 
 
+
+    ];
 
     useEffect(() => {
+        setFromDate(new Date())
+        setToDate(new Date())
         getCustomerQueue()
+        getCustomerQueue2()
     }, []);
+
+
+
+
+
+    const handleExcelDownload = () => {
+        const sectionData = [
+            { title: 'VAT Output Register', data: customerQueue2, columns: columns2 },
+            { title: 'VAT Input Register', data: customerQueue, columns: columns }
+        ];
+
+        const worksheetData = [];
+
+        sectionData.forEach(({ title, data, columns }) => {
+            if (!data || data.length === 0) return;
+
+            const totals = {};
+
+            // Section title
+            worksheetData.push([title]);
+            worksheetData.push([]);
+
+            // Column headers
+            const headers = columns.map(col => col.header);
+            worksheetData.push(headers);
+
+            // Data rows
+            data.forEach((row, index) => {
+                const dataRow = columns.map((col) => {
+                    if (col.header === "S.No") return index + 1;
+
+                    let value = col.accessorFn ? col.accessorFn(row) : row[col.accessorKey];
+                    const isNumeric = typeof value === "number" || !isNaN(parseFloat(value));
+
+                    if (col.accessorKey === "pay_method") {
+                        value = value?.split(",").join(" & ");
+                    }
+
+                    const excludeFromTotal = [
+                        "Receipt Date", "Receipt Time", "Card No.", "Category",
+                        "Cashier", "Customer Name", "Inv No.", "Receipt No."
+                    ];
+
+                    if (isNumeric && col.header !== "S.No" && !excludeFromTotal.includes(col.header)) {
+                        totals[col.header] = (totals[col.header] || 0) + parseFloat(value || 0);
+                    }
+
+                    return value ?? '';
+                });
+
+                worksheetData.push(dataRow);
+            });
+
+            // Section total row
+            const totalRow = columns.map((col, i) => {
+                if (i === 0) return 'TOTAL';
+                const val = totals[col.header];
+                return val != null ? val.toFixed(2) : '';
+            });
+
+            worksheetData.push(totalRow);
+            worksheetData.push([]); // Empty row after section
+        });
+        // Add Net Payable VAT at the end
+        const netVat = parseFloat(outputVat - inputVat).toFixed(2);
+        worksheetData.push(["Net Payable VAT:", netVat]);
+        // Create Excel file
+        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "VAT Report");
+
+        XLSX.writeFile(workbook, "vat_register.xlsx");
+    };
+
+
+
 
     return (
         <Box sx={{ p: 3 }}>
@@ -519,16 +593,16 @@ function PurchaseInvoices() {
                     </Grid>
                 </Box>
             </SimpleDialog>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Invoice List</Typography>
-              
 
 
-            </Box>
+
+
+            {/* Filters */}
+
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
+                <Grid item xs={9}>
                     <Grid container spacing={1}>
-                        <Grid item xs={5}>
+                        <Grid item xs={3}>
                             <DatePicker
                                 label={"From Date"}
                                 disableFuture={true}
@@ -537,7 +611,7 @@ function PurchaseInvoices() {
                                 onChange={(date) => handleFromDate(date)}
                             />
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={3}>
                             <DatePicker
                                 label={"To Date"}
 
@@ -554,36 +628,45 @@ function PurchaseInvoices() {
                                 icon={<SearchIcon />}
                                 title="Search"
                                 sx={{ marginTop: "30px" }}
-                                onClick={() => getCustomerQueue(null, null, null)}
+                                onClick={() => { getCustomerQueue(null, null, null); getCustomerQueue2(null, null, null) }}
                                 loading={loading}
                             />
                         </Grid>
+                        <Grid item xs={3} sx={{ marginTop: "40px" }}>
+                            <Typography sx={{ fontSize: '20', fontWeight: 'bold' }}>Net Vat Payable : {parseFloat(parseFloat(outputVat) - parseFloat(inputVat)).toFixed(2)}</Typography>
+                        </Grid>
+
                     </Grid>
                 </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                    <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="Create"
-
-                        onClick={() => {
-                            navigate("/create-purchase-invoice");
-                            localStorage.setItem("currentUrl", "/create-customer");
-                        }}
-                        loading={loading}
-                    />
+                <Grid item xs={3} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+                    <Grid item>
+                        <PrimaryButton
+                            bgcolor={"#001f3f"}
+                            title="Download Excel"
+                            sx={{ marginTop: "30px" }}
+                            onClick={() => handleExcelDownload()}
+                            loading={loading}
+                        />
+                    </Grid>
                 </Grid>
             </Grid>
-          
+            <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Vat Output Register</Typography>
 
-            {/* Filters */}
+
+
+            {<DataTable loading={loader} total={true} csv={false} data={customerQueue2} columns={columns2} />}
+
+
             <Box >
 
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Vat Input Register</Typography>
+                {<DataTable loading={loader} total={true} csv={false} data={customerQueue} columns={columns} />}
 
-                {<DataTable loading={loader} data={customerQueue} columns={columns} />}
+
             </Box>
 
         </Box>
     );
 }
 
-export default PurchaseInvoices;
+export default VatRegister;

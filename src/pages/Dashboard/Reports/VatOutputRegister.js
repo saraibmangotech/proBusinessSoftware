@@ -109,7 +109,7 @@ const useStyles = makeStyles({
   }
 })
 
-function CollectionDetailedReport() {
+function VatOutputRegister() {
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -172,17 +172,10 @@ function CollectionDetailedReport() {
 
       }
 
-      const { data } = await CustomerServices.getDetailedCollectionReport(params)
-      setCustomerQueue(data?.rows)
-      let totalData = data?.totals
-      if (agencyType[process.env.REACT_APP_TYPE]?.category != "TASHEEL") {
-
-        delete totalData?.totalMohre
-        console.log(totalData, 'totalDatatotalData');
-      }
-
-      setData(totalData)
-
+      const { data } = await CustomerServices.getVatReport(params)
+      setCustomerQueue(data?.report)
+    //   setData(data?.totals)
+      
 
     } catch (error) {
       showErrorToast(error)
@@ -290,178 +283,71 @@ function CollectionDetailedReport() {
 
   const columns = [
     {
-      header: "SR No.",
-      accessorKey: "sr_no",
-      cell: ({ row }) => row.index + 1,
-    },
+        header: "S.No",
+        accessorKey: "serialNo",
+        total: false,
+        cell: ({ row, table }) => {
+          const index = table.getSortedRowModel().rows.findIndex(r => r.id === row.id);
+          return index + 1;
+        }
+      },
+      
     {
-      header: "Receipt No.",
-      accessorKey: "receipt_number",
+      header: "Ledger Name",
+      accessorKey: "impactAccountName",
       total: false,
-      accessorFn: (row) => row?.receipt_number,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {row?.original?.receipt_number}
-        </Box>
-      ),
-    },
-
-    {
-      header: "Invoice no.",
-      accessorKey: "invoice_number",
-      total: false,
-      accessorFn: (row) => row?.invoice_number,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {row?.original?.invoice_number}
-        </Box>
+       accessorFn: (row) => row?.impactAccountName ,
+           cell: ({row}) => (
+             <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+               {row?.original?.impactAccountName}
+             </Box>
            ),
     },
-
     {
-      header: "Receipt Date",
-      accessorKey: "invoice_date",
-      total: false,
-      accessorFn: (row) => row?.receipt_date ? moment(row?.receipt_date).format("DD/MM/YYYY") : '',
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {row?.original?.receipt_date ? moment(row?.original?.receipt_date).format("DD/MM/YYYY") : ""}
-        </Box>
-      ),
-    },
+        header: "Total Govt. Charges",
+        accessorKey: "totalGovtCharges",
+        total: true,
+        accessorFn: (row) => row?.totalGovtCharges,
+        cell: ({ row }) => {
+          const value = parseFloat(row?.original?.totalGovtCharges || 0).toFixed(2);
+          return (
+            <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+              {value}
+            </Box>
+          );
+        },
+      },
+      {
+        header: "Total Service Charge",
+        accessorKey: "totalServiceCharges",
+        total: true,
+        accessorFn: (row) => row?.totalServiceCharges,
+        cell: ({ row }) => {
+          const value = parseFloat(row?.original?.totalServiceCharges || 0).toFixed(2);
+          return (
+            <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+              {value}
+            </Box>
+          );
+        },
+      },
+      {
+        header: "Output Vat",
+        accessorKey: "totalVat",
+        total: true,
+        accessorFn: (row) => row?.totalVat,
+        cell: ({ row }) => {
+          const value = parseFloat(row?.original?.totalVat || 0).toFixed(2);
+          return (
+            <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+              {value}
+            </Box>
+          );
+        },
+      }
+      
 
-
-
-
-
-
-    {
-      header: "Cashier",
-      accessorKey: "cashier",
-      total: false,
-      accessorFn: (row) => row?.cashier?.name,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {row?.original?.cashier?.name}
-        </Box>
-      ),
-    },
-    {
-      header: "Pay. Method",
-      accessorKey: "pay_method",
-      total: false,
-      accessorFn: (row) => row?.payment_method,
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {row?.original?.payment_method}
-        </Box>
-      ),
-    },
-
-
-    {
-      header: "Sub Total",
-      accessorKey: "line_total",
-      accessorFn: (row) => (parseFloat(row?.line_total)).toFixed(2),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.line_total)).toFixed(2)}
-
-        </Box>
-      ),
-    },
-
-    {
-      header: "Amount",
-      accessorKey: "amount",
-      accessorFn: (row) => (parseFloat(row?.amount)).toFixed(2),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.amount)).toFixed(2)}
-
-        </Box>
-      ),
-    },
-
-    {
-      header: "Additional Charges",
-      accessorKey: "additional_charges",
-      accessorFn: (row) => (parseFloat(row?.additional_charges_value)).toFixed(2),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.additional_charges_value)).toFixed(2)}
-
-        </Box>
-      ),
-    },
-    {
-      header: "Auth Code",
-      accessorKey: "auth_code",
-      total: false,
-      accessorFn: (row) => (row?.auth_code ? row?.auth_code : "-"),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {row?.original?.auth_code ? row?.original?.auth_code : "-"}
-        </Box>
-      ),
-    },
-
-    {
-      header: "Total",
-      accessorKey: "line_total",
-      accessorFn: (row) => (parseFloat(row?.line_total)).toFixed(2),
-      cell: ({ row }) => (
-        <Box
-          variant="contained"
-          color="primary"
-          sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-        >
-          {(parseFloat(row?.original?.line_total)).toFixed(2)}
-
-        </Box>
-      ),
-    },
-
-
-
-
-
+   
 
   ];
 
@@ -473,86 +359,68 @@ function CollectionDetailedReport() {
   }, []);
 
 
-  const handleCSVDownload = () => {
-    let rows = customerQueue;
+
+  const handleExcelDownload = () => {
+    const rows = customerQueue;
     if (!rows || rows.length === 0) return;
-
+  
     const headers = columns.map(col => col.header);
-    const csvRows = [headers];
+    const dataRows = [];
     const totals = {};
-
+  
     rows.forEach((row, index) => {
-      const csvRow = columns.map((col, colIndex) => {
-        if (col.header === "SR No.") return index + 1;
-
+      const dataRow = columns.map((col, colIndex) => {
+        if (col.header === "S.No") return index + 1;
+  
         let value = col.accessorFn ? col.accessorFn(row) : row[col.accessorKey];
-
-        // Format payment method
+        const isNumeric = typeof value === "number" || !isNaN(parseFloat(value));
+  
         if (col.accessorKey === "pay_method") {
           value = value?.split(",").join(" & ");
         }
-
-        // Determine if numeric
-        const isNumeric = typeof value === 'number' || !isNaN(parseFloat(value));
-
+  
         const excludeFromTotal = [
-          "Receipt Date",
-          "Card No.",
-          "Category",
-          "Cashier",
-          "Pay. Method"
+          "Receipt Date", "Receipt Time", "Card No.", "Category",
+          "Cashier", "Customer Name", "Inv No.", "Receipt No."
         ];
-
-        if (isNumeric && col.header !== "SR No." && !excludeFromTotal.includes(col.header)) {
+  
+        if (isNumeric && col.header !== "S.No" && !excludeFromTotal.includes(col.header)) {
           totals[col.header] = (totals[col.header] || 0) + parseFloat(value || 0);
         }
-
+  
         return value ?? '';
       });
-
-      csvRows.push(csvRow);
+  
+      dataRows.push(dataRow);
     });
-
-    // Create TOTAL row
+  
+    // Total Row
     const totalRow = columns.map((col, i) => {
       if (i === 0) return 'TOTAL';
       const val = totals[col.header];
       return val != null ? val.toFixed(2) : '';
     });
-
-    csvRows.push(totalRow);
-
-    // Custom total row from `data`
-    const customTotalRow = [];
-    Object.entries(data || {}).forEach(([key, value]) => {
-      customTotalRow.push([
-        key.replace(/total/, 'Total '),
-        value.toFixed(2)
-      ]);
-    });
-
-    customTotalRow.forEach(row => {
-      const paddedRow = Array(columns.length).fill('');
-      paddedRow[0] = row[0];
-      paddedRow[1] = row[1];
-      csvRows.push(paddedRow);
-    });
-
-    // Convert to CSV
-    const csvString = csvRows.map(row => row.join(',')).join('\n');
-    const csvWithBOM = "\uFEFF" + csvString;
-
-    // Trigger download
-    const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'collection_report_detailed.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+  
+    dataRows.push(totalRow);
+  
+    // Optional: Add custom totals from a `data` object
+    if (data) {
+      Object.entries(data).forEach(([key, value]) => {
+        const row = Array(columns.length).fill('');
+        row[0] = key.replace(/total/, 'Total ');
+        row[1] = parseFloat(value).toFixed(2);
+        dataRows.push(row);
+      });
+    }
+  
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Customer Queue");
+  
+    XLSX.writeFile(workbook, "vat_output_register.xlsx");
   };
-
-
+  
+  
 
   return (
     <Box sx={{ p: 3 }}>
@@ -625,7 +493,7 @@ function CollectionDetailedReport() {
 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Detailed Collection Report</Typography>
+        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Vat Output Register</Typography>
 
 
 
@@ -667,109 +535,30 @@ function CollectionDetailedReport() {
               />
             </Grid>
 
-
+           
           </Grid>
         </Grid>
         <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-          <Grid item>
-            <PrimaryButton
-              bgcolor={"#001f3f"}
-              title="Download Excel"
-              sx={{ marginTop: "30px" }}
-              onClick={() => handleCSVDownload()}
-              loading={loading}
-            />
-          </Grid>
+        <Grid item>
+              <PrimaryButton
+                bgcolor={"#001f3f"}
+                title="Download Excel"
+                sx={{ marginTop: "30px" }}
+                onClick={() => handleExcelDownload()}
+                loading={loading}
+              />
+            </Grid>
         </Grid>
       </Grid>
       <Box >
 
 
         {<DataTable loading={loader} total={true} csv={false} data={customerQueue} columns={columns} />}
-        <Grid container spacing={2} mt={1}>
-          <Grid item xs={4}>
-            <Input
-              sx={{
-                "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
-              }}
-              fullWidth
-              disabled
-              value={`Total Cash: ${CommaSeparator(parseFloat(data?.totalCash).toFixed(2))}`}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Input
-              sx={{
-                "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
-              }}
-              fullWidth
-              disabled
-              value={`Total Network: ${CommaSeparator(parseFloat(data?.totalNetwork).toFixed(2))}`}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Input
-              sx={{
-                "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
-              }}
-              fullWidth
-              disabled
-              value={`Total Bank: ${CommaSeparator(parseFloat(data?.totalBank).toFixed(2))}`}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Input
-              sx={{
-                "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
-              }}
-              fullWidth
-              disabled
-              value={`Total Card: ${CommaSeparator(parseFloat(data?.totalCard).toFixed(2))}`}
-            />
-          </Grid>
-          {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && <Grid item xs={4}>
-            <Input
-              sx={{
-                "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
-              }}
-              fullWidth
-              disabled
-              value={`Mohre Account Receivable: ${CommaSeparator(parseFloat(data?.totalMohre).toFixed(2))}`}
-            />
-          </Grid>}
-          <Grid item xs={4}>
-            <Input
-              sx={{
-                "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
-              }}
-              fullWidth
-              disabled
-              value={`Total Amount: ${CommaSeparator(parseFloat(data?.totalAmount).toFixed(2))}`}
-            />
-          </Grid>
-        </Grid>
+    
       </Box>
 
     </Box>
   );
 }
 
-export default CollectionDetailedReport;
+export default VatOutputRegister;
