@@ -733,7 +733,7 @@ function Dashboard() {
               }}
             >
               <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Category Wise Service Distribution
+                Category Wise Service Sales
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -830,7 +830,7 @@ function Dashboard() {
               }}
             >
               <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Typist Wise Service Distribution
+                Typist Wise Service Sales
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={employeess} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>

@@ -152,7 +152,8 @@ const routes = {
   adjustLeaves:'/hrms/leaves/adjust',
   CreateSaleReceipt2:'/sales/receipts/place/mohre',
   getVatReport:'/reports/vatRegister/Output',
-  getVatInputReport:'/reports/vatRegister/Input'
+  getVatInputReport:'/reports/vatRegister/Input',
+  invoiceDateUpdate:'/sales/receipts/updateDate'
 
 
 };
