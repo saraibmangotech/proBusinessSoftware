@@ -680,7 +680,7 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
-                    { (
+                    {row?.original?.is_paid && (
                         <Tooltip title="Payment Receipt">
                             <IconButton
                                 onClick={() => {
