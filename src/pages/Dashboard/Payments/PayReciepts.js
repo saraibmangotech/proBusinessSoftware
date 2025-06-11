@@ -49,6 +49,7 @@ import Barcode from "react-barcode";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import DatePicker from 'components/DatePicker';
 import { id } from 'date-fns/locale';
+import { useAuth } from 'context/UseContext';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -129,6 +130,7 @@ function PayReceipts() {
     const [invoiceData2, setInvoiceData2] = useState(null)
     const [payReceiptData, setPayReceiptData] = useState([]);
     console.log(payReceiptData, "payReceiptData");
+      const { user } = useAuth()
     const {
         register,
         handleSubmit,
@@ -699,7 +701,7 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
-                      { (
+                      {[1000,3,2].includes(user?.role_id) && (
                         <Tooltip title="Change Invoice Date">
                             <IconButton
                                 onClick={() => {
