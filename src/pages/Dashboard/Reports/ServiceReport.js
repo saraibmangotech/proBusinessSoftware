@@ -190,11 +190,11 @@ function ServiceReport() {
         const govtFee = parseFloat(item?.govt_fee) || 0;
         const bankCharge = parseFloat(item?.bank_charge) || 0;
         const quantity = parseFloat(item?.quantity) || 0;
-      
+
         const lineTotal = (centerFee + govtFee + bankCharge + (centerFee * 0.05)) * quantity;
         return sum + lineTotal;
       }, 0);
-      
+
       setInvoiceTotal(totalLineTotal)
       const result = data?.rows?.reduce((acc, item) => {
 
@@ -800,10 +800,7 @@ function ServiceReport() {
         item?.receipt?.is_paid ? "Paid" : "UnPaid",
         item?.receipt?.creator?.employee_id || "",
         item?.receipt?.creator?.name || "",
-        (
-          Number.parseFloat(item?.total) +
-          Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05
-        ).toFixed(5),
+        ((centerFee + bankCharge + govtFee + (centerFee * 0.05)) * quantity).toFixed(5),
         (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(5),
       ])
 
@@ -842,61 +839,179 @@ function ServiceReport() {
       0,
     )
     const totalGovtFee = data.reduce((sum, item) => {
-      console.log(item?.govt_fee);
-      
-      const govtFee = parseFloat(item?.govt_fee) || 0;
-      const bankCharge = parseFloat(item?.bank_charge) || 0;
-      const quantity = parseFloat(item?.quantity) || 0;
-      return sum + ((govtFee + bankCharge) * quantity);
-    }, 0);
-
+      const govtFee = Number.parseFloat(item?.govt_fee) || 0
+      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
+      const quantity = Number.parseFloat(item?.quantity) || 0
+      return sum + (govtFee + bankCharge) * quantity
+    }, 0)
     const totalLineTotal = data.reduce((sum, item) => {
       const centerFee = parseFloat(item?.center_fee) || 0;
       const govtFee = parseFloat(item?.govt_fee) || 0;
       const bankCharge = parseFloat(item?.bank_charge) || 0;
       const quantity = parseFloat(item?.quantity) || 0;
-    
+
       const subtotal = centerFee + govtFee + bankCharge + (centerFee * 0.05);
       return sum + (subtotal * quantity);
-    }, 0);    
-    const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
+    }, 0);
+    const totalInvoiceTotal = data.reduce(
+      (sum, item) => sum + (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)),
+      0,
+    )
 
-    // Append totals row
-    csvRows.push({
-      "SR No.": "",
-      "Inv No.": "",
-      "Inv Date": "",
-      "Department": "",
-      "Stock ID": "",
-      "Service Name": "",
-      "Category": "",
-      "Customer Ref": "",
-      "Display Customer": "",
-      "Customer Mobile": "",
-      "Customer Email": "",
-      "Quantity": "",
-      "Service Charge": "",
-      "Total Service Charge": totalServiceCharge.toFixed(2),
-      "Total VAT": totalVat.toFixed(2),
-      "Govt. Fee": "",
-      "Bank Service Charge": "",
-      "Other Charge": "0",
-      "Total Govt. Fee": totalGovtFee.toFixed(2),
-      "Transaction ID": "",
-      "Application/Case ID": "",
-      "Ref Name": "",
-      "Payment Status": "",
-      "Employee ID": "",
-      "Employee Name": "",
-      "Line Total": totalLineTotal.toFixed(2),
-      "Invoice Total": totalInvoiceTotal.toFixed(2),
-    });
+    // Add empty row before totals
+    worksheet.addRow([])
 
-    // Ensure data is formatted properly as an array of objects
-    const finalData = [...csvRows.map(row => Object.values(row))];
+    // Add totals row
+    const totalRow = worksheet.addRow([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      totalServiceCharge.toFixed(2),
+      totalVat.toFixed(2),
+      "",
+      "",
+      "0",
+      totalGovtFee.toFixed(2),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      totalLineTotal.toFixed(2),
+      totalInvoiceTotal.toFixed(2),
+    ])
 
-    return finalData;
-  };
+    // Style totals row
+    totalRow.eachCell((cell, colNumber) => {
+      if ([14, 15, 19, 26, 27].includes(colNumber)) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "000000" }, // Black
+        }
+        cell.font = {
+          name: "Arial",
+          bold: true,
+          color: { argb: "FFFFFF" },
+          size: 11,
+        }
+        cell.border = {
+          top: { style: "medium", color: { argb: "000000" } },
+          left: { style: "medium", color: { argb: "000000" } },
+          bottom: { style: "medium", color: { argb: "000000" } },
+          right: { style: "medium", color: { argb: "000000" } },
+        }
+        cell.alignment = { horizontal: "right", vertical: "middle" }
+
+        if (colNumber === 15 || colNumber === 26 || colNumber === 27) {
+          cell.numFmt = "#,##0.00000" // 5 decimal places
+        } else {
+          cell.numFmt = "#,##0.00" // 2 decimal places
+        }
+      }
+    })
+
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronically generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: true,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:Z${reportRow.number}`)
+
+    // Add powered by line
+    const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+    poweredByRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    poweredByRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${poweredByRow.number}:Z${poweredByRow.number}`)
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 8 }, // SR No.
+      { width: 12 }, // Inv No.
+      { width: 12 }, // Inv Date
+      { width: 15 }, // Department
+      { width: 12 }, // Stock ID
+      { width: 20 }, // Service Name
+      { width: 15 }, // Category
+      { width: 15 }, // Customer Ref
+      { width: 15 }, // Display Customer
+      { width: 15 }, // Customer Mobile
+      { width: 20 }, // Customer Email
+      { width: 10 }, // Quantity
+      { width: 12 }, // Service Charge
+      { width: 15 }, // Total Service Charge
+      { width: 12 }, // Total VAT
+      { width: 12 }, // Govt. Fee
+      { width: 15 }, // Bank Service Charge
+      { width: 12 }, // Other Charge
+      { width: 15 }, // Total Govt. Fee
+      { width: 15 }, // Transaction ID
+      { width: 18 }, // Application/Case ID
+      { width: 12 }, // Ref Name
+      { width: 12 }, // Payment Status
+      { width: 12 }, // Employee ID
+      { width: 15 }, // Employee Name
+      { width: 12 }, // Line Total
+      { width: 15 }, // Invoice Total
+    ]
+
+    // Add workbook properties
+    workbook.creator = "Finance Department"
+    workbook.lastModifiedBy = "Finance System"
+    workbook.created = new Date()
+    workbook.modified = new Date()
+    workbook.lastPrinted = new Date()
+
+    // Set workbook properties
+    workbook.properties = {
+      title: "Invoice Report",
+      subject: "Financial Report",
+      keywords: "invoice, financial, accounting, services",
+      category: "Financial Reports",
+      description: "Invoice report generated from accounting system",
+      company: "Premium Professional Government Services LLC",
+    }
+
+    const download = async () => {
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+      saveAs(blob, "Invoice_Report.xlsx")
+    }
+
+    download()
+  }
 
 
 
@@ -979,7 +1094,7 @@ function ServiceReport() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          {customerQueue?.length > 0 && 
+          {customerQueue?.length > 0 &&
             <Button
               onClick={() => downloadInvoiceExcel(customerQueue)}
               startIcon={<FileDownload />}
@@ -998,7 +1113,7 @@ function ServiceReport() {
             >
               Export to Excel
             </Button>}
-       
+
         </Box>
 
 
