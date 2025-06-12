@@ -425,7 +425,7 @@ function EmployeeWiseSalesReport() {
         // Set custom footer as requested
         worksheet.headerFooter.oddFooter =
             '&C&"Arial,Regular"&10\n' + // One line gap
-            '&C&"Arial,Bold"&12This is electronic generated report\n' +
+            '&C&"Arial,Bold"&12This is electronically generated report\n' +
             '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
 
         worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
@@ -667,7 +667,7 @@ function EmployeeWiseSalesReport() {
         worksheet.addRow([])
 
         // Add the electronic generated report text with black border as requested
-        const reportRow = worksheet.addRow(["This is electronic generated report"])
+        const reportRow = worksheet.addRow(["This is electronically generated report"])
         reportRow.getCell(1).font = {
             name: "Arial",
             size: 12,

@@ -22,6 +22,7 @@ import {
   Tooltip,
   Checkbox,
   InputAdornment,
+  Button,
 } from "@mui/material";
 import {
   AllocateIcon,
@@ -46,6 +47,7 @@ import { makeStyles } from "@mui/styles";
 import Pagination from "components/Pagination";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import {
+  agencyType,
   Debounce,
   encryptData,
   formatPermissionData,
@@ -75,7 +77,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Barcode from "react-barcode";
 import DatePicker from 'components/DatePicker';
-
+import ExcelJS from "exceljs";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -564,16 +566,18 @@ function PreSalesList() {
     },
     {
       header: "Total Amount",
-      accessorFn: (row) => {return (
-        row?.sale_receipt_items?.reduce((total2, item) => {
-          return parseFloat(total2) + parseFloat(item?.total ?? 0);
-        }, 0) +
-        row?.sale_receipt_items?.reduce((total, item) => {
-          const fee = parseFloat(item?.center_fee ?? 0);
-          const qty = parseFloat(item?.quantity ?? 1);
-          return total + fee * qty;
-        }, 0) * 0.05
-      ).toFixed(2)},
+      accessorFn: (row) => {
+        return (
+          row?.sale_receipt_items?.reduce((total2, item) => {
+            return parseFloat(total2) + parseFloat(item?.total ?? 0);
+          }, 0) +
+          row?.sale_receipt_items?.reduce((total, item) => {
+            const fee = parseFloat(item?.center_fee ?? 0);
+            const qty = parseFloat(item?.quantity ?? 1);
+            return total + fee * qty;
+          }, 0) * 0.05
+        ).toFixed(2)
+      },
       accessorKey: "total_amount",
       cell: ({ row }) => (
         <Box
@@ -667,26 +671,26 @@ function PreSalesList() {
             )}
           </Box>
           {(!row?.original?.is_paid && row?.original?.credited_by != null) && (
-                        <Tooltip title="Credit Invoice">
-                            <IconButton
-                                onClick={() => {
-                                    window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
-                                        '_blank'
-                                    );
-                                }}
-                                sx={{
-                                    backgroundColor: "#f9f9f9",
-                                    borderRadius: 2,
-                                    border: "1px solid #eee",
-                                    width: 40,
-                                    height: 40,
-                                }}
-                            >
-                                <ReceiptIcon color="black" fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
-                    )}
+            <Tooltip title="Credit Invoice">
+              <IconButton
+                onClick={() => {
+                  window.open(
+                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-unpaid?id=${row?.original?.invoice_id}&instance=${process.env.REACT_APP_TYPE}`,
+                    '_blank'
+                  );
+                }}
+                sx={{
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: 2,
+                  border: "1px solid #eee",
+                  width: 40,
+                  height: 40,
+                }}
+              >
+                <ReceiptIcon color="black" fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
           {row?.original?.is_paid && (
             <Tooltip title=" Invoice">
               <IconButton
@@ -780,6 +784,318 @@ function PreSalesList() {
     },
   ];
 
+  const downloadSalesRequestsExcel = () => {
+    // Skip if no data
+    if (!data || data.length === 0) return
+
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet("Sales Requests")
+
+    // Set professional header
+    worksheet.headerFooter.oddHeader =
+      '&C&"Arial,Bold"&18SALES REQUESTS\n' +
+      '&C&"Arial,Regular"&12Your Company Name\n' +
+      '&C&"Arial,Regular"&10Period: &D - &T\n' +
+      '&L&"Arial,Regular"&8Generated on: ' +
+      new Date().toLocaleDateString() +
+      "\n" +
+      '&R&"Arial,Regular"&8Page &P of &N'
+
+    // Set custom footer as requested
+    worksheet.headerFooter.oddFooter =
+      '&C&"Arial,Regular"&10\n' + // One line gap
+      '&C&"Arial,Bold"&12This is electronically generated report\n' +
+      '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
+
+    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+    // Set page setup for professional printing
+    worksheet.pageSetup = {
+      paperSize: 9, // A4
+      orientation: "landscape",
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 1.0,
+        bottom: 1.0,
+        header: 0.3,
+        footer: 0.5,
+      },
+    }
+
+    // Add title section at the top of the worksheet
+    const titleRow = worksheet.addRow(["SALES REQUESTS"])
+    titleRow.getCell(1).font = {
+      name: "Arial",
+      size: 16,
+      bold: true,
+      color: { argb: "2F4F4F" },
+    }
+    titleRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A1:G1") // Merge cells across all columns
+
+    const companyName =
+      agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+        ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+        : "PREMIUM BUSINESSMAN SERVICES"
+
+    const companyRow = worksheet.addRow([companyName])
+    companyRow.getCell(1).font = {
+      name: "Arial",
+      size: 14,
+      bold: true,
+      color: { argb: "4472C4" },
+    }
+    companyRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A2:G2")
+
+    const dateRow = worksheet.addRow([
+      `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+    ])
+    dateRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    dateRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A3:G3")
+
+    const periodRow = worksheet.addRow([
+      toDate && fromDate
+        ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+        : `Period: All`,
+    ])
+    periodRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    periodRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A4:G4")
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    // Define headers based on the columns structure (excluding Actions column)
+    const headers = ["SR No.", "Customer", "Token Number", "Total Amount", "Payment Status", "Created By", "Created At"]
+
+    // Add headers with professional styling
+    const headerRow = worksheet.addRow(headers)
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "2F4F4F" }, // Dark slate gray
+      }
+      cell.font = {
+        name: "Arial",
+        bold: true,
+        color: { argb: "FFFFFF" },
+        size: 11,
+      }
+      cell.alignment = { horizontal: "center", vertical: "middle" }
+      cell.border = {
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
+      }
+    })
+
+    // Track totals for numeric columns
+    let totalAmount = 0
+
+    // Add data rows
+    data.forEach((item, index) => {
+      // Calculate total amount exactly as in the column definition
+      const itemsTotal =
+        item?.sale_receipt_items?.reduce((total2, receiptItem) => {
+          return Number.parseFloat(total2) + Number.parseFloat(receiptItem?.total ?? 0)
+        }, 0) || 0
+
+      const vatTotal =
+        item?.sale_receipt_items?.reduce((total, receiptItem) => {
+          const fee = Number.parseFloat(receiptItem?.center_fee ?? 0)
+          const qty = Number.parseFloat(receiptItem?.quantity ?? 1)
+          return total + fee * qty
+        }, 0) * 0.05 || 0
+
+      const calculatedTotalAmount = itemsTotal + vatTotal
+
+      // Determine payment status
+      let paymentStatus = "Pending"
+      if (item?.is_paid === false) {
+        paymentStatus = "Unpaid"
+      } else if (item?.is_paid === true) {
+        paymentStatus = "Paid"
+      }
+
+      const dataRow = worksheet.addRow([
+        index + 1, // SR No.
+        item?.customer_name || "",
+        item?.token_number || "",
+        calculatedTotalAmount.toFixed(2),
+        paymentStatus,
+        item?.creator?.name || "",
+        item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "",
+      ])
+
+      // Add to total
+      totalAmount += calculatedTotalAmount
+
+      // Style data rows
+      dataRow.eachCell((cell, colNumber) => {
+        cell.font = { name: "Arial", size: 10 }
+
+        // Determine alignment based on column type
+        const isNumericColumn = colNumber === 4 // Total Amount column
+
+        cell.alignment = {
+          horizontal: isNumericColumn ? "right" : "left",
+          vertical: "middle",
+        }
+
+        cell.border = {
+          top: { style: "hair", color: { argb: "CCCCCC" } },
+          left: { style: "hair", color: { argb: "CCCCCC" } },
+          bottom: { style: "hair", color: { argb: "CCCCCC" } },
+          right: { style: "hair", color: { argb: "CCCCCC" } },
+        }
+
+        // Format numeric columns
+        if (isNumericColumn) {
+          cell.numFmt = "#,##0.00"
+          cell.value = Number.parseFloat(cell.value || 0)
+        }
+
+        // Color coding for payment status
+        if (colNumber === 5) {
+          // Payment Status column
+          if (cell.value === "Paid") {
+            cell.font = { name: "Arial", size: 10, color: { argb: "008000" }, bold: true } // Green
+          } else if (cell.value === "Unpaid") {
+            cell.font = { name: "Arial", size: 10, color: { argb: "FF0000" }, bold: true } // Red
+          } else if (cell.value === "Pending") {
+            cell.font = { name: "Arial", size: 10, color: { argb: "FF8C00" }, bold: true } // Orange
+          }
+        }
+      })
+    })
+
+    // Add empty row before totals
+    worksheet.addRow([])
+
+    // Add totals row
+    const totalRow = worksheet.addRow(["", "", "TOTAL", totalAmount.toFixed(2), "", "", ""])
+
+    // Style totals row
+    totalRow.eachCell((cell, colNumber) => {
+      if (colNumber === 3 || colNumber === 4) {
+        // "TOTAL" label and amount
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "000000" }, // Black
+        }
+        cell.font = {
+          name: "Arial",
+          bold: true,
+          color: { argb: "FFFFFF" },
+          size: 11,
+        }
+        cell.border = {
+          top: { style: "medium", color: { argb: "000000" } },
+          left: { style: "medium", color: { argb: "000000" } },
+          bottom: { style: "medium", color: { argb: "000000" } },
+          right: { style: "medium", color: { argb: "000000" } },
+        }
+
+        if (colNumber === 3) {
+          cell.alignment = { horizontal: "center", vertical: "middle" }
+        } else {
+          cell.alignment = { horizontal: "right", vertical: "middle" }
+          cell.numFmt = "#,##0.00"
+          cell.value = Number.parseFloat(cell.value || 0)
+        }
+      }
+    })
+
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronically generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: true,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:G${reportRow.number}`)
+
+    // Add powered by line
+    const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+    poweredByRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    poweredByRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${poweredByRow.number}:G${poweredByRow.number}`)
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 10 }, // SR No.
+      { width: 25 }, // Customer
+      { width: 15 }, // Token Number
+      { width: 15 }, // Total Amount
+      { width: 15 }, // Payment Status
+      { width: 20 }, // Created By
+      { width: 15 }, // Created At
+    ]
+
+    // Add workbook properties
+    workbook.creator = "Finance Department"
+    workbook.lastModifiedBy = "Finance System"
+    workbook.created = new Date()
+    workbook.modified = new Date()
+    workbook.lastPrinted = new Date()
+
+    // Set workbook properties
+    workbook.properties = {
+      title: "Sales Requests",
+      subject: "Sales Requests Report",
+      keywords: "sales, requests, customer, payment, financial",
+      category: "Sales Reports",
+      description: "Sales requests report generated from system",
+      company: companyName,
+    }
+
+    const download = async () => {
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+      saveAs(blob, "sales_requests.xlsx")
+    }
+
+    download()
+  }
+
   useEffect(() => {
     if (invoiceData) {
       generatePDF();
@@ -861,6 +1177,25 @@ function PreSalesList() {
           {" "}
           Sales List
         </Typography>
+        {data?.length > 0 &&
+          <Button
+            onClick={() => downloadSalesRequestsExcel(customerQueue)}
+
+
+            variant="contained"
+            color="primary"
+            sx={{
+              padding: '10px',
+              textTransform: 'capitalize !important',
+              backgroundColor: "#001f3f !important",
+              fontSize: "12px",
+              ":hover": {
+                backgroundColor: "#001f3f !important",
+              },
+            }}
+          >
+            Export to Excel
+          </Button>}
         {/* {true && (
           <PrimaryButton
             bgcolor={"#001f3f"}
@@ -925,7 +1260,7 @@ function PreSalesList() {
         </Grid>
       </Grid>
 
-      <Box>{<DataTable loading={loader} data={data} csv={true} csvName={'presale_requests'} columns={columns} />}</Box>
+      <Box>{<DataTable loading={loader} data={data} csvName={'presale_requests'} columns={columns} />}</Box>
       <Box className="showPdf" ref={invoiceRef} sx={{ padding: "20px 60px" }}>
         <div
           style={{

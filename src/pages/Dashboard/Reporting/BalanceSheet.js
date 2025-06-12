@@ -796,7 +796,7 @@ function BalanceSheet() {
     worksheet.addRow([])
 
     // Add the electronic generated report text with black border as requested
-    const reportRow = worksheet.addRow(["This is electronically generated report"])
+    const reportRow = worksheet.addRow(["This is electronicallyally generated report"])
     reportRow.getCell(1).font = {
       name: "Arial",
       size: 12,
