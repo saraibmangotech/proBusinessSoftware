@@ -1781,7 +1781,7 @@ function SalesReciept2() {
                                                 console.log(value?.id, 'value?.id');
 
                                                 setValue1('percentage', 0);
-                                                let percentageValue = parseFloat(1 || 0);
+                                                let percentageValue = parseFloat(0);
                                                 if (agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && getValues1('invoiceID')?.includes('DED')) {
                                                     setValue1('percentage', 0);
                                                     percentageValue = parseFloat(0 || 0);
@@ -1846,6 +1846,7 @@ function SalesReciept2() {
                                             <InputField
                                                 label="Percentage"
                                                 size="small"
+                                                disabled={user?.role_id == 1005 || user?.role_id == 1003 }
                                                 placeholder="Enter percentage"
                                                 type="number"
                                                 register={register1("percentage", {

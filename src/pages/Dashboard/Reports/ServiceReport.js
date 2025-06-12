@@ -45,6 +45,7 @@ import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
 import { CSVLink } from 'react-csv';
+import ExcelJS from "exceljs";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -160,7 +161,7 @@ function ServiceReport() {
 
   const [loading, setLoading] = useState(false)
   const [sort, setSort] = useState('desc')
-const [invoiceTotal, setInvoiceTotal] = useState(0)
+  const [invoiceTotal, setInvoiceTotal] = useState(0)
   // *For Get Customer Queue
   const getCustomerQueue = async (page, limit, filter) => {
     setLoader(true)
@@ -183,16 +184,16 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
             (t) => t.receipt?.invoice_number === item.receipt?.invoice_number
           )
       );
-    
+
       const totalLineTotal = data?.rows?.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
-     
+
       setInvoiceTotal(totalLineTotal)
       const result = data?.rows?.reduce((acc, item) => {
 
         acc.totalQuantity += item.quantity;
         acc.totalServiceCharges += (item.center_fee * parseInt(item.quantity));
         acc.totalVat += (item.center_fee * parseInt(item.quantity || 0)) * 0.05;
-        acc.totalGovtFee += ((parseFloat(item.govt_fee || 0) + parseFloat(item?.bank_charge||0)) * parseInt(item.quantity || 0));
+        acc.totalGovtFee += ((parseFloat(item.govt_fee || 0) + parseFloat(item?.bank_charge || 0)) * parseInt(item.quantity || 0));
         acc.invoiceTotal += (parseFloat(item?.total || 0) + ((parseFloat(item?.center_fee || 0) * parseFloat(item?.quantity || 1)) * 0.05)).toFixed(2);
         return acc;
       }, {
@@ -560,10 +561,10 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
     },
     {
       header: "Line Total",
-      accessorFn: (row) => (parseFloat(row?.center_fee || 0) + parseFloat(row?.bank_charge || 0) + parseFloat(row?.govt_fee || 0) + ((parseFloat(row?.center_fee || 0) ) * 0.05) * parseFloat(row?.quantity || 1)).toFixed(2),
+      accessorFn: (row) => (parseFloat(row?.center_fee || 0) + parseFloat(row?.bank_charge || 0) + parseFloat(row?.govt_fee || 0) + ((parseFloat(row?.center_fee || 0)) * 0.05) * parseFloat(row?.quantity || 1)).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.center_fee || 0) + parseFloat(row?.original?.bank_charge || 0) + parseFloat(row?.original?.govt_fee || 0) + ((parseFloat(row?.original?.center_fee || 0) ) * 0.05) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+          {(parseFloat(row?.original?.center_fee || 0) + parseFloat(row?.original?.bank_charge || 0) + parseFloat(row?.original?.govt_fee || 0) + ((parseFloat(row?.original?.center_fee || 0)) * 0.05) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
         </Box>
       ),
     },
@@ -608,103 +609,401 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
     "Line Total",
     "Invoice Total"
   ];
+  const downloadInvoiceExcel = (data) => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet("Invoice Report")
 
-  const prepareCSVData = (data) => {
+    // Set professional header
+    worksheet.headerFooter.oddHeader =
+      '&C&"Arial,Bold"&18INVOICE REPORT\n' +
+      '&C&"Arial,Regular"&12Your Company Name\n' +
+      '&C&"Arial,Regular"&10Period: &D - &T\n' +
+      '&L&"Arial,Regular"&8Generated on: ' +
+      new Date().toLocaleDateString() +
+      "\n" +
+      '&R&"Arial,Regular"&8Page &P of &N'
 
+    // Set custom footer as requested
+    worksheet.headerFooter.oddFooter =
+      '&C&"Arial,Regular"&10\n' + // One line gap
+      '&C&"Arial,Bold"&12This is electronic generated report\n' +
+      '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
 
-    // Map each entry into the desired CSV format based on your provided columns
-    const csvRows = data.map((item) => {
-      const quantity = parseFloat(item?.quantity) || 0;
-      const centerFee = parseFloat(item?.center_fee) || 0;
-      const govtFee = parseFloat(item?.govt_fee) || 0;
-      const bankCharge = parseFloat(item?.bank_charge) || 0;
-      const totalServiceCharge = centerFee * quantity;
-      const totalVAT = (parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05;
-      const totalGovtFee = (govtFee + bankCharge) * quantity;
+    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
 
-      return {
-        "SR No.": item.id || "",
-        "Inv No.": item?.receipt?.invoice_number || "",
-        "Inv Date": item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
-        "Department": agencyType[process.env.REACT_APP_TYPE]?.category || "",
-        "Stock ID": item?.service?.item_code || "",
-        "Service Name": item?.service?.name || "",
-        "Category": item?.service?.category?.name || "",
-        "Customer Ref": item?.receipt?.customer?.name || "",
-        "Display Customer": item?.receipt?.customer_name || "",
-        "Customer Mobile": item?.receipt?.customer_mobile || "",
-        "Customer Email": item?.receipt?.customer_email || "",
-        "Quantity": quantity,
-        "Service Charge": centerFee.toFixed(2),
-        "Total Service Charge": totalServiceCharge.toFixed(2),
-        "Total VAT": totalVAT.toFixed(5),
-        "Govt. Fee": govtFee.toFixed(2),
-        "Bank Service Charge": bankCharge.toFixed(2),
-        "Other Charge": "0", // Static
-        "Total Govt. Fee": totalGovtFee.toFixed(2),
-        "Transaction ID": item.transaction_id || "",
-        "Application/Case ID": item.application_id || "",
-        "Ref Name": item.ref_no || "",
-        "Payment Status": item?.receipt?.is_paid ? "Paid" : "UnPaid",
-        "Employee ID": item?.receipt?.creator?.employee_id || "",
-        "Employee Name": item?.receipt?.creator?.name || "",
-        "Line Total": (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)).toFixed(5),
-        "Invoice Total": (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)).toFixed(5),
-      };
-    });
+    // Set page setup for professional printing
+    worksheet.pageSetup = {
+      paperSize: 9, // A4
+      orientation: "landscape",
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 1.0,
+        bottom: 1.0,
+        header: 0.3,
+        footer: 0.5,
+      },
+    }
 
+    // Add title section at the top of the worksheet
+    const titleRow = worksheet.addRow(["INVOICE REPORT"])
+    titleRow.getCell(1).font = {
+      name: "Arial",
+      size: 16,
+      bold: true,
+      color: { argb: "2F4F4F" },
+    }
+    titleRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A1:Z1")
 
-    // Calculate totals for Debit and Credit
-    const totalServiceCharge = data.reduce((sum, item) => sum + (parseFloat(item?.center_fee) * parseFloat(item?.quantity)), 0);
-    const totalVat = data.reduce((sum, item) => sum + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05), 0);
+    const companyRow = worksheet.addRow([
+      agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+        ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+        : "PREMIUM BUSINESSMAN SERVICES",
+    ])
+    companyRow.getCell(1).font = {
+      name: "Arial",
+      size: 14,
+      bold: true,
+      color: { argb: "4472C4" },
+    }
+    companyRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A2:Z2")
+
+    const dateRow = worksheet.addRow([
+      `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+    ])
+    dateRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    dateRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A3:Z3")
+
+    const periodRow = worksheet.addRow([
+      toDate && fromDate
+        ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+        : `Period: All`,
+    ])
+    periodRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    periodRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A4:Z4")
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    // Define headers exactly as in your CSV function
+    const headers = [
+      "SR No.",
+      "Inv No.",
+      "Inv Date",
+      "Department",
+      "Stock ID",
+      "Service Name",
+      "Category",
+      "Customer Ref",
+      "Display Customer",
+      "Customer Mobile",
+      "Customer Email",
+      "Quantity",
+      "Service Charge",
+      "Total Service Charge",
+      "Total VAT",
+      "Govt. Fee",
+      "Bank Service Charge",
+      "Other Charge",
+      "Total Govt. Fee",
+      "Transaction ID",
+      "Application/Case ID",
+      "Ref Name",
+      "Payment Status",
+      "Employee ID",
+      "Employee Name",
+      "Line Total",
+      "Invoice Total",
+    ]
+
+    // Add headers with professional styling
+    const headerRow = worksheet.addRow(headers)
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "2F4F4F" }, // Dark slate gray
+      }
+      cell.font = {
+        name: "Arial",
+        bold: true,
+        color: { argb: "FFFFFF" },
+        size: 11,
+      }
+      cell.alignment = { horizontal: "center", vertical: "middle" }
+      cell.border = {
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
+      }
+    })
+
+    // Process data exactly as in your CSV function
+    data?.forEach((item) => {
+      const quantity = Number.parseFloat(item?.quantity) || 0
+      const centerFee = Number.parseFloat(item?.center_fee) || 0
+      const govtFee = Number.parseFloat(item?.govt_fee) || 0
+      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
+      const totalServiceCharge = centerFee * quantity
+      const totalVAT = Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05
+      const totalGovtFee = (govtFee + bankCharge) * quantity
+
+      const dataRow = worksheet.addRow([
+        item.id || "",
+        item?.receipt?.invoice_number || "",
+        item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : "",
+        agencyType?.[process.env.REACT_APP_TYPE]?.category || "",
+        item?.service?.item_code || "",
+        item?.service?.name || "",
+        item?.service?.category?.name || "",
+        item?.receipt?.customer?.name || "",
+        item?.receipt?.customer_name || "",
+        item?.receipt?.customer_mobile || "",
+        item?.receipt?.customer_email || "",
+        quantity,
+        centerFee.toFixed(2),
+        totalServiceCharge.toFixed(2),
+        totalVAT.toFixed(5),
+        govtFee.toFixed(2),
+        bankCharge.toFixed(2),
+        "0", // Static
+        totalGovtFee.toFixed(2),
+        item.transaction_id || "",
+        item.application_id || "",
+        item.ref_no || "",
+        item?.receipt?.is_paid ? "Paid" : "UnPaid",
+        item?.receipt?.creator?.employee_id || "",
+        item?.receipt?.creator?.name || "",
+        (
+          Number.parseFloat(item?.total) +
+          Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05
+        ).toFixed(5),
+        (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(5),
+      ])
+
+      // Style data rows
+      dataRow.eachCell((cell, colNumber) => {
+        cell.font = { name: "Arial", size: 10 }
+        cell.alignment = {
+          horizontal: [12, 13, 14, 15, 16, 18, 26, 27].includes(colNumber) ? "right" : "left", // Number columns right-aligned
+          vertical: "middle",
+        }
+        cell.border = {
+          top: { style: "hair", color: { argb: "CCCCCC" } },
+          left: { style: "hair", color: { argb: "CCCCCC" } },
+          bottom: { style: "hair", color: { argb: "CCCCCC" } },
+          right: { style: "hair", color: { argb: "CCCCCC" } },
+        }
+
+        // Format number columns
+        if ([12, 13, 14, 15, 16, 18, 26, 27].includes(colNumber)) {
+          if (colNumber === 14 || colNumber === 26 || colNumber === 27) {
+            cell.numFmt = "#,##0.00000" // 5 decimal places for VAT and totals
+          } else {
+            cell.numFmt = "#,##0.00" // 2 decimal places for other amounts
+          }
+        }
+      })
+    })
+
+    // Calculate totals exactly as in your CSV function
+    const totalServiceCharge = data.reduce(
+      (sum, item) => sum + Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity),
+      0,
+    )
+    const totalVat = data.reduce(
+      (sum, item) => sum + Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05,
+      0,
+    )
     const totalGovtFee = data.reduce((sum, item) => {
-      console.log(item?.govt_fee);
-      
-      const govtFee = parseFloat(item?.govt_fee) || 0;
-      const bankCharge = parseFloat(item?.bank_charge) || 0;
-      const quantity = parseFloat(item?.quantity) || 0;
-      return sum + ((govtFee + bankCharge) * quantity);
-    }, 0);
+      const govtFee = Number.parseFloat(item?.govt_fee) || 0
+      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
+      const quantity = Number.parseFloat(item?.quantity) || 0
+      return sum + (govtFee + bankCharge) * quantity
+    }, 0)
+    const totalLineTotal = data.reduce(
+      (sum, item) =>
+        sum +
+        (Number.parseFloat(item?.total) + Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05),
+      0,
+    )
+    const totalInvoiceTotal = data.reduce(
+      (sum, item) => sum + (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)),
+      0,
+    )
 
-    const totalLineTotal = data.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
-    const totalInvoiceTotal = data.reduce((sum, item) => sum + (parseFloat(item?.receipt?.total_amount) + parseFloat(item?.receipt?.total_vat)), 0);
+    // Add empty row before totals
+    worksheet.addRow([])
 
-    // Append totals row
-    csvRows.push({
-      "SR No.": "",
-      "Inv No.": "",
-      "Inv Date": "",
-      "Department": "",
-      "Stock ID": "",
-      "Service Name": "",
-      "Category": "",
-      "Customer Ref": "",
-      "Display Customer": "",
-      "Customer Mobile": "",
-      "Customer Email": "",
-      "Quantity": "",
-      "Service Charge": "",
-      "Total Service Charge": totalServiceCharge.toFixed(2),
-      "Total VAT": totalVat.toFixed(2),
-      "Govt. Fee": "",
-      "Bank Service Charge": "",
-      "Other Charge": "0",
-      "Total Govt. Fee": totalGovtFee.toFixed(2),
-      "Transaction ID": "",
-      "Application/Case ID": "",
-      "Ref Name": "",
-      "Payment Status": "",
-      "Employee ID": "",
-      "Employee Name": "",
-      "Line Total": totalLineTotal.toFixed(2),
-      "Invoice Total": totalInvoiceTotal.toFixed(2),
-    });
+    // Add totals row
+    const totalRow = worksheet.addRow([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      totalServiceCharge.toFixed(2),
+      totalVat.toFixed(2),
+      "",
+      "",
+      "0",
+      totalGovtFee.toFixed(2),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      totalLineTotal.toFixed(2),
+      totalInvoiceTotal.toFixed(2),
+    ])
 
-    // Ensure data is formatted properly as an array of objects
-    const finalData = [...csvRows.map(row => Object.values(row))];
+    // Style totals row
+    totalRow.eachCell((cell, colNumber) => {
+      if ([14, 15, 19, 26, 27].includes(colNumber)) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "000000" }, // Black
+        }
+        cell.font = {
+          name: "Arial",
+          bold: true,
+          color: { argb: "FFFFFF" },
+          size: 11,
+        }
+        cell.border = {
+          top: { style: "medium", color: { argb: "000000" } },
+          left: { style: "medium", color: { argb: "000000" } },
+          bottom: { style: "medium", color: { argb: "000000" } },
+          right: { style: "medium", color: { argb: "000000" } },
+        }
+        cell.alignment = { horizontal: "right", vertical: "middle" }
 
-    return finalData;
-  };
+        if (colNumber === 15 || colNumber === 26 || colNumber === 27) {
+          cell.numFmt = "#,##0.00000" // 5 decimal places
+        } else {
+          cell.numFmt = "#,##0.00" // 2 decimal places
+        }
+      }
+    })
+
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronic generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: true,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:Z${reportRow.number}`)
+
+    // Add powered by line
+    const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+    poweredByRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    poweredByRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${poweredByRow.number}:Z${poweredByRow.number}`)
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 8 }, // SR No.
+      { width: 12 }, // Inv No.
+      { width: 12 }, // Inv Date
+      { width: 15 }, // Department
+      { width: 12 }, // Stock ID
+      { width: 20 }, // Service Name
+      { width: 15 }, // Category
+      { width: 15 }, // Customer Ref
+      { width: 15 }, // Display Customer
+      { width: 15 }, // Customer Mobile
+      { width: 20 }, // Customer Email
+      { width: 10 }, // Quantity
+      { width: 12 }, // Service Charge
+      { width: 15 }, // Total Service Charge
+      { width: 12 }, // Total VAT
+      { width: 12 }, // Govt. Fee
+      { width: 15 }, // Bank Service Charge
+      { width: 12 }, // Other Charge
+      { width: 15 }, // Total Govt. Fee
+      { width: 15 }, // Transaction ID
+      { width: 18 }, // Application/Case ID
+      { width: 12 }, // Ref Name
+      { width: 12 }, // Payment Status
+      { width: 12 }, // Employee ID
+      { width: 15 }, // Employee Name
+      { width: 12 }, // Line Total
+      { width: 15 }, // Invoice Total
+    ]
+
+    // Add workbook properties
+    workbook.creator = "Finance Department"
+    workbook.lastModifiedBy = "Finance System"
+    workbook.created = new Date()
+    workbook.modified = new Date()
+    workbook.lastPrinted = new Date()
+
+    // Set workbook properties
+    workbook.properties = {
+      title: "Invoice Report",
+      subject: "Financial Report",
+      keywords: "invoice, financial, accounting, services",
+      category: "Financial Reports",
+      description: "Invoice report generated from accounting system",
+      company: "Premium Professional Government Services LLC",
+    }
+
+    const download = async () => {
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+      saveAs(blob, "Invoice_Report.xlsx")
+    }
+
+    download()
+  }
 
 
 
@@ -787,13 +1086,9 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          {customerQueue?.length > 0 && <CSVLink
-            data={prepareCSVData(customerQueue)}
-            headers={headers}
-            filename="service_report.csv"
-          >
+          {customerQueue?.length > 0 && 
             <Button
-
+              onClick={() => downloadInvoiceExcel(customerQueue)}
               startIcon={<FileDownload />}
 
               variant="contained"
@@ -809,8 +1104,8 @@ const [invoiceTotal, setInvoiceTotal] = useState(0)
               }}
             >
               Export to Excel
-            </Button>
-          </CSVLink>}
+            </Button>}
+       
         </Box>
 
 

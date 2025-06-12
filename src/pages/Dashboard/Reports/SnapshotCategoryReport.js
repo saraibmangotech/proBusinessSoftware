@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -41,7 +42,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
-
+import ExcelJS from "exceljs";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -358,11 +359,11 @@ function SnapshotCategoryReport() {
             header: "Gross Invoice Amount",
             accessorKey: "grossCharges", // Use a unique key to avoid conflict
             accessorFn: (row) => {
-                
+
                 return parseFloat(row?.grossCharges || 0).toFixed(2);
             },
             cell: ({ row }) => {
-                
+
                 const gross = parseFloat(row?.original?.grossCharges || 0)
                 return (
                     <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
@@ -372,8 +373,323 @@ function SnapshotCategoryReport() {
             },
         },
     ];
-    
 
+    const downloadCategoryReportExcel = (data) => {
+        // Skip if no data
+        if (!customerQueue || customerQueue.length === 0) return
+
+        const workbook = new ExcelJS.Workbook()
+        const worksheet = workbook.addWorksheet("Category Report")
+
+        // Set professional header
+        worksheet.headerFooter.oddHeader =
+            '&C&"Arial,Bold"&18CATEGORY REPORT\n' +
+            '&C&"Arial,Regular"&12Your Company Name\n' +
+            '&C&"Arial,Regular"&10Period: &D - &T\n' +
+            '&L&"Arial,Regular"&8Generated on: ' +
+            new Date().toLocaleDateString() +
+            "\n" +
+            '&R&"Arial,Regular"&8Page &P of &N'
+
+        // Set custom footer as requested
+        worksheet.headerFooter.oddFooter =
+            '&C&"Arial,Regular"&10\n' + // One line gap
+            '&C&"Arial,Bold"&12This is electronic generated report\n' +
+            '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
+
+        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+        // Set page setup for professional printing
+        worksheet.pageSetup = {
+            paperSize: 9, // A4
+            orientation: "landscape",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: {
+                left: 0.7,
+                right: 0.7,
+                top: 1.0,
+                bottom: 1.0,
+                header: 0.3,
+                footer: 0.5,
+            },
+        }
+
+        // Add title section at the top of the worksheet
+        const titleRow = worksheet.addRow(["CATEGORY REPORT"])
+        titleRow.getCell(1).font = {
+            name: "Arial",
+            size: 16,
+            bold: true,
+            color: { argb: "2F4F4F" },
+        }
+        titleRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A1:${String.fromCharCode(64 + columns.length)}1`) // Merge cells across all columns
+
+        const companyName =
+            agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+                : "PREMIUM BUSINESSMAN SERVICES"
+
+        const companyRow = worksheet.addRow([companyName])
+        companyRow.getCell(1).font = {
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "4472C4" },
+        }
+        companyRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A2:${String.fromCharCode(64 + columns.length)}2`)
+
+        const dateRow = worksheet.addRow([
+            `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+        ])
+        dateRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        dateRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A3:${String.fromCharCode(64 + columns.length)}3`)
+
+        const periodRow = worksheet.addRow([
+            toDate && fromDate
+                ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                : `Period: All`,
+        ])
+        periodRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        periodRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A4:${String.fromCharCode(64 + columns.length)}4`)
+
+        // Add empty row for spacing
+        worksheet.addRow([])
+
+        // Add headers based on your category report columns
+        const headers = [
+            "Category",
+            "Count",
+            "Total Govt. Charges",
+            "Total Service Charges",
+            "Tax",
+            "Typist Commission",
+            "Customer Commission",
+            "Net service charge",
+            "Gross Invoice Amount",
+        ]
+
+        const headerRow = worksheet.addRow(headers)
+
+        // Style header row
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "2F4F4F" }, // Dark slate gray
+            }
+            cell.font = {
+                name: "Arial",
+                bold: true,
+                color: { argb: "FFFFFF" },
+                size: 11,
+            }
+            cell.alignment = { horizontal: "center", vertical: "middle" }
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+        })
+
+        // Track totals for numeric columns
+        const totals = {}
+
+        // Add data rows
+        customerQueue.forEach((row, index) => {
+            const dataRow = worksheet.addRow([
+                row?.category || "",
+                row?.itemCount || 0,
+                Number.parseFloat(row?.totalGovernmentCharges || 0).toFixed(2),
+                Number.parseFloat(row?.totalCenterFee || 0).toFixed(2),
+                Number.parseFloat(row?.totalVat || 0).toFixed(2),
+                Number.parseFloat(row?.typistCommission || 0).toFixed(2),
+                Number.parseFloat(row?.proCommission || 0).toFixed(2),
+                Number.parseFloat(row?.netCharges || 0).toFixed(2),
+                Number.parseFloat(row?.grossCharges || 0).toFixed(2),
+            ])
+
+            // Calculate totals for numeric columns
+            totals.count = (totals.count || 0) + Number.parseInt(row?.itemCount || 0)
+            totals.totalGovernmentCharges =
+                (totals.totalGovernmentCharges || 0) + Number.parseFloat(row?.totalGovernmentCharges || 0)
+            totals.totalCenterFee = (totals.totalCenterFee || 0) + Number.parseFloat(row?.totalCenterFee || 0)
+            totals.totalVat = (totals.totalVat || 0) + Number.parseFloat(row?.totalVat || 0)
+            totals.typistCommission = (totals.typistCommission || 0) + Number.parseFloat(row?.typistCommission || 0)
+            totals.proCommission = (totals.proCommission || 0) + Number.parseFloat(row?.proCommission || 0)
+            totals.netCharges = (totals.netCharges || 0) + Number.parseFloat(row?.netCharges || 0)
+            totals.grossCharges = (totals.grossCharges || 0) + Number.parseFloat(row?.grossCharges || 0)
+
+            // Style data rows
+            dataRow.eachCell((cell, colNumber) => {
+                cell.font = { name: "Arial", size: 10 }
+                cell.alignment = {
+                    horizontal: colNumber === 1 ? "left" : "right", // Category left-aligned, numbers right-aligned
+                    vertical: "middle",
+                }
+                cell.border = {
+                    top: { style: "hair", color: { argb: "CCCCCC" } },
+                    left: { style: "hair", color: { argb: "CCCCCC" } },
+                    bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                    right: { style: "hair", color: { argb: "CCCCCC" } },
+                }
+
+                // Format numeric columns
+                if (colNumber > 1) {
+                    if (colNumber === 2) {
+                        // Count column - no decimal places
+                        cell.numFmt = "#,##0"
+                        cell.value = Number.parseInt(cell.value || 0)
+                    } else {
+                        // Amount columns - 2 decimal places
+                        cell.numFmt = "#,##0.00"
+                        cell.value = Number.parseFloat(cell.value || 0)
+                    }
+                }
+            })
+        })
+
+        // Add empty row before totals
+        worksheet.addRow([])
+
+        // Add TOTAL row
+        const totalRow = worksheet.addRow([
+            "TOTAL",
+            totals.count || 0,
+            totals.totalGovernmentCharges?.toFixed(2) || "0.00",
+            totals.totalCenterFee?.toFixed(2) || "0.00",
+            totals.totalVat?.toFixed(2) || "0.00",
+            totals.typistCommission?.toFixed(2) || "0.00",
+            totals.proCommission?.toFixed(2) || "0.00",
+            totals.netCharges?.toFixed(2) || "0.00",
+            totals.grossCharges?.toFixed(2) || "0.00",
+        ])
+
+        // Style total row
+        totalRow.eachCell((cell, colNumber) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "000000" }, // Black
+            }
+            cell.font = {
+                name: "Arial",
+                bold: true,
+                color: { argb: "FFFFFF" },
+                size: 11,
+            }
+            cell.border = {
+                top: { style: "medium", color: { argb: "000000" } },
+                left: { style: "medium", color: { argb: "000000" } },
+                bottom: { style: "medium", color: { argb: "000000" } },
+                right: { style: "medium", color: { argb: "000000" } },
+            }
+
+            if (colNumber === 1) {
+                cell.alignment = { horizontal: "center", vertical: "middle" }
+            } else {
+                cell.alignment = { horizontal: "right", vertical: "middle" }
+                if (colNumber === 2) {
+                    // Count column
+                    cell.numFmt = "#,##0"
+                    cell.value = Number.parseInt(cell.value || 0)
+                } else {
+                    // Amount columns
+                    cell.numFmt = "#,##0.00"
+                    cell.value = Number.parseFloat(cell.value || 0)
+                }
+            }
+        })
+
+       
+        // Add empty rows for spacing before footer
+        worksheet.addRow([])
+        worksheet.addRow([])
+
+        // Add the electronic generated report text with black border as requested
+        const reportRow = worksheet.addRow(["This is electronic generated report"])
+        reportRow.getCell(1).font = {
+            name: "Arial",
+            size: 12,
+            bold: true,
+            color: { argb: "000000" },
+        }
+        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+        reportRow.getCell(1).border = {
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+        }
+        worksheet.mergeCells(`A${reportRow.number}:${String.fromCharCode(64 + headers.length)}${reportRow.number}`)
+
+        // Add powered by line
+        const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+        poweredByRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        poweredByRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A${poweredByRow.number}:${String.fromCharCode(64 + headers.length)}${poweredByRow.number}`)
+
+        // Set column widths
+        worksheet.columns = [
+            { width: 25 }, // Category
+            { width: 10 }, // Count
+            { width: 18 }, // Total Govt. Charges
+            { width: 20 }, // Total Service Charges
+            { width: 12 }, // Tax
+            { width: 18 }, // Typist Commission
+            { width: 20 }, // Customer Commission
+            { width: 18 }, // Net service charge
+            { width: 20 }, // Gross Invoice Amount
+        ]
+
+        // Add workbook properties
+        workbook.creator = "Finance Department"
+        workbook.lastModifiedBy = "Finance System"
+        workbook.created = new Date()
+        workbook.modified = new Date()
+        workbook.lastPrinted = new Date()
+
+        // Set workbook properties
+        workbook.properties = {
+            title: "Category Report",
+            subject: "Category Analysis Report",
+            keywords: "category, analysis, financial, charges, commission",
+            category: "Financial Reports",
+            description: "Category report generated from accounting system",
+            company: companyName,
+        }
+
+        const download = async () => {
+            const buffer = await workbook.xlsx.writeBuffer()
+            const blob = new Blob([buffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            })
+            saveAs(blob, "category_report.xlsx")
+        }
+
+        download()
+    }
 
     useEffect(() => {
         setFromDate(new Date())
@@ -454,7 +770,25 @@ function SnapshotCategoryReport() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Category Report</Typography>
 
+                {customerQueue?.length > 0 &&
+                    <Button
+                        onClick={() => downloadCategoryReportExcel(customerQueue)}
 
+
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                            padding: '10px',
+                            textTransform: 'capitalize !important',
+                            backgroundColor: "#001f3f !important",
+                            fontSize: "12px",
+                            ":hover": {
+                                backgroundColor: "#001f3f !important",
+                            },
+                        }}
+                    >
+                        Export to Excel
+                    </Button>}
 
             </Box>
 
@@ -502,7 +836,7 @@ function SnapshotCategoryReport() {
             <Box >
 
 
-                {<DataTable loading={loader} total={true} csv={true} csvName={'category_report'} data={customerQueue} columns={columns} />}
+                {<DataTable loading={loader} total={true}  csvName={'category_report'} data={customerQueue} columns={columns} />}
             </Box>
 
         </Box>

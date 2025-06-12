@@ -840,6 +840,35 @@ function ProfitLossStatement() {
           })
       }
   
+      worksheet.addRow([])
+      worksheet.addRow([])
+  
+      // Add the electronic generated report text with black border as requested
+      const reportRow = worksheet.addRow(["This is electronically generated report"])
+      reportRow.getCell(1).font = {
+        name: "Arial",
+        size: 12,
+        bold: false,
+        color: { argb: "000000" },
+      }
+      reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+      reportRow.getCell(1).border = {
+        top: { style: "medium", color: { argb: "000000" } },
+        left: { style: "medium", color: { argb: "000000" } },
+        bottom: { style: "medium", color: { argb: "000000" } },
+        right: { style: "medium", color: { argb: "000000" } },
+      }
+      worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
+
+      const system2 = worksheet.addRow([`Powered By: MangotechDevs.ae`])
+      system2.getCell(1).font = {
+        name: "Arial",
+        size: 10,
+        italic: true,
+        color: { argb: "666666" },
+      }
+      system2.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells(`A${system2.number}:G${system2.number}`)
       // Set column widths
       worksheet.columns = [
           { width: 15 },
@@ -866,17 +895,7 @@ function ProfitLossStatement() {
           description: "Comprehensive profit loss statement generated from accounting system",
           company: "Your Company Name",
       }
-      const system2 = worksheet.addRow([
-        `Powered By: MangotechDevs.ae`,
-    ])
-    system2.getCell(3).font = {
-        name: "Arial",
-        size: 10,
-        italic: true,
-        color: { argb: "666666" },
-    }
-    system2.getCell(3).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A9:G9")
+      
     
     // Add empty row for spacing
     worksheet.addRow([])
