@@ -543,17 +543,37 @@ function ReceiptVouchers() {
                 company: "Your Company Name",
             }
     
-            const poweredByRow = worksheet.addRow([
-                `Powered By: MangotechDevs.ae`,
-            ])
-            poweredByRow.getCell(3).font = {
-                name: "Arial",
-                size: 10,
-                italic: true,
-                color: { argb: "666666" },
-            }
-            poweredByRow.getCell(3).alignment = { horizontal: "center" }
-            worksheet.mergeCells(`A${poweredByRow.number}:G${poweredByRow.number}`);
+          // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronicallyally generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: false,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
+
+    // Add powered by line
+    const poweredByRow = worksheet.addRow(["Powered by : MangotechDevs.ae"])
+    poweredByRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    poweredByRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${poweredByRow.number}:H${poweredByRow.number}`)
     
             // Add empty row for spacing
             worksheet.addRow([])
@@ -561,7 +581,10 @@ function ReceiptVouchers() {
             const download = async () => {
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-                saveAs(blob, "Receipt_Vouchers.xlsx");
+                saveAs( blob,
+                    toDate && fromDate
+                      ? `Receipt_Vouchers  : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                      : `Receipt_Vouchers : Present `,);
             }
             download();
         };

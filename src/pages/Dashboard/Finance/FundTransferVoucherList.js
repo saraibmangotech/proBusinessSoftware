@@ -36,6 +36,7 @@ import {
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import Colors from "assets/Style/Colors";
+import ExcelJS from "exceljs";
 import { CircleLoading } from "components/Loaders";
 import { ErrorToaster, SuccessToaster } from "components/Toaster";
 import FinanceStatusDialog from "components/Dialog/FinanceStatusDialog";
@@ -547,7 +548,284 @@ function PreSalesList() {
     },
   ];
 
+  const downloadFundTransferExcel = () => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet("Fund Transfer Vouchers")
 
+    // Set professional header
+    worksheet.headerFooter.oddHeader =
+      '&C&"Arial,Bold"&18FUND TRANSFER VOUCHERS\n' +
+      '&C&"Arial,Regular"&12Your Company Name\n' +
+      '&C&"Arial,Regular"&10Period: &D - &T\n' +
+      '&L&"Arial,Regular"&8Generated on: ' +
+      new Date().toLocaleDateString() +
+      "\n" +
+      '&R&"Arial,Regular"&8Page &P of &N'
+
+    // Set custom footer as requested
+    worksheet.headerFooter.oddFooter =
+      '&C&"Arial,Regular"&10\n' + // One line gap
+      '&C&"Arial,Bold"&12This is electronically generated report\n' +
+      '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
+
+    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+    // Set page setup for professional printing
+    worksheet.pageSetup = {
+      paperSize: 9, // A4
+      orientation: "landscape",
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 1.0,
+        bottom: 1.0,
+        header: 0.3,
+        footer: 0.5,
+      },
+    }
+
+    // Add title section at the top of the worksheet
+    const titleRow = worksheet.addRow(["FUND TRANSFER VOUCHERS"])
+    titleRow.getCell(1).font = {
+      name: "Arial",
+      size: 16,
+      bold: true,
+      color: { argb: "2F4F4F" },
+    }
+    titleRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A1:H1")
+
+    const companyRow = worksheet.addRow(["PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"])
+    companyRow.getCell(1).font = {
+      name: "Arial",
+      size: 14,
+      bold: true,
+      color: { argb: "4472C4" },
+    }
+    companyRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A2:H2")
+
+    const dateRow = worksheet.addRow([
+      `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+    ])
+    dateRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    dateRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A3:H3")
+
+    const periodRow = worksheet.addRow([
+      toDate && fromDate
+        ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+        : `Period: All`,
+    ])
+    periodRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    periodRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A4:H4")
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    // Define headers based on your fund transfer columns
+    const headers = [
+      "SR No.",
+      "Cost Center",
+      "From Account",
+      "To Account",
+      "Transfer Amount",
+      "Created At",
+      "Impact Date",
+      "Created By",
+    ]
+
+    // Add headers with professional styling
+    const headerRow = worksheet.addRow(headers)
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "2F4F4F" }, // Dark slate gray
+      }
+      cell.font = {
+        name: "Arial",
+        bold: true,
+        color: { argb: "FFFFFF" },
+        size: 11,
+      }
+      cell.alignment = { horizontal: "center", vertical: "middle" }
+      cell.border = {
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
+      }
+    })
+
+    // Add data rows
+    data?.forEach((voucher, index) => {
+      const dataRow = worksheet.addRow([
+        index + 1, // SR No.
+        voucher.cost_center || "-",
+        voucher.from_account?.name || "-",
+        voucher.to_account?.name || "-",
+        voucher.to_amount || "0.00",
+        voucher.createdAt ? moment(voucher.createdAt).format("DD/MM/YYYY") : "N/A",
+        voucher.date ? moment(voucher.date).format("DD/MM/YYYY") : "N/A",
+        voucher.creator?.name || "-",
+      ])
+
+      // Style data rows
+      dataRow.eachCell((cell, colNumber) => {
+        cell.font = { name: "Arial", size: 10 }
+        cell.alignment = {
+          horizontal: colNumber === 5 ? "right" : "left", // Transfer Amount column right-aligned
+          vertical: "middle",
+        }
+        cell.border = {
+          top: { style: "hair", color: { argb: "CCCCCC" } },
+          left: { style: "hair", color: { argb: "CCCCCC" } },
+          bottom: { style: "hair", color: { argb: "CCCCCC" } },
+          right: { style: "hair", color: { argb: "CCCCCC" } },
+        }
+
+        // Format transfer amount column
+        if (colNumber === 5) {
+          const amount = Number.parseFloat(voucher.to_amount?.toString() || "0")
+          cell.numFmt = "#,##0.00"
+          cell.value = amount
+        }
+      })
+    })
+
+    // Add totals row if there are vouchers
+    if (data?.length > 0) {
+      // Calculate total transfer amount
+      const totalAmount = data.reduce((sum, voucher) => {
+        return sum + Number.parseFloat(voucher.to_amount?.toString() || "0")
+      }, 0)
+
+      // Add empty row before totals
+      worksheet.addRow([])
+
+      // Add totals row
+      const totalRow = worksheet.addRow(["", "", "", "Total", totalAmount.toFixed(2), "", "", ""])
+
+      // Style totals row
+      totalRow.eachCell((cell, colNumber) => {
+        if (colNumber === 4 || colNumber === 5) {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "000000" }, // Black
+          }
+          cell.font = {
+            name: "Arial",
+            bold: true,
+            color: { argb: "FFFFFF" },
+            size: 11,
+          }
+          cell.border = {
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+          }
+
+          if (colNumber === 5) {
+            cell.numFmt = "#,##0.00"
+            cell.alignment = { horizontal: "right", vertical: "middle" }
+          } else {
+            cell.alignment = { horizontal: "center", vertical: "middle" }
+          }
+        }
+      })
+    }
+
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronicallyally generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: false,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
+
+    // Add powered by line
+    const poweredByRow = worksheet.addRow(["Powered by : MangotechDevs.ae"])
+    poweredByRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    poweredByRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${poweredByRow.number}:H${poweredByRow.number}`)
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 10 }, // SR No.
+      { width: 15 }, // Cost Center
+      { width: 20 }, // From Account
+      { width: 20 }, // To Account
+      { width: 15 }, // Transfer Amount
+      { width: 15 }, // Created At
+      { width: 15 }, // Impact Date
+      { width: 20 }, // Created By
+    ]
+
+    // Add workbook properties
+    workbook.creator = "Finance Department"
+    workbook.lastModifiedBy = "Finance System"
+    workbook.created = new Date()
+    workbook.modified = new Date()
+    workbook.lastPrinted = new Date()
+
+    // Set workbook properties
+    workbook.properties = {
+      title: "Fund Transfer Vouchers",
+      subject: "Financial Report",
+      keywords: "fund transfer, vouchers, financial, accounting",
+      category: "Financial Reports",
+      description: "Fund transfer vouchers report generated from accounting system",
+      company: "Premium Professional Government Services LLC",
+    }
+
+    const download = async () => {
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+      saveAs( blob,
+        toDate && fromDate
+          ? `Fund_Transfer_Vouchers  : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+          : `Fund_Transfer_Vouchers : Present `,)
+    }
+
+    download()
+  }
 
   useEffect(() => {
     setFromDate(new Date())
@@ -631,6 +909,11 @@ function PreSalesList() {
           {" "}
           Fund Transfer Voucher List
         </Typography>
+
+        <PrimaryButton
+          title={"Export To Excel"}
+          onClick={() => downloadFundTransferExcel()}
+        />
         {/* {true && (
           <PrimaryButton
             bgcolor={"#001f3f"}
@@ -695,7 +978,7 @@ function PreSalesList() {
         </Grid>
       </Grid>
 
-      <Box>{<DataTable loading={loader} data={data} csv={true} csvName={'iftv_lists'} columns={columns} />}</Box>
+      <Box>{<DataTable loading={loader} data={data}  csvName={'iftv_lists'} columns={columns} />}</Box>
 
     </Box>
   );

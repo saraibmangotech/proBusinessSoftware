@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -21,7 +22,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -50,7 +51,8 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import DatePicker from 'components/DatePicker';
 import { id } from 'date-fns/locale';
 import { useAuth } from 'context/UseContext';
-
+import ExcelJS from "exceljs";
+import DoNotDisturbAltIcon from '@mui/icons-material/DoNotDisturbAlt';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -124,13 +126,16 @@ function PayReceipts() {
     const contentRef = useRef(null);
     const [status, setStatus] = useState(null)
     const [statusDialog, setStatusDialog] = useState(false)
+    const [statusDialog2, setStatusDialog2] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
     const [invoiceData, setInvoiceData] = useState(null)
     const [invoiceData2, setInvoiceData2] = useState(null)
     const [payReceiptData, setPayReceiptData] = useState([]);
     console.log(payReceiptData, "payReceiptData");
-      const { user } = useAuth()
+    const [buttonVal, setButtonVal] = useState(null)
+    const [paid, setPaid] = useState(null)
+    const { user } = useAuth()
     const {
         register,
         handleSubmit,
@@ -311,7 +316,7 @@ function PayReceipts() {
     const [loader, setLoader] = useState(false);
 
     const [confirmationDialog, setConfirmationDialog] = useState(false)
-
+    const [confirmationDialog2, setConfirmationDialog2] = useState(false)
     // *For Customer Queue
     const [customerQueue, setCustomerQueue] = useState([]);
     const [data, setData] = useState([])
@@ -344,7 +349,7 @@ function PayReceipts() {
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                 is_paid: true,
-                invoice_number:getValues('invoiceNumber')
+                invoice_number: getValues('invoiceNumber')
 
 
             }
@@ -445,7 +450,29 @@ function PayReceipts() {
             // setLoader(false)
         }
     }
+    const handleVoid = async (item) => {
 
+
+        try {
+            let params = {
+                id: selectedData?.id,
+                void_type:buttonVal
+                
+
+
+            }
+
+
+            const { message } = await CustomerServices.handleVoid(params)
+
+            SuccessToaster(message);
+            getCustomerQueue()
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            // setLoader(false)
+        }
+    }
     const getData = async (id) => {
         try {
             let params = {
@@ -541,7 +568,34 @@ function PayReceipts() {
             console.log(error);
         }
     };
+    const UpdateStatus2 = async () => {
+        try {
+            let obj = {
+                id: selectedData?.id,
+                invoice_date: invoiceDate,
+            };
 
+            const promise = CustomerServices.invoiceDateUpdate(obj);
+            console.log(promise);
+
+            showPromiseToast(
+                promise,
+                "Saving...",
+                "Added Successfully",
+                "Something Went Wrong"
+            );
+
+            // Await the promise and then check its response
+            const response = await promise;
+            if (response?.responseCode === 200) {
+                setStatusDialog(false);
+                setStatus(null)
+                getCustomerQueue();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(() => {
         if (invoiceData) {
@@ -680,7 +734,7 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
-                    { (
+                    {row?.original?.is_paid && (
                         <Tooltip title="Payment Receipt">
                             <IconButton
                                 onClick={() => {
@@ -701,7 +755,7 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
-                      {[1000,3,2].includes(user?.role_id) && (
+                    {[1000, 3, 2].includes(user?.role_id) && (
                         <Tooltip title="Change Invoice Date">
                             <IconButton
                                 onClick={() => {
@@ -721,12 +775,337 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
+
+                    {[1000, 3, 2].includes(user?.role_id) && (
+                        <Tooltip title="Void Invoice">
+                            <IconButton
+                                onClick={() => {
+                                    setSelectedData(row?.original)
+                                    // setInvoiceDate(new Date(row?.original?.invoice_date))
+                                    setPaid(row?.original?.is_paid )
+                                    setStatusDialog2(true)
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <DoNotDisturbAltIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </Box>
             ),
         },
     ];
 
+    const downloadPaidReceiptsExcel = () => {
+        // Skip if no data
+        if (!data || data.length === 0) return
 
+        const workbook = new ExcelJS.Workbook()
+        const worksheet = workbook.addWorksheet("Paid Receipts")
+
+        // Set professional header
+        worksheet.headerFooter.oddHeader =
+            '&C&"Arial,Bold"&18PAID RECEIPTS\n' +
+            '&C&"Arial,Regular"&12Your Company Name\n' +
+            '&C&"Arial,Regular"&10Period: &D - &T\n' +
+            '&L&"Arial,Regular"&8Generated on: ' +
+            new Date().toLocaleDateString() +
+            "\n" +
+            '&R&"Arial,Regular"&8Page &P of &N'
+
+        // Set custom footer as requested
+        worksheet.headerFooter.oddFooter =
+            '&C&"Arial,Regular"&10\n' + // One line gap
+            '&C&"Arial,Bold"&12This is electronically generated report\n' +
+            '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
+
+        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+        // Set page setup for professional printing
+        worksheet.pageSetup = {
+            paperSize: 9, // A4
+            orientation: "landscape",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: {
+                left: 0.7,
+                right: 0.7,
+                top: 1.0,
+                bottom: 1.0,
+                header: 0.3,
+                footer: 0.5,
+            },
+        }
+
+        // Add title section at the top of the worksheet
+        const titleRow = worksheet.addRow(["PAID RECEIPTS"])
+        titleRow.getCell(1).font = {
+            name: "Arial",
+            size: 16,
+            bold: true,
+            color: { argb: "2F4F4F" },
+        }
+        titleRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A1:G1") // Merge cells across all columns
+
+        const companyName =
+            agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+                : "PREMIUM BUSINESSMAN SERVICES"
+
+        const companyRow = worksheet.addRow([companyName])
+        companyRow.getCell(1).font = {
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "4472C4" },
+        }
+        companyRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A2:G2")
+
+        const dateRow = worksheet.addRow([
+            `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+        ])
+        dateRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        dateRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A3:G3")
+
+        const periodRow = worksheet.addRow([
+            toDate && fromDate
+                ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                : `Period: All`,
+        ])
+        periodRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        periodRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A4:G4")
+
+        // Add empty row for spacing
+        worksheet.addRow([])
+
+        // Define headers based on the columns structure (excluding Actions column)
+        const headers = ["Invoice#", "Customer", "Token Number", "Total Amount", "Status", "Created By", "Created At"]
+
+        // Add headers with professional styling
+        const headerRow = worksheet.addRow(headers)
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "2F4F4F" }, // Dark slate gray
+            }
+            cell.font = {
+                name: "Arial",
+                bold: true,
+                color: { argb: "FFFFFF" },
+                size: 11,
+            }
+            cell.alignment = { horizontal: "center", vertical: "middle" }
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+        })
+
+        // Track totals for numeric columns
+        let totalAmount = 0
+
+        // Add data rows
+        data.forEach((item, index) => {
+            // Calculate total amount exactly as in the column definition
+            const itemsTotal =
+                item?.sale_receipt_items?.reduce((total2, receiptItem) => {
+                    return Number.parseFloat(total2) + Number.parseFloat(receiptItem?.total ?? 0)
+                }, 0) || 0
+
+            const vatTotal =
+                item?.sale_receipt_items?.reduce((total, receiptItem) => {
+                    const fee = Number.parseFloat(receiptItem?.center_fee ?? 0)
+                    const qty = Number.parseFloat(receiptItem?.quantity ?? 1)
+                    return total + fee * qty
+                }, 0) * 0.05 || 0
+
+            const calculatedTotalAmount = itemsTotal + vatTotal
+
+            // Determine status (simplified to Paid/Unpaid as per column definition)
+            const status = item?.is_paid ? "Paid" : "Unpaid"
+
+            const dataRow = worksheet.addRow([
+                item?.invoice_number || "",
+                item?.customer_name || "",
+                item?.token_number || "",
+                calculatedTotalAmount.toFixed(2),
+                status,
+                item?.creator?.name || "",
+                item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "",
+            ])
+
+            // Add to total
+            totalAmount += calculatedTotalAmount
+
+            // Style data rows
+            dataRow.eachCell((cell, colNumber) => {
+                cell.font = { name: "Arial", size: 10 }
+
+                // Determine alignment based on column type
+                const isNumericColumn = colNumber === 4 // Total Amount column
+
+                cell.alignment = {
+                    horizontal: isNumericColumn ? "right" : "left",
+                    vertical: "middle",
+                }
+
+                cell.border = {
+                    top: { style: "hair", color: { argb: "CCCCCC" } },
+                    left: { style: "hair", color: { argb: "CCCCCC" } },
+                    bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                    right: { style: "hair", color: { argb: "CCCCCC" } },
+                }
+
+                // Format numeric columns
+                if (isNumericColumn) {
+                    cell.numFmt = "#,##0.00"
+                    cell.value = Number.parseFloat(cell.value || 0)
+                }
+
+                // Color coding for status
+                if (colNumber === 5) {
+                    // Status column
+                    if (cell.value === "Paid") {
+                        cell.font = { name: "Arial", size: 10, color: { argb: "008000" }, bold: true } // Green
+                    } else if (cell.value === "Unpaid") {
+                        cell.font = { name: "Arial", size: 10, color: { argb: "FF0000" }, bold: true } // Red
+                    }
+                }
+            })
+        })
+
+        // Add empty row before totals
+        worksheet.addRow([])
+
+        // Add totals row
+        const totalRow = worksheet.addRow(["", "", "TOTAL", totalAmount.toFixed(2), "", "", ""])
+
+        // Style totals row
+        totalRow.eachCell((cell, colNumber) => {
+            if (colNumber === 3 || colNumber === 4) {
+                // "TOTAL" label and amount
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "000000" }, // Black
+                }
+                cell.font = {
+                    name: "Arial",
+                    bold: true,
+                    color: { argb: "FFFFFF" },
+                    size: 11,
+                }
+                cell.border = {
+                    top: { style: "medium", color: { argb: "000000" } },
+                    left: { style: "medium", color: { argb: "000000" } },
+                    bottom: { style: "medium", color: { argb: "000000" } },
+                    right: { style: "medium", color: { argb: "000000" } },
+                }
+
+                if (colNumber === 3) {
+                    cell.alignment = { horizontal: "center", vertical: "middle" }
+                } else {
+                    cell.alignment = { horizontal: "right", vertical: "middle" }
+                    cell.numFmt = "#,##0.00"
+                    cell.value = Number.parseFloat(cell.value || 0)
+                }
+            }
+        })
+
+        // Add empty rows for spacing before footer
+        worksheet.addRow([])
+        worksheet.addRow([])
+
+        // Add the electronic generated report text with black border as requested
+        const reportRow = worksheet.addRow(["This is electronically generated report"])
+        reportRow.getCell(1).font = {
+            name: "Arial",
+            size: 12,
+            bold: true,
+            color: { argb: "000000" },
+        }
+        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+        reportRow.getCell(1).border = {
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+        }
+        worksheet.mergeCells(`A${reportRow.number}:G${reportRow.number}`)
+
+        // Add powered by line
+        const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+        poweredByRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        poweredByRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A${poweredByRow.number}:G${poweredByRow.number}`)
+
+        // Set column widths
+        worksheet.columns = [
+            { width: 15 }, // Invoice#
+            { width: 25 }, // Customer
+            { width: 15 }, // Token Number
+            { width: 15 }, // Total Amount
+            { width: 12 }, // Status
+            { width: 20 }, // Created By
+            { width: 15 }, // Created At
+        ]
+
+        // Add workbook properties
+        workbook.creator = "Finance Department"
+        workbook.lastModifiedBy = "Finance System"
+        workbook.created = new Date()
+        workbook.modified = new Date()
+        workbook.lastPrinted = new Date()
+
+        // Set workbook properties
+        workbook.properties = {
+            title: "Paid Receipts",
+            subject: "Paid Receipts Report",
+            keywords: "paid, receipts, invoice, customer, payment, financial",
+            category: "Financial Reports",
+            description: "Paid receipts report generated from system",
+            company: companyName,
+        }
+
+        const download = async () => {
+            const buffer = await workbook.xlsx.writeBuffer()
+            const blob = new Blob([buffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            })
+            saveAs(blob, "paid_receipts.xlsx")
+        }
+
+        download()
+    }
 
     useEffect(() => {
         setFromDate(new Date())
@@ -747,6 +1126,17 @@ function PayReceipts() {
 
                 }}
             />
+
+            <ConfirmationDialog
+                open={confirmationDialog2}
+                onClose={() => setConfirmationDialog2(false)}
+                message={"Are You Sure? This action can not be reversed."}
+                action={() => {
+                    setConfirmationDialog2(false);
+                    handleVoid()
+
+                }}
+            />
             <SimpleDialog
                 open={statusDialog}
                 onClose={() => setStatusDialog(false)}
@@ -755,13 +1145,13 @@ function PayReceipts() {
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={12}>
-                        <DatePicker
-                        label={"Invoice Date"}
-                        disableFuture={true}
-                        size="small"
-                        value={invoiceDate}
-                        onChange={(date) => handleFromDate2(date)}
-                    />
+                            <DatePicker
+                                label={"Invoice Date"}
+                                disableFuture={true}
+                                size="small"
+                                value={invoiceDate}
+                                onChange={(date) => handleFromDate2(date)}
+                            />
                         </Grid>
                         <Grid container sx={{ justifyContent: "center" }}>
                             <Grid
@@ -791,10 +1181,73 @@ function PayReceipts() {
                 </Box>
             </SimpleDialog>
 
+            <SimpleDialog
+                open={statusDialog2}
+                onClose={() => setStatusDialog2(false)}
+                title={"Void Invoice"}
+            >
+                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
+                    <Box sx={{display:'flex',justifyContent:'center',gap:2}}>
+                        <Box>Invoice No : {selectedData?.invoice_number ? selectedData?.invoice_number : '-' } </Box>
+                        {selectedData?.payment?.id && <Box>Receipt No : {selectedData?.payment?.id ? 'RC-'+selectedData?.payment?.id : '-'}</Box>}
+                    </Box>
+                    <Grid container spacing={2}>
 
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            sx={{
+                                mt: 2,
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: "25px",
+                            }}
+                        >
+                            <PrimaryButton
+                                onClick={() => {setButtonVal('invoice');setConfirmationDialog2(true)}}
+                                bgcolor={Colors.primary}
+                                title="Void Invoice"
+
+                            />
+                            {paid && <PrimaryButton
+                                onClick={() => {setButtonVal('receipt');setConfirmationDialog2(true)}}
+                                bgcolor={"#FF1F25"}
+                                title="Void Receipt"
+                            />}
+                            {paid && <PrimaryButton
+                                onClick={() => {setButtonVal('both');setConfirmationDialog2(true)}}
+                                bgcolor={"#FF1F25"}
+                                title="Void Both"
+                            />}
+                        </Grid>
+
+
+                    </Grid>
+                </Box>
+            </SimpleDialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Paid Receipt List</Typography>
-                <Box >
+                <Box sx={{ display: 'flex', gap: 2 }} >
+                    {data?.length > 0 &&
+                        <Button
+                            onClick={() => downloadPaidReceiptsExcel(customerQueue)}
+
+
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                                padding: '10px',
+                                textTransform: 'capitalize !important',
+                                backgroundColor: "#001f3f !important",
+                                fontSize: "12px",
+                                ":hover": {
+                                    backgroundColor: "#001f3f !important",
+                                },
+                            }}
+                        >
+                            Export to Excel
+                        </Button>}
                     <PrimaryButton
                         bgcolor={'#001f3f'}
                         title="Create"
@@ -855,16 +1308,16 @@ function PayReceipts() {
                         </Grid>
                     </Grid>
                 </Grid>
-           
+
             </Grid>
 
 
             <Box >
 
 
-                {<DataTable loading={loader} csv={true} csvName={'paid_receipts'} data={data} columns={columns} />}
+                {<DataTable loading={loader} csvName={'paid_receipts'} data={data} columns={columns} />}
             </Box>
-         
+
         </Box>
     );
 }

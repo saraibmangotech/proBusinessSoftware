@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -41,7 +42,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
-
+import ExcelJS from "exceljs";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -400,6 +401,310 @@ function EmployeeSalesSummary() {
 
     ];
 
+    const downloadEmployeeSalesSummaryExcel = (data) => {
+        // Skip if no data
+        if (!customerQueue || customerQueue.length === 0) return
+
+        const workbook = new ExcelJS.Workbook()
+        const worksheet = workbook.addWorksheet("Employee Sales Summary")
+
+        // Set professional header
+        worksheet.headerFooter.oddHeader =
+            '&C&"Arial,Bold"&18EMPLOYEE SALES SUMMARY REPORT\n' +
+            '&C&"Arial,Regular"&12Your Company Name\n' +
+            '&C&"Arial,Regular"&10Period: &D - &T\n' +
+            '&L&"Arial,Regular"&8Generated on: ' +
+            new Date().toLocaleDateString() +
+            "\n" +
+            '&R&"Arial,Regular"&8Page &P of &N'
+
+        // Set custom footer as requested
+        worksheet.headerFooter.oddFooter =
+            '&C&"Arial,Regular"&10\n' + // One line gap
+            '&C&"Arial,Bold"&12This is electronically generated report\n' +
+            '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
+
+        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+        // Set page setup for professional printing
+        worksheet.pageSetup = {
+            paperSize: 9, // A4
+            orientation: "landscape",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: {
+                left: 0.7,
+                right: 0.7,
+                top: 1.0,
+                bottom: 1.0,
+                header: 0.3,
+                footer: 0.5,
+            },
+        }
+
+        // Add title section at the top of the worksheet
+        const titleRow = worksheet.addRow(["EMPLOYEE SALES SUMMARY REPORT"])
+        titleRow.getCell(1).font = {
+            name: "Arial",
+            size: 16,
+            bold: true,
+            color: { argb: "2F4F4F" },
+        }
+        titleRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A1:I1`) // Merge cells across all columns
+
+        const companyName =
+            agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+                : "PREMIUM BUSINESSMAN SERVICES"
+
+        const companyRow = worksheet.addRow([companyName])
+        companyRow.getCell(1).font = {
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "4472C4" },
+        }
+        companyRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A2:I2`)
+
+        const dateRow = worksheet.addRow([
+            `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+        ])
+        dateRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        dateRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A3:I3`)
+
+        const periodRow = worksheet.addRow([
+            toDate && fromDate
+                ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                : `Period: All`,
+        ])
+        periodRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        periodRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A4:I4`)
+
+        // Add empty row for spacing
+        worksheet.addRow([])
+
+        // Add headers based on your employee sales summary columns
+        const headers = [
+            "Employee ID",
+            "Employee Name",
+            "Total Govt. Charges",
+            "Total Service Charges",
+            "Tax",
+            "Typist Commission",
+            "Customer Commission",
+            "Net service charge",
+            "Gross Invoice Amount",
+        ]
+
+        const headerRow = worksheet.addRow(headers)
+
+        // Style header row
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "2F4F4F" }, // Dark slate gray
+            }
+            cell.font = {
+                name: "Arial",
+                bold: true,
+                color: { argb: "FFFFFF" },
+                size: 11,
+            }
+            cell.alignment = { horizontal: "center", vertical: "middle" }
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+        })
+
+        // Track totals for numeric columns
+        const totals = {}
+
+        // Add data rows
+        customerQueue.forEach((row, index) => {
+            const dataRow = worksheet.addRow([
+                row?.employeeId || "",
+                row?.employeeName || "",
+                Number.parseFloat(row?.totalGovernmentCharges || 0).toFixed(2),
+                Number.parseFloat(row?.totalCenterFee || 0).toFixed(2),
+                Number.parseFloat(row?.totalVat || 0).toFixed(2),
+                Number.parseFloat(row?.typistCommission || 0).toFixed(2),
+                Number.parseFloat(row?.proCommission || 0).toFixed(2),
+                Number.parseFloat(row?.netCharges || 0).toFixed(2),
+                Number.parseFloat(row?.grossCharges || 0).toFixed(2),
+            ])
+
+            // Calculate totals for numeric columns
+            totals.totalGovernmentCharges =
+                (totals.totalGovernmentCharges || 0) + Number.parseFloat(row?.totalGovernmentCharges || 0)
+            totals.totalCenterFee = (totals.totalCenterFee || 0) + Number.parseFloat(row?.totalCenterFee || 0)
+            totals.totalVat = (totals.totalVat || 0) + Number.parseFloat(row?.totalVat || 0)
+            totals.typistCommission = (totals.typistCommission || 0) + Number.parseFloat(row?.typistCommission || 0)
+            totals.proCommission = (totals.proCommission || 0) + Number.parseFloat(row?.proCommission || 0)
+            totals.netCharges = (totals.netCharges || 0) + Number.parseFloat(row?.netCharges || 0)
+            totals.grossCharges = (totals.grossCharges || 0) + Number.parseFloat(row?.grossCharges || 0)
+
+            // Style data rows
+            dataRow.eachCell((cell, colNumber) => {
+                cell.font = { name: "Arial", size: 10 }
+                cell.alignment = {
+                    horizontal: colNumber <= 2 ? "left" : "right", // Employee ID and Name left-aligned, numbers right-aligned
+                    vertical: "middle",
+                }
+                cell.border = {
+                    top: { style: "hair", color: { argb: "CCCCCC" } },
+                    left: { style: "hair", color: { argb: "CCCCCC" } },
+                    bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                    right: { style: "hair", color: { argb: "CCCCCC" } },
+                }
+
+                // Format numeric columns (columns 3-9)
+                if (colNumber > 2) {
+                    cell.numFmt = "#,##0.00"
+                    cell.value = Number.parseFloat(cell.value || 0)
+                }
+            })
+        })
+
+        // Add empty row before totals
+        worksheet.addRow([])
+
+        // Add TOTAL row
+        const totalRow = worksheet.addRow([
+            "",
+            "TOTAL",
+            totals.totalGovernmentCharges?.toFixed(2) || "0.00",
+            totals.totalCenterFee?.toFixed(2) || "0.00",
+            totals.totalVat?.toFixed(2) || "0.00",
+            totals.typistCommission?.toFixed(2) || "0.00",
+            totals.proCommission?.toFixed(2) || "0.00",
+            totals.netCharges?.toFixed(2) || "0.00",
+            totals.grossCharges?.toFixed(2) || "0.00",
+        ])
+
+        // Style total row
+        totalRow.eachCell((cell, colNumber) => {
+            if (colNumber >= 2) {
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "000000" }, // Black
+                }
+                cell.font = {
+                    name: "Arial",
+                    bold: true,
+                    color: { argb: "FFFFFF" },
+                    size: 11,
+                }
+                cell.border = {
+                    top: { style: "medium", color: { argb: "000000" } },
+                    left: { style: "medium", color: { argb: "000000" } },
+                    bottom: { style: "medium", color: { argb: "000000" } },
+                    right: { style: "medium", color: { argb: "000000" } },
+                }
+
+                if (colNumber === 2) {
+                    cell.alignment = { horizontal: "center", vertical: "middle" }
+                } else {
+                    cell.alignment = { horizontal: "right", vertical: "middle" }
+                    cell.numFmt = "#,##0.00"
+                    cell.value = Number.parseFloat(cell.value || 0)
+                }
+            }
+        })
+
+      
+
+        // Add empty rows for spacing before footer
+        worksheet.addRow([])
+        worksheet.addRow([])
+
+        // Add the electronic generated report text with black border as requested
+        const reportRow = worksheet.addRow(["This is electronically generated report"])
+        reportRow.getCell(1).font = {
+            name: "Arial",
+            size: 12,
+            bold: true,
+            color: { argb: "000000" },
+        }
+        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+        reportRow.getCell(1).border = {
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+        }
+        worksheet.mergeCells(`A${reportRow.number}:I${reportRow.number}`)
+
+        // Add powered by line
+        const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+        poweredByRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        poweredByRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A${poweredByRow.number}:I${poweredByRow.number}`)
+
+        // Set column widths
+        worksheet.columns = [
+            { width: 15 }, // Employee ID
+            { width: 25 }, // Employee Name
+            { width: 18 }, // Total Govt. Charges
+            { width: 20 }, // Total Service Charges
+            { width: 12 }, // Tax
+            { width: 18 }, // Typist Commission
+            { width: 20 }, // Customer Commission
+            { width: 18 }, // Net service charge
+            { width: 20 }, // Gross Invoice Amount
+        ]
+
+        // Add workbook properties
+        workbook.creator = "Finance Department"
+        workbook.lastModifiedBy = "Finance System"
+        workbook.created = new Date()
+        workbook.modified = new Date()
+        workbook.lastPrinted = new Date()
+
+        // Set workbook properties
+        workbook.properties = {
+            title: "Employee Sales Summary Report",
+            subject: "Employee Performance Report",
+            keywords: "employee, sales, summary, performance, charges, commission",
+            category: "Sales Reports",
+            description: "Employee sales summary report generated from accounting system",
+            company: companyName,
+        }
+
+        const download = async () => {
+            const buffer = await workbook.xlsx.writeBuffer()
+            const blob = new Blob([buffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            })
+            saveAs(blob, "employee_sales_summary_report.xlsx")
+        }
+
+        download()
+    }
 
     useEffect(() => {
         setFromDate(new Date())
@@ -481,7 +786,25 @@ function EmployeeSalesSummary() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Employee Sales Summary Report</Typography>
 
+                {customerQueue?.length > 0 &&
+                    <Button
+                        onClick={() => downloadEmployeeSalesSummaryExcel(customerQueue)}
 
+
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                            padding: '10px',
+                            textTransform: 'capitalize !important',
+                            backgroundColor: "#001f3f !important",
+                            fontSize: "12px",
+                            ":hover": {
+                                backgroundColor: "#001f3f !important",
+                            },
+                        }}
+                    >
+                        Export to Excel
+                    </Button>}
 
             </Box>
 
@@ -542,7 +865,7 @@ function EmployeeSalesSummary() {
             <Box >
 
 
-                {<DataTable loading={loader} total={true} csv={true} csvName={'employee_sales_summary_report'} data={customerQueue} columns={columns} />}
+                {<DataTable loading={loader} total={true}  csvName={'employee_sales_summary_report'} data={customerQueue} columns={columns} />}
             </Box>
 
         </Box>

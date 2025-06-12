@@ -153,7 +153,8 @@ const routes = {
   CreateSaleReceipt2:'/sales/receipts/place/mohre',
   getVatReport:'/reports/vatRegister/Output',
   getVatInputReport:'/reports/vatRegister/Input',
-  invoiceDateUpdate:'/sales/receipts/updateDate'
+  invoiceDateUpdate:'/sales/receipts/updateDate',
+  handleVoid:'sales/invoice/void'
 
 
 };

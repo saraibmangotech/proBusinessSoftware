@@ -764,6 +764,27 @@ function TrialBalanceDetailed() {
         }
         cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
       })
+
+               // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronicallyally generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: false,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
     
       // Set column widths
       worksheet.columns = [
@@ -1078,6 +1099,26 @@ function TrialBalanceDetailed() {
           }
           cell.font = { bold: true, color: { argb: "FFFFFF" } }
         })
+                 // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border as requested
+    const reportRow = worksheet.addRow(["This is electronicallyally generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: false,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
       
         // Set column widths
         worksheet.columns = [
@@ -1090,14 +1131,14 @@ function TrialBalanceDetailed() {
           { width: 18 },
         ]
         const system2 = worksheet.addRow([`Powered By: MangotechDevs.ae`])
-        system2.getCell(3).font = {
+        system2.getCell(1).font = {
           name: "Arial",
           size: 10,
           italic: true,
           color: { argb: "666666" },
         }
-        system2.getCell(3).alignment = { horizontal: "center" }
-        worksheet.mergeCells("A9:G9")
+        system2.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A${system2.number}:G${system2.number}`)
       
         // Add empty row for spacing
         worksheet.addRow([])
