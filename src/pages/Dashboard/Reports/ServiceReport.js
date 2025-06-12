@@ -185,7 +185,15 @@ function ServiceReport() {
           )
       );
 
-      const totalLineTotal = data?.rows?.reduce((sum, item) => sum + (parseFloat(item?.total) + ((parseFloat(item?.center_fee) * parseFloat(item?.quantity)) * 0.05)), 0);
+      const totalLineTotal = data?.rows?.reduce((sum, item) => {
+        const centerFee = parseFloat(item?.center_fee) || 0;
+        const govtFee = parseFloat(item?.govt_fee) || 0;
+        const bankCharge = parseFloat(item?.bank_charge) || 0;
+        const quantity = parseFloat(item?.quantity) || 0;
+
+        const lineTotal = (centerFee + govtFee + bankCharge + (centerFee * 0.05)) * quantity;
+        return sum + lineTotal;
+      }, 0);
 
       setInvoiceTotal(totalLineTotal)
       const result = data?.rows?.reduce((acc, item) => {
@@ -792,10 +800,7 @@ function ServiceReport() {
         item?.receipt?.is_paid ? "Paid" : "UnPaid",
         item?.receipt?.creator?.employee_id || "",
         item?.receipt?.creator?.name || "",
-        (
-          Number.parseFloat(item?.total) +
-          Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05
-        ).toFixed(5),
+        ((centerFee + bankCharge + govtFee + (centerFee * 0.05)) * quantity).toFixed(5),
         (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(5),
       ])
 
@@ -839,12 +844,15 @@ function ServiceReport() {
       const quantity = Number.parseFloat(item?.quantity) || 0
       return sum + (govtFee + bankCharge) * quantity
     }, 0)
-    const totalLineTotal = data.reduce(
-      (sum, item) =>
-        sum +
-        (Number.parseFloat(item?.total) + Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05),
-      0,
-    )
+    const totalLineTotal = data.reduce((sum, item) => {
+      const centerFee = parseFloat(item?.center_fee) || 0;
+      const govtFee = parseFloat(item?.govt_fee) || 0;
+      const bankCharge = parseFloat(item?.bank_charge) || 0;
+      const quantity = parseFloat(item?.quantity) || 0;
+
+      const subtotal = centerFee + govtFee + bankCharge + (centerFee * 0.05);
+      return sum + (subtotal * quantity);
+    }, 0);
     const totalInvoiceTotal = data.reduce(
       (sum, item) => sum + (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)),
       0,
@@ -1086,7 +1094,7 @@ function ServiceReport() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          {customerQueue?.length > 0 && 
+          {customerQueue?.length > 0 &&
             <Button
               onClick={() => downloadInvoiceExcel(customerQueue)}
               startIcon={<FileDownload />}
@@ -1105,7 +1113,7 @@ function ServiceReport() {
             >
               Export to Excel
             </Button>}
-       
+
         </Box>
 
 
