@@ -466,6 +466,7 @@ function PayReceipts() {
             const { message } = await CustomerServices.handleVoid(params)
 
             SuccessToaster(message);
+            setStatusDialog2(false)
             getCustomerQueue()
         } catch (error) {
             showErrorToast(error)
