@@ -118,7 +118,7 @@ const useStyles = makeStyles({
     }
 })
 
-function VoidInvoices() {
+function VoidReceipts() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -355,7 +355,8 @@ function VoidInvoices() {
 
             }
 
-            const { data } = await CustomerServices.getInvoices(params)
+            const { data } = await CustomerServices.getVoidReceipts(params)
+
             setData(data?.rows);
 
 
@@ -611,34 +612,27 @@ function VoidInvoices() {
     }, [invoiceData2]);
     const columns = [
         {
-            header: "Invoice#",
-            accessorKey: "invoice_number",
+            header: "Receipt No #",
+            accessorKey: "id",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {'RC-'+ row?.original?.id}
+                </Box>
+            ),
         },
-        {
-            header: "Customer",
-            accessorKey: "customer_name",
-        },
-        {
-            header: "Token Number",
-            accessorKey: "token_number",
-        },
+     
         {
             header: "Total Amount",
             accessorFn: (row) => {
 
                 return (
-                    row?.sale_receipt_items?.reduce((total2, item) => {
-                        return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                    }, 0) +
-                    row?.sale_receipt_items?.reduce((total, item) => {
-                        const fee = parseFloat(item?.center_fee ?? 0);
-                        const qty = parseFloat(item?.quantity ?? 1);
-                        return total + fee * qty;
-                    }, 0) * 0.05
+                    row?.payment_entries?.reduce((total2, item) => {
+                        return parseFloat(total2) + parseFloat(item?.amount ?? 0);
+                    }, 0)
                 ).toFixed(2);
 
             },
-            accessorKey: "total_amount",
+            accessorKey: "amount",
             cell: ({ row }) => (
                 <Box
                     variant="contained"
@@ -646,44 +640,41 @@ function VoidInvoices() {
                     sx={{ cursor: "pointer", display: "flex", gap: 2 }}
                 >
                     {(
-                        row?.original?.sale_receipt_items?.reduce((total2, item) => {
-                            return parseFloat(total2) + parseFloat(item?.total ?? 0);
-                        }, 0) +
-                        row?.original?.sale_receipt_items?.reduce((total, item) => {
-                            const fee = parseFloat(item?.center_fee ?? 0);
-                            const qty = parseFloat(item?.quantity ?? 1);
-                            return total + fee * qty;
-                        }, 0) * 0.05
+                        row?.original?.payment_entries?.reduce((total2, item) => {
+                            return parseFloat(total2) + parseFloat(item?.amount ?? 0);
+                        }, 0) 
                     ).toFixed(2)}
                 </Box>
             ),
         },
+ 
         {
-            header: "Status",
-            accessorKey: "is_paid",
+            header: "Voided By",
+            accessorKey: "void_by",
+            accessorFn: (row) => row?.void_by,
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.is_paid ? 'Paid' : 'Unpaid'}
-                </Box>
-            ),
-        },
-        {
-            header: "Created By",
-            accessorKey: "creator",
-            accessorFn: (row) => row?.creator,
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.creator?.name}
+                    {row?.original?.void_by?.name}
                 </Box>
             ),
         },
         {
             id: "created_at",
-            header: "Created At",
+            header: "Receipt Date",
             accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {moment(row.original.created_at).format("DD/MM/YYYY")}
+                </Box>
+            ),
+        },
+        {
+            id: "voided_at",
+            header: "Voided At",
+            accessorFn: (row) => moment(row.voided_at).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.voided_at).format("DD/MM/YYYY")}
                 </Box>
             ),
         },
@@ -697,7 +688,7 @@ function VoidInvoices() {
                             <IconButton
                                 onClick={() => {
                                     window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}/generate-voided-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}/generate-voided-receipt?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                         '_blank'
                                     );
                                 }}
@@ -709,7 +700,7 @@ function VoidInvoices() {
                                     height: 40,
                                 }}
                             >
-                                <ReceiptIcon color="black" fontSize="small" />
+                                <PaymentIcon color="black" fontSize="small" />
                             </IconButton>
                         </Tooltip>
                     )}
@@ -728,7 +719,7 @@ function VoidInvoices() {
         if (!data || data.length === 0) return
 
         const workbook = new ExcelJS.Workbook()
-        const worksheet = workbook.addWorksheet("Void Invoices")
+        const worksheet = workbook.addWorksheet("Void Receipts")
 
         // Set professional header
         worksheet.headerFooter.oddHeader =
@@ -766,7 +757,7 @@ function VoidInvoices() {
         }
 
         // Add title section at the top of the worksheet
-        const titleRow = worksheet.addRow(["VOID INVOICES"])
+        const titleRow = worksheet.addRow(["VOID RECEIPTS"])
         titleRow.getCell(1).font = {
             name: "Arial",
             size: 16,
@@ -821,7 +812,7 @@ function VoidInvoices() {
         worksheet.addRow([])
 
         // Define headers based on the columns structure (excluding Actions column)
-        const headers = ["Invoice#", "Customer", "Token Number", "Total Amount", "Status", "Created By", "Created At"]
+        const headers = ["Invoice#", "Amount", "Voided By", "Receipt At", "Voided At"]
 
         // Add headers with professional styling
         const headerRow = worksheet.addRow(headers)
@@ -853,8 +844,8 @@ function VoidInvoices() {
         data.forEach((item, index) => {
             // Calculate total amount exactly as in the column definition
             const itemsTotal =
-                item?.sale_receipt_items?.reduce((total2, receiptItem) => {
-                    return Number.parseFloat(total2) + Number.parseFloat(receiptItem?.total ?? 0)
+                item?.payment_entries?.reduce((total2, receiptItem) => {
+                    return Number.parseFloat(total2) + Number.parseFloat(receiptItem?.amount ?? 0)
                 }, 0) || 0
 
             const vatTotal =
@@ -864,19 +855,16 @@ function VoidInvoices() {
                     return total + fee * qty
                 }, 0) * 0.05 || 0
 
-            const calculatedTotalAmount = itemsTotal + vatTotal
+            const calculatedTotalAmount = itemsTotal
 
-            // Determine status (simplified to Paid/Unpaid as per column definition)
-            const status = item?.is_paid ? "Paid" : "Unpaid"
+
 
             const dataRow = worksheet.addRow([
-                item?.invoice_number || "",
-                item?.customer_name || "",
-                item?.token_number || "",
+                'RC-'+item?.id || "",
                 calculatedTotalAmount.toFixed(2),
-                status,
-                item?.creator?.name || "",
+                item?.void_by?.name || "",
                 item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "",
+                item?.voided_at ? moment(item?.voided_at).format("DD/MM/YYYY") : "",
             ])
 
             // Add to total
@@ -887,7 +875,7 @@ function VoidInvoices() {
                 cell.font = { name: "Arial", size: 10 }
 
                 // Determine alignment based on column type
-                const isNumericColumn = colNumber === 4 // Total Amount column
+                const isNumericColumn = colNumber === 2 // Total Amount column
 
                 cell.alignment = {
                     horizontal: isNumericColumn ? "right" : "left",
@@ -901,21 +889,8 @@ function VoidInvoices() {
                     right: { style: "hair", color: { argb: "CCCCCC" } },
                 }
 
-                // Format numeric columns
-                if (isNumericColumn) {
-                    cell.numFmt = "#,##0.00"
-                    cell.value = Number.parseFloat(cell.value || 0)
-                }
 
-                // Color coding for status
-                if (colNumber === 5) {
-                    // Status column
-                    if (cell.value === "Paid") {
-                        cell.font = { name: "Arial", size: 10, color: { argb: "008000" }, bold: true } // Green
-                    } else if (cell.value === "Unpaid") {
-                        cell.font = { name: "Arial", size: 10, color: { argb: "FF0000" }, bold: true } // Red
-                    }
-                }
+               
             })
         })
 
@@ -923,11 +898,11 @@ function VoidInvoices() {
         worksheet.addRow([])
 
         // Add totals row
-        const totalRow = worksheet.addRow(["", "", "TOTAL", totalAmount.toFixed(2), "", "", ""])
+        const totalRow = worksheet.addRow(["", totalAmount.toFixed(2), "", "", ""])
 
         // Style totals row
         totalRow.eachCell((cell, colNumber) => {
-            if (colNumber === 3 || colNumber === 4) {
+            if (colNumber === 1 || colNumber === 2) {
                 // "TOTAL" label and amount
                 cell.fill = {
                     type: "pattern",
@@ -947,12 +922,12 @@ function VoidInvoices() {
                     right: { style: "medium", color: { argb: "000000" } },
                 }
 
-                if (colNumber === 3) {
+                if (colNumber === 2) {
                     cell.alignment = { horizontal: "center", vertical: "middle" }
                 } else {
                     cell.alignment = { horizontal: "right", vertical: "middle" }
                     cell.numFmt = "#,##0.00"
-                    cell.value = Number.parseFloat(cell.value || 0)
+                    cell.value = 'TOTAL'
                 }
             }
         })
@@ -1009,8 +984,8 @@ function VoidInvoices() {
 
         // Set workbook properties
         workbook.properties = {
-            title: "Void Invoices",
-            subject: "Void Invoices Report",
+            title: "Void Receipts",
+            subject: "Void Receipts Report",
             keywords: "paid, receipts, invoice, customer, payment, financial",
             category: "Financial Reports",
             description: "Void receipts report generated from system",
@@ -1022,7 +997,7 @@ function VoidInvoices() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "void_invoices.xlsx")
+            saveAs(blob, "void_receipts.xlsx")
         }
 
         download()
@@ -1148,7 +1123,7 @@ function VoidInvoices() {
                 </Box>
             </SimpleDialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Void Invoice List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Void Receipt List</Typography>
                 <Box sx={{ display: 'flex', gap: 2 }} >
                     {data?.length > 0 &&
                         <Button
@@ -1243,4 +1218,4 @@ function VoidInvoices() {
     );
 }
 
-export default VoidInvoices;
+export default VoidReceipts;

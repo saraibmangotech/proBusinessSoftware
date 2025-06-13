@@ -296,6 +296,9 @@ const PayReceipts = lazy(() =>
 const VoidInvoices = lazy(() =>
   import("pages/Dashboard/Payments/VoidInvoices")
 );
+const VoidReceipts = lazy(() =>
+  import("pages/Dashboard/Payments/VoidReceipts")
+);
 const CreatePaidReceipt = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaidReceipt")
 );
@@ -416,6 +419,9 @@ const UpdatePurchaseInvoice= lazy(() =>
 );
 const CreatePaymentInvoice= lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentInvoice")
+);
+const SettleInvoices= lazy(() =>
+  import("pages/Dashboard/Payments/SettleInvoices")
 );
 const CreateSaleInvoicePayment= lazy(() =>
   import("pages/Dashboard/Payments/CreateSaleInvoicePayment")
@@ -702,6 +708,10 @@ const AdminRoutes = [
     component: <CreateSaleInvoicePayment />,
   },
   {
+    path: "/settle-invoices",
+    component: <SettleInvoices />,
+  },
+  {
     path: "/product-category-list",
     component: <Categories />,
   },
@@ -836,6 +846,10 @@ const AdminRoutes = [
   {
     path: "/void-invoices",
     component: <VoidInvoices />,
+  },
+  {
+    path: "/void-receipts",
+    component: <VoidReceipts />,
   },
   {
     path: "/card-list",

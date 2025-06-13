@@ -154,7 +154,9 @@ const routes = {
   getVatReport:'/reports/vatRegister/Output',
   getVatInputReport:'/reports/vatRegister/Input',
   invoiceDateUpdate:'/sales/receipts/updateDate',
-  handleVoid:'sales/invoice/void'
+  handleVoid:'sales/invoice/void',
+  getVoidReceipts:'/sales/receipts/payments',
+  settledInvoiceData:'/payments/customer/receipts'
 
 
 };

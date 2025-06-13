@@ -254,6 +254,10 @@ const CustomerServices = {
     const data = await get(routes.getDetailedCollectionReport, params);
     return data;
   },
+  getVoidReceipts: async (params) => {
+    const data = await get(routes.getVoidReceipts, params);
+    return data;
+  },
   getVatReport: async (params) => {
     const data = await get(routes.getVatReport, params);
     return data;
@@ -284,6 +288,10 @@ const CustomerServices = {
   },
   getVouchers: async (params) => {
     const data = await get(routes.getVouchers, params);
+    return data;
+  },
+  settledInvoiceData: async (params) => {
+    const data = await get(routes.settledInvoiceData, params);
     return data;
   },
   getVoucherToken: async (params) => {

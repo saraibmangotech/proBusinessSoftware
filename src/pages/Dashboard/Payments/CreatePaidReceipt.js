@@ -592,6 +592,8 @@ function CreatePaidReceipt() {
     }
   }
   const addPayments = (amount, mode, bank, card, code, percentage = null, additionalCharges = null, submit = null) => {
+    console.log(percentage);
+    
     const total = parseFloat(getValues1("total")) || 0;
     const currentAmount = parseFloat(amount) || 0;
     const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
@@ -640,7 +642,7 @@ function CreatePaidReceipt() {
       return;
     }
 
-    if ((mode === "Payment Link" || mode === "Card") && (!percentage || isNaN(percentage))) {
+    if ((mode === "Payment Link" || mode === "Card") && (percentage === undefined || percentage === null || isNaN(percentage))) {
       showErrorToast("Percentage is required for Bank/Card mode");
       return;
     }
@@ -1439,13 +1441,15 @@ function CreatePaidReceipt() {
                           if ((agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ||
                             agencyType[process.env.REACT_APP_TYPE]?.category === "AL-AHDEED")
                             && value?.id === 'Card') {
-                            console.log(value?.id, 'value?.id');
+                              console.log(agencyType[process.env.REACT_APP_TYPE]?.category,'value?.id');
+                              console.log(getValues1('invoiceID')?.includes('DED'),'value?.id');
+                            console.log(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && getValues1('invoiceID')?.includes('DED'), 'value?.id');
 
                             setValue1('percentage', 1);
                             let percentageValue = parseFloat(1 || 0);
                             if(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && getValues1('invoiceID')?.includes('DED')){
                               setValue1('percentage',0);
-                             percentageValue = parseFloat(0 || 0);
+                             percentageValue = parseFloat(0);
                             }
                             if(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && getValues1('invoiceID')?.includes('TYP')){
                               setValue1('percentage',1);
@@ -1647,18 +1651,18 @@ function CreatePaidReceipt() {
                                 {payment.card?.name || payment.card}
                               </Typography>
                             )}
-                            {payment.additional_charges_percentage && (
+                            {(payment.payment_mode === "Card" || payment.payment_mode === "Payment Link") && (
                               <Typography variant="body1">
                                 <strong>Additional Percent:</strong> {payment.additional_charges_percentage}%
                               </Typography>
                             )}
-                            {payment.additional_charges_percentage && (
+                            {(payment.payment_mode === "Card" || payment.payment_mode === "Payment Link") && (
                               <Typography variant="body1">
                                 <strong>Additional Charges:</strong>{" "}
                                 {payment.additional_charges_value}
                               </Typography>
                             )}
-                              {payment.additional_charges_percentage && (
+                              {(payment.payment_mode === "Card" || payment.payment_mode === "Payment Link") && (
                               <Typography variant="body1">
                                 <strong>Total:</strong>{" "}
                                 {parseFloat(payment.additional_charges_value)+parseFloat(payment?.amount)}
