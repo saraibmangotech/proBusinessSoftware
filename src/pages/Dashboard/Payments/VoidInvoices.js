@@ -658,25 +658,18 @@ function VoidInvoices() {
                 </Box>
             ),
         },
+   
         {
-            header: "Status",
-            accessorKey: "is_paid",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.is_paid ? 'Paid' : 'Unpaid'}
-                </Box>
-            ),
-        },
-        {
-            header: "Created By",
+            header: "Voided By",
             accessorKey: "creator",
-            accessorFn: (row) => row?.creator,
+            accessorFn: (row) => row?.void_by,
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.creator?.name}
+                    {row?.original?.void_by?.name}
                 </Box>
             ),
         },
+        
         {
             id: "created_at",
             header: "Created At",
@@ -684,6 +677,16 @@ function VoidInvoices() {
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {moment(row.original.created_at).format("DD/MM/YYYY")}
+                </Box>
+            ),
+        },
+        {
+            id: "voided_at",
+            header: "Voided At",
+            accessorFn: (row) => moment(row.voided_at).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.voided_at).format("DD/MM/YYYY")}
                 </Box>
             ),
         },
@@ -821,7 +824,7 @@ function VoidInvoices() {
         worksheet.addRow([])
 
         // Define headers based on the columns structure (excluding Actions column)
-        const headers = ["Invoice#", "Customer", "Token Number", "Total Amount", "Status", "Created By", "Created At"]
+        const headers = ["Invoice#", "Customer", "Token Number", "Total Amount",  "Voided By", "Created At","Voided At"]
 
         // Add headers with professional styling
         const headerRow = worksheet.addRow(headers)
@@ -874,9 +877,10 @@ function VoidInvoices() {
                 item?.customer_name || "",
                 item?.token_number || "",
                 calculatedTotalAmount.toFixed(2),
-                status,
-                item?.creator?.name || "",
+                
+                item?.void_by?.name || "",
                 item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "",
+                item?.voided_at ? moment(item?.voided_at).format("DD/MM/YYYY") : "",
             ])
 
             // Add to total
