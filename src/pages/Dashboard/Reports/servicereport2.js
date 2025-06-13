@@ -1,123 +1,99 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import {
-  Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, tableCellClasses, IconButton, CircularProgress, Chip, Grid, InputLabel,
-  FormControl,
-  Select,
-  MenuItem,
-  ListItemText,
-  Tooltip,
-  Checkbox,
-  InputAdornment,
-  Button,
-  Input,
-} from '@mui/material';
-import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
-import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
-import Colors from 'assets/Style/Colors';
-import { CircleLoading } from 'components/Loaders';
-import { ErrorToaster, SuccessToaster } from 'components/Toaster';
-import FinanceStatusDialog from 'components/Dialog/FinanceStatusDialog';
-import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
-import AllocateDialog from 'components/Dialog/AllocateDialog';
-import CustomerServices from 'services/Customer';
-import { makeStyles } from '@mui/styles';
-import Pagination from 'components/Pagination';
-import { agencyType, CommaSeparator, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
-import InputField from 'components/Input';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { addPermission } from 'redux/slices/navigationDataSlice';
-import SimpleDialog from 'components/Dialog/SimpleDialog';
-import { PrimaryButton } from 'components/Buttons';
-import SelectField from 'components/Select';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import SearchIcon from '@mui/icons-material/Search';
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { PDFExport } from '@progress/kendo-react-pdf';
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { Box, TableCell, TableRow, Typography, tableCellClasses, Grid, Button, Input } from "@mui/material"
+import { FontFamily } from "assets"
+import styled from "@emotion/styled"
+import { useNavigate } from "react-router-dom"
+import Colors from "assets/Style/Colors"
+import { ErrorToaster, SuccessToaster } from "components/Toaster"
+import CustomerServices from "services/Customer"
+import { makeStyles } from "@mui/styles"
+import { agencyType, CommaSeparator, Debounce } from "utils"
+import { useForm } from "react-hook-form"
+import { useDispatch } from "react-redux"
+import SimpleDialog from "components/Dialog/SimpleDialog"
+import { PrimaryButton } from "components/Buttons"
+import SelectField from "components/Select"
+import SearchIcon from "@mui/icons-material/Search"
+import { saveAs } from "file-saver"
 import { FileDownload } from "@mui/icons-material"
-import moment from 'moment';
-import LabelCustomInput from 'components/Input/LabelCustomInput';
-import { showErrorToast, showPromiseToast } from 'components/NewToaster';
-import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
-import DataTable from 'components/DataTable';
-import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import DatePicker from 'components/DatePicker';
-import { CSVLink } from 'react-csv';
-import ExcelJS from "exceljs";
+import moment from "moment"
+import { showErrorToast, showPromiseToast } from "components/NewToaster"
+import ConfirmationDialog from "components/Dialog/ConfirmationDialog"
+import DatePicker from "components/DatePicker"
+import ExcelJS from "exceljs"
+import DataTable2 from "components/Datatable2"
+
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
-
-}));
+}))
 
 const Cell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     fontSize: 14,
-    fontFamily: 'Public Sans',
-    border: '1px solid #EEEEEE',
-    padding: '15px',
-    textAlign: 'left',
-    whiteSpace: 'nowrap',
-    color: '#434343',
-    paddingRight: '50px',
-    background: 'transparent',
-    fontWeight: 'bold'
-
+    fontFamily: "Public Sans",
+    border: "1px solid #EEEEEE",
+    padding: "15px",
+    textAlign: "left",
+    whiteSpace: "nowrap",
+    color: "#434343",
+    paddingRight: "50px",
+    background: "transparent",
+    fontWeight: "bold",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    fontFamily: 'Public Sans',
+    fontFamily: "Public Sans",
 
-    textWrap: 'nowrap',
-    padding: '5px !important',
-    paddingLeft: '15px !important',
+    textWrap: "nowrap",
+    padding: "5px !important",
+    paddingLeft: "15px !important",
 
-    '.MuiBox-root': {
-      display: 'flex',
-      gap: '6px',
-      alignItems: 'center',
-      justifyContent: 'center',
-      '.MuiBox-root': {
-        cursor: 'pointer'
-      }
+    ".MuiBox-root": {
+      display: "flex",
+      gap: "6px",
+      alignItems: "center",
+      justifyContent: "center",
+      ".MuiBox-root": {
+        cursor: "pointer",
+      },
     },
-    'svg': {
-      width: 'auto',
-      height: '24px',
+    svg: {
+      width: "auto",
+      height: "24px",
     },
-    '.MuiTypography-root': {
-      textTransform: 'capitalize',
+    ".MuiTypography-root": {
+      textTransform: "capitalize",
       fontFamily: FontFamily.NunitoRegular,
-      textWrap: 'nowrap',
+      textWrap: "nowrap",
     },
-    '.MuiButtonBase-root': {
-      padding: '8px',
-      width: '28px',
-      height: '28px',
-    }
+    ".MuiButtonBase-root": {
+      padding: "8px",
+      width: "28px",
+      height: "28px",
+    },
   },
-}));
+}))
 
 const useStyles = makeStyles({
   loaderWrap: {
-    display: 'flex',
+    display: "flex",
     height: 100,
-    '& svg': {
-      width: '40px !important',
-      height: '40px !important'
-    }
-  }
+    "& svg": {
+      width: "40px !important",
+      height: "40px !important",
+    },
+  },
 })
 
 function ServiceReport() {
-
-  const navigate = useNavigate();
-  const classes = useStyles();
-  const dispatch = useDispatch();
-  const contentRef = useRef(null);
+  const navigate = useNavigate()
+  const classes = useStyles()
+  const dispatch = useDispatch()
+  const contentRef = useRef(null)
   const [status, setStatus] = useState(null)
   const [statusDialog, setStatusDialog] = useState(false)
   const [selectedData, setSelectedData] = useState(null)
@@ -129,92 +105,103 @@ function ServiceReport() {
     setValue,
     getValues,
     reset,
-  } = useForm();
+  } = useForm()
 
-  const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [
+    { name: "SR No.", key: "" },
+    { name: "Token Number.", key: "" },
+    { name: "Customer ", key: "name" },
+    { name: "Registration Date", key: "visa_eligibility" },
+    { name: "Deposit Amount", key: "deposit_total" },
+    { name: "Status", key: "" },
+    { name: "Actions", key: "" },
+  ]
 
-
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(false)
 
   const [confirmationDialog, setConfirmationDialog] = useState(false)
 
   // *For Customer Queue
-  const [customerQueue, setCustomerQueue] = useState([]);
+  const [customerQueue, setCustomerQueue] = useState([])
   const [Totals, setTotals] = useState(null)
 
-
-
-  const [totalCount, setTotalCount] = useState(0);
-  const [pageLimit, setPageLimit] = useState(50);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [fromDate, setFromDate] = useState(new Date());
-  const [toDate, setToDate] = useState(new Date());
-
-
-
+  const [totalCount, setTotalCount] = useState(0)
+  const [pageLimit, setPageLimit] = useState(10) // Default to 10 items per page
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortField, setSortField] = useState(null)
+  const [sortOrder, setSortOrder] = useState(null)
+  const [fromDate, setFromDate] = useState(new Date())
+  const [toDate, setToDate] = useState(new Date())
 
   // *For Filters
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState({})
 
   // *For Permissions
-  const [permissions, setPermissions] = useState();
+  const [permissions, setPermissions] = useState()
 
   const [loading, setLoading] = useState(false)
-  const [sort, setSort] = useState('desc')
+  const [sort, setSort] = useState("desc")
   const [invoiceTotal, setInvoiceTotal] = useState(0)
   // *For Get Customer Queue
-  const getCustomerQueue = async (page, limit, filter) => {
+  const getCustomerQueue = async (page = currentPage, limit = pageLimit, filter = {}) => {
     setLoader(true)
 
     try {
+      const params = {
+        page: page,
+        limit: limit,
+        from_date: fromDate ? moment(fromDate).format("MM-DD-YYYY") : "",
+        to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
+      }
 
-      let params = {
-        page: 1,
-        limit: 999999,
-        from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
-        to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-
+      // Add sorting parameters if available
+      if (sortField && sortOrder) {
+        params.sort_by = sortField
+        params.sort_order = sortOrder
       }
 
       const { data } = await CustomerServices.getServiceReport(params)
-      setCustomerQueue(data?.rows)
-      const uniqueData = data?.rows?.filter(
-        (item, index, self) =>
-          index === self.findIndex(
-            (t) => t.receipt?.invoice_number === item.receipt?.invoice_number
-          )
-      );
+      setCustomerQueue(data?.rows || [])
+      setTotalCount(data?.count || 0)
 
-      const totalLineTotal = data?.rows?.reduce((sum, item) => {
-        const centerFee = parseFloat(item?.center_fee) || 0;
-        const govtFee = parseFloat(item?.govt_fee) || 0;
-        const bankCharge = parseFloat(item?.bank_charge) || 0;
-        const quantity = parseFloat(item?.quantity) || 0;
+      // Calculate totals as before
+      const result = data?.rows?.reduce(
+        (acc, item) => {
+          acc.totalQuantity += item.quantity
+          acc.totalServiceCharges += item.center_fee * Number.parseInt(item.quantity)
+          acc.totalVat += item.center_fee * Number.parseInt(item.quantity || 0) * 0.05
+          acc.totalGovtFee +=
+            (Number.parseFloat(item.govt_fee || 0) + Number.parseFloat(item?.bank_charge || 0)) *
+            Number.parseInt(item.quantity || 0)
+          acc.invoiceTotal += (
+            Number.parseFloat(item?.total || 0) +
+            Number.parseFloat(item?.center_fee || 0) * Number.parseFloat(item?.quantity || 1) * 0.05
+          ).toFixed(2)
+          return acc
+        },
+        {
+          totalQuantity: 0,
+          totalServiceCharges: 0,
+          totalVat: 0,
+          totalGovtFee: 0,
+          invoiceTotal: 0,
+        },
+      )
 
-        const lineTotal = (centerFee + govtFee + bankCharge + (centerFee * 0.05)) * quantity;
-        return sum + lineTotal;
-      }, 0);
-
-      setInvoiceTotal(totalLineTotal)
-      const result = data?.rows?.reduce((acc, item) => {
-
-        acc.totalQuantity += item.quantity;
-        acc.totalServiceCharges += (item.center_fee * parseInt(item.quantity));
-        acc.totalVat += (item.center_fee * parseInt(item.quantity || 0)) * 0.05;
-        acc.totalGovtFee += ((parseFloat(item.govt_fee || 0) + parseFloat(item?.bank_charge || 0)) * parseInt(item.quantity || 0));
-        acc.invoiceTotal += (parseFloat(item?.total || 0) + ((parseFloat(item?.center_fee || 0) * parseFloat(item?.quantity || 1)) * 0.05)).toFixed(2);
-        return acc;
-      }, {
-        totalQuantity: 0,
-        totalServiceCharges: 0,
-        totalVat: 0,
-        totalGovtFee: 0,
-        invoiceTotal: 0
-      });
-
-      console.log(result, 'result');
       setTotals(result)
 
+      // Calculate invoice total
+      const totalLineTotal = data?.rows?.reduce((sum, item) => {
+        const centerFee = Number.parseFloat(item?.center_fee) || 0
+        const govtFee = Number.parseFloat(item?.govt_fee) || 0
+        const bankCharge = Number.parseFloat(item?.bank_charge) || 0
+        const quantity = Number.parseFloat(item?.quantity) || 0
+
+        const lineTotal = (centerFee + govtFee + bankCharge + centerFee * 0.05) * quantity
+        return sum + lineTotal
+      }, 0)
+
+      setInvoiceTotal(totalLineTotal)
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -222,36 +209,28 @@ function ServiceReport() {
     }
   }
 
-
-
-
-
-
-
   const handleSort = (key) => {
-    let data = {
+    const data = {
       sort_by: key,
-      sort_order: sort
+      sort_order: sort,
     }
-    Debounce(() => getCustomerQueue(1, '', data));
+    Debounce(() => getCustomerQueue(1, "", data))
   }
-
-
 
   // *For Handle Filter
 
   const handleFilter = () => {
-    let data = {
-      search: getValues('search')
+    const data = {
+      search: getValues("search"),
     }
-    Debounce(() => getCustomerQueue(1, '', data));
+    Debounce(() => getCustomerQueue(1, "", data))
   }
 
   const handleFromDate = (newDate) => {
     try {
       // eslint-disable-next-line eqeqeq
-      if (newDate == 'Invalid Date') {
-        setFromDate('invalid')
+      if (newDate == "Invalid Date") {
+        setFromDate("invalid")
         return
       }
       console.log(newDate, "newDate")
@@ -264,8 +243,8 @@ function ServiceReport() {
   const handleToDate = (newDate) => {
     try {
       // eslint-disable-next-line eqeqeq
-      if (newDate == 'Invalid Date') {
-        setToDate('invalid')
+      if (newDate == "Invalid Date") {
+        setToDate("invalid")
         return
       }
       setToDate(new Date(newDate))
@@ -274,17 +253,13 @@ function ServiceReport() {
     }
   }
 
-
   const handleDelete = async (item) => {
-
-
     try {
-      let params = { reception_id: selectedData?.id }
-
+      const params = { reception_id: selectedData?.id }
 
       const { message } = await CustomerServices.deleteReception(params)
 
-      SuccessToaster(message);
+      SuccessToaster(message)
       getCustomerQueue()
     } catch (error) {
       showErrorToast(error)
@@ -294,32 +269,27 @@ function ServiceReport() {
   }
   const UpdateStatus = async () => {
     try {
-      let obj = {
+      const obj = {
         customer_id: selectedData?.id,
         is_active: status?.id,
-      };
+      }
 
-      const promise = CustomerServices.CustomerStatus(obj);
-      console.log(promise);
+      const promise = CustomerServices.CustomerStatus(obj)
+      console.log(promise)
 
-      showPromiseToast(
-        promise,
-        "Saving...",
-        "Added Successfully",
-        "Something Went Wrong"
-      );
+      showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
 
       // Await the promise and then check its response
-      const response = await promise;
+      const response = await promise
       if (response?.responseCode === 200) {
-        setStatusDialog(false);
+        setStatusDialog(false)
         setStatus(null)
-        getCustomerQueue();
+        getCustomerQueue()
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   const columns = [
     {
@@ -332,17 +302,17 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.invoice_number,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.invoice_number}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.invoice_number}</Box>
       ),
     },
     {
       header: "Inv Date",
-      accessorFn: (row) => row?.receipt?.invoice_date ? moment(row?.receipt?.invoice_date).format("DD/MM/YYYY") : '',
+      accessorFn: (row) => (row?.receipt?.invoice_date ? moment(row?.receipt?.invoice_date).format("DD/MM/YYYY") : ""),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.invoice_date ? moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY") : ''}
+          {row?.original?.receipt?.invoice_date
+            ? moment(row?.original?.receipt?.invoice_date).format("DD/MM/YYYY")
+            : ""}
         </Box>
       ),
       total: false,
@@ -350,10 +320,15 @@ function ServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category,
+      accessorFn: () =>
+        agencyType[process.env.REACT_APP_TYPE].category == "AL-AHDEED"
+          ? "AL-ADHEED"
+          : agencyType[process.env.REACT_APP_TYPE].category,
       cell: () => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category}
+          {agencyType[process.env.REACT_APP_TYPE].category == "AL-AHDEED"
+            ? "AL-ADHEED"
+            : agencyType[process.env.REACT_APP_TYPE].category}
         </Box>
       ),
     },
@@ -363,9 +338,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.service?.item_code,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.service?.item_code}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.service?.item_code}</Box>
       ),
     },
     {
@@ -373,11 +346,7 @@ function ServiceReport() {
       accessorKey: "service_name",
       total: false,
       accessorFn: (row) => row?.service?.name,
-      cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.service?.name}
-        </Box>
-      ),
+      cell: ({ row }) => <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.service?.name}</Box>,
     },
     {
       header: "Category",
@@ -385,9 +354,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.service?.category?.name,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.service?.category?.name}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.service?.category?.name}</Box>
       ),
     },
     {
@@ -395,9 +362,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer?.name,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.customer?.name}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.customer?.name}</Box>
       ),
     },
     {
@@ -406,9 +371,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer_name,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.customer_name}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.customer_name}</Box>
       ),
     },
     {
@@ -417,9 +380,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer_mobile,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.customer_mobile}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.customer_mobile}</Box>
       ),
     },
     {
@@ -428,9 +389,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.customer_email,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.customer_email}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.customer_email}</Box>
       ),
     },
     {
@@ -440,50 +399,62 @@ function ServiceReport() {
     {
       header: "Service Charge",
       accessorKey: "center_fee",
-      accessorFn: (row) => (parseFloat(row?.center_fee || 0)).toFixed(2),
+      accessorFn: (row) => Number.parseFloat(row?.center_fee || 0).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.center_fee || 0)).toFixed(2)}
+          {Number.parseFloat(row?.original?.center_fee || 0).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Total Service Charge",
       accessorKey: "total_service_charge",
-      accessorFn: (row) => (parseFloat(row?.center_fee || 0) * parseFloat(row?.quantity || 1)).toFixed(2),
+      accessorFn: (row) => (Number.parseFloat(row?.center_fee || 0) * Number.parseFloat(row?.quantity || 1)).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.center_fee || 0) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+          {(
+            Number.parseFloat(row?.original?.center_fee || 0) * Number.parseFloat(row?.original?.quantity || 1)
+          ).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Total VAT",
       accessorKey: "total_vat",
-      accessorFn: (row) => ((parseFloat(row?.center_fee || 0) * parseFloat(row?.quantity || 1)) * 0.05).toFixed(2),
+      accessorFn: (row) =>
+        (Number.parseFloat(row?.center_fee || 0) * Number.parseFloat(row?.quantity || 1) * 0.05).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {((parseFloat(row?.original?.center_fee || 0) * parseFloat(row?.original?.quantity || 1)) * 0.05).toFixed(2)}
+          {(
+            Number.parseFloat(row?.original?.center_fee || 0) *
+            Number.parseFloat(row?.original?.quantity || 1) *
+            0.05
+          ).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Govt. Fee",
       accessorKey: "govt_fee",
-      accessorFn: (row) => (parseFloat(row?.govt_fee || 0) * parseFloat(row?.quantity || 1)).toFixed(2),
+      accessorFn: (row) => (Number.parseFloat(row?.govt_fee || 0) * Number.parseFloat(row?.quantity || 1)).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.govt_fee || 0) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+          {(Number.parseFloat(row?.original?.govt_fee || 0) * Number.parseFloat(row?.original?.quantity || 1)).toFixed(
+            2,
+          )}
         </Box>
       ),
     },
     {
       header: "Bank Service Charge",
       accessorKey: "bank_charge",
-      accessorFn: (row) => (parseFloat(row?.bank_charge || 0) * parseFloat(row?.quantity || 1)).toFixed(2),
+      accessorFn: (row) =>
+        (Number.parseFloat(row?.bank_charge || 0) * Number.parseFloat(row?.quantity || 1)).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.bank_charge || 0) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+          {(
+            Number.parseFloat(row?.original?.bank_charge || 0) * Number.parseFloat(row?.original?.quantity || 1)
+          ).toFixed(2)}
         </Box>
       ),
     },
@@ -491,53 +462,26 @@ function ServiceReport() {
       header: "Other Charge",
       accessorKey: "other_charge",
       accessorFn: () => "0.00",
-      cell: () => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          0.00
-        </Box>
-      ),
+      cell: () => <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>0.00</Box>,
     },
     {
       header: "Total Govt. Fee",
       accessorKey: "total_govt_fee",
       accessorFn: (row) => {
-        const govtFee = parseFloat(row?.govt_fee || 0);
-        const bankCharge = parseFloat(row?.bank_charge || 0);
-        const quantity = parseFloat(row?.quantity || 1); // Default to 1 if quantity is missing
-        return ((govtFee + bankCharge) * quantity).toFixed(2);
+        const govtFee = Number.parseFloat(row?.govt_fee || 0)
+        const bankCharge = Number.parseFloat(row?.bank_charge || 0)
+        const quantity = Number.parseFloat(row?.quantity || 1) // Default to 1 if quantity is missing
+        return ((govtFee + bankCharge) * quantity).toFixed(2)
       },
       cell: ({ row }) => {
-        const govtFee = parseFloat(row?.original?.govt_fee || 0);
-        const bankCharge = parseFloat(row?.original?.bank_charge || 0);
-        const quantity = parseFloat(row?.original?.quantity || 1);
-        const total = (govtFee + bankCharge) * quantity;
-        return (
-          <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-            {total.toFixed(2)}
-          </Box>
-        );
+        const govtFee = Number.parseFloat(row?.original?.govt_fee || 0)
+        const bankCharge = Number.parseFloat(row?.original?.bank_charge || 0)
+        const quantity = Number.parseFloat(row?.original?.quantity || 1)
+        const total = (govtFee + bankCharge) * quantity
+        return <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{total.toFixed(2)}</Box>
       },
     },
-    {
-      header: "PRO Commission",
-      accessorKey: "pro_commission",
-      accessorFn: (row) => row?.pro_commission,
-      cell: (row) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.pro_commission ? parseFloat(row?.original?.pro_commission).toFixed(2) :  '0.00'}
-        </Box>
-      ),
-    },
-    {
-      header: "Typist Commission",
-      accessorKey: "typist_commission",
-      accessorFn: (row) => row?.typist_commission,
-      cell: (row) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.typist_commission ? parseFloat(row?.original?.typist_commission).toFixed(2) :  '0.00'}
-        </Box>
-      ),
-    },
+
     {
       header: "Transaction ID",
       accessorKey: "transaction_id",
@@ -570,9 +514,7 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.creator?.employee_id,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.creator?.employee_id}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.creator?.employee_id}</Box>
       ),
     },
     {
@@ -581,31 +523,46 @@ function ServiceReport() {
       total: false,
       accessorFn: (row) => row?.receipt?.creator?.name,
       cell: ({ row }) => (
-        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {row?.original?.receipt?.creator?.name}
-        </Box>
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.creator?.name}</Box>
       ),
     },
     {
       header: "Line Total",
-      accessorFn: (row) => (parseFloat(row?.center_fee || 0) + parseFloat(row?.bank_charge || 0) + parseFloat(row?.govt_fee || 0) + ((parseFloat(row?.center_fee || 0)) * 0.05) * parseFloat(row?.quantity || 1)).toFixed(2),
+      accessorFn: (row) =>
+        (
+          Number.parseFloat(row?.center_fee || 0) +
+          Number.parseFloat(row?.bank_charge || 0) +
+          Number.parseFloat(row?.govt_fee || 0) +
+          Number.parseFloat(row?.center_fee || 0) * 0.05 * Number.parseFloat(row?.quantity || 1)
+        ).toFixed(2),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.center_fee || 0) + parseFloat(row?.original?.bank_charge || 0) + parseFloat(row?.original?.govt_fee || 0) + ((parseFloat(row?.original?.center_fee || 0)) * 0.05) * parseFloat(row?.original?.quantity || 1)).toFixed(2)}
+          {(
+            Number.parseFloat(row?.original?.center_fee || 0) +
+            Number.parseFloat(row?.original?.bank_charge || 0) +
+            Number.parseFloat(row?.original?.govt_fee || 0) +
+            Number.parseFloat(row?.original?.center_fee || 0) * 0.05 * Number.parseFloat(row?.original?.quantity || 1)
+          ).toFixed(2)}
         </Box>
       ),
     },
     {
       header: "Invoice Total",
       accessorKey: "total_amount",
-      accessorFn: (row) => (parseFloat(row?.receipt?.total_amount || 0) + parseFloat(row?.receipt?.total_vat || 0)).toFixed(2),
+      accessorFn: (row) =>
+        (Number.parseFloat(row?.receipt?.total_amount || 0) + Number.parseFloat(row?.receipt?.total_vat || 0)).toFixed(
+          2,
+        ),
       cell: ({ row }) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {(parseFloat(row?.original?.receipt?.total_amount || 0) + parseFloat(row?.original?.receipt?.total_vat || 0)).toFixed(2)}
+          {(
+            Number.parseFloat(row?.original?.receipt?.total_amount || 0) +
+            Number.parseFloat(row?.original?.receipt?.total_vat || 0)
+          ).toFixed(2)}
         </Box>
       ),
     },
-  ];
+  ]
 
   const headers = [
     "SR No.",
@@ -634,8 +591,8 @@ function ServiceReport() {
     "Employee ID",
     "Employee Name",
     "Line Total",
-    "Invoice Total"
-  ];
+    "Invoice Total",
+  ]
   const downloadInvoiceExcel = (data) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet("Invoice Report")
@@ -819,7 +776,7 @@ function ServiceReport() {
         item?.receipt?.is_paid ? "Paid" : "UnPaid",
         item?.receipt?.creator?.employee_id || "",
         item?.receipt?.creator?.name || "",
-        ((centerFee + bankCharge + govtFee + (centerFee * 0.05)) * quantity).toFixed(5),
+        ((centerFee + bankCharge + govtFee + centerFee * 0.05) * quantity).toFixed(5),
         (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(5),
       ])
 
@@ -864,16 +821,17 @@ function ServiceReport() {
       return sum + (govtFee + bankCharge) * quantity
     }, 0)
     const totalLineTotal = data.reduce((sum, item) => {
-      const centerFee = parseFloat(item?.center_fee) || 0;
-      const govtFee = parseFloat(item?.govt_fee) || 0;
-      const bankCharge = parseFloat(item?.bank_charge) || 0;
-      const quantity = parseFloat(item?.quantity) || 0;
+      const centerFee = Number.parseFloat(item?.center_fee) || 0
+      const govtFee = Number.parseFloat(item?.govt_fee) || 0
+      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
+      const quantity = Number.parseFloat(item?.quantity) || 0
 
-      const subtotal = centerFee + govtFee + bankCharge + (centerFee * 0.05);
-      return sum + (subtotal * quantity);
-    }, 0);
+      const subtotal = centerFee + govtFee + bankCharge + centerFee * 0.05
+      return sum + subtotal * quantity
+    }, 0)
     const totalInvoiceTotal = data.reduce(
-      (sum, item) => sum + (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)),
+      (sum, item) =>
+        sum + (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)),
       0,
     )
 
@@ -1032,48 +990,54 @@ function ServiceReport() {
     download()
   }
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage)
+    getCustomerQueue(newPage, pageLimit)
+  }
 
+  const handlePageSizeChange = (newSize) => {
+    setPageLimit(newSize)
+    setCurrentPage(1) // Reset to first page when changing page size
+    getCustomerQueue(1, newSize)
+  }
+
+  const handleSortChange = (field, order) => {
+    setSortField(field)
+    setSortOrder(order)
+    getCustomerQueue(currentPage, pageLimit, { sort_by: field, sort_order: order })
+  }
 
   useEffect(() => {
     setFromDate(new Date())
     setToDate(new Date())
-    getCustomerQueue()
-  }, []);
+    getCustomerQueue(currentPage, pageLimit)
+  }, [])
 
   return (
     <Box sx={{ p: 3 }}>
-
       <ConfirmationDialog
         open={confirmationDialog}
         onClose={() => setConfirmationDialog(false)}
         message={"Are You Sure?"}
         action={() => {
-          setConfirmationDialog(false);
+          setConfirmationDialog(false)
           handleDelete()
-
         }}
       />
-      <SimpleDialog
-        open={statusDialog}
-        onClose={() => setStatusDialog(false)}
-        title={"Change Status?"}
-      >
+      <SimpleDialog open={statusDialog} onClose={() => setStatusDialog(false)} title={"Change Status?"}>
         <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
               <SelectField
                 size={"small"}
                 label={"Select Status :"}
-                options={
-
-                  [
-                    { id: false, name: "Disabled" },
-                    { id: true, name: "Enabled" },
-
-                  ]}
+                options={[
+                  { id: false, name: "Disabled" },
+                  { id: true, name: "Enabled" },
+                ]}
                 selected={status}
                 onSelect={(value) => {
-                  setStatus(value);
+                  setStatus(value)
                 }}
                 error={errors?.status?.message}
                 register={register("status", {
@@ -1093,36 +1057,26 @@ function ServiceReport() {
                   gap: "25px",
                 }}
               >
-                <PrimaryButton
-                  bgcolor={Colors.primary}
-                  title="Yes,Confirm"
-                  type="submit"
-                />
-                <PrimaryButton
-                  onClick={() => setStatusDialog(false)}
-                  bgcolor={"#FF1F25"}
-                  title="No,Cancel"
-                />
+                <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
+                <PrimaryButton onClick={() => setStatusDialog(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
               </Grid>
             </Grid>
           </Grid>
         </Box>
       </SimpleDialog>
 
-
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Service Report</Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          {customerQueue?.length > 0 &&
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Service Report</Typography>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          {customerQueue?.length > 0 && (
             <Button
               onClick={() => downloadInvoiceExcel(customerQueue)}
               startIcon={<FileDownload />}
-
               variant="contained"
               color="primary"
               sx={{
-                padding: '10px',
-                textTransform: 'capitalize !important',
+                padding: "10px",
+                textTransform: "capitalize !important",
                 backgroundColor: "#001f3f !important",
                 fontSize: "12px",
                 ":hover": {
@@ -1131,15 +1085,12 @@ function ServiceReport() {
               }}
             >
               Export to Excel
-            </Button>}
-
+            </Button>
+          )}
         </Box>
-
-
       </Box>
 
       {/* Filters */}
-
 
       <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
         <Grid item xs={8}>
@@ -1156,7 +1107,6 @@ function ServiceReport() {
             <Grid item xs={5}>
               <DatePicker
                 label={"To Date"}
-
                 disableFuture={true}
                 size="small"
                 value={toDate}
@@ -1176,89 +1126,92 @@ function ServiceReport() {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-
-        </Grid>
+        <Grid item xs={4} display={"flex"} mt={2.7} justifyContent={"flex-end"}></Grid>
       </Grid>
 
-
-      <Box >
-
-
-        {<DataTable loading={loader} csvName={'service_report'} data={customerQueue} columns={columns} />}
+      <Box>
+        {
+          <DataTable2
+            loading={loader}
+            csvName={"service_report"}
+            data={customerQueue}
+            columns={columns}
+            totalCount={totalCount}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            page={currentPage}
+            pageSize={pageLimit}
+            onSortChange={handleSortChange}
+            total={true}
+            csv={true}
+          />
+        }
 
         <Grid container spacing={2} mt={1}>
           <Grid item xs={4}>
             <Input
               sx={{
                 "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
+                  WebkitTextFillColor: "Black !important",
+                },
               }}
               fullWidth
               disabled
-              value={`Total Quantity: ${CommaSeparator(parseFloat(Totals?.totalQuantity).toFixed(2))}`}
+              value={`Total Quantity: ${CommaSeparator(Number.parseFloat(Totals?.totalQuantity).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
             <Input
               sx={{
                 "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
+                  WebkitTextFillColor: "Black !important",
+                },
               }}
               fullWidth
               disabled
-              value={`Total Govt Fee: ${CommaSeparator(parseFloat(Totals?.totalGovtFee).toFixed(2))}`}
+              value={`Total Govt Fee: ${CommaSeparator(Number.parseFloat(Totals?.totalGovtFee).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
             <Input
               sx={{
                 "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
+                  WebkitTextFillColor: "Black !important",
+                },
               }}
               fullWidth
               disabled
-              value={`Total Service Charges: ${CommaSeparator(parseFloat(Totals?.totalServiceCharges).toFixed(2))}`}
+              value={`Total Service Charges: ${CommaSeparator(Number.parseFloat(Totals?.totalServiceCharges).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
             <Input
               sx={{
                 "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
+                  WebkitTextFillColor: "Black !important",
+                },
               }}
               fullWidth
               disabled
-              value={`Total Vat: ${CommaSeparator(parseFloat(Totals?.totalVat).toFixed(2))}`}
+              value={`Total Vat: ${CommaSeparator(Number.parseFloat(Totals?.totalVat).toFixed(2))}`}
             />
           </Grid>
           <Grid item xs={4}>
             <Input
               sx={{
                 "& .MuiInputBase-input": {
-                  WebkitTextFillColor: "Black !important"
-
-                }
+                  WebkitTextFillColor: "Black !important",
+                },
               }}
               fullWidth
               disabled
-              value={`Total Invoice Amount: ${CommaSeparator(parseFloat(invoiceTotal).toFixed(2))}`}
+              value={`Total Invoice Amount: ${CommaSeparator(Number.parseFloat(invoiceTotal).toFixed(2))}`}
             />
           </Grid>
-
         </Grid>
       </Box>
-
     </Box>
-  );
+  )
 }
 
-export default ServiceReport;
+export default ServiceReport
