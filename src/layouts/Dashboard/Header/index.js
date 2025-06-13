@@ -969,6 +969,17 @@ function Header() {
               order_by: 33,
             },
 
+            {
+              id: 33,
+              name: "Void Invoice List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/void-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
 
 
           ],
@@ -1870,7 +1881,17 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-
+            {
+              id: 33,
+              name: "Void Invoice List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/void-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
 
 
           ],
