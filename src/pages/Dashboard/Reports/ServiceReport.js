@@ -750,6 +750,9 @@ function ServiceReport() {
       "Bank Service Charge",
       "Other Charge",
       "Total Govt. Fee",
+      "PRO Commission",
+      "Typist Commission",
+      
       "Transaction ID",
       "Application/Case ID",
       "Ref Name",
@@ -813,6 +816,8 @@ function ServiceReport() {
         bankCharge.toFixed(2),
         "0", // Static
         totalGovtFee.toFixed(2),
+        item.pro_commission ? parseFloat(item.pro_commission).toFixed(2) :  '0.00',
+        item.typist_commission ? parseFloat(item.typist_commission).toFixed(2) :  '0.00',
         item.transaction_id || "",
         item.application_id || "",
         item.ref_no || "",
