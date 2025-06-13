@@ -245,7 +245,8 @@ function PreSalesList() {
 
     try {
       let params = {
-
+        page: 1,
+        limit:999999,
         from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
       };
@@ -818,7 +819,7 @@ function PreSalesList() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      saveAs( blob,
+      saveAs(blob,
         toDate && fromDate
           ? `Fund_Transfer_Vouchers  : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
           : `Fund_Transfer_Vouchers : Present `,)
@@ -978,7 +979,7 @@ function PreSalesList() {
         </Grid>
       </Grid>
 
-      <Box>{<DataTable loading={loader} data={data}  csvName={'iftv_lists'} columns={columns} />}</Box>
+      <Box>{<DataTable loading={loader} data={data} csvName={'iftv_lists'} columns={columns} />}</Box>
 
     </Box>
   );
