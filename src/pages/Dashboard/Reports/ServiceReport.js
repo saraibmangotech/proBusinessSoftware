@@ -177,7 +177,9 @@ function ServiceReport() {
       }
 
       const { data } = await CustomerServices.getServiceReport(params)
-      setCustomerQueue(data?.rows)
+      setCustomerQueue(
+        data?.rows?.sort((a, b) => new Date(a.receipt?.invoice_date) - new Date(b?.receipt?.invoice_date))
+      );
       const uniqueData = data?.rows?.filter(
         (item, index, self) =>
           index === self.findIndex(
