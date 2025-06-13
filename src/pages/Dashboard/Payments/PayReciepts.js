@@ -859,7 +859,7 @@ function PayReceipts() {
         const companyName =
             agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
                 ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-                : "PREMIUM BUSINESSMAN SERVICES"
+                : "PREMIUM BUSINESSMEN SERVICES"
 
         const companyRow = worksheet.addRow([companyName])
         companyRow.getCell(1).font = {

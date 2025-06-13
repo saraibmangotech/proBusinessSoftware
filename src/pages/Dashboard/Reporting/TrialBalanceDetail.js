@@ -456,7 +456,7 @@ function TrialBalanceDetailed() {
       const name =
         agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
           ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-          : "PREMIUM BUSINESSMAN  SERVICES"
+          : "PREMIUM BUSINESSMEN  SERVICES"
       const companyRow = worksheet.addRow([name])
       companyRow.getCell(1).font = {
         name: "Arial",
@@ -876,7 +876,7 @@ function TrialBalanceDetailed() {
         const name =
           agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
             ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-            : "PREMIUM BUSINESSMAN  SERVICES"
+            : "PREMIUM BUSINESSMEN  SERVICES"
         const companyRow = worksheet.addRow([name])
         companyRow.getCell(1).font = {
           name: "Arial",

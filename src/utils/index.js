@@ -315,6 +315,6 @@ export let agencyType = {
   "AL-AHDEED":{
     imageUrl: Images.headerCenterLogoAdheed,
     category: "AL-AHDEED",
-    name:'PREMIUM BUSINESSMAN  SERVICES '
+    name:'PREMIUM BUSINESSMEN  SERVICES '
   },
 }

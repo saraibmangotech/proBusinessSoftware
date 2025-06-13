@@ -646,7 +646,7 @@ function ServiceReport() {
     const companyRow = worksheet.addRow([
       agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
         ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-        : "PREMIUM BUSINESSMAN SERVICES",
+        : "PREMIUM BUSINESSMEN SERVICES",
     ])
     companyRow.getCell(1).font = {
       name: "Arial",
