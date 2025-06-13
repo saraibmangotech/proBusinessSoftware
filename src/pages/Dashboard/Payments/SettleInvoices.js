@@ -82,7 +82,7 @@ function SettleInvoices() {
 
     const tableHead = ['Select', 'Date', 'Invoice ID', 'Customer Name', ' Total Amount', ' Vat', 'Paid', 'Balance', 'Payment Status']
 
-    const tableHead2 = ['Select',  'Invoice ID',  ' Total Amount', ' Settled Amount',  'Balance','Receiving']
+    const tableHead2 = ['Select', 'Invoice ID', ' Total Amount', ' Settled Amount', 'Balance', 'Receiving']
     const { register, formState: { errors }, handleSubmit, setValue, getValues, trigger, watch } = useForm();
     const { register: register2, getValues: getValues2 } = useForm();
     const { register: register3, handleSubmit: handleSubmit3 } = useForm();
@@ -105,6 +105,7 @@ function SettleInvoices() {
     const [selectedInvoice2, setSelectedInvoice2] = useState([]);
     const [exchangeRate, setExchangeRate] = useState();
     const [totalAmount, setTotalAmount] = useState(0);
+    const [totalAmount2, setTotalAmount2] = useState(0);
     const [aedTotalAmount, setAedTotalAmount] = useState(0);
     const [exchangeLoss, setExchangeLoss] = useState(0);
     const [banks, setBanks] = useState([])
@@ -242,19 +243,16 @@ function SettleInvoices() {
         try {
 
             let params = {
-                page: 1,
-                limit: 999999,
-                customer_id: selectedVendor?.id,
-                receivable_account_id: selectedVendor?.receivable_account_id,
-                customer_name: selectedVendor?.name,
-                invoice_number: getValues2('invoiceNumber'),
-                is_paid: false
+                // page: 1,
+                // limit: 999999,
+                // // customer_id: selectedVendor?.id,
+
 
             }
 
             const { data } = await CustomerServices.settledInvoiceData(params)
             setInvoiceList2(data?.rows)
-            
+
             setSelectedInvoice2([])
 
         } catch (error) {
@@ -307,7 +305,7 @@ function SettleInvoices() {
     const handleSelectInvoice = (data) => {
         try {
             const isAlreadySelected = selectedInvoice.some(e => e.invoiceId === data?.id);
-    
+
             if (isAlreadySelected) {
                 // Deselect if already selected
                 setSelectedInvoice([]);
@@ -336,14 +334,14 @@ function SettleInvoices() {
                         ).toFixed(2)
                     )
                 );
-                
+
                 setSelectedInvoice([obj]);
             }
         } catch (error) {
             ErrorToaster(error);
         }
     };
-    
+
     const handleSelectInvoice2 = (data) => {
         console.log(data);
 
@@ -357,18 +355,13 @@ function SettleInvoices() {
 
             if (currentIndex === -1) {
                 const obj = {
-                    vendor_id: data?.vendor_id,
-                    vendor_name: data?.vendor?.name,
+
                     invoiceId: data?.id,
-                    invoice_id: data?.id,
-                    invoiceNumber: data?.invoice_number,
-                    invoicePrefix: data?.invoice_prefix,
-                    purchaseDate: data?.purchase_date,
-                    amount: parseFloat(data?.total_amount),
-                    paidAmount: parseFloat(data?.paid_amount),
-                    paymentStatus: data?.payment_status,
-                    isPaid: data?.is_paid,
-                    receiveAmount: 0,
+                    payment_mode: (Object.keys(data).includes("receipt_id")) ? "Unsettled Receipt" : 'Customer Payment',
+                    amount: 0,
+                    id: data?.id,
+
+
 
                 };
                 shallowCopy.push(obj);
@@ -376,7 +369,10 @@ function SettleInvoices() {
                 shallowCopy.splice(currentIndex, 1);
             }
             console.log(shallowCopy, 'shallowCopyshallowCopy');
-
+            setTotalAmount2((shallowCopy).reduce(
+                (sum, entry) => sum + parseFloat(entry.receiveAmount || 0),
+                0
+            ))
             setSelectedInvoice2(shallowCopy);
 
 
@@ -386,10 +382,27 @@ function SettleInvoices() {
         }
     };
 
+    useEffect(() => {
+        console.log((selectedInvoice2).reduce(
+            (sum, entry) => sum + parseFloat(entry.receiveAmount || 0),
+            0
+        ), 'shallowCopyshallowCopy22');
+
+        setTotalAmount2((selectedInvoice2).reduce(
+            (sum, entry) => sum + parseFloat(entry.receiveAmount || 0),
+            0
+        ))
+
+
+    }, [selectedInvoice2])
+
+
     // *For Handle Receive Amount
     const handleReceive = (value, id, balance) => {
+        console.log(balance, 'shallowCopy222222');
+
         try {
-            const shallowCopy = [...selectedInvoice];
+            const shallowCopy = [...selectedInvoice2];
             const currentIndex = shallowCopy.findIndex(e => e.invoiceId === id);
 
             if (currentIndex === -1) return; // Safeguard: invoice not found
@@ -399,12 +412,15 @@ function SettleInvoices() {
 
             if (numericValue > numericBalance) {
                 shallowCopy[currentIndex].receiveAmount = numericBalance;
+                shallowCopy[currentIndex].amount = numericBalance;
                 setValue(`receiving${id}`, numericBalance.toFixed(2));
             } else {
                 shallowCopy[currentIndex].receiveAmount = numericValue;
+                shallowCopy[currentIndex].amount = numericValue;
             }
+            console.log(shallowCopy, 'shallowCopy222222');
 
-            setSelectedInvoice(shallowCopy);
+            setSelectedInvoice2(shallowCopy);
         } catch (error) {
             ErrorToaster(error);
         }
@@ -485,52 +501,44 @@ function SettleInvoices() {
     }
 
     // *For Receive Payment
-    const receivePayment = async (formData) => {
+    const settledInvoice = async () => {
         setLoading(true);
 
-        const finalTotal = parseFloat(getValues('finalTotal') || 0);
-        const existingTotal = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+        console.log(selectedInvoice, 'selectedInvoice2selectedInvoice2');
 
-        console.log("Final Total:", finalTotal);
-        console.log("Existing Total:", existingTotal);
-
-        if (finalTotal !== existingTotal) {
-            showErrorToast(`Remaining amount must be paid. Remaining: ${(finalTotal - existingTotal).toFixed(2)}`);
+        const total = selectedInvoice2.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+        if (parseFloat(totalAmount2) != parseFloat(totalAmount)){
+            showErrorToast('Invoice amount and Receiving amount must be equal ')
             setLoading(false);
-            return;
         }
+        else{
+            try {
+                let obj = {
+                    customer_id: selectedVendor?.id,
+                    invoice_id: selectedInvoice[0]?.invoiceId,
+                    total_amount: totalAmount2,
+                    payment_methods:selectedInvoice2
 
-        const paymentModesString = payments.map((item) => item.payment_mode).join(", ");
-
-        try {
-            let obj = {
-                additional_charges_percentage: formData?.percentage,
-                additional_charges_value: formData?.additionalCharges,
-                payment_methods: payments,
-                total_amount: getValues('total'),
-                final_amount: finalTotal,
-                invoices: selectedInvoice,
-                narration: formData?.narration,
-                notes: formData?.notes,
-                payment_date: moment(date).format('MM-DD-YYYY'),
-                payment_mode: paymentModesString,
-            };
-            console.log(obj);
+                };
+                console.log(obj);
 
 
-            const promise = VehiclePaymentServices.SettleInvoices(obj)
-            const response = await promise
-            showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
-            if (response?.responseCode === 200) {
-                navigate('/payment-invoice-list')
+                // const promise = VehiclePaymentServices.SettleInvoices(obj)
+                // const response = await promise
+                // showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
+                // if (response?.responseCode === 200) {
+                //     navigate('/payment-invoice-list')
+                // }
+
+
+            } catch (error) {
+                ErrorToaster(error);
+            } finally {
+                setLoading(false);
             }
 
-
-        } catch (error) {
-            ErrorToaster(error);
-        } finally {
-            setLoading(false);
         }
+        
     };
 
 
@@ -798,7 +806,7 @@ function SettleInvoices() {
                             icon={<SearchIcon />}
                             title="Search"
                             sx={{ marginTop: "30px" }}
-                            onClick={() =>{ getInvoiceList(null, null, null);getInvoiceList2(null, null, null)}}
+                            onClick={() => { getInvoiceList(null, null, null); getInvoiceList2(null, null, null) }}
                             loading={loading}
                         />
                     </Grid>
@@ -992,22 +1000,7 @@ function SettleInvoices() {
                                         error={errors?.notes?.message}
                                     />
                                 </Grid>
-                                <Grid item md={4} sm={12} xs={12}>
-                                    <DatePicker
-                                        label={"Payment Date:*"}
-                                        value={date}
-                                        size={"small"}
-                                        error={errors?.paidAt?.message}
-                                        register={register("paidAt", {
-                                            required: date ? false : 'Date is required'
-                                        })}
-                                        onChange={(date) => {
-                                            setValue("paidAt", date)
-                                            setDate(new Date(date))
 
-                                        }}
-                                    />
-                                </Grid>
                                 <Grid item xs={12} sm={2.5}>
                                     <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
                                         <Typography variant="body2" sx={{ fontFamily: FontFamily.NunitoRegular }}>
@@ -1024,11 +1017,11 @@ function SettleInvoices() {
                             </Grid>
                         </Box>
 
-                     
+
 
                     </Fragment>
                 }
-   {invoiceList2 &&
+                {invoiceList2 &&
                     <Fragment>
 
                         {/* ========== Table ========== */}
@@ -1054,28 +1047,41 @@ function SettleInvoices() {
                                                         />
 
                                                     </Cell>
-                                                   
-                                                    <Cell>
-                                                        {item?.id ?? '-'}
-                                                    </Cell>
-                                                   
-
 
                                                     <Cell>
-                                                        {parseFloat(item?.total_amount).toFixed(2) ?? '-'}
+
+                                                        {(Object.keys(item).includes("receipt_id")) ? 'RC-' + item.id : 'CP-' + item.id ?? '-'}
+                                                    </Cell>
+
+
+
+                                                    <Cell>
+
+                                                        {(Object.keys(item).includes("receipt_id"))
+                                                            ? (item.payment_entries || []).reduce(
+                                                                (sum, entry) => sum + parseFloat(entry.amount || 0),
+                                                                0
+                                                            ).toFixed(2)
+                                                            : parseFloat(item?.amount || 0).toFixed(2)}
+
                                                     </Cell>
                                                     <Cell>
-                                                        {parseFloat(item?.total_vat).toFixed(2) ?? '-'}
+                                                        {parseFloat(item?.settled_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
-                                                  
+
 
                                                     <Cell>
                                                         {
-                                                            parseFloat(parseFloat(parseFloat(item?.total_amount || 0) + parseFloat(item?.total_vat || 0)) - parseFloat(item?.paid_amount || 0)).toFixed(2)
+                                                            (Object.keys(item).includes("receipt_id"))
+                                                                ? parseFloat((item.payment_entries || []).reduce(
+                                                                    (sum, entry) => sum + parseFloat(entry.amount || 0),
+                                                                    0
+                                                                ) - parseFloat(item?.paid_amount || 0)).toFixed(2)
+                                                                : parseFloat(parseFloat(item?.amount || 0) - parseFloat(item?.paid_amount || 0)).toFixed(2)
                                                         }
 
                                                     </Cell>
-                                                 
+
                                                     <Cell>
                                                         <Box sx={{ width: '150px' }}>
                                                             <InputField
@@ -1099,9 +1105,12 @@ function SettleInvoices() {
                                                                                 if (num < 0) return 'Amount cannot be negative';
                                                                                 if (
                                                                                     num > (
-                                                                                        (parseFloat(item?.total_amount || 0) +
-                                                                                            parseFloat(item?.total_vat || 0)) -
-                                                                                        parseFloat(item?.paid_amount || 0)
+                                                                                        (Object.keys(item).includes("receipt_id"))
+                                                                                            ? parseFloat((item.payment_entries || []).reduce(
+                                                                                                (sum, entry) => sum + parseFloat(entry.amount || 0),
+                                                                                                0
+                                                                                            ) - parseFloat(item?.paid_amount || 0)).toFixed(2)
+                                                                                            : parseFloat(parseFloat(item?.amount || 0) - parseFloat(item?.paid_amount || 0)).toFixed(2)
                                                                                     )
                                                                                 ) {
                                                                                     return 'Amount cannot be greater than balance amount';
@@ -1114,12 +1123,20 @@ function SettleInvoices() {
                                                                         trigger(`receiving${item?.id}`);
                                                                         if (
                                                                             num >= 0 &&
-                                                                            num <= (parseFloat(item?.total_amount || 0) +
-                                                                                parseFloat(item?.total_vat || 0)) -
-                                                                            parseFloat(item?.paid_amount || 0)
+                                                                                num <= (Object.keys(item).includes("receipt_id"))
+                                                                                ? parseFloat((item.payment_entries || []).reduce(
+                                                                                    (sum, entry) => sum + parseFloat(entry.amount || 0),
+                                                                                    0
+                                                                                ) - parseFloat(item?.paid_amount || 0))
+                                                                                : parseFloat(parseFloat(item?.amount || 0) - parseFloat(item?.paid_amount || 0))
 
                                                                         ) {
-                                                                            handleReceive(num, item?.id, item?.balance);
+                                                                            handleReceive(num, item?.id, (Object.keys(item).includes("receipt_id"))
+                                                                                ? parseFloat((item.payment_entries || []).reduce(
+                                                                                    (sum, entry) => sum + parseFloat(entry.amount || 0),
+                                                                                    0
+                                                                                ) - parseFloat(item?.paid_amount || 0))
+                                                                                : parseFloat(parseFloat(item?.amount || 0) - parseFloat(item?.paid_amount || 0)));
                                                                         }
                                                                     },
                                                                 })}
@@ -1143,11 +1160,20 @@ function SettleInvoices() {
                             </Table>
                         </TableContainer>
 
-                        
 
-                  
+                        {console.log(selectedInvoice, selectedInvoice2, 'sssss')}
 
-                     
+                        <Grid item xs={2} sm={3} sx={{ marginTop: "30px", display: 'flex', justifyContent: 'flex-end' }}>
+                            <PrimaryButton
+                                bgcolor={"#001f3f"}
+                                disabled={(selectedInvoice?.length == 0 && selectedInvoice2?.length == 0)}
+                                title="Settle Invoice"
+                                sx={{ marginTop: "30px" }}
+                                onClick={() => settledInvoice()}
+                                loading={loading}
+                            />
+                        </Grid>
+
 
                     </Fragment>
                 }

@@ -156,7 +156,8 @@ const routes = {
   invoiceDateUpdate:'/sales/receipts/updateDate',
   handleVoid:'sales/invoice/void',
   getVoidReceipts:'/sales/receipts/payments',
-  settledInvoiceData:'/payments/customer/receipts'
+  settledInvoiceData:'/payments/customer/receipts',
+  RefundInvoice:'sales/receipts/refund'
 
 
 };

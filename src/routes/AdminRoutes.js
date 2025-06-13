@@ -299,6 +299,9 @@ const VoidInvoices = lazy(() =>
 const VoidReceipts = lazy(() =>
   import("pages/Dashboard/Payments/VoidReceipts")
 );
+const UnsettledReceipts = lazy(() =>
+  import("pages/Dashboard/Payments/UnsettledReceipts")
+);
 const CreatePaidReceipt = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaidReceipt")
 );
@@ -850,6 +853,10 @@ const AdminRoutes = [
   {
     path: "/void-receipts",
     component: <VoidReceipts />,
+  },
+  {
+    path: "/unsettled-receipts",
+    component: <UnsettledReceipts />,
   },
   {
     path: "/card-list",
