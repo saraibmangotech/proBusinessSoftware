@@ -621,7 +621,26 @@ function UnsettledReceipts() {
                 </Box>
             ),
         },
-     
+        {
+            header: "Invoice Number ",
+            accessorKey: "invoice_number",
+            accessorFn: (row) => row?.payment_items[0]?.invoice?.invoice_number,
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.payment_items[0]?.invoice?.invoice_number}
+                </Box>
+            ),
+        },
+        {
+            header: "Customer Name",
+            accessorKey: "customer_name",
+            accessorFn: (row) => row?.payment_items[0]?.invoice?.customer_name,
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.payment_items[0]?.invoice?.customer_name}
+                </Box>
+            ),
+        },
         {
             header: "Total Amount",
             accessorFn: (row) => {
@@ -648,17 +667,17 @@ function UnsettledReceipts() {
                 </Box>
             ),
         },
- 
         {
-            header: "Voided By",
-            accessorKey: "void_by",
-            accessorFn: (row) => row?.void_by,
+            id: "invoice_date",
+            header: "Invoice Date",
+            accessorFn: (row) => moment(row?.payment_items[0]?.invoice?.invoice_date).format("DD/MM/YYYY"),
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.void_by?.name}
+                    {moment(row.original?.payment_items[0]?.invoice?.invoice_date).format("DD/MM/YYYY")}
                 </Box>
             ),
         },
+      
         {
             id: "created_at",
             header: "Receipt Date",
@@ -669,16 +688,7 @@ function UnsettledReceipts() {
                 </Box>
             ),
         },
-        {
-            id: "voided_at",
-            header: "Voided At",
-            accessorFn: (row) => moment(row.voided_at).format("DD/MM/YYYY"),
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.voided_at).format("DD/MM/YYYY")}
-                </Box>
-            ),
-        },
+        
         {
             id: "status",
             header: "Status",
@@ -821,7 +831,7 @@ function UnsettledReceipts() {
         worksheet.addRow([])
 
         // Define headers based on the columns structure (excluding Actions column)
-        const headers = ["Invoice#", "Amount", "Voided By","Status", "Receipt At", "Voided At" ]
+        const headers = ["Receipt No#", "Invoice Number", "Customer Name", "Total Amount", "Invoice Date", "Receipt Date", "Status" ]
 
         // Add headers with professional styling
         const headerRow = worksheet.addRow(headers)
@@ -870,11 +880,12 @@ function UnsettledReceipts() {
 
             const dataRow = worksheet.addRow([
                 'RC-'+item?.id || "",
+                item?.payment_items[0]?.invoice?.invoice_number,
+                item?.payment_items[0]?.invoice?.customer_name,
                 calculatedTotalAmount.toFixed(2),
-                item?.void_by?.name || "",
-                item?.is_refunded ? 'Refunded' : 'Pending',
+                item?.payment_items[0]?.invoice?.invoice_date ? moment(item?.payment_items[0]?.invoice?.invoice_date).format("DD/MM/YYYY") : "",
                 item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "",
-                item?.voided_at ? moment(item?.voided_at).format("DD/MM/YYYY") : "",
+                item?.is_refunded ? 'Refunded' : 'Pending',
             ])
 
             // Add to total
@@ -908,11 +919,11 @@ function UnsettledReceipts() {
         worksheet.addRow([])
 
         // Add totals row
-        const totalRow = worksheet.addRow(["", totalAmount.toFixed(2), "", "", ""])
+        const totalRow = worksheet.addRow(["", "","",totalAmount.toFixed(2), "", "", ""])
 
         // Style totals row
         totalRow.eachCell((cell, colNumber) => {
-            if (colNumber === 1 || colNumber === 2) {
+            if (colNumber === 3 || colNumber === 4) {
                 // "TOTAL" label and amount
                 cell.fill = {
                     type: "pattern",

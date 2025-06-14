@@ -640,7 +640,7 @@ function ServiceReport() {
   ];
   const downloadInvoiceExcel = (data) => {
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet("Invoice Report")
+    const worksheet = workbook.addWorksheet("Service Report")
 
     // Set professional header
     worksheet.headerFooter.oddHeader =
@@ -678,7 +678,7 @@ function ServiceReport() {
     }
 
     // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["INVOICE REPORT"])
+    const titleRow = worksheet.addRow(["SERVICE REPORT"])
     titleRow.getCell(1).font = {
       name: "Arial",
       size: 16,
