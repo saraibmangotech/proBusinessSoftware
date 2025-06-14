@@ -821,7 +821,7 @@ function ServiceReport() {
         item.pro_commission ? parseFloat(item.pro_commission).toFixed(2) :  '0.00',
         item.typist_commission ? parseFloat(item.typist_commission).toFixed(2) :  '0.00',
         item.transaction_id || "",
-        item.application_id || "",
+        item.application_id + "­" || "",
         item.ref_no || "",
         item?.receipt?.is_paid ? "Paid" : "UnPaid",
         item?.receipt?.creator?.employee_id || "",
