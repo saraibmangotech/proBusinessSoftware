@@ -1033,7 +1033,12 @@ function ServiceReport() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      saveAs(blob, "Invoice_Report.xlsx")
+
+       saveAs( blob,
+                      toDate && fromDate
+                        ? `Invoice_Report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                        : `Invoice_Report: Present `,);
+     
     }
 
     download()

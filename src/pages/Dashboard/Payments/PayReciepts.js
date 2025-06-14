@@ -1102,7 +1102,11 @@ function PayReceipts() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "paid_receipts.xlsx")
+                  saveAs(blob,
+                    toDate && fromDate
+                        ? `paid_receipts : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                        : `paid_receipts: Present `,);
+         
         }
 
         download()

@@ -1669,7 +1669,7 @@ function UpdatePurchaseInvoice() {
                                                     <DeleteIcon color="error" fontSize="small" />
                                                 </IconButton>
 
-                                                <Typography variant="body1"><strong>Amount:</strong> {payment.amount}</Typography>
+                                                <Typography variant="body1"><strong>Amount:</strong> {parseFloat(payment.amount || 0).toFixed(2)}</Typography>
                                                 <Typography variant="body1"><strong>Mode:</strong> {payment.payment_mode}</Typography>
                                                 {payment.mode === 'Bank' && (
                                                     <Typography variant="body1"><strong>Bank:</strong> {payment.bank?.name || payment.bank}</Typography>

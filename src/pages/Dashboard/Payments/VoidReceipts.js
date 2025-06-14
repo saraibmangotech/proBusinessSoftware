@@ -997,7 +997,11 @@ function VoidReceipts() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "void_receipts.xlsx")
+                  saveAs(blob,
+                            toDate && fromDate
+                                ? `void_receipts : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                                : `void_receipts: Present `,);
+          
         }
 
         download()

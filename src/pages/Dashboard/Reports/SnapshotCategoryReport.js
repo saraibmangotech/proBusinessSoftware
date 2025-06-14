@@ -685,7 +685,11 @@ function SnapshotCategoryReport() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "category_report.xlsx")
+                    saveAs(blob,
+                                  toDate && fromDate
+                                      ? `category_report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                                      : `category_report: Present `,);
+           
         }
 
         download()

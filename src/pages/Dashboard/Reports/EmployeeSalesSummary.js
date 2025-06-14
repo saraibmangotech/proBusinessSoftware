@@ -631,7 +631,7 @@ function EmployeeSalesSummary() {
             }
         })
 
-      
+
 
         // Add empty rows for spacing before footer
         worksheet.addRow([])
@@ -700,7 +700,11 @@ function EmployeeSalesSummary() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "employee_sales_summary_report.xlsx")
+            saveAs(blob,
+                toDate && fromDate
+                    ? `employee_sales_summary_report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                    : `employee_sales_summary_report: Present `,);
+
         }
 
         download()
@@ -865,7 +869,7 @@ function EmployeeSalesSummary() {
             <Box >
 
 
-                {<DataTable loading={loader} total={true}  csvName={'employee_sales_summary_report'} data={customerQueue} columns={columns} />}
+                {<DataTable loading={loader} total={true} csvName={'employee_sales_summary_report'} data={customerQueue} columns={columns} />}
             </Box>
 
         </Box>

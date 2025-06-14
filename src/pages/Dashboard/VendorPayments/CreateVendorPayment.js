@@ -1115,7 +1115,7 @@ function CreateVendorPayment() {
                                                             </IconButton>
 
                                                             <Typography variant="body1">
-                                                                <strong>Amount:</strong> {payment.amount}
+                                                                <strong>Amount:</strong> {parseFloat(payment.amount || 0).toFixed(2)}
                                                             </Typography>
                                                             <Typography variant="body1">
                                                                 <strong>Account Name:</strong> {payment.payment_mode}
