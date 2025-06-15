@@ -379,14 +379,14 @@ function SnapshotEmployeeServiceReport() {
     {
       header: "Department",
       accessorKey: "department",
-      accessorFn: (row) => 'Al-Adheed',
+      accessorFn: (row) => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : 'TASHEEL',
       cell: ({ row }) => (
         <Box
           variant="contained"
           color="primary"
           sx={{ cursor: "pointer", display: "flex", gap: 2 }}
         >
-          {agencyType[process.env.REACT_APP_TYPE].category}
+          {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : 'TASHEEL' }
         </Box>
       ),
     },
@@ -792,7 +792,7 @@ function SnapshotEmployeeServiceReport() {
         item?.receipt?.creator?.name || "",
         item?.receipt?.invoice_number || "",
         item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : "",
-        agencyType?.[process.env.REACT_APP_TYPE]?.category || "Al-Adheed",
+        agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : 'TASHEEL',
         item?.service?.item_code || "",
         item?.service?.name || "",
         item?.service?.category?.name || "",
@@ -1015,7 +1015,11 @@ function SnapshotEmployeeServiceReport() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      saveAs(blob, "employee_service_report.xlsx")
+      saveAs(blob,
+        toDate && fromDate
+            ? `employee_service_report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+            : `employee_service_report: Present `,);
+ 
     }
 
     download()

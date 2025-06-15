@@ -689,7 +689,11 @@ function VatInputRegister() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      saveAs(blob, "vat_input_register.xlsx")
+           saveAs(blob,
+                      toDate && fromDate
+                          ? `vat_input_register : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                          : `vat_input_register: Present `,);
+
     }
   
     download()

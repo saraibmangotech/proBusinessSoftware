@@ -342,9 +342,11 @@ function CompleteTransactionReport() {
             mimeType:
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
+        saveAs(new Blob([buf]),
+            toDate && fromDate
+                ? `complete_transaction_report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                : `complete_transaction_report: Present `,);
 
-        // Save the file using FileSaver.js
-        saveAs(new Blob([buf]), "data.xlsx");
     };
 
     useEffect(() => {

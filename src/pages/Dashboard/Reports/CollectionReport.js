@@ -920,7 +920,11 @@ function CollectionReport() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      saveAs(blob, "Collection_Report.xlsx")
+      
+             saveAs( blob,
+                            toDate && fromDate
+                              ? `Collection_Report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                              : `Collection_Report: Present `,);
     }
   
     download()

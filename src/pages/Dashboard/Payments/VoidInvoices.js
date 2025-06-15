@@ -1026,7 +1026,11 @@ function VoidInvoices() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "void_invoices.xlsx")
+            saveAs(blob,
+                toDate && fromDate
+                    ? `void_invoices : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                    : `void_invoices: Present `,);
+       
         }
 
         download()

@@ -1634,7 +1634,7 @@ function CreatePaidReceipt() {
                             </IconButton>
 
                             <Typography variant="body1">
-                              <strong>Amount:</strong> {payment.amount}
+                              <strong>Amount:</strong> {parseFloat(payment.amount || 0).toFixed(2)}
                             </Typography>
                             <Typography variant="body1">
                               <strong>Mode:</strong> {payment.payment_mode}
@@ -1665,7 +1665,7 @@ function CreatePaidReceipt() {
                               {(payment.payment_mode === "Card" || payment.payment_mode === "Payment Link") && (
                               <Typography variant="body1">
                                 <strong>Total:</strong>{" "}
-                                {parseFloat(payment.additional_charges_value)+parseFloat(payment?.amount)}
+                                {parseFloat(parseFloat(payment.additional_charges_value)+parseFloat(payment?.amount)).toFixed(2)}
                               </Typography>
                             )}
                           </Box>

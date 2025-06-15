@@ -1018,7 +1018,11 @@ function UnsettledReceipts() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "unsettled_receipt.xlsx")
+               saveAs(blob,
+                                        toDate && fromDate
+                                            ? `unsettled_receipt : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                                            : `unsettled_receipt: Present `,);
+           
         }
 
         download()

@@ -729,206 +729,210 @@ function EmployeeWiseSalesReport() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-            saveAs(blob, "employee_wise_sales_report.xlsx")
-        }
-
-        download()
+            saveAs(blob,
+                toDate && fromDate
+                    ? `employee_wise_sales_report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                    : `employee_wise_sales_report: Present `,);
+          
     }
 
-    useEffect(() => {
-        if (user?.role_id != 1000) {
-            setFieldDisabled(true)
-            setSelectedUser(user)
+    download()
+}
 
-        }
+useEffect(() => {
+    if (user?.role_id != 1000) {
+        setFieldDisabled(true)
+        setSelectedUser(user)
 
-    }, [user])
+    }
 
-    useEffect(() => {
-        getUsers()
-        setFromDate(new Date())
-        setToDate(new Date())
-        getCustomerQueue()
-    }, []);
+}, [user])
 
-    return (
-        <Box sx={{ p: 3 }}>
+useEffect(() => {
+    getUsers()
+    setFromDate(new Date())
+    setToDate(new Date())
+    getCustomerQueue()
+}, []);
 
-            <ConfirmationDialog
-                open={confirmationDialog}
-                onClose={() => setConfirmationDialog(false)}
-                message={"Are You Sure?"}
-                action={() => {
-                    setConfirmationDialog(false);
-                    handleDelete()
+return (
+    <Box sx={{ p: 3 }}>
 
-                }}
-            />
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={3}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select User "}
-                                disabled={fieldDisabled}
-                                options={users}
-                                selected={selectedUser}
-                                onSelect={(value) => {
-                                    setSelectedUser(value);
+        <ConfirmationDialog
+            open={confirmationDialog}
+            onClose={() => setConfirmationDialog(false)}
+            message={"Are You Sure?"}
+            action={() => {
+                setConfirmationDialog(false);
+                handleDelete()
 
-                                }}
-                                error={errors?.user?.message}
-                                register={register("user", {
-                                    required: "Please select user account.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={
+            }}
+        />
+        <SimpleDialog
+            open={statusDialog}
+            onClose={() => setStatusDialog(false)}
+            title={"Change Status?"}
+        >
+            <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
+                <Grid container spacing={2}>
+                    <Grid item xs={3}>
+                        <SelectField
+                            size={"small"}
+                            label={"Select User "}
+                            disabled={fieldDisabled}
+                            options={users}
+                            selected={selectedUser}
+                            onSelect={(value) => {
+                                setSelectedUser(value);
 
-                                    [
-                                        { id: false, name: "Disabled" },
-                                        { id: true, name: "Enabled" },
-
-                                    ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
-                                }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
+                            }}
+                            error={errors?.user?.message}
+                            register={register("user", {
+                                required: "Please select user account.",
+                            })}
+                        />
                     </Grid>
-                </Box>
-            </SimpleDialog>
+                    <Grid item xs={12} sm={12}>
+                        <SelectField
+                            size={"small"}
+                            label={"Select Status :"}
+                            options={
 
+                                [
+                                    { id: false, name: "Disabled" },
+                                    { id: true, name: "Enabled" },
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Employee Wise Sales Report</Typography>
-
-                {customerQueue?.length > 0 &&
-                    <Button
-                        onClick={() => downloadEmployeeWiseSalesReportExcel(customerQueue)}
-
-
-                        variant="contained"
-                        color="primary"
-                        sx={{
-                            padding: '10px',
-                            textTransform: 'capitalize !important',
-                            backgroundColor: "#001f3f !important",
-                            fontSize: "12px",
-                            ":hover": {
-                                backgroundColor: "#001f3f !important",
-                            },
-                        }}
-                    >
-                        Export to Excel
-                    </Button>}
-
-            </Box>
-
-            {/* Filters */}
-
-            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
-                    <Grid container spacing={1}>
-                        <Grid item xs={3.5}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select User "}
-                                disabled={fieldDisabled}
-                                options={users}
-                                selected={selectedUser}
-                                onSelect={(value) => {
-                                    setSelectedUser(value);
-
-                                }}
-                                error={errors?.user?.message}
-                                register={register("user", {
-                                    required: "Please select user account.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid item xs={3.5}>
-                            <DatePicker
-                                label={"From Date"}
-                                disableFuture={true}
-                                size="small"
-                                value={fromDate}
-                                onChange={(date) => handleFromDate(date)}
-                            />
-                        </Grid>
-                        <Grid item xs={3.5}>
-                            <DatePicker
-                                label={"To Date"}
-
-                                disableFuture={true}
-                                size="small"
-                                value={toDate}
-                                onChange={(date) => handleToDate(date)}
-                            />
-                        </Grid>
-
-                        <Grid item xs={1.5} sx={{ marginTop: "30px" }}>
+                                ]}
+                            selected={status}
+                            onSelect={(value) => {
+                                setStatus(value);
+                            }}
+                            error={errors?.status?.message}
+                            register={register("status", {
+                                required: "Please select status.",
+                            })}
+                        />
+                    </Grid>
+                    <Grid container sx={{ justifyContent: "center" }}>
+                        <Grid
+                            item
+                            xs={6}
+                            sm={6}
+                            sx={{
+                                mt: 2,
+                                display: "flex",
+                                justifyContent: "space-between",
+                                gap: "25px",
+                            }}
+                        >
                             <PrimaryButton
-                                bgcolor={"#001f3f"}
-                                icon={<SearchIcon />}
-                                title="Search"
-                                sx={{ marginTop: "30px" }}
-                                onClick={() => getCustomerQueue(null, null, null)}
-                                loading={loading}
+                                bgcolor={Colors.primary}
+                                title="Yes,Confirm"
+                                type="submit"
+                            />
+                            <PrimaryButton
+                                onClick={() => setStatusDialog(false)}
+                                bgcolor={"#FF1F25"}
+                                title="No,Cancel"
                             />
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-
-                </Grid>
-            </Grid>
-            <Box >
-
-
-                {<DataTable loading={loader} total={true}  csvName={'category_report'} data={customerQueue} columns={columns} />}
             </Box>
+        </SimpleDialog>
+
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Employee Wise Sales Report</Typography>
+
+            {customerQueue?.length > 0 &&
+                <Button
+                    onClick={() => downloadEmployeeWiseSalesReportExcel(customerQueue)}
+
+
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                        padding: '10px',
+                        textTransform: 'capitalize !important',
+                        backgroundColor: "#001f3f !important",
+                        fontSize: "12px",
+                        ":hover": {
+                            backgroundColor: "#001f3f !important",
+                        },
+                    }}
+                >
+                    Export to Excel
+                </Button>}
 
         </Box>
-    );
+
+        {/* Filters */}
+
+        <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+            <Grid item xs={8}>
+                <Grid container spacing={1}>
+                    <Grid item xs={3.5}>
+                        <SelectField
+                            size={"small"}
+                            label={"Select User "}
+                            disabled={fieldDisabled}
+                            options={users}
+                            selected={selectedUser}
+                            onSelect={(value) => {
+                                setSelectedUser(value);
+
+                            }}
+                            error={errors?.user?.message}
+                            register={register("user", {
+                                required: "Please select user account.",
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={3.5}>
+                        <DatePicker
+                            label={"From Date"}
+                            disableFuture={true}
+                            size="small"
+                            value={fromDate}
+                            onChange={(date) => handleFromDate(date)}
+                        />
+                    </Grid>
+                    <Grid item xs={3.5}>
+                        <DatePicker
+                            label={"To Date"}
+
+                            disableFuture={true}
+                            size="small"
+                            value={toDate}
+                            onChange={(date) => handleToDate(date)}
+                        />
+                    </Grid>
+
+                    <Grid item xs={1.5} sx={{ marginTop: "30px" }}>
+                        <PrimaryButton
+                            bgcolor={"#001f3f"}
+                            icon={<SearchIcon />}
+                            title="Search"
+                            sx={{ marginTop: "30px" }}
+                            onClick={() => getCustomerQueue(null, null, null)}
+                            loading={loading}
+                        />
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
+
+            </Grid>
+        </Grid>
+        <Box >
+
+
+            {<DataTable loading={loader} total={true} csvName={'category_report'} data={customerQueue} columns={columns} />}
+        </Box>
+
+    </Box>
+);
 }
 
 export default EmployeeWiseSalesReport;
