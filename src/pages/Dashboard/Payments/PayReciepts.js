@@ -822,7 +822,7 @@ function PayReceipts() {
                     )}
 
 
-                    {[1000, 3, 2].includes(user?.role_id) && (!row?.original?.invoice_number?.includes('TSL')) && (
+                    {[1000, 3, 2].includes(user?.role_id) && (!row?.original?.invoice_number?.includes('TSL')) && (row?.original?.is_paid )&& (
                         <Tooltip title="Update Payment">
                             <IconButton
                                 onClick={() => {
