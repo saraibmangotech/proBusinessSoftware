@@ -432,6 +432,7 @@ function CustomerPaymentList() {
                         src={Images.detailIcon}
                         width={"35px"}
                     ></Box>}
+                    {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/customer-payment-update/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'} height={'35px'}></Box>}
                     <Box>
                         {true && (
                             <Box

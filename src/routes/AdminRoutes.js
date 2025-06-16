@@ -333,8 +333,11 @@ const FundTransferVoucherDetail = lazy(() =>
 const CustomerPaymentList = lazy(() =>
   import("pages/Dashboard/CustomerPayment/CustomerPaymentList")
 );
-const UpdateCustomerPayment = lazy(() =>
+const CustomerPaymentDetail = lazy(() =>
   import("pages/Dashboard/CustomerPayment/CustomerPaymentDetail")
+);
+const UpdateCustomerPayment = lazy(() =>
+  import("pages/Dashboard/CustomerPayment/UpdateCustomerPayment")
 );
 const SnapshotCategoryReport = lazy(() =>
   import("pages/Dashboard/Reports/SnapshotCategoryReport")
@@ -821,7 +824,7 @@ const AdminRoutes = [
   },
   {
     path: "/customer-payment-detail/:id",
-    component: <UpdateCustomerPayment />,
+    component: <CustomerPaymentDetail />,
   },
   {
     path: "/vendor-payment-detail/:id",
@@ -838,6 +841,10 @@ const AdminRoutes = [
   {
     path: "/update-payment-method/:id",
     component: <UpdatePaidReceipt />,
+  },
+  {
+    path: "/customer-payment-update/:id",
+    component: <UpdateCustomerPayment />,
   },
   {
     path: "/create-aldeed",

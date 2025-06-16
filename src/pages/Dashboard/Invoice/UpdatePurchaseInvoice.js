@@ -1469,8 +1469,8 @@ function UpdatePurchaseInvoice() {
                                                 {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
                                                     let selectedID = item?.id
-                                                    setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                    let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                                                    setRows(rows?.filter(item2 => item2?.unique_id != item?.unique_id))
+                                                    let filteredData = rows?.filter(item2 => item2?.unique_id != item?.unique_id)
                                                     // 👇 Calculate total after updating rows
                                                     const total = filteredData.reduce((sum, item) => {
                                                         // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)

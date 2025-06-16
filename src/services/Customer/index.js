@@ -10,6 +10,10 @@ const CustomerServices = {
     const data = await patch(routes.UpdatePaidReceipt, obj);
     return data;
   },
+  customerPaymentUpdate: async (obj) => {
+    const data = await patch(routes.customerPaymentUpdate, obj);
+    return data;
+  },
   RefundInvoice: async (obj) => {
     const data = await post(routes.RefundInvoice, obj);
     return data;
