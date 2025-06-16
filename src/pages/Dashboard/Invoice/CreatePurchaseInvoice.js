@@ -95,7 +95,7 @@ function CreatePurchaseInvoice() {
     const [selectedCard, setSelectedCard] = useState(null)
     const [payments, setPayments] = useState([])
     const [isVatApplicable, setIsVatApplicable] = useState(true);
-
+    const [vatToggle, setVatToggle] = useState(false)
     console.log(rows, "data");
     const [items, setItems] = useState([
         {
@@ -153,15 +153,23 @@ function CreatePurchaseInvoice() {
             (parseFloat(centerFee) || 0) +
             (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", parseFloat(finalTotal).toFixed(2));
-    }, [govtFee, centerFee, bankCharges, qty]);
+        let vat = rows?.reduce((total, item) => {
+            const fee = Number.parseFloat(item?.center_fee ?? 0);
+            const qty = Number.parseFloat(item?.quantity ?? 1);
+            return total + parseFloat(fee * qty);
+        }, 0) * 0.05
+        console.log(vatToggle, 'vatToggle');
+
+
+    }, [govtFee, centerFee, bankCharges, qty, vatToggle]);
     useEffect(() => {
         console.log(rows, 'rowsrowsrows');
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
 
         console.log(grandTotal); // Output: 100
-        setValue1('total', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
+       let  total = parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+        setValue1('total',total)
+        setValue1('finalTotal',total)
         setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
         setValue1('paidamount', 0)
     }, [rows]);
@@ -175,7 +183,7 @@ function CreatePurchaseInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
-    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center, quantity, charges, description, ref, total, vatVal) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -213,6 +221,7 @@ function CreatePurchaseInvoice() {
 
         // Create a new row
         const newRow = {
+            unique_id: Date.now() + Math.random(), // Ensure unique key
             product_id: serviceItem?.id,
             item,
             quantity: parsedQuantity,
@@ -221,7 +230,9 @@ function CreatePurchaseInvoice() {
             ref,
             total: parsedTotal,
             selectedService: serviceItem,
-            cost_center: selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name,
+            vat_enabled: vatVal,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05 ).toFixed(2) : 0
         };
         console.log(newRow);
 
@@ -248,6 +259,7 @@ function CreatePurchaseInvoice() {
         setValue("application_id", '');
         setValue("description", '');
         setValue("ref", '');
+        setValue("total", '');
         setServiceItem(null);
         setValue("quantity", '');
     };
@@ -623,6 +635,14 @@ function CreatePurchaseInvoice() {
             setValue("quantity", 1);
             setValue("description", value?.description);
             setValue("charges", value?.price);
+            let vat = parseFloat(value?.price) * 0.05
+            console.log(vat, 'vatToggle');
+            if (vatToggle) {
+                setValue("total", parseFloat(parseFloat(value?.price) + vat).toFixed(2));
+            }
+            else {
+                setValue("total", parseFloat(value?.price).toFixed(2));
+            }
         }
         else {
             setValue("id", '');
@@ -700,9 +720,9 @@ function CreatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
+    const updateItem = (item2, cost_center, quantity, charges, description, ref, total, vatVal, id) => {
         console.log("Current serviceItem:", serviceItem);
-
+        console.log("Matching item2.unique_id:", item2?.unique_id);
         // Parse numeric values
         const parsedQuantity = parseFloat(quantity);
         const parsedCharges = parseFloat(charges);
@@ -727,7 +747,7 @@ function CreatePurchaseInvoice() {
 
         // Updated item using current form data and serviceItem
         const updatedItem = {
-            id: item2.id, // Ensure ID is retained
+
             item: item2.item || '',
             quantity: parsedQuantity,
             charge: parsedCharges,
@@ -736,7 +756,9 @@ function CreatePurchaseInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
-            cost_center: selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name,
+            vat_enabled: vatVal,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05 ).toFixed(2) : 0
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -745,7 +767,7 @@ function CreatePurchaseInvoice() {
             console.log("Previous rows:", prevItems);
 
             const updatedRows = prevItems.map((item) =>
-                item.product_id === item2.id ? updatedItem : item
+                item.unique_id === selectedRow.unique_id ? updatedItem : item
             );
 
             console.log("Rows after update:", updatedRows);
@@ -778,6 +800,7 @@ function CreatePurchaseInvoice() {
         setValue("application_id", '');
         setValue("description", '');
         setValue("ref", '');
+        setValue("total", '');
         setServiceItem(null);
         setValue("quantity", '');
     };
@@ -971,14 +994,14 @@ function CreatePurchaseInvoice() {
     useEffect(() => {
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
-
+        let total =parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
         const totalWithVat = isVatApplicable
             ? parseFloat((grandTotal * 0.05) + grandTotal)
             : grandTotal;
 
-        setValue1('total', totalWithVat.toFixed(2));
-        setValue1('finalTotal', totalWithVat.toFixed(2));
-        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
+        setValue1('total', total.toFixed(2));
+        setValue1('finalTotal', total.toFixed(2));
+        setValue1('balance', (total - grandTotal2).toFixed(2));
     }, [isVatApplicable, rows, payments]);
 
 
@@ -1144,6 +1167,7 @@ function CreatePurchaseInvoice() {
                                     <TableCell sx={{ width: "150px" }}> Charges</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Description</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
+                                    <TableCell sx={{ width: "150px" }}>Vat</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Total</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Action</TableCell>
                                 </TableRow>
@@ -1204,23 +1228,64 @@ function CreatePurchaseInvoice() {
                                             disabled={detail?.is_paid}
                                             placeholder="Quantity"
                                             type="number"
-                                            register={register("quantity", { required: false })}
+                                            register={register("quantity", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+
+                                                    }
+
+                                                },
+                                            })}
                                         />
-                                        {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
+                                        {errors.quantity && (
+                                            <span style={{ color: "red" }}>{errors.quantity.message}</span>
+                                        )}
                                     </TableCell>
 
+                                    {/* Charges Field */}
                                     <TableCell>
                                         <InputField
                                             size="small"
-
+                                            disabled={detail?.is_paid}
                                             placeholder="Charges"
+                                            type="number"
+                                            register={register("charges", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+                                                    }
 
-                                            register={register("charges", { required: false })}
-
+                                                },
+                                            })}
                                         />
-                                        {errors.charges && <span style={{ color: "red" }}>{errors.charges.message}</span>}
-
+                                        {errors.charges && (
+                                            <span style={{ color: "red" }}>{errors.charges.message}</span>
+                                        )}
                                     </TableCell>
+
 
                                     <TableCell>
                                         <InputField
@@ -1252,7 +1317,29 @@ function CreatePurchaseInvoice() {
                                             </span>
                                         )}
                                     </TableCell>
+                                    <TableCell>
+                                        <Switch
+                                            checked={vatToggle}
+                                            onChange={(e) => {
+                                                setVatToggle(e.target.checked);
 
+                                                const quantity = parseFloat(getValues('quantity')) || 0;
+                                                const charges = parseFloat(getValues('charges')) || 0;
+                                                const subtotal = quantity * charges;
+                                                const vat = subtotal * 0.05;
+
+                                                console.log(vat, 'vatToggle');
+
+                                                if (e.target.checked) {
+                                                    setValue("total", (subtotal + vat).toFixed(2));
+                                                } else {
+                                                    setValue("total", subtotal.toFixed(2));
+                                                }
+                                            }}
+
+                                            color="primary"
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <InputField
                                             disabled={true}
@@ -1266,7 +1353,7 @@ function CreatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1281,7 +1368,7 @@ function CreatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1308,6 +1395,7 @@ function CreatePurchaseInvoice() {
                                                     setValue("transaction_id", '');
                                                     setValue("application_id", '');
                                                     setValue("ref_no", '');
+                                                    setValue("total", '');
                                                     setServiceItem(null);
                                                     setValue("quantity", '');
                                                 }}
@@ -1337,19 +1425,20 @@ function CreatePurchaseInvoice() {
                                         <TableCell>{item?.charge}</TableCell>
                                         <TableCell>{item?.description}</TableCell>
                                         <TableCell>{item?.ref}</TableCell>
-
+                                        <TableCell>{item?.vat_enabled ? 'Enabled' : 'Disabled'}</TableCell>
                                         <TableCell>{item?.total}</TableCell>
                                         <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
                                             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                 setSelectedRow(item); setEditState(true)
                                                 console.log(item);
-
+                                                setVatToggle(item?.vat_enabled)
                                                 setValue("id", item?.product_id);
                                                 setValue("item_code", item?.product_id);
                                                 setValue("description", item?.description);
                                                 setValue("ref", item?.ref);
                                                 setValue("charges", item?.charge);
+                                                setValue("total", item?.total);
                                                 setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                                 setValue("ref_no", item?.ref_no);
                                                 setValue("service", item?.service);
@@ -1384,45 +1473,32 @@ function CreatePurchaseInvoice() {
                                 ))}
 
                                 <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                    <TableCell colSpan={8} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)}</Typography> {/* Display the Sub-total */}
                                     </TableCell>
                                 </TableRow>
-
                                 <TableRow>
-
-                                    <TableCell colSpan={7} align="right">
-                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                            <Switch
-                                                checked={isVatApplicable}
-                                                onChange={(e) => setIsVatApplicable(e.target.checked)}
-                                                color="primary"
-                                            />
-                                            <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
-                                        </Box>
+                                    <TableCell colSpan={8} align="right">
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total-Vat:</Typography>
                                     </TableCell>
-
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                                            {isVatApplicable
-                                                ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
-                                                : "0.00"}
-                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item.vat_enabled ? item.tax  : 0), 0)}</Typography> {/* Display the Sub-total */}
                                     </TableCell>
                                 </TableRow>
 
+
                                 <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                    <TableCell colSpan={8} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
                                             {(
-                                                parseFloat(subTotal) +
-                                                (isVatApplicable ? parseFloat(subTotal) * 0.05 : 0)
+                                                parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+
                                             ).toFixed(2)}
                                         </Typography>
                                     </TableCell>

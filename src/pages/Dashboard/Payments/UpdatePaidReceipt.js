@@ -218,24 +218,8 @@ function UpdatePaidReceipt() {
             setButtonDisabled(true)
             try {
                 const obj = {
-                    id: getValues1("invoicenumber"),
-                    total_amount: detail?.total_amount,
-                    items: rows,
-                    paid_date: moment(paidAt).format('MM-DD-YYYY'),
-                    paid_amount: detail?.amount,
+                    id: id,
 
-                    remarks: formData?.remarks,
-                    narration: formData?.narration,
-                    payment_mode: paymentModesString,
-                    payment_status: 'Paid',
-                    charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.center_fee || 0), 0),
-                    govt_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.govt_fee || 0), 0),
-                    bank_charges: detail?.sale_receipt_items?.reduce((acc, item) => acc + Number(item?.bank_charge || 0), 0),
-                    additional_charges_value: totalAdditionalCharges,
-
-                    customer_id: detail?.customer_id,
-                    invoice_prefix: detail?.invoice_prefix,
-                    category_id: detail?.sale_receipt_items[0]?.service?.category_id,
                     payment_methods: payments,
 
                 }
@@ -244,7 +228,7 @@ function UpdatePaidReceipt() {
                 if (detail?.is_paid == true) {
                     ErrorToaster("Already paid")
                 } else {
-                    const promise = CustomerServices.PayReceipt(obj)
+                    const promise = CustomerServices.UpdatePaidReceipt(obj)
                     const response = await promise
                     showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
                     if (response?.responseCode === 200) {
@@ -262,6 +246,22 @@ function UpdatePaidReceipt() {
             showErrorToast(`Remaining amount to be added is ${difference.toFixed(2)}`)
         }
     }
+    useEffect(() => {
+        const newSubTotal = rows.reduce((sum, row) => sum + row.total, 0)
+
+        let vat = round(
+            rows?.reduce((total, item) => {
+                const fee = Number.parseFloat(item?.center_fee ?? 0);
+                const qty = Number.parseFloat(item?.quantity ?? 1);
+                return total + round(fee * qty);
+            }, 0) * 0.05
+        )
+        setSubTotal(newSubTotal)
+        setValue1('total', newSubTotal +vat )
+        setValue1('finalTotal', newSubTotal + vat)
+        setValue1('amount', 0)
+    }, [rows])
+
 
     const handleCredit = async (formData) => {
 
@@ -689,11 +689,11 @@ function UpdatePaidReceipt() {
         console.log(total, 'total');
         console.log(existingTotal, 'existingTotal');
         console.log(total, 'total');
-        console.log(parseFloat(parseFloat(total) - parseFloat(existingTotal)), 'minusval');
+        console.log(parseFloat(round(parseFloat(total)) - round(parseFloat(existingTotal))), 'minusval');
 
-        setValue1('amount', parseFloat(existingTotal).toFixed(2))
-        setValue1('balance', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
-        setValue1('payamount', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
+        setValue1('amount', round(parseFloat(existingTotal).toFixed(2)))
+        setValue1('balance', round(parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2)))
+        setValue1('payamount', round(parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2)))
 
         if (payments?.length > 0) {
             setChargesDisabled(true)
@@ -857,7 +857,11 @@ function UpdatePaidReceipt() {
             setValue1('ref', detail?.ref)
             setValue1('trn', detail?.customer?.trn)
             setValue1('address', detail?.customer?.address)
-            
+            setRows(detail?.sale_receipt_items)
+            setPayButton(true)
+
+
+
         } catch (error) {
             console.error("Error fetching location:", error);
         }
@@ -1084,10 +1088,7 @@ function UpdatePaidReceipt() {
                                                     placeholder="Mobile No"
                                                     disabled={true}
                                                     register={register1("mobile", {
-                                                        pattern: {
-                                                            value: /^05[0-9]{8}$/,
-                                                            message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                                        },
+
                                                     })}
                                                     error={errors1?.mobile?.message}
                                                 />
@@ -1202,7 +1203,7 @@ function UpdatePaidReceipt() {
                                                     <TextField
                                                         size="small"
                                                         placeholder="Transaction Id"
-                                                        disabled={oldRows[index].transaction_id ? true : false}
+                                                        disabled={false}
                                                         type="text"
                                                         value={item.transaction_id || ""}
                                                         onChange={(e) => handleInputChange(index, "transaction_id", e.target.value)}
@@ -1717,7 +1718,7 @@ function UpdatePaidReceipt() {
                                                 },
                                             }}
                                         >
-                                            Create Receipt
+                                            Update Payment
                                         </Button>
                                     </Grid>
                                 </Grid>

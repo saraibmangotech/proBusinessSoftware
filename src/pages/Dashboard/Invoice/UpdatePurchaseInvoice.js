@@ -95,7 +95,7 @@ function UpdatePurchaseInvoice() {
     const [selectedCard, setSelectedCard] = useState(null)
     const [payments, setPayments] = useState([])
     const [isVatApplicable, setIsVatApplicable] = useState(false);
-
+    const [vatToggle, setVatToggle] = useState(false)
     console.log(rows, "data");
     const [items, setItems] = useState([
         {
@@ -147,112 +147,135 @@ function UpdatePurchaseInvoice() {
     const centerFee = watch("center_fee", 0);
     const bankCharges = watch("charges", 0);
     const qty = watch("quantity", 1);
-    useEffect(() => {
-        const feesTotal =
-            (parseFloat(govtFee) || 0) +
-            (parseFloat(centerFee) || 0) +
-            (parseFloat(bankCharges) || 0);
-        const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", parseFloat(finalTotal).toFixed(2));
-    }, [govtFee, centerFee, bankCharges, qty]);
-    useEffect(() => {
-        console.log(rows, 'rowsrowsrows');
-        const grandTotal = rows?.reduce((acc, item) => acc + parseFloat(item.total), 0);
+      useEffect(() => {
+          const feesTotal =
+              (parseFloat(govtFee) || 0) +
+              (parseFloat(centerFee) || 0) +
+              (parseFloat(bankCharges) || 0);
+          const finalTotal = feesTotal * (parseFloat(qty) || 1);
+          let vat = rows?.reduce((total, item) => {
+              const fee = Number.parseFloat(item?.center_fee ?? 0);
+              const qty = Number.parseFloat(item?.quantity ?? 1);
+              return total + parseFloat(fee * qty);
+          }, 0) * 0.05
+          console.log(vatToggle, 'vatToggle');
+  
+  
+      }, [govtFee, centerFee, bankCharges, qty, vatToggle]);
+      useEffect(() => {
+          console.log(rows, 'rowsrowsrows');
+          const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
+  
+          console.log(grandTotal); // Output: 100
+         let  total = parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+          setValue1('total',total)
+          setValue1('finalTotal',total)
+          setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
+          setValue1('paidamount', 0)
+      }, [rows]);
+      useEffect(() => {
+          console.log(payments, 'paymentspaymentspayments');
+          const grandTotal = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+          console.log(grandTotal);
+          setValue1('balance', parseFloat(getValues1('finalTotal')) - parseFloat(grandTotal))
+          setValue1('paidamount', grandTotal)
+  
+          // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
+          // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
+      }, [payments]);
+     useEffect(() => {
+         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
+         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+         let total =parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+         const totalWithVat = isVatApplicable
+             ? parseFloat((grandTotal * 0.05) + grandTotal)
+             : grandTotal;
+ 
+         setValue1('total', total.toFixed(2));
+         setValue1('finalTotal', total.toFixed(2));
+         setValue1('balance', (total - grandTotal2).toFixed(2));
+     }, [isVatApplicable, rows, payments]);
 
-        console.log(grandTotal); // Output: 100
-        setValue1('total', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('paidamount', 0)
-    }, [rows]);
-    useEffect(() => {
-        console.log(payments, 'paymentspaymentspayments');
-        const grandTotal = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
-        console.log(grandTotal);
-        setValue1('balance', parseFloat(getValues1('finalTotal')) - parseFloat(grandTotal))
-        setValue1('paidamount', grandTotal)
-
-        // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
-        // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
-    }, [payments]);
-    useEffect(() => {
-        const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
-        const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
-
-        const totalWithVat = isVatApplicable
-            ? parseFloat((grandTotal * 0.05) + grandTotal)
-            : grandTotal;
-
-        setValue1('total', totalWithVat.toFixed(2));
-        setValue1('finalTotal', totalWithVat.toFixed(2));
-        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
-    }, [isVatApplicable, rows, payments]);
-
-    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
-        console.log(item?.impact_account_id);
-
-        // Parse numeric inputs
-        const parsedQuantity = parseFloat(quantity);
-        const parsedCharges = parseFloat(charges);
-        const parsedTotal = parseFloat(total);
-
-        // Basic required field validation
-        if (!item || !cost_center || quantity === "" || charges === "") {
-            showErrorToast("Item, quantity,cost center and charges are required!");
-            return;
-        }
-
-        // Check for negative values
-        if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
-            showErrorToast("Quantity, charges, and total must be 0 or greater!");
-            return;
-        }
-
-        // Check for consistent impact account ID
-        if (rows.length > 0) {
-            const firstImpactAccountId = rows[0].item?.impact_account_id;
-            if (item?.impact_account_id !== firstImpactAccountId) {
-                // showErrorToast("You cannot add items with a different impact account.");
-                // return;
-            }
-        }
-
-        // Check for duplicate product
-        // const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
-        // if (isDuplicate) {
-        //     showErrorToast("This product has already been added.");
-        //     return;
-        // }
-
-        // Create a new row
-        const newRow = {
-            product_id: serviceItem?.id,
-            item,
-            quantity: parsedQuantity,
-            charge: parsedCharges,
-            description,
-            ref,
-            total: parsedTotal,
-            selectedService: serviceItem,
-            cost_center: selectedCostCenter?.name
-        };
-        console.log(newRow);
-
-        // Update rows and subtotal
-        setRows((prevRows) => {
-            const updatedRows = [...prevRows, newRow];
-            const newSubTotal = updatedRows.reduce(
-                (sum, row) => sum + parseFloat(row.total || 0),
-                0
-            );
-            setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-            return updatedRows;
-        });
-
-        setPayments([]);
-        setServiceItem("");
-        setSelectedCostCenter('')
-    };
+    const addItem = (item, cost_center, quantity, charges, description, ref, total, vatVal) => {
+          console.log(item?.impact_account_id);
+  
+          // Parse numeric inputs
+          const parsedQuantity = parseFloat(quantity);
+          const parsedCharges = parseFloat(charges);
+          const parsedTotal = parseFloat(total);
+  
+          // Basic required field validation
+          if (!item || !cost_center || quantity === "" || charges === "") {
+              showErrorToast("Item, quantity,cost center and charges are required!");
+              return;
+          }
+  
+          // Check for negative values
+          if (parsedQuantity < 0 || parsedCharges < 0 || parsedTotal < 0) {
+              showErrorToast("Quantity, charges, and total must be 0 or greater!");
+              return;
+          }
+  
+          // Check for consistent impact account ID
+          if (rows.length > 0) {
+              const firstImpactAccountId = rows[0].item?.impact_account_id;
+              if (item?.impact_account_id !== firstImpactAccountId) {
+                  // showErrorToast("You cannot add items with a different impact account.");
+                  // return;
+              }
+          }
+  
+          // Check for duplicate product
+          // const isDuplicate = rows.some(row => row.product_id === serviceItem?.id);
+          // if (isDuplicate) {
+          //     showErrorToast("This product has already been added.");
+          //     return;
+          // }
+  
+          // Create a new row
+          const newRow = {
+              unique_id: Date.now() + Math.random(), // Ensure unique key
+              product_id: serviceItem?.id,
+              item,
+              quantity: parsedQuantity,
+              charge: parsedCharges,
+              description,
+              ref,
+              total: parsedTotal,
+              selectedService: serviceItem,
+              cost_center: selectedCostCenter?.name,
+              vat_enabled: vatVal,
+              tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05 ).toFixed(2) : 0
+          };
+          console.log(newRow);
+  
+          // Update rows and subtotal
+          setRows((prevRows) => {
+              const updatedRows = [...prevRows, newRow];
+              const newSubTotal = updatedRows.reduce(
+                  (sum, row) => sum + parseFloat(row.total || 0),
+                  0
+              );
+              setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+              return updatedRows;
+          });
+  
+          setPayments([]);
+          setServiceItem("");
+          setSelectedCostCenter('')
+          setValue("id", '');
+          setValue("item_code", '');
+          setValue("govt_fee", '');
+          setValue("center_fee", '');
+          setValue("charges", '');
+          setValue("transaction_id", '');
+          setValue("application_id", '');
+          setValue("description", '');
+          setValue("ref", '');
+          setValue("total", '');
+          setServiceItem(null);
+          setValue("quantity", '');
+      };
 
 
     const { id } = useParams()
@@ -387,6 +410,7 @@ function UpdatePurchaseInvoice() {
                 const obj = {
                     id: id,
                     vendor_id: selectedVendor?.id,
+                    vendor_account_id: selectedVendor?.account_id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     items: rows,
@@ -615,8 +639,16 @@ function UpdatePurchaseInvoice() {
             setValue("id", value?.id);
             setValue("item_code", value?.id);
             setValue("quantity", 1);
-
+            setValue("description", value?.description);
             setValue("charges", value?.price);
+            let vat = parseFloat(value?.price) * 0.05
+            console.log(vat, 'vatToggle');
+            if (vatToggle) {
+                setValue("total", parseFloat(parseFloat(value?.price) + vat).toFixed(2));
+            }
+            else {
+                setValue("total", parseFloat(value?.price).toFixed(2));
+            }
         }
         else {
             setValue("id", '');
@@ -625,7 +657,7 @@ function UpdatePurchaseInvoice() {
             setValue("charges", '');
             setValue("transaction_id", '');
             setValue("application_id", '');
-            setValue("ref_no", '');
+            setValue("ref", '');
             setServiceItem(null);
             setValue("quantity", '');
         }
@@ -723,9 +755,9 @@ function UpdatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
+   const updateItem = (item2, cost_center, quantity, charges, description, ref, total, vatVal, id) => {
         console.log("Current serviceItem:", serviceItem);
-
+        console.log("Matching item2.unique_id:", item2?.unique_id);
         // Parse numeric values
         const parsedQuantity = parseFloat(quantity);
         const parsedCharges = parseFloat(charges);
@@ -750,7 +782,7 @@ function UpdatePurchaseInvoice() {
 
         // Updated item using current form data and serviceItem
         const updatedItem = {
-            id: item2.id, // Ensure ID is retained
+
             item: item2.item || '',
             quantity: parsedQuantity,
             charge: parsedCharges,
@@ -759,7 +791,9 @@ function UpdatePurchaseInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
-            cost_center: selectedCostCenter?.name
+            cost_center: selectedCostCenter?.name,
+            vat_enabled: vatVal,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05 ).toFixed(2) : 0
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -768,7 +802,7 @@ function UpdatePurchaseInvoice() {
             console.log("Previous rows:", prevItems);
 
             const updatedRows = prevItems.map((item) =>
-                item.product_id === item2.id ? updatedItem : item
+                item.unique_id === selectedRow.unique_id ? updatedItem : item
             );
 
             console.log("Rows after update:", updatedRows);
@@ -785,11 +819,25 @@ function UpdatePurchaseInvoice() {
         });
 
         console.log("Resetting form and states...");
-        reset();
+
         setServiceItem(null);
         setSelectedCostCenter(null)
         setPayments([])
         setEditState(false);
+        setServiceItem("");
+        setSelectedCostCenter('')
+        setValue("id", '');
+        setValue("item_code", '');
+        setValue("govt_fee", '');
+        setValue("center_fee", '');
+        setValue("charges", '');
+        setValue("transaction_id", '');
+        setValue("application_id", '');
+        setValue("description", '');
+        setValue("ref", '');
+        setValue("total", '');
+        setServiceItem(null);
+        setValue("quantity", '');
     };
 
 
@@ -939,7 +987,8 @@ function UpdatePurchaseInvoice() {
             const updatedItems = detail?.invoice_items?.map(item => ({
                 ...item,
                 selectedService: item.product,
-                total: parseFloat(item.charge) * parseInt(item.quantity)
+                total: item?.vat_enabled ? parseFloat((parseFloat(item.charge) * parseInt(item.quantity))+parseFloat(item?.tax)) : parseFloat(item.charge) * parseInt(item.quantity),
+                
             }));
             const grandTotal = updatedItems.reduce((sum, item) => {
                 return sum + (parseFloat(item.total) || 0);
@@ -1081,10 +1130,7 @@ function UpdatePurchaseInvoice() {
                                         placeholder="Mobile No"
                                         disabled={true}
                                         register={register1("mobile", {
-                                            pattern: {
-                                                value: /^05[0-9]{8}$/,
-                                                message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                            },
+                                        
                                         })}
                                         error={errors1?.mobile?.message}
                                     />
@@ -1125,6 +1171,7 @@ function UpdatePurchaseInvoice() {
                     </Box>
 
 
+
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
@@ -1137,6 +1184,7 @@ function UpdatePurchaseInvoice() {
                                     <TableCell sx={{ width: "150px" }}> Charges</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Description</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
+                                    <TableCell sx={{ width: "150px" }}>Vat</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Total</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Action</TableCell>
                                 </TableRow>
@@ -1197,23 +1245,64 @@ function UpdatePurchaseInvoice() {
                                             disabled={detail?.is_paid}
                                             placeholder="Quantity"
                                             type="number"
-                                            register={register("quantity", { required: false })}
+                                            register={register("quantity", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+
+                                                    }
+
+                                                },
+                                            })}
                                         />
-                                        {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
+                                        {errors.quantity && (
+                                            <span style={{ color: "red" }}>{errors.quantity.message}</span>
+                                        )}
                                     </TableCell>
 
+                                    {/* Charges Field */}
                                     <TableCell>
                                         <InputField
                                             size="small"
-
+                                            disabled={detail?.is_paid}
                                             placeholder="Charges"
+                                            type="number"
+                                            register={register("charges", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+                                                    }
 
-                                            register={register("charges", { required: false })}
-
+                                                },
+                                            })}
                                         />
-                                        {errors.charges && <span style={{ color: "red" }}>{errors.charges.message}</span>}
-
+                                        {errors.charges && (
+                                            <span style={{ color: "red" }}>{errors.charges.message}</span>
+                                        )}
                                     </TableCell>
+
 
                                     <TableCell>
                                         <InputField
@@ -1245,7 +1334,29 @@ function UpdatePurchaseInvoice() {
                                             </span>
                                         )}
                                     </TableCell>
+                                    <TableCell>
+                                        <Switch
+                                            checked={vatToggle}
+                                            onChange={(e) => {
+                                                setVatToggle(e.target.checked);
 
+                                                const quantity = parseFloat(getValues('quantity')) || 0;
+                                                const charges = parseFloat(getValues('charges')) || 0;
+                                                const subtotal = quantity * charges;
+                                                const vat = subtotal * 0.05;
+
+                                                console.log(vat, 'vatToggle');
+
+                                                if (e.target.checked) {
+                                                    setValue("total", (subtotal + vat).toFixed(2));
+                                                } else {
+                                                    setValue("total", subtotal.toFixed(2));
+                                                }
+                                            }}
+
+                                            color="primary"
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <InputField
                                             disabled={true}
@@ -1259,7 +1370,7 @@ function UpdatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1274,7 +1385,149 @@ function UpdatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
+                                            sx={{
+                                                textTransform: 'capitalize',
+                                                backgroundColor: "#001f3f",
+                                                fontSize: "12px",
+                                                ":hover": {
+                                                    backgroundColor: "#001f3f",
+                                                },
+                                            }}
+                                        >
+                                            Update
+                                        </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+
+                                                onClick={() => {
+                                                    setEditState(false)
+
+                                                    setValue("id", '');
+                                                    setValue("item_code", '');
+                                                    setValue("govt_fee", '');
+                                                    setValue("center_fee", '');
+                                                    setValue("charges", '');
+                                                    setValue("transaction_id", '');
+                                                    setValue("application_id", '');
+                                                    setValue("ref_no", '');
+                                                    setValue("total", '');
+                                                    setServiceItem(null);
+                                                    setValue("quantity", '');
+                                                }}
+                                                sx={{
+                                                    mt: 2,
+                                                    textTransform: 'capitalize',
+                                                    backgroundColor: "#001f3f",
+                                                    fontSize: "12px",
+                                                    ":hover": {
+                                                        backgroundColor: "#001f3f",
+                                                    },
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button></>}
+                                    </TableCell>
+                                </TableRow>}
+
+                                {rows?.length > 0 && rows?.map((item, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
+                                        <TableCell>{item?.product_id}</TableCell>
+                                        <TableCell>{item?.selectedService?.name}</TableCell>
+                                        <TableCell>{item?.cost_center}</TableCell>
+                                        <TableCell>{item?.quantity}</TableCell>
+
+                                        <TableCell>{item?.charge}</TableCell>
+                                        <TableCell>{item?.description}</TableCell>
+                                        <TableCell>{item?.ref}</TableCell>
+                                        <TableCell>{item?.vat_enabled ? 'Enabled' : 'Disabled'}</TableCell>
+                                        <TableCell>{item?.total}</TableCell>
+                                        <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
+
+                                            {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
+                                                setSelectedRow(item); setEditState(true)
+                                                console.log(item);
+                                                setVatToggle(item?.vat_enabled)
+                                                setValue("id", item?.product_id);
+                                                setValue("item_code", item?.product_id);
+                                                setValue("description", item?.description);
+                                                setValue("ref", item?.ref);
+                                                setValue("charges", item?.charge);
+                                                setValue("total", item?.total);
+                                                setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
+                                                setValue("ref_no", item?.ref_no);
+                                                setValue("service", item?.service);
+                                                setServiceItem(item?.selectedService);
+                                                setValue("quantity", item?.quantity);
+                                                console.log(item?.service)
+
+                                            }} src={Images.editIcon} width={'35px'}></Box>}
+                                            <Box>
+                                                {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
+
+                                                    let selectedID = item?.id
+                                                    setRows(rows?.filter(item2 => item2?.id != item?.id))
+                                                    let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                                                    // 👇 Calculate total after updating rows
+                                                    const total = filteredData.reduce((sum, item) => {
+                                                        // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
+                                                        return sum + (parseFloat(item.total) || 0);
+                                                    }, 0);
+
+                                                    console.log("New total after update:", total);
+
+                                                    // You can update a state for total if you have one:
+                                                    setSubTotal(total); // <-- Make sure to declare this with useState
+                                                }} width={'35px'}></Box>}
+
+
+                                            </Box>
+
+                                        </Box></TableCell>
+                                    </TableRow>
+                                ))}
+
+                                <TableRow>
+                                    <TableCell colSpan={8} align="right">
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)}</Typography> {/* Display the Sub-total */}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell colSpan={8} align="right">
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total-Vat:</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item.vat_enabled ? item.tax  : 0), 0)}</Typography> {/* Display the Sub-total */}
+                                    </TableCell>
+                                </TableRow>
+
+
+                                <TableRow>
+                                    <TableCell colSpan={8} align="right">
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
+                                            {(
+                                                parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+
+                                            ).toFixed(2)}
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+
+                                <TableRow>
+                                    <TableCell colSpan={10} align="right">
+                                        <Grid container gap={2} justifyContent={"center"}>
+                                        {editState && <> <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1317,93 +1570,9 @@ function UpdatePurchaseInvoice() {
                                             >
                                                 Cancel
                                             </Button></>}
-                                    </TableCell>
-                                </TableRow>}
-
-                                {rows?.length > 0 && rows?.map((item, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
-                                        <TableCell>{item?.product_id}</TableCell>
-
-                                        <TableCell>{item?.selectedService?.name}</TableCell>
-                                        <TableCell>{item?.cost_center}</TableCell>
-                                        <TableCell>{item?.quantity}</TableCell>
-
-                                        <TableCell>{item?.charge}</TableCell>
-                                        <TableCell>{item?.description}</TableCell>
-                                        <TableCell>{item?.ref}</TableCell>
-
-                                        <TableCell>{item?.total}</TableCell>
-                                        <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
-
-                                            {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
-                                                setSelectedRow(item); setEditState(true)
-                                                console.log(item);
-
-                                                setValue("id", item?.product_id);
-                                                setValue("item_code", item?.product_id);
-                                                setValue("description", item?.description);
-                                                setValue("ref", item?.ref);
-                                                setValue("charges", item?.charge);
-
-                                                setValue("ref_no", item?.ref_no);
-                                                setValue("service", item?.service);
-                                                setServiceItem(item?.selectedService);
-                                                setValue("quantity", item?.quantity);
-                                                console.log(item?.service)
-
-                                            }} src={Images.editIcon} width={'35px'}></Box>}
-                                            <Box>
-                                                {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
-
-                                                    let selectedID = item?.id
-                                                    setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                    let filteredData = rows?.filter(item2 => item2?.id != item?.id)
-                                                    // 👇 Calculate total after updating rows
-                                                    const total = filteredData.reduce((sum, item) => {
-                                                        // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
-                                                        return sum + (parseFloat(item.total) || 0);
-                                                    }, 0);
-
-                                                    console.log("New total after update:", total);
-
-                                                    // You can update a state for total if you have one:
-                                                    setSubTotal(total); // <-- Make sure to declare this with useState
-                                                }} width={'35px'}></Box>}
-
-
-                                            </Box>
-
-                                        </Box></TableCell>
-                                    </TableRow>
-                                ))}
-
-                                <TableRow>
-                                    <TableCell colSpan={7} align="right">
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                                        </Grid>
                                     </TableCell>
                                 </TableRow>
-
-                                <TableCell colSpan={7} align="right">
-                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                        <Switch
-                                            checked={isVatApplicable}
-                                            onChange={(e) => setIsVatApplicable(e.target.checked)}
-                                            color="primary"
-                                        />
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
-                                    </Box>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                                        {isVatApplicable
-                                            ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
-                                            : "0.00"}
-                                    </Typography>
-                                </TableCell>
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
@@ -1446,263 +1615,7 @@ function UpdatePurchaseInvoice() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    {payButton && (
-                        <Grid container mt={2} spacing={2}>
-                            <Grid item md={3} sm={12} xs={12}>
-                                <InputField
-                                    label="Total Amount"
-                                    size="small"
-                                    disabled={true}
-                                    placeholder="Total Amount"
-                                    register={register1("total", {
-                                        required: "please enter total .",
-                                    })}
-                                    error={errors1?.total?.message}
-                                />
-                            </Grid>
-                            <Grid item md={3} sm={12} xs={12}>
-                                <InputField
-                                    label="Additional Percentage"
-                                    size="small"
-                                    disabled={payments.length > 0}
-                                    placeholder="Additional Percentage"
-                                    register={register1("percentage", {
-                                        required: false,
-                                        onChange: (e) => {
-                                            const percentage = parseFloat(e.target.value) || 0;
-                                            const totalAmount = parseFloat(getValues1("total")) || 0;
-
-                                            const additionalCharges = (totalAmount * percentage) / 100;
-
-                                            console.log("Additional Charges:", additionalCharges.toFixed(2));
-
-                                            setValue1("additionalCharges", additionalCharges.toFixed(2));
-                                            setValue1('finalTotal', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
-                                            setValue1('balance', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
-                                            setValue1('payamount', parseFloat(parseFloat(getValues1('total')) + parseFloat(additionalCharges)).toFixed(2))
-                                        },
-                                    })}
-                                    error={errors1?.percentage?.message}
-                                />
-                            </Grid>
-
-
-                            <Grid item md={3} sm={12} xs={12}>
-                                <InputField
-                                    label="Additional Charges"
-                                    size="small"
-                                    disabled={true}
-                                    placeholder="Additional Charges"
-                                    register={register1("additionalCharges", {
-                                        required: false,
-                                    })}
-                                    error={errors1?.additionalCharges?.message}
-                                />
-                            </Grid>
-                            <Grid item md={3} sm={12} xs={12}>
-                                <InputField
-                                    label="Final Total"
-                                    size="small"
-                                    disabled={true}
-                                    placeholder="Final Total"
-                                    register={register1("finalTotal", {
-                                        required: "please enter finalTotal .",
-                                    })}
-                                    error={errors1?.finalTotal?.message}
-                                />
-                            </Grid>
-                            <Grid item md={3} sm={12} xs={12}>
-                                <InputField
-                                    label="Paid Amount"
-
-                                    disabled={true}
-                                    size="small"
-                                    placeholder="Enter amount"
-
-                                    register={register1("paidamount", {
-                                        required: false,
-
-                                    })}
-                                    error={errors1?.paidamount?.message}
-                                />
-                            </Grid>
-                            <Grid item md={3} sm={12} xs={12}>
-                                <InputField
-                                    label="Balance Amount"
-                                    size="small"
-                                    disabled={true}
-                                    placeholder="Balance Amount"
-                                    register={register1("balance", {
-                                        required: "please enter balance .",
-                                    })}
-                                    error={errors1?.balance?.message}
-                                />
-                            </Grid>
-
-
-                            <Grid container p={2} spacing={2}>
-                                <Grid item md={3} sm={12} xs={12}>
-                                    <InputField
-                                        label="Amount"
-                                        size="small"
-
-                                        placeholder="Amount"
-                                        register={register1("payamount", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.payamount?.message}
-                                    />
-                                </Grid>
-                                <Grid item md={3} sm={12} xs={12}>
-                                    <SelectField
-                                        label="Payment Mode"
-                                        size="small"
-                                        options={[
-                                            { id: "Cash", name: "Cash" },
-                                            { id: "Bank", name: "Bank" },
-                                            { id: "Card", name: "Card" },
-                                            { id: "Payment Link", name: "Payment Link" },
-                                        ]}
-                                        selected={watch1("payment")}
-                                        onSelect={(value) => {
-                                            setValue1("payment", value)
-                                            setSelectedMode(value)
-                                        }}
-                                        register={register1("payment", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.payment?.message}
-                                    />
-                                </Grid>
-                                {selectedMode?.id == "Bank" && (
-                                    <Grid item md={3} sm={12} xs={12}>
-                                        <SelectField
-                                            label="Banks"
-                                            size="small"
-                                            options={banks}
-                                            selected={selectedBank}
-                                            onSelect={(value) => {
-                                                setSelectedBank(value)
-                                            }}
-                                            register={register1("bank", {
-                                                required: false,
-                                            })}
-                                            error={errors1?.bank?.message}
-                                        />
-                                    </Grid>
-                                )}
-                                {selectedMode?.id == "Card" && (
-                                    <Grid item md={3} sm={12} xs={12}>
-                                        <SelectField
-                                            label="Card"
-                                            size="small"
-                                            options={cards}
-                                            selected={selectedCard}
-                                            onSelect={(value) => {
-                                                setSelectedCard(value)
-                                            }}
-                                            register={register1("card", {
-                                                required: false,
-                                            })}
-                                            error={errors1?.card?.message}
-                                        />
-                                    </Grid>
-                                )}
-                                {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
-                                    <InputField
-                                        label="Authorization Code"
-                                        size="small"
-                                        placeholder="Authorization Code"
-                                        register={register1("remarks", {
-                                            required: false,
-                                        })}
-                                        error={errors1?.remarks?.message}
-                                    />
-                                </Grid>}
-                                <Grid item md={12} sm={12} xs={12}>
-                                    <Button
-                                        onClick={() => addPayments(getValues1('payamount'), selectedMode?.id, selectedBank, selectedCard, getValues1('remarks'))}
-
-                                        variant="contained"
-                                        sx={{
-                                            textTransform: "capitalize",
-                                            backgroundColor: "#001f3f",
-                                            width: "200px",
-                                            ":hover": {
-                                                backgroundColor: "#001f3f",
-                                            },
-                                        }}
-                                    >
-                                        Add New Method
-                                    </Button>
-
-
-                                </Grid>
-                                <Typography variant="body1" sx={{ p: 2, fontWeight: 'bold', mt: 2 }} color="initial">
-
-                                    Payment Details
-                                </Typography>
-
-                                <Grid container mt={2} p={2}>
-                                    <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2, width: '100%' }}>
-                                        {payments.map((payment, index) => (
-                                            <Box
-                                                key={index}
-                                                sx={{
-                                                    border: '1px solid #ccc',
-                                                    borderRadius: 2,
-                                                    width: '30%',
-                                                    p: 2,
-                                                    mb: 1,
-                                                    backgroundColor: '#f9f9f9',
-                                                    position: 'relative',
-                                                }}
-                                            >
-                                                <IconButton
-                                                    size="small"
-                                                    sx={{ position: 'absolute', top: 8, right: 8 }}
-                                                    onClick={() => {
-                                                        const updatedPayments = payments.filter((_, i) => i !== index);
-                                                        setPayments(updatedPayments);
-                                                    }}
-                                                >
-                                                    <DeleteIcon color="error" fontSize="small" />
-                                                </IconButton>
-
-                                                <Typography variant="body1"><strong>Amount:</strong> {parseFloat(payment.amount || 0).toFixed(2)}</Typography>
-                                                <Typography variant="body1"><strong>Mode:</strong> {payment.payment_mode}</Typography>
-                                                {payment.mode === 'Bank' && (
-                                                    <Typography variant="body1"><strong>Bank:</strong> {payment.bank?.name || payment.bank}</Typography>
-                                                )}
-                                                {payment.mode === 'Card' && (
-                                                    <Typography variant="body1"><strong>Card:</strong> {payment.card?.name || payment.card}</Typography>
-                                                )}
-                                            </Box>
-                                        ))}
-                                    </Box>
-                                </Grid>
-                                <Grid>
-
-                                </Grid>
-                            </Grid>
-                            <Grid container justifyContent={"flex-end"} mt={2} pr={2}>
-                                <Button
-                                    type="submit"
-                                    disabled={rows?.length == 0 || buttonDisabled}
-                                    variant="contained"
-                                    sx={{
-                                        textTransform: "capitalize",
-                                        backgroundColor: "#001f3f",
-                                        ":hover": {
-                                            backgroundColor: "#001f3f",
-                                        },
-                                    }}
-                                >
-                                    Create Receipt
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    )}
+               
 
 
 
