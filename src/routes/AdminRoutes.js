@@ -306,7 +306,7 @@ const CreatePaidReceipt = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaidReceipt")
 );
 const UpdatePaidReceipt = lazy(() =>
-  import("pages/Dashboard/Payments/UpdateReceipt")
+  import("pages/Dashboard/Payments/UpdatePaidReceipt")
 );
 const CardList = lazy(() =>
   import("pages/Dashboard/Cards/Cards")
@@ -814,6 +814,7 @@ const AdminRoutes = [
     path: "/snapshot-employee-service-report",
     component: <SnapshotEmployeeServiceReport />,
   },
+
   {
     path: "/fund-transfer-voucher-detail/:id",
     component: <FundTransferVoucherDetail />,
@@ -835,7 +836,7 @@ const AdminRoutes = [
     component: <UpdateCard />,
   },
   {
-    path: "/update-paid-receipt/:id",
+    path: "/update-payment-method/:id",
     component: <UpdatePaidReceipt />,
   },
   {

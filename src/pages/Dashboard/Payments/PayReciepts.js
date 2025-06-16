@@ -21,6 +21,7 @@ import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
 import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Pagination from 'components/Pagination';
 import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
@@ -456,8 +457,8 @@ function PayReceipts() {
         try {
             let params = {
                 id: selectedData?.id,
-                void_type:buttonVal
-                
+                void_type: buttonVal
+
 
 
             }
@@ -541,15 +542,32 @@ function PayReceipts() {
             console.error("Error fetching location:", error);
         }
     };
-    const UpdateStatus = async () => {
+    const UpdateStatus = async (data, event) => {
+        // Ensure invoiceDate is present
+        if (!invoiceDate) {
+            showErrorToast('Date is required');
+            return;
+        }
+
+        const action = event?.nativeEvent?.submitter?.value;
+
+        if (action === "invoiceOnly") {
+            console.log("Updating Invoice Date only", data);
+        } else if (action === "invoiceAndReceipt") {
+            console.log("Updating Invoice and Receipt Date", data);
+        } else {
+            showErrorToast("Invalid action");
+            return;
+        }
+
         try {
-            let obj = {
+            const obj = {
                 id: selectedData?.id,
                 invoice_date: invoiceDate,
+                receipt: action === "invoiceAndReceipt" ? true : false
             };
 
             const promise = CustomerServices.invoiceDateUpdate(obj);
-            console.log(promise);
 
             showPromiseToast(
                 promise,
@@ -558,17 +576,21 @@ function PayReceipts() {
                 "Something Went Wrong"
             );
 
-            // Await the promise and then check its response
             const response = await promise;
+
             if (response?.responseCode === 200) {
                 setStatusDialog(false);
-                setStatus(null)
+                setStatus(null);
                 getCustomerQueue();
+            } else {
+                showErrorToast("Failed to update. Please try again.");
             }
         } catch (error) {
-            console.log(error);
+            console.error("Error updating status:", error);
+            showErrorToast("An unexpected error occurred. Please try again.");
         }
     };
+
     const UpdateStatus2 = async () => {
         try {
             let obj = {
@@ -783,7 +805,7 @@ function PayReceipts() {
                                 onClick={() => {
                                     setSelectedData(row?.original)
                                     // setInvoiceDate(new Date(row?.original?.invoice_date))
-                                    setPaid(row?.original?.is_paid )
+                                    setPaid(row?.original?.is_paid)
                                     setStatusDialog2(true)
                                 }}
                                 sx={{
@@ -798,6 +820,26 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
+
+
+                    {/* {[1000, 3, 2].includes(user?.role_id) && (
+                        <Tooltip title="Update Payment">
+                            <IconButton
+                                onClick={() => {
+                                   navigate(`/update-payment-method/${row?.original?.id}`)
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <MonetizationOnIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )} */}
                 </Box>
             ),
         },
@@ -1102,11 +1144,11 @@ function PayReceipts() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-                  saveAs(blob,
-                    toDate && fromDate
-                        ? `paid_receipts : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
-                        : `paid_receipts: Present `,);
-         
+            saveAs(blob,
+                toDate && fromDate
+                    ? `paid_receipts : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                    : `paid_receipts: Present `,);
+
         }
 
         download()
@@ -1147,7 +1189,7 @@ function PayReceipts() {
                 onClose={() => setStatusDialog(false)}
                 title={"Change Date?"}
             >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
+                <Box component="form" onSubmit={handleSubmit((data, event) => UpdateStatus(data, event))}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={12}>
                             <DatePicker
@@ -1161,29 +1203,35 @@ function PayReceipts() {
                         <Grid container sx={{ justifyContent: "center" }}>
                             <Grid
                                 item
-                                xs={6}
-                                sm={6}
+                                xs={12}
+                                sm={12}
                                 sx={{
                                     mt: 2,
                                     display: "flex",
                                     justifyContent: "space-between",
+                                    alignItems: 'center',
                                     gap: "25px",
                                 }}
                             >
                                 <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
                                     type="submit"
+                                    name="action"
+                                    value="invoiceOnly"
+                                    bgcolor={Colors.primary}
+                                    title="Update Invoice Date"
                                 />
                                 <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
+                                    type="submit"
+                                    name="action"
+                                    value="invoiceAndReceipt"
+                                    bgcolor="#FF1F25"
+                                    title="Update Invoice & Receipt Date"
                                 />
                             </Grid>
                         </Grid>
                     </Grid>
                 </Box>
+
             </SimpleDialog>
 
             <SimpleDialog
@@ -1192,9 +1240,9 @@ function PayReceipts() {
                 title={"Void Invoice"}
             >
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Box sx={{display:'flex',justifyContent:'center',gap:2}}>
-                        <Box>Invoice No : {selectedData?.invoice_number ? selectedData?.invoice_number : '-' } </Box>
-                        {selectedData?.payment?.id && <Box>Receipt No : {selectedData?.payment?.id ? 'RC-'+selectedData?.payment?.id : '-'}</Box>}
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                        <Box>Invoice No : {selectedData?.invoice_number ? selectedData?.invoice_number : '-'} </Box>
+                        {selectedData?.payment?.id && <Box>Receipt No : {selectedData?.payment?.id ? 'RC-' + selectedData?.payment?.id : '-'}</Box>}
                     </Box>
                     <Grid container spacing={2}>
 
@@ -1210,18 +1258,18 @@ function PayReceipts() {
                             }}
                         >
                             <PrimaryButton
-                                onClick={() => {setButtonVal('invoice');setConfirmationDialog2(true)}}
+                                onClick={() => { setButtonVal('invoice'); setConfirmationDialog2(true) }}
                                 bgcolor={Colors.primary}
                                 title="Void Invoice"
 
                             />
                             {paid && <PrimaryButton
-                                onClick={() => {setButtonVal('receipt');setConfirmationDialog2(true)}}
+                                onClick={() => { setButtonVal('receipt'); setConfirmationDialog2(true) }}
                                 bgcolor={"#FF1F25"}
                                 title="Void Receipt"
                             />}
                             {paid && <PrimaryButton
-                                onClick={() => {setButtonVal('both');setConfirmationDialog2(true)}}
+                                onClick={() => { setButtonVal('both'); setConfirmationDialog2(true) }}
                                 bgcolor={"#FF1F25"}
                                 title="Void Both"
                             />}
