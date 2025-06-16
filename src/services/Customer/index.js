@@ -266,6 +266,10 @@ const CustomerServices = {
     const data = await get(routes.getVatReport, params);
     return data;
   },
+  getPaidReceiptDetail: async (params) => {
+    const data = await get(routes.getPaidReceiptDetail, params);
+    return data;
+  },
   getLeaves: async (params) => {
     const data = await get(routes.getLeaves, params);
     return data;

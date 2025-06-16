@@ -524,7 +524,7 @@ function ServiceReport() {
       header: "PRO Commission",
       accessorKey: "pro_commission",
       accessorFn: (row) => row?.pro_commission,
-      cell: (row) => (
+      cell: ({row}) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.pro_commission ? parseFloat(row?.original?.pro_commission).toFixed(2) :  '0.00'}
         </Box>
@@ -534,7 +534,7 @@ function ServiceReport() {
       header: "Typist Commission",
       accessorKey: "typist_commission",
       accessorFn: (row) => row?.typist_commission,
-      cell: (row) => (
+      cell: ({row}) => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
           {row?.original?.typist_commission ? parseFloat(row?.original?.typist_commission).toFixed(2) :  '0.00'}
         </Box>
