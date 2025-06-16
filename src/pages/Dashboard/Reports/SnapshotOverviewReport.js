@@ -444,8 +444,8 @@ function SnapshotOverviewReport() {
       
         const companyName =
           agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-            ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-            : "PREMIUM BUSINESSMEN SERVICES"
+            ? "PREMIUM BUSINESSMEN SERVICES"
+            : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
       
         const companyRow = worksheet.addRow([companyName])
         companyRow.getCell(1).font = {

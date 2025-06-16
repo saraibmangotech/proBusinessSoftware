@@ -599,7 +599,7 @@ function PreSalesList() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:H1")
 
-    const companyRow = worksheet.addRow(["PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"])
+    const companyRow = worksheet.addRow(["PREMIUM BUSINESSMEN SERVICES"])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,
@@ -811,7 +811,7 @@ function PreSalesList() {
       keywords: "fund transfer, vouchers, financial, accounting",
       category: "Financial Reports",
       description: "Fund transfer vouchers report generated from accounting system",
-      company: "Premium Professional Government Services LLC",
+      company: "PREMIUM BUSINESSMEN SERVICES",
     }
 
     const download = async () => {

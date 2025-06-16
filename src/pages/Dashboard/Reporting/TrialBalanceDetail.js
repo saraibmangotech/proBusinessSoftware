@@ -455,7 +455,7 @@ function TrialBalanceDetailed() {
       worksheet.mergeCells("A1:G1")
       const name =
         agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-          ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+          ? "PREMIUM BUSINESSMEN SERVICES"
           : "PREMIUM BUSINESSMEN  SERVICES"
       const companyRow = worksheet.addRow([name])
       companyRow.getCell(1).font = {
@@ -875,7 +875,7 @@ function TrialBalanceDetailed() {
         worksheet.mergeCells("A1:G1")
         const name =
           agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-            ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+            ? "PREMIUM BUSINESSMEN SERVICES"
             : "PREMIUM BUSINESSMEN  SERVICES"
         const companyRow = worksheet.addRow([name])
         companyRow.getCell(1).font = {

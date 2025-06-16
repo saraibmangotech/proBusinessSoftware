@@ -310,11 +310,11 @@ export let agencyType = {
   "TASHEEL":{
     imageUrl: Images.headerCenterLogoTasheel,
     category: "TASHEEL",
-  name:'PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC'
+  name:'PREMIUM BUSINESSMEN SERVICES'
   },
   "AL-AHDEED":{
     imageUrl: Images.headerCenterLogoAdheed,
     category: "AL-AHDEED",
-    name:'PREMIUM BUSINESSMEN  SERVICES '
+    name:'PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC'
   },
 }
