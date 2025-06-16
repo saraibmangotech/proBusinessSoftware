@@ -599,7 +599,7 @@ function CategoryList() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:P1")
 
-    const companyRow = worksheet.addRow(["PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"])
+    const companyRow = worksheet.addRow(["PREMIUM BUSINESSMEN SERVICES"])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,
@@ -857,7 +857,7 @@ function CategoryList() {
       keywords: "service items, fees, charges, commission",
       category: "Service Reports",
       description: "Service items report generated from system",
-      company: "Premium Professional Government Services LLC",
+      company: "PREMIUM BUSINESSMEN SERVICES",
     }
 
     const download = async () => {

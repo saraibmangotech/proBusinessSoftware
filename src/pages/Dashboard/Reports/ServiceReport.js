@@ -690,8 +690,8 @@ function ServiceReport() {
 
     const companyRow = worksheet.addRow([
       agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-        ? "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-        : "PREMIUM BUSINESSMEN SERVICES",
+        ? "PREMIUM BUSINESSMEN SERVICES"
+        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC",
     ])
     companyRow.getCell(1).font = {
       name: "Arial",
@@ -1025,7 +1025,7 @@ function ServiceReport() {
       keywords: "invoice, financial, accounting, services",
       category: "Financial Reports",
       description: "Invoice report generated from accounting system",
-      company: "Premium Professional Government Services LLC",
+      company: "PREMIUM BUSINESSMEN SERVICES",
     }
 
     const download = async () => {
@@ -1036,8 +1036,8 @@ function ServiceReport() {
 
        saveAs( blob,
                       toDate && fromDate
-                        ? `Invoice_Report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
-                        : `Invoice_Report: Present `,);
+                        ? `Service_Report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                        : `Service_Report: Present `,);
      
     }
 

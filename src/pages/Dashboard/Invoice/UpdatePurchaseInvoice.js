@@ -987,6 +987,7 @@ function UpdatePurchaseInvoice() {
             const updatedItems = detail?.invoice_items?.map(item => ({
                 ...item,
                 selectedService: item.product,
+                unique_id:item?.id, // Ensure unique key
                 total: item?.vat_enabled ? parseFloat((parseFloat(item.charge) * parseInt(item.quantity))+parseFloat(item?.tax)) : parseFloat(item.charge) * parseInt(item.quantity),
                 
             }));
@@ -1521,7 +1522,7 @@ function UpdatePurchaseInvoice() {
                                     </TableCell>
                                 </TableRow>
 
-                                <TableRow>
+                                {/* <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
                                         {editState && <> <Button
@@ -1572,7 +1573,7 @@ function UpdatePurchaseInvoice() {
                                             </Button></>}
                                         </Grid>
                                     </TableCell>
-                                </TableRow>
+                                </TableRow> */}
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
@@ -1593,21 +1594,7 @@ function UpdatePurchaseInvoice() {
                                             </Button>
                                             {console.log(selectedCustomer, 'selectedCustomer')
                                             }
-                                            {/* {!payButton && <Button
-                                                                                disabled={rows?.length == 0}
-                                                                                type="submit"
-                                                                                variant="contained"
-                                                                                sx={{
-                                                                                    textTransform: "capitalize",
-                                                                                    backgroundColor: "#001f3f",
-                                                                                    width: "200px",
-                                                                                    ":hover": {
-                                                                                        backgroundColor: "#001f3f",
-                                                                                    },
-                                                                                }}
-                                                                            >
-                                                                                Mark As Unpaid
-                                                                            </Button>} */}
+                                         
 
                                         </Grid>
                                     </TableCell>
