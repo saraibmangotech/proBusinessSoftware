@@ -700,7 +700,7 @@ function VoidInvoices() {
                             <IconButton
                                 onClick={() => {
                                     window.open(
-                                        `${process.env.REACT_APP_INVOICE_GENERATOR}/generate-voided-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                        `${process.env.REACT_APP_INVOICE_GENERATOR}generate-voided-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                         '_blank'
                                     );
                                 }}
