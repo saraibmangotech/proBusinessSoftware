@@ -76,6 +76,7 @@ import html2canvas from "html2canvas";
 import Barcode from "react-barcode";
 import DatePicker from 'components/DatePicker';
 import FinanceServices from "services/Finance";
+import LedgerModal from "LedgerTable";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -201,6 +202,39 @@ function VendorPaymentList() {
 
 
 
+    const [data2, setData2] = useState([])
+    const [loader2, setLoader2] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false)
+    const handleOpenModal = () => {
+        setModalOpen(true)
+    }
+
+    const handleCloseModal = () => {
+        setModalOpen(false)
+    }
+
+    const getGeneralJournalLedgers = async (number) => {
+        setModalOpen(true)
+        setLoader2(true)
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                module: 'supplier_payment',
+                id: number
+            }
+
+            const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+            setData2(data?.statement?.rows)
+
+
+        } catch (error) {
+            ErrorToaster(error)
+        } finally {
+            setLoader2(false)
+        }
+    }
 
 
 
@@ -422,6 +456,25 @@ function VendorPaymentList() {
             header: "Actions",
             cell: ({ row }) => (
                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                            <IconButton
+                        onClick={() =>
+
+
+                            getGeneralJournalLedgers(row?.original?.id)
+                        }
+                        sx={{
+                            width: '35px',
+                            height: '35px',
+                            bgcolor:
+                                Colors.primary,
+                            "&:hover": {
+                                bgcolor:
+                                    Colors.primary,
+                            },
+                        }}
+                    >
+                        <EyeIcon />
+                    </IconButton>
                     {<Box
                         component={"img"}
                         sx={{ cursor: "pointer" }}
@@ -466,6 +519,13 @@ function VendorPaymentList() {
 
     return (
         <Box sx={{ p: 3 }}>
+              <LedgerModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                generalJournalAccounts={data2}
+                title=" Journal Entries"
+                loading={loader2}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
