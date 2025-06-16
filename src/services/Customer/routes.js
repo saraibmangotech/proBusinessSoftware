@@ -158,7 +158,8 @@ const routes = {
   getVoidReceipts:'/sales/receipts/payments',
   settledInvoiceData:'/payments/customer/receipts',
   RefundInvoice:'sales/receipts/refund',
-  getPaidReceiptDetail:'sales/receipts/invoice/details'
+  getPaidReceiptDetail:'sales/receipts/invoice/details',
+  UpdatePaidReceipt:'sales/receipts/updatePaymentMethod'
 
 
 };

@@ -1056,10 +1056,7 @@ function CreatePaidReceipt() {
                           placeholder="Mobile No"
                           disabled={true}
                           register={register1("mobile", {
-                            pattern: {
-                              value: /^05[0-9]{8}$/,
-                              message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                            },
+                         
                           })}
                           error={errors1?.mobile?.message}
                         />
