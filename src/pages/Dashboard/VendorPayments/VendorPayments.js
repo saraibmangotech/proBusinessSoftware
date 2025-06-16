@@ -221,7 +221,7 @@ function VendorPaymentList() {
             let params = {
                 page: 1,
                 limit: 999999,
-                module: 'supplier_payment',
+                module: 'vendor_payment',
                 id: number
             }
 
