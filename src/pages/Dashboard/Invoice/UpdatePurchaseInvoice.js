@@ -987,6 +987,7 @@ function UpdatePurchaseInvoice() {
             const updatedItems = detail?.invoice_items?.map(item => ({
                 ...item,
                 selectedService: item.product,
+                unique_id:item?.id, // Ensure unique key
                 total: item?.vat_enabled ? parseFloat((parseFloat(item.charge) * parseInt(item.quantity))+parseFloat(item?.tax)) : parseFloat(item.charge) * parseInt(item.quantity),
                 
             }));
