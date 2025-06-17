@@ -45,6 +45,7 @@ import DatePicker from 'components/DatePicker';
 import FinanceServices from 'services/Finance';
 import LedgerModal from 'LedgerTable';
 import ExcelJS from "exceljs";
+import { useAuth } from 'context/UseContext';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -130,7 +131,7 @@ function PaymentVouchers() {
     } = useForm();
 
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
-
+	const { user } = useAuth();
 
     const [loader, setLoader] = useState(false);
 
@@ -723,7 +724,7 @@ function PaymentVouchers() {
                     >
                         <EyeIcon />
                     </IconButton>
-                    {<Box
+                    {user?.role_id != 1004 && <Box
                         component={"img"}
                         sx={{ cursor: "pointer" }}
                         onClick={() => {
@@ -754,7 +755,7 @@ function PaymentVouchers() {
                     </Tooltip>
                     <Box>
 
-                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+                        {user?.role_id != 1004 && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
                         {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
                     </Box>

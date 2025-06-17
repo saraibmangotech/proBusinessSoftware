@@ -1003,7 +1003,7 @@ function CreatePaidReceipt() {
                       <Grid item md={3.8} sm={5.5} xs={12}>
                         <DatePicker
                           label={"Payment Date :*"}
-                          value={date}
+                          value={paidAt}
                           disabled={!creditButton}
                           size={"small"}
                           error={errors1?.date?.message}

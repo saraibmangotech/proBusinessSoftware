@@ -45,6 +45,7 @@ import DatePicker from 'components/DatePicker';
 import FinanceServices from 'services/Finance';
 import LedgerModal from 'LedgerTable';
 import ExcelJS from "exceljs";
+import { useAuth } from 'context/UseContext';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -111,7 +112,7 @@ const useStyles = makeStyles({
 })
 
 function ReceiptVouchers() {
-
+	const { user } = useAuth();
     const navigate = useNavigate();
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -726,7 +727,7 @@ function ReceiptVouchers() {
                     >
                         <EyeIcon />
                     </IconButton>
-                    {<Box
+                    {user?.role_id != 1004 && <Box
                         component={"img"}
                         sx={{ cursor: "pointer" }}
                         onClick={() => {
@@ -757,7 +758,7 @@ function ReceiptVouchers() {
                     </Tooltip>
 
                     <Box>
-                        {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
+                        {user?.role_id != 1004  && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
 
                         {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
                     </Box>

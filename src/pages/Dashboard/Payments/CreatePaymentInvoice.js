@@ -80,7 +80,7 @@ function CreatePaymentInvoice() {
     const { user } = useAuth();
     const { usdExchangeRate, cadExchangeRate } = useSelector((state) => state.navigationReducer);
 
-    const tableHead = ['Select', 'Date', 'Invoice ID', 'Vendor Name', ' Charges', ' Vat', 'Total Amount', 'Paid', 'Balance', 'Payment Status', 'Receiving']
+    const tableHead = ['Select', 'Date', 'Invoice ID','Invoice Number',  'Vendor Name', ' Charges', ' Vat', 'Total Amount', 'Paid', 'Balance', 'Payment Status', 'Receiving']
 
     const { register, formState: { errors }, handleSubmit, setValue, getValues, trigger, watch } = useForm();
     const { register: register2, getValues: getValues2 } = useForm();
@@ -545,7 +545,7 @@ function CreatePaymentInvoice() {
         console.log(total, 'total');
         console.log(parseFloat(parseFloat(total) - parseFloat(existingTotal)), 'minusval');
 
-        setValue('amount', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
+        setValue('amount', parseFloat(parseFloat(parseFloat(existingTotal))).toFixed(2))
         setValue('balance', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
         setValue('payamount', parseFloat(parseFloat(parseFloat(total) - parseFloat(existingTotal))).toFixed(2))
 
@@ -573,12 +573,12 @@ function CreatePaymentInvoice() {
             })
             console.log(totalAmount, 'totalAmount');
 
-            setValue('total', totalAmount)
-            setValue('payamount', parseFloat(parseFloat(totalAmount).toFixed(2)))
-            setValue('balance', totalAmount)
-            setValue('finalTotal', totalAmount)
-            setValue('payAmount', totalAmount)
-            setTotalAmount(totalAmount)
+            setValue('total', parseFloat(totalAmount).toFixed(2))
+            setValue('payamount', parseFloat(totalAmount).toFixed(2))
+            setValue('balance', parseFloat(totalAmount).toFixed(2))
+            setValue('finalTotal', parseFloat(totalAmount).toFixed(2))
+            setValue('payAmount', parseFloat(totalAmount).toFixed(2))
+            setTotalAmount(parseFloat(totalAmount).toFixed(2))
 
         }
     }, [selectedInvoice]);
@@ -766,6 +766,9 @@ function CreatePaymentInvoice() {
                                                         {item?.id ?? '-'}
                                                     </Cell>
                                                     <Cell>
+                                                        {item?.invoice_number ?? '-'}
+                                                    </Cell>
+                                                    <Cell>
                                                         <Tooltip
                                                             title={item?.vendor?.name ?? '-'}
                                                             arrow
@@ -912,7 +915,7 @@ function CreatePaymentInvoice() {
                                         </Typography>
                                         <Box sx={{ textAlign: 'center', p: 1, width: '130px', bgcolor: Colors.flashWhite, border: '1px solid #B2B5BA', borderRadius: '4px' }}>
                                             <Typography variant="body2" sx={{ color: Colors.smokeyGrey }}>
-                                                {totalAmount.toFixed(2)}
+                                                {parseFloat(totalAmount).toFixed(2)}
                                             </Typography>
                                         </Box>
                                     </Box>

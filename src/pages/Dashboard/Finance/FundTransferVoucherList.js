@@ -79,6 +79,7 @@ import Barcode from "react-barcode";
 import DatePicker from 'components/DatePicker';
 import FinanceServices from "services/Finance";
 import LedgerModal from "LedgerTable";
+import { useAuth } from "context/UseContext";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -152,7 +153,7 @@ function PreSalesList() {
   const [statusDialog, setStatusDialog] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [tableLoader, setTableLoader] = useState(false);
-
+	const { user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -506,7 +507,7 @@ function PreSalesList() {
           >
             <EyeIcon />
           </IconButton>
-          {<Box
+          {user?.role_id != 1004 && <Box
             component={"img"}
             sx={{ cursor: "pointer" }}
             onClick={() => {
@@ -527,7 +528,7 @@ function PreSalesList() {
             width={"35px"}
           ></Box>}
           <Box>
-            {true && (
+            {user?.role_id != 1004  && (
               <Box
                 sx={{ cursor: "pointer", mt: 1 }}
                 component={"img"}

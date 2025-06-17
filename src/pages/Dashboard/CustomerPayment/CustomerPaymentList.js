@@ -77,6 +77,7 @@ import Barcode from "react-barcode";
 import DatePicker from 'components/DatePicker';
 import FinanceServices from "services/Finance";
 import LedgerModal from "LedgerTable";
+import { useAuth } from "context/UseContext";
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -144,6 +145,7 @@ const useStyles = makeStyles({
 function CustomerPaymentList() {
     const navigate = useNavigate();
     const classes = useStyles();
+    const { user } = useAuth();
     const dispatch = useDispatch();
     const contentRef = useRef(null);
     const [status, setStatus] = useState(null);
@@ -485,9 +487,9 @@ function CustomerPaymentList() {
                         src={Images.detailIcon}
                         width={"35px"}
                     ></Box>}
-                    {<Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/customer-payment-update/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'} height={'35px'}></Box>}
+                    {user?.role_id != 1004 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/customer-payment-update/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'} height={'35px'}></Box>}
                     <Box>
-                        {true && (
+                        {user?.role_id != 1004 && (
                             <Box
                                 sx={{ cursor: "pointer", mt: 1 }}
                                 component={"img"}
