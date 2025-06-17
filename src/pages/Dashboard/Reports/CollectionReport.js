@@ -608,7 +608,7 @@ function CollectionReport() {
   
     const periodRow = worksheet.addRow([
       toDate && fromDate
-        ? `Period: ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+        ? `Period: ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
         : `Period: All`,
     ])
     periodRow.getCell(1).font = {
@@ -923,7 +923,7 @@ function CollectionReport() {
       
              saveAs( blob,
                             toDate && fromDate
-                              ? `Collection_Report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                              ? `Collection_Report : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
                               : `Collection_Report: Present `,);
     }
   

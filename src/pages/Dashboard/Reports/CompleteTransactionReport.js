@@ -344,7 +344,7 @@ function CompleteTransactionReport() {
         });
         saveAs(new Blob([buf]),
             toDate && fromDate
-                ? `complete_transaction_report : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                ? `complete_transaction_report : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
                 : `complete_transaction_report: Present `,);
 
     };

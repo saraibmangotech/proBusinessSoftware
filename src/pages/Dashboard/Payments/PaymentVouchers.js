@@ -513,7 +513,7 @@ function PaymentVouchers() {
             const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             saveAs( blob,
                 toDate && fromDate
-                  ? `Payment_Vouchers : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+                  ? `Payment_Vouchers : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
                   : `Payment_Vouchers: Present `,);
         }
         download();

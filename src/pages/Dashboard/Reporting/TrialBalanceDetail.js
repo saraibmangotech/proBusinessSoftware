@@ -481,7 +481,7 @@ function TrialBalanceDetailed() {
     
       const dateRow2 = worksheet.addRow([
         toDate && fromDate
-          ? `Period:  ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+          ? `Period:  ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
           : `Period: All `,
       ])
       dateRow2.getCell(1).font = {
@@ -504,7 +504,7 @@ function TrialBalanceDetailed() {
       worksheet.mergeCells("A5:G5")
     
       const system = worksheet.addRow([
-        `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-DHEED"}`,
+        `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
       ])
       system.getCell(1).font = {
         name: "Arial",
@@ -814,7 +814,7 @@ function TrialBalanceDetailed() {
       saveAs(
         blob,
         toDate && fromDate
-          ? `Trial Balance : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+          ? `Trial Balance : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
           : `Trial Balance: Present `,
       )
     }
@@ -901,7 +901,7 @@ function TrialBalanceDetailed() {
       
         const dateRow2 = worksheet.addRow([
           toDate && fromDate
-            ? `Period:  ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+            ? `Period:  ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
             : `Period: All `,
         ])
         dateRow2.getCell(1).font = {
@@ -924,7 +924,7 @@ function TrialBalanceDetailed() {
         worksheet.mergeCells("A5:G5")
       
         const system = worksheet.addRow([
-          `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-DHEED"}`,
+          `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
         ])
         system.getCell(1).font = {
           name: "Arial",
@@ -1149,7 +1149,7 @@ function TrialBalanceDetailed() {
         saveAs(
           blob,
           toDate && fromDate
-            ? `Trial Balance Detailed : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+            ? `Trial Balance Detailed : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
             : `Trial Balance Detailed: Present `,
         )
       }

@@ -333,7 +333,7 @@ function ChartOfAccount() {
         worksheet.mergeCells("A4:F4")
     
         const system = worksheet.addRow([
-            `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? 'TASHEEL' : 'Al-DHEED'}`,
+            `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? 'TASHEEL' : 'Al-ADHEED'}`,
         ])
         system.getCell(1).font = {
             name: "Arial",

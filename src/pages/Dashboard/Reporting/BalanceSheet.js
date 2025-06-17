@@ -507,7 +507,7 @@ function BalanceSheet() {
     worksheet.mergeCells("A5:G5")
 
     const system = worksheet.addRow([
-      `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? 'TASHEEL' : 'Al-DHEED'}`,
+      `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? 'TASHEEL' : 'Al-ADHEED'}`,
     ])
     system.getCell(1).font = {
       name: "Arial",
