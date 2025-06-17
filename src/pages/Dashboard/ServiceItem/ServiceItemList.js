@@ -22,7 +22,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -599,7 +599,9 @@ function CategoryList() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:P1")
 
-    const companyRow = worksheet.addRow(["PREMIUM BUSINESSMEN SERVICES"])
+    const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+          ? "PREMIUM BUSINESSMEN SERVICES"
+          : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,

@@ -472,7 +472,7 @@ function ProfitLossStatement() {
       titleRow.getCell(1).alignment = { horizontal: "center" }
       worksheet.mergeCells("A1:F1")
       
-      let name = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "PREMIUM BUSINESSMEN SERVICES" : 'PREMIUM BUSINESSMEN  SERVICES'
+      let name = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "PREMIUM BUSINESSMEN SERVICES" : 'PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC'
       const companyRow = worksheet.addRow([name])
       companyRow.getCell(1).font = {
           name: "Arial",

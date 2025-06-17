@@ -47,6 +47,7 @@ import { makeStyles } from "@mui/styles";
 import Pagination from "components/Pagination";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import {
+  agencyType,
   Debounce,
   encryptData,
   formatPermissionData,
@@ -599,7 +600,9 @@ function PreSalesList() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:H1")
 
-    const companyRow = worksheet.addRow(["PREMIUM BUSINESSMEN SERVICES"])
+    const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+          ? "PREMIUM BUSINESSMEN SERVICES"
+          : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,

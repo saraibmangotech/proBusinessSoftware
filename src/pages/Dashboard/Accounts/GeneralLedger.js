@@ -29,7 +29,7 @@ import Pagination from "components/Pagination";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import InputField from "components/Input";
 import { useForm } from "react-hook-form";
-import { Debounce, LedgerLinking, handleExportWithComponent } from "utils";
+import { Debounce, LedgerLinking, agencyType, handleExportWithComponent } from "utils";
 import SelectField from "components/Select";
 import AuctionHouseServices from "services/AuctionHouse";
 import DatePicker from "components/DatePicker";
@@ -378,7 +378,9 @@ function GeneralLedger() {
     titleRow.getCell(1).alignment = { horizontal: "center" };
     worksheet.mergeCells("A1:J1");
 
-    const companyRow = worksheet.addRow(["PREMIUM BUSINESSMEN SERVICES"]);
+    const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+          ? "PREMIUM BUSINESSMEN SERVICES"
+          : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"]);
     companyRow.getCell(1).font = {
         name: "Arial",
         size: 14,
