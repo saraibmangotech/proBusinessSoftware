@@ -173,16 +173,21 @@ function CollectionReport() {
       }
 
       const { data } = await CustomerServices.getCollectionReport(params)
-      setCustomerQueue(data?.rows)
-      let totalData=data?.totals
-      if(agencyType[process.env.REACT_APP_TYPE]?.category != "TASHEEL"){
+      // Sort rows by created_at in descending order (latest first)
+      const sortedRows = [...(data?.rows || [])].sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      setCustomerQueue(sortedRows);
+      let totalData = data?.totals
+      if (agencyType[process.env.REACT_APP_TYPE]?.category != "TASHEEL") {
 
         delete totalData?.totalMohre
-        console.log(totalData,'totalDatatotalData');
+        console.log(totalData, 'totalDatatotalData');
       }
-      
+
       setData(totalData)
-      
+
 
     } catch (error) {
       showErrorToast(error)
@@ -297,12 +302,12 @@ function CollectionReport() {
       header: "Category",
       accessorKey: "category",
       total: false,
-       accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category ,
-           cell: () => (
-             <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-               {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' :agencyType[process.env.REACT_APP_TYPE].category}
-             </Box>
-           ),
+      accessorFn: () => agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category,
+      cell: () => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {agencyType[process.env.REACT_APP_TYPE].category == 'AL-AHDEED' ? 'AL-ADHEED' : agencyType[process.env.REACT_APP_TYPE].category}
+        </Box>
+      ),
     },
     {
       header: "Receipt Date",
@@ -529,10 +534,10 @@ function CollectionReport() {
   const handleCSVDownload = () => {
     // Skip if no data
     if (!customerQueue || customerQueue.length === 0) return
-  
+
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet("Collection Report")
-  
+
     // Set professional header
     worksheet.headerFooter.oddHeader =
       '&C&"Arial,Bold"&18COLLECTION REPORT\n' +
@@ -542,15 +547,15 @@ function CollectionReport() {
       new Date().toLocaleDateString() +
       "\n" +
       '&R&"Arial,Regular"&8Page &P of &N'
-  
+
     // Set custom footer as requested
     worksheet.headerFooter.oddFooter =
       '&C&"Arial,Regular"&10\n' + // One line gap
       '&C&"Arial,Bold"&12This is electronically generated report\n' +
       '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
-  
+
     worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
-  
+
     // Set page setup for professional printing
     worksheet.pageSetup = {
       paperSize: 9, // A4
@@ -567,7 +572,7 @@ function CollectionReport() {
         footer: 0.5,
       },
     }
-  
+
     // Add title section at the top of the worksheet
     const titleRow = worksheet.addRow(["COLLECTION REPORT"])
     titleRow.getCell(1).font = {
@@ -578,12 +583,12 @@ function CollectionReport() {
     }
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells(`A1:${String.fromCharCode(64 + columns.length)}1`) // Merge cells across all columns
-  
+
     const companyName =
       agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
         ? "PREMIUM BUSINESSMEN SERVICES"
         : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-  
+
     const companyRow = worksheet.addRow([companyName])
     companyRow.getCell(1).font = {
       name: "Arial",
@@ -593,7 +598,7 @@ function CollectionReport() {
     }
     companyRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells(`A2:${String.fromCharCode(64 + columns.length)}2`)
-  
+
     const dateRow = worksheet.addRow([
       `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
     ])
@@ -605,7 +610,7 @@ function CollectionReport() {
     }
     dateRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells(`A3:${String.fromCharCode(64 + columns.length)}3`)
-  
+
     const periodRow = worksheet.addRow([
       toDate && fromDate
         ? `Period: ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
@@ -619,14 +624,14 @@ function CollectionReport() {
     }
     periodRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells(`A4:${String.fromCharCode(64 + columns.length)}4`)
-  
+
     // Add empty row for spacing
     worksheet.addRow([])
-  
+
     // Add headers
     const headers = columns.map((col) => col.header)
     const headerRow = worksheet.addRow(headers)
-  
+
     // Style header row
     headerRow.eachCell((cell) => {
       cell.fill = {
@@ -648,7 +653,7 @@ function CollectionReport() {
         right: { style: "thin", color: { argb: "000000" } },
       }
     })
-  
+
     // Track totals for numeric columns
     const totals = {}
     const excludeFromTotal = [
@@ -661,33 +666,33 @@ function CollectionReport() {
       "Inv No.",
       "Receipt No.",
     ]
-  
+
     // Add data rows
     customerQueue.forEach((row, index) => {
       const rowData = columns.map((col, colIndex) => {
         if (col.header === "SR No.") return index + 1
-  
+
         let value = col.accessorFn ? col.accessorFn(row) : row[col.accessorKey]
         const isNumeric = typeof value === "number" || !isNaN(Number.parseFloat(value))
-  
+
         if (col.accessorKey === "pay_method") {
           value = value?.split(",").join(" & ")
         }
-  
+
         // Calculate totals for numeric columns
         if (isNumeric && col.header !== "SR No." && !excludeFromTotal.includes(col.header)) {
           totals[col.header] = (totals[col.header] || 0) + Number.parseFloat(value || 0)
         }
-  
+
         return value ?? ""
       })
-  
+
       const dataRow = worksheet.addRow(rowData)
-  
+
       // Style data rows
       dataRow.eachCell((cell, colNumber) => {
         cell.font = { name: "Arial", size: 10 }
-  
+
         // Check if this column is likely to be numeric
         const colHeader = columns[colNumber - 1]?.header
         const isLikelyNumeric =
@@ -698,19 +703,19 @@ function CollectionReport() {
             colHeader?.includes("Fee") ||
             colHeader?.includes("Price") ||
             colHeader?.includes("Cost"))
-  
+
         cell.alignment = {
           horizontal: isLikelyNumeric ? "right" : "left",
           vertical: "middle",
         }
-  
+
         cell.border = {
           top: { style: "hair", color: { argb: "CCCCCC" } },
           left: { style: "hair", color: { argb: "CCCCCC" } },
           bottom: { style: "hair", color: { argb: "CCCCCC" } },
           right: { style: "hair", color: { argb: "CCCCCC" } },
         }
-  
+
         // Format numeric cells
         if (isLikelyNumeric && !isNaN(Number.parseFloat(cell.value))) {
           cell.numFmt = "#,##0.00"
@@ -718,24 +723,24 @@ function CollectionReport() {
         }
       })
     })
-  
+
     // Add empty row before totals
     worksheet.addRow([])
-  
+
     // Add TOTAL row
     const totalRowData = columns.map((col, i) => {
       if (i === 0) return "TOTAL"
       const val = totals[col.header]
       return val != null ? val.toFixed(2) : ""
     })
-  
+
     const totalRow = worksheet.addRow(totalRowData)
-  
+
     // Style total row
     totalRow.eachCell((cell, colNumber) => {
       const colHeader = columns[colNumber - 1]?.header
       const hasValue = cell.value !== "" && cell.value !== "TOTAL"
-  
+
       if (colNumber === 1 || hasValue) {
         cell.fill = {
           type: "pattern",
@@ -754,7 +759,7 @@ function CollectionReport() {
           bottom: { style: "medium", color: { argb: "000000" } },
           right: { style: "medium", color: { argb: "000000" } },
         }
-  
+
         if (colNumber === 1) {
           cell.alignment = { horizontal: "center", vertical: "middle" }
         } else {
@@ -766,12 +771,12 @@ function CollectionReport() {
         }
       }
     })
-  
+
     // Add custom total rows from data object with specific totals structure
     if (data && Object.keys(data).length > 0) {
       // Add empty row for spacing
       worksheet.addRow([])
-  
+
       // Add a section header for totals
       const totalsHeaderRow = worksheet.addRow(["PAYMENT METHOD TOTALS"])
       totalsHeaderRow.getCell(1).font = {
@@ -789,7 +794,7 @@ function CollectionReport() {
       worksheet.mergeCells(
         `A${totalsHeaderRow.number}:${String.fromCharCode(64 + Math.min(columns.length, 4))}${totalsHeaderRow.number}`,
       )
-  
+
       // Define the specific totals with proper labels
       const totalLabels = {
         totalCash: "Total Cash",
@@ -799,19 +804,19 @@ function CollectionReport() {
         totalAmount: "Grand Total Amount",
         totalMohre: "Total MOHRE",
       }
-  
+
       // Add custom total rows in a structured format
       Object.entries(data).forEach(([key, value]) => {
         const label = totalLabels[key] || key.replace(/total/, "Total ")
         const customRowData = Array(columns.length).fill("")
         customRowData[0] = label
         customRowData[1] = Number.parseFloat(value || 0).toFixed(2)
-  
+
         const customRow = worksheet.addRow(customRowData)
-  
+
         // Style custom total rows with different colors for grand total
         const isGrandTotal = key === "totalAmount"
-  
+
         customRow.getCell(1).font = {
           name: "Arial",
           size: isGrandTotal ? 12 : 11,
@@ -819,7 +824,7 @@ function CollectionReport() {
           color: { argb: isGrandTotal ? "FFFFFF" : "000000" },
         }
         customRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
-  
+
         if (isGrandTotal) {
           customRow.getCell(1).fill = {
             type: "pattern",
@@ -827,7 +832,7 @@ function CollectionReport() {
             fgColor: { argb: "2F4F4F" }, // Dark gray for grand total
           }
         }
-  
+
         customRow.getCell(2).font = {
           name: "Arial",
           size: isGrandTotal ? 12 : 11,
@@ -837,7 +842,7 @@ function CollectionReport() {
         customRow.getCell(2).alignment = { horizontal: "right", vertical: "middle" }
         customRow.getCell(2).numFmt = "#,##0.00"
         customRow.getCell(2).value = Number.parseFloat(value || 0)
-  
+
         if (isGrandTotal) {
           customRow.getCell(2).fill = {
             type: "pattern",
@@ -859,11 +864,11 @@ function CollectionReport() {
         }
       })
     }
-  
+
     // Add empty rows for spacing before footer
     worksheet.addRow([])
     worksheet.addRow([])
-  
+
     // Add the electronic generated report text with black border as requested
     const reportRow = worksheet.addRow(["This is electronically generated report"])
     reportRow.getCell(1).font = {
@@ -880,7 +885,7 @@ function CollectionReport() {
       right: { style: "medium", color: { argb: "000000" } },
     }
     worksheet.mergeCells(`A${reportRow.number}:${String.fromCharCode(64 + columns.length)}${reportRow.number}`)
-  
+
     // Add powered by line
     const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
     poweredByRow.getCell(1).font = {
@@ -891,20 +896,20 @@ function CollectionReport() {
     }
     poweredByRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells(`A${poweredByRow.number}:${String.fromCharCode(64 + columns.length)}${poweredByRow.number}`)
-  
+
     // Set column widths - dynamically based on header content
     worksheet.columns.forEach((column, i) => {
       const maxLength = headers[i]?.length || 10
       column.width = Math.max(maxLength + 2, 12) // Minimum width of 12
     })
-  
+
     // Add workbook properties
     workbook.creator = "Finance Department"
     workbook.lastModifiedBy = "Finance System"
     workbook.created = new Date()
     workbook.modified = new Date()
     workbook.lastPrinted = new Date()
-  
+
     // Set workbook properties
     workbook.properties = {
       title: "Collection Report",
@@ -914,23 +919,23 @@ function CollectionReport() {
       description: "Collection report generated from accounting system",
       company: companyName,
     }
-  
+
     const download = async () => {
       const buffer = await workbook.xlsx.writeBuffer()
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      
-             saveAs( blob,
-                            toDate && fromDate
-                              ? `Collection_Report : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
-                              : `Collection_Report: Present `,);
+
+      saveAs(blob,
+        toDate && fromDate
+          ? `Collection_Report : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+          : `Collection_Report: Present `,);
     }
-  
+
     download()
   }
-  
-  
+
+
 
   return (
     <Box sx={{ p: 3 }}>
@@ -1045,19 +1050,19 @@ function CollectionReport() {
               />
             </Grid>
 
-           
+
           </Grid>
         </Grid>
         <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-        <Grid item>
-              <PrimaryButton
-                bgcolor={"#001f3f"}
-                title="Download Excel"
-                sx={{ marginTop: "30px" }}
-                onClick={() => handleCSVDownload()}
-                loading={loading}
-              />
-            </Grid>
+          <Grid item>
+            <PrimaryButton
+              bgcolor={"#001f3f"}
+              title="Download Excel"
+              sx={{ marginTop: "30px" }}
+              onClick={() => handleCSVDownload()}
+              loading={loading}
+            />
+          </Grid>
         </Grid>
       </Grid>
       <Box >
@@ -1065,85 +1070,85 @@ function CollectionReport() {
 
         {<DataTable loading={loader} total={true} csv={false} data={customerQueue} columns={columns} />}
         <Grid container spacing={2} mt={1}>
-      <Grid item xs={4}>
-        <Input
-        sx={{
-          "& .MuiInputBase-input":{
-            WebkitTextFillColor: "Black !important"
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
 
-          }
-        }}
-          fullWidth
-          disabled
-          value={`Total Cash: ${CommaSeparator(parseFloat(data?.totalCash).toFixed(2))}`}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <Input
-        sx={{
-          "& .MuiInputBase-input":{
-            WebkitTextFillColor: "Black !important"
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Cash: ${CommaSeparator(parseFloat(data?.totalCash).toFixed(2))}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
 
-          }
-        }}
-          fullWidth
-          disabled
-          value={`Total Network: ${CommaSeparator(parseFloat(data?.totalNetwork).toFixed(2))}`}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <Input
-        sx={{
-          "& .MuiInputBase-input":{
-            WebkitTextFillColor: "Black !important"
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Network: ${CommaSeparator(parseFloat(data?.totalNetwork).toFixed(2))}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
 
-          }
-        }}
-          fullWidth
-          disabled
-          value={`Total Bank: ${CommaSeparator(parseFloat(data?.totalBank).toFixed(2))}`}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <Input
-        sx={{
-          "& .MuiInputBase-input":{
-            WebkitTextFillColor: "Black !important"
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Bank: ${CommaSeparator(parseFloat(data?.totalBank).toFixed(2))}`}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
 
-          }
-        }}
-          fullWidth
-          disabled
-          value={`Total Card: ${CommaSeparator(parseFloat(data?.totalCard).toFixed(2))}`}
-        />
-      </Grid>
-      {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && <Grid item xs={4}>
-        <Input
-        sx={{
-          "& .MuiInputBase-input":{
-            WebkitTextFillColor: "Black !important"
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Card: ${CommaSeparator(parseFloat(data?.totalCard).toFixed(2))}`}
+            />
+          </Grid>
+          {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" && <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
 
-          }
-        }}
-          fullWidth
-          disabled
-          value={`Mohre Account Receivable: ${CommaSeparator(parseFloat(data?.totalMohre).toFixed(2))}`}
-        />
-      </Grid>}
-      <Grid item xs={4}>
-        <Input
-        sx={{
-          "& .MuiInputBase-input":{
-            WebkitTextFillColor: "Black !important"
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Mohre Account Receivable: ${CommaSeparator(parseFloat(data?.totalMohre).toFixed(2))}`}
+            />
+          </Grid>}
+          <Grid item xs={4}>
+            <Input
+              sx={{
+                "& .MuiInputBase-input": {
+                  WebkitTextFillColor: "Black !important"
 
-          }
-        }}
-          fullWidth
-          disabled
-          value={`Total Amount: ${CommaSeparator(parseFloat(data?.totalAmount).toFixed(2))}`}
-        />
-      </Grid>
-    </Grid>
+                }
+              }}
+              fullWidth
+              disabled
+              value={`Total Amount: ${CommaSeparator(parseFloat(data?.totalAmount).toFixed(2))}`}
+            />
+          </Grid>
+        </Grid>
       </Box>
 
     </Box>
