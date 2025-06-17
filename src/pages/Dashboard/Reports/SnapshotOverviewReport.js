@@ -391,301 +391,300 @@ function SnapshotOverviewReport() {
 
       const downloadOverviewReportExcel = () => {
         // Skip if no data
-        if (!customerQueue) return
-      
-        const workbook = new ExcelJS.Workbook()
-        const worksheet = workbook.addWorksheet("Overview Report")
-      
+        if (!customerQueue) return;
+    
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Overview Report");
+    
         // Set professional header
         worksheet.headerFooter.oddHeader =
-          '&C&"Arial,Bold"&18OVERVIEW REPORT\n' +
-          '&C&"Arial,Regular"&12Your Company Name\n' +
-          '&C&"Arial,Regular"&10Period: &D - &T\n' +
-          '&L&"Arial,Regular"&8Generated on: ' +
-          new Date().toLocaleDateString() +
-          "\n" +
-          '&R&"Arial,Regular"&8Page &P of &N'
-      
+            '&C&"Arial,Bold"&18OVERVIEW REPORT\n' +
+            '&C&"Arial,Regular"&12Your Company Name\n' +
+            '&C&"Arial,Regular"&10Period: &D - &T\n' +
+            '&L&"Arial,Regular"&8Generated on: ' +
+            new Date().toLocaleDateString() +
+            "\n" +
+            '&R&"Arial,Regular"&8Page &P of &N';
+    
         // Set custom footer as requested
         worksheet.headerFooter.oddFooter =
-          '&C&"Arial,Regular"&10\n' + // One line gap
-          '&C&"Arial,Bold"&12This is electronically generated report\n' +
-          '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
-      
-        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
-      
+            '&C&"Arial,Regular"&10\n' + // One line gap
+            '&C&"Arial,Bold"&12This is electronically generated report\n' +
+            '&C&"Arial,Regular"&10Powered by MangotechDevs.ae';
+    
+        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter;
+    
         // Set page setup for professional printing
         worksheet.pageSetup = {
-          paperSize: 9, // A4
-          orientation: "portrait", // Portrait for overview report
-          fitToPage: true,
-          fitToWidth: 1,
-          fitToHeight: 0,
-          margins: {
-            left: 0.7,
-            right: 0.7,
-            top: 1.0,
-            bottom: 1.0,
-            header: 0.3,
-            footer: 0.5,
-          },
-        }
-      
+            paperSize: 9, // A4
+            orientation: "portrait", // Portrait for overview report
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: {
+                left: 0.7,
+                right: 0.7,
+                top: 1.0,
+                bottom: 1.0,
+                header: 0.3,
+                footer: 0.5,
+            },
+        };
+    
         // Add title section at the top of the worksheet
-        const titleRow = worksheet.addRow(["OVERVIEW REPORT"])
+        const titleRow = worksheet.addRow(["OVERVIEW REPORT"]);
         titleRow.getCell(1).font = {
-          name: "Arial",
-          size: 16,
-          bold: true,
-          color: { argb: "2F4F4F" },
-        }
-        titleRow.getCell(1).alignment = { horizontal: "center" }
-        worksheet.mergeCells("A1:B1")
-      
+            name: "Arial",
+            size: 16,
+            bold: true,
+            color: { argb: "2F4F4F" },
+        };
+        titleRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A1:B1");
+    
         const companyName =
-          agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-            ? "PREMIUM BUSINESSMEN SERVICES"
-            : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-      
-        const companyRow = worksheet.addRow([companyName])
+            agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                ? "PREMIUM BUSINESSMEN SERVICES"
+                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC";
+    
+        const companyRow = worksheet.addRow([companyName]);
         companyRow.getCell(1).font = {
-          name: "Arial",
-          size: 14,
-          bold: true,
-          color: { argb: "4472C4" },
-        }
-        companyRow.getCell(1).alignment = { horizontal: "center" }
-        worksheet.mergeCells("A2:B2")
-      
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "4472C4" },
+        };
+        companyRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A2:B2");
+    
         const dateRow = worksheet.addRow([
-          `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
-        ])
+            `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+        ]);
         dateRow.getCell(1).font = {
-          name: "Arial",
-          size: 10,
-          italic: true,
-          color: { argb: "666666" },
-        }
-        dateRow.getCell(1).alignment = { horizontal: "center" }
-        worksheet.mergeCells("A3:B3")
-      
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        };
+        dateRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A3:B3");
+    
         const periodRow = worksheet.addRow([
-          toDate && fromDate
-            ? `Period: ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
-            : `Period: All`,
-        ])
+            toDate && fromDate
+                ? `Period: ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+                : `Period: All`,
+        ]);
         periodRow.getCell(1).font = {
-          name: "Arial",
-          size: 10,
-          italic: true,
-          color: { argb: "666666" },
-        }
-        periodRow.getCell(1).alignment = { horizontal: "center" }
-        worksheet.mergeCells("A4:B4")
-      
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        };
+        periodRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A4:B4");
+    
         // Add empty row for spacing
-        worksheet.addRow([])
-      
+        worksheet.addRow([]);
+    
         // Create table data exactly as provided
         const tableData = [
-          { description: "Invoice Count", value: customerQueue.invoiceCount },
-          { description: "Service Count", value: customerQueue.itemCount },
-          {
-            description: "Total Invoice Amount",
-            value: (
-              Number.parseFloat(customerQueue.totalGovernmentCharges) +
-              Number.parseFloat(customerQueue.totalBankCharges) +
-              Number.parseFloat(customerQueue.totalCenterFee)
-            ).toFixed(2),
-          },
-          {
-            description: "Total Govt. Charges",
-            value: (
-              Number.parseFloat(customerQueue.totalGovernmentCharges) + Number.parseFloat(customerQueue.totalBankCharges)
-            ).toFixed(2),
-          },
-          { description: "Total Service Charges", value: Number.parseFloat(customerQueue.totalCenterFee).toFixed(2) },
-          { description: "Total VAT", value: Number.parseFloat(customerQueue.totalVat).toFixed(2) },
-          { description: "Total PRO Commission", value: Number.parseFloat(customerQueue.proCommission).toFixed(2) },
-          { description: "Total Employee Commission", value: Number.parseFloat(customerQueue.typistCommission).toFixed(2) },
-          {
-            description: "Net Service Charge",
-            value: (
-              Number.parseFloat(customerQueue.totalGovernmentCharges) +
-              Number.parseFloat(customerQueue.totalBankCharges) +
-              Number.parseFloat(customerQueue.totalCenterFee) +
-              Number.parseFloat(customerQueue.totalVat) -
-              Number.parseFloat(customerQueue.proCommission) -
-              Number.parseFloat(customerQueue.typistCommission)
-            ).toFixed(2),
-          },
-          { description: "Cash Collection", value: Number.parseFloat(customerQueue.totalCash).toFixed(2) },
-          { description: "Credit Card Collection", value: Number.parseFloat(customerQueue.totalCard).toFixed(2) },
-          { description: "Bank Transfer Collection", value: Number.parseFloat(customerQueue.totalBank).toFixed(2) },
-          { description: "Online Payment Collection", value: Number.parseFloat(customerQueue.totalNetwork).toFixed(2) },
-          {
-            description: "Net Collection",
-            value: (
-              Number.parseFloat(customerQueue.totalCash) +
-              Number.parseFloat(customerQueue.totalCard) +
-              Number.parseFloat(customerQueue.totalBank) +
-              Number.parseFloat(customerQueue.totalMohre || 0) +
-              Number.parseFloat(customerQueue.totalNetwork)
-            ).toFixed(2),
-          },
-        ]
-      
+            { description: "Invoice Count", value: customerQueue.invoiceCount },
+            { description: "Service Count", value: customerQueue.itemCount },
+            {
+                description: "Total Invoice Amount",
+                value: (
+                    Number.parseFloat(customerQueue.totalGovernmentCharges) +
+                    Number.parseFloat(customerQueue.totalBankCharges) +
+                    Number.parseFloat(customerQueue.totalCenterFee)
+                ).toFixed(2),
+            },
+            {
+                description: "Total Govt. Charges",
+                value: (
+                    Number.parseFloat(customerQueue.totalGovernmentCharges) + Number.parseFloat(customerQueue.totalBankCharges)
+                ).toFixed(2),
+            },
+            { description: "Total Service Charges", value: Number.parseFloat(customerQueue.totalCenterFee).toFixed(2) },
+            { description: "Total VAT", value: Number.parseFloat(customerQueue.totalVat).toFixed(2) },
+            { description: "Total PRO Commission", value: Number.parseFloat(customerQueue.proCommission).toFixed(2) },
+            { description: "Total Employee Commission", value: Number.parseFloat(customerQueue.typistCommission).toFixed(2) },
+            {
+                description: "Net Service Charge",
+                value: (
+                    Number.parseFloat(customerQueue.totalGovernmentCharges) +
+                    Number.parseFloat(customerQueue.totalBankCharges) +
+                    Number.parseFloat(customerQueue.totalCenterFee) +
+                    Number.parseFloat(customerQueue.totalVat) -
+                    Number.parseFloat(customerQueue.proCommission) -
+                    Number.parseFloat(customerQueue.typistCommission)
+                ).toFixed(2),
+            },
+            { description: "Cash Collection", value: Number.parseFloat(customerQueue.totalCash).toFixed(2) },
+            { description: "Credit Card Collection", value: Number.parseFloat(customerQueue.totalCard).toFixed(2) },
+            { description: "Bank Transfer Collection", value: Number.parseFloat(customerQueue.totalBank).toFixed(2) },
+            { description: "Online Payment Collection", value: Number.parseFloat(customerQueue.totalNetwork).toFixed(2) },
+            {
+                description: "Net Collection",
+                value: (
+                    Number.parseFloat(customerQueue.totalCash) +
+                    Number.parseFloat(customerQueue.totalCard) +
+                    Number.parseFloat(customerQueue.totalBank) +
+                    Number.parseFloat(customerQueue.totalMohre || 0) +
+                    Number.parseFloat(customerQueue.totalNetwork)
+                ).toFixed(2),
+            },
+        ];
+    
         // Add headers
-        const headers = ["Description", "Value"]
-        const headerRow = worksheet.addRow(headers)
-      
+        const headers = ["Description", "Value"];
+        const headerRow = worksheet.addRow(headers);
+    
         // Style header row
         headerRow.eachCell((cell) => {
-          cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "2F4F4F" }, // Dark slate gray
-          }
-          cell.font = {
-            name: "Arial",
-            bold: true,
-            color: { argb: "FFFFFF" },
-            size: 11,
-          }
-          cell.alignment = { horizontal: "center", vertical: "middle" }
-          cell.border = {
-            top: { style: "thin", color: { argb: "000000" } },
-            left: { style: "thin", color: { argb: "000000" } },
-            bottom: { style: "thin", color: { argb: "000000" } },
-            right: { style: "thin", color: { argb: "000000" } },
-          }
-        })
-      
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "2F4F4F" }, // Dark slate gray
+            };
+            cell.font = {
+                name: "Arial",
+                bold: true,
+                color: { argb: "FFFFFF" },
+                size: 11,
+            };
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            };
+        });
+    
         // Add data rows
         tableData.forEach((row, index) => {
-          const dataRow = worksheet.addRow([row.description, row.value])
-      
-          // Style data rows
-          dataRow.eachCell((cell, colNumber) => {
-            cell.font = { name: "Arial", size: 10 }
-            cell.alignment = {
-              horizontal: colNumber === 1 ? "left" : "right", // Description left-aligned, value right-aligned
-              vertical: "middle",
-            }
-            cell.border = {
-              top: { style: "hair", color: { argb: "CCCCCC" } },
-              left: { style: "hair", color: { argb: "CCCCCC" } },
-              bottom: { style: "hair", color: { argb: "CCCCCC" } },
-              right: { style: "hair", color: { argb: "CCCCCC" } },
-            }
-      
-            // Format value column (column 2)
-            if (colNumber === 2) {
-              // Check if it's a count field (no decimal formatting needed)
-              if (row.description.includes("Count")) {
-                cell.numFmt = "#,##0"
-                cell.value = Number.parseInt(row.value || 0)
-              } else {
-                // Amount fields - 2 decimal places
-                cell.numFmt = "#,##0.00"
-                cell.value = Number.parseFloat(row.value || 0)
-              }
-            }
-      
-            // Highlight important rows with different background colors
-            if (
-              row.description === "Total Invoice Amount" ||
-              row.description === "Net Service Charge" ||
-              row.description === "Net Collection"
-            ) {
-              cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "E6F3FF" }, // Light blue background for key metrics
-              }
-              cell.font = { name: "Arial", size: 10, bold: true }
-            }
-      
-            // Highlight collection rows with light green
-            if (row.description.includes("Collection") && row.description !== "Net Collection") {
-              cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "E6F7E6" }, // Light green background for collection methods
-              }
-            }
-          })
-        })
-      
+            const dataRow = worksheet.addRow([row.description, row.value]);
+    
+            // Style data rows
+            dataRow.eachCell((cell, colNumber) => {
+                cell.font = { name: "Arial", size: 10 };
+                cell.alignment = {
+                    horizontal: colNumber === 1 ? "left" : "right", // Description left-aligned, value right-aligned
+                    vertical: "middle",
+                };
+                cell.border = {
+                    top: { style: "hair", color: { argb: "CCCCCC" } },
+                    left: { style: "hair", color: { argb: "CCCCCC" } },
+                    bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                    right: { style: "hair", color: { argb: "CCCCCC" } },
+                };
+    
+                // Format value column (column 2)
+                if (colNumber === 2) {
+                    // Check if it's a count field (no decimal formatting needed)
+                    if (row.description.includes("Count")) {
+                        cell.numFmt = "#,##0";
+                        cell.value = Number.parseInt(row.value || 0);
+                    } else {
+                        // Amount fields - 2 decimal places
+                        cell.numFmt = "#,##0.00";
+                        cell.value = Number.parseFloat(row.value || 0);
+                    }
+                }
+    
+                // Highlight important rows with different background colors
+                if (
+                    row.description === "Total Invoice Amount" ||
+                    row.description === "Net Service Charge" ||
+                    row.description === "Net Collection"
+                ) {
+                    cell.fill = {
+                        type: "pattern",
+                        pattern: "solid",
+                        fgColor: { argb: "E6F3FF" }, // Light blue background for key metrics
+                    };
+                    cell.font = { name: "Arial", size: 10, bold: true };
+                }
+    
+                // Highlight collection rows with light green
+                if (row.description.includes("Collection") && row.description !== "Net Collection") {
+                    cell.fill = {
+                        type: "pattern",
+                        pattern: "solid",
+                        fgColor: { argb: "E6F7E6" }, // Light green background for collection methods
+                    };
+                }
+            });
+        });
+    
         // Add empty rows for spacing before footer
-        worksheet.addRow([])
-        worksheet.addRow([])
-      
+        worksheet.addRow([]);
+        worksheet.addRow([]);
+    
         // Add the electronic generated report text with black border as requested
-        const reportRow = worksheet.addRow(["This is electronically generated report"])
+        const reportRow = worksheet.addRow(["This is electronically generated report"]);
         reportRow.getCell(1).font = {
-          name: "Arial",
-          size: 12,
-          bold: true,
-          color: { argb: "000000" },
-        }
-        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+            name: "Arial",
+            size: 12,
+            bold: true,
+            color: { argb: "000000" },
+        };
+        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" };
         reportRow.getCell(1).border = {
-          top: { style: "medium", color: { argb: "000000" } },
-          left: { style: "medium", color: { argb: "000000" } },
-          bottom: { style: "medium", color: { argb: "000000" } },
-          right: { style: "medium", color: { argb: "000000" } },
-        }
-        worksheet.mergeCells(`A${reportRow.number}:B${reportRow.number}`)
-      
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+        };
+        worksheet.mergeCells(`A${reportRow.number}:B${reportRow.number}`);
+    
         // Add powered by line
-        const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+        const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"]);
         poweredByRow.getCell(1).font = {
-          name: "Arial",
-          size: 10,
-          italic: true,
-          color: { argb: "666666" },
-        }
-        poweredByRow.getCell(1).alignment = { horizontal: "center" }
-        worksheet.mergeCells(`A${poweredByRow.number}:B${poweredByRow.number}`)
-      
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        };
+        poweredByRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells(`A${poweredByRow.number}:B${poweredByRow.number}`);
+    
         // Set column widths
         worksheet.columns = [
-          { width: 35 }, // Description
-          { width: 20 }, // Value
-        ]
-      
+            { width: 35 }, // Description
+            { width: 20 }, // Value
+        ];
+    
         // Add workbook properties
-        workbook.creator = "Finance Department"
-        workbook.lastModifiedBy = "Finance System"
-        workbook.created = new Date()
-        workbook.modified = new Date()
-        workbook.lastPrinted = new Date()
-      
+        workbook.creator = "Finance Department";
+        workbook.lastModifiedBy = "Finance System";
+        workbook.created = new Date();
+        workbook.modified = new Date();
+        workbook.lastPrinted = new Date();
+    
         // Set workbook properties
         workbook.properties = {
-          title: "Overview Report",
-          subject: "Financial Overview Report",
-          keywords: "overview, financial, summary, invoice, collection, charges, commission",
-          category: "Financial Reports",
-          description: "Overview report generated from accounting system",
-          company: companyName,
-        }
-      
+            title: "Overview Report",
+            subject: "Financial Overview Report",
+            keywords: "overview, financial, summary, invoice, collection, charges, commission",
+            category: "Financial Reports",
+            description: "Overview report generated from accounting system",
+            company: companyName,
+        };
+    
         const download = async () => {
-          const buffer = await workbook.xlsx.writeBuffer()
-          const blob = new Blob([buffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          })
-                saveAs(blob,
-                          toDate && fromDate
-                              ? `overview_report : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
-                              : `overview_report: Present `,);
-         
-        }
-      
-        download()
-      }
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+            saveAs(blob,
+                toDate && fromDate
+                    ? `overview_report : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+                    : `overview_report: Present`);
+        };
+    
+        download();
+    };
   
     useEffect(() => {
         setFromDate(new Date())
@@ -766,9 +765,9 @@ function SnapshotOverviewReport() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}> Overview Report</Typography>
 
-                {customerQueue?.length > 0 &&
+                {
                     <Button
-                        onClick={() => downloadOverviewReportExcel(customerQueue)}
+                        onClick={() => downloadOverviewReportExcel()}
 
 
                         variant="contained"
@@ -827,15 +826,7 @@ function SnapshotOverviewReport() {
                 </Grid>
                 <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
 
-                    <CSVLink
-                        data={tableData}
-                        filename={"overview_report.csv"}
-                        style={{ textDecoration: 'none' }} // Remove the default link styling
-                    >
-                        <Button sx={{backgroundColor:'#001f3f',textTransform:'capitalize'}} variant="contained" color="primary">
-                            Export to Excel
-                        </Button>
-                    </CSVLink>
+           
                 </Grid>
             </Grid>
             <Box >
