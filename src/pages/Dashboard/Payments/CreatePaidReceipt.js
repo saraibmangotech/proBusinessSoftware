@@ -1004,7 +1004,7 @@ function CreatePaidReceipt() {
                         <DatePicker
                           label={"Payment Date :*"}
                           value={date}
-                          disabled={true}
+                          disabled={!creditButton}
                           size={"small"}
                           error={errors1?.date?.message}
                           register={register1("paidAt")}

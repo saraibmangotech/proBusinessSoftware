@@ -317,6 +317,10 @@ function EmployeeSalesSummary() {
             accessorKey: "employeeName",
         },
         {
+            header: "Total Transactions ",
+            accessorKey: "itemCount",
+        },
+        {
             header: "Total Govt. Charges",
             accessorKey: "totalGovernmentCharges",
             accessorFn: (row) => parseFloat(row?.totalGovernmentCharges || 0),
@@ -502,6 +506,7 @@ function EmployeeSalesSummary() {
         const headers = [
             "Employee ID",
             "Employee Name",
+            "Total Transactions",
             "Total Govt. Charges",
             "Total Service Charges",
             "Tax",
@@ -543,6 +548,7 @@ function EmployeeSalesSummary() {
             const dataRow = worksheet.addRow([
                 row?.employeeId || "",
                 row?.employeeName || "",
+                row?.itemCount || "",
                 Number.parseFloat(row?.totalGovernmentCharges || 0).toFixed(2),
                 Number.parseFloat(row?.totalCenterFee || 0).toFixed(2),
                 Number.parseFloat(row?.totalVat || 0).toFixed(2),
