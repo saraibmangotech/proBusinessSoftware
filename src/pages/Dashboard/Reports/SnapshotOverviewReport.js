@@ -458,7 +458,7 @@ function SnapshotOverviewReport() {
         worksheet.mergeCells("A2:B2");
     
         const dateRow = worksheet.addRow([
-            `Report Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+            `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
         ]);
         dateRow.getCell(1).font = {
             name: "Arial",
