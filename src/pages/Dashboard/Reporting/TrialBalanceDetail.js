@@ -481,7 +481,7 @@ function TrialBalanceDetailed() {
     
       const dateRow2 = worksheet.addRow([
         toDate && fromDate
-          ? `Period:  ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+          ? `Period:  ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
           : `Period: All `,
       ])
       dateRow2.getCell(1).font = {
@@ -814,7 +814,7 @@ function TrialBalanceDetailed() {
       saveAs(
         blob,
         toDate && fromDate
-          ? `Trial Balance : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+          ? `Trial Balance : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
           : `Trial Balance: Present `,
       )
     }
@@ -901,7 +901,7 @@ function TrialBalanceDetailed() {
       
         const dateRow2 = worksheet.addRow([
           toDate && fromDate
-            ? `Period:  ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+            ? `Period:  ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
             : `Period: All `,
         ])
         dateRow2.getCell(1).font = {
@@ -1149,7 +1149,7 @@ function TrialBalanceDetailed() {
         saveAs(
           blob,
           toDate && fromDate
-            ? `Trial Balance Detailed : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+            ? `Trial Balance Detailed : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
             : `Trial Balance Detailed: Present `,
         )
       }

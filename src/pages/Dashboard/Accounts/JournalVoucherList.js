@@ -598,7 +598,7 @@ function JournalVoucherList() {
             const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             saveAs( blob,
                 toDate && fromDate
-                  ? `Journal_Vouchers  : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+                  ? `Journal_Vouchers  : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
                   : `Journal_Vouchers : Present `,);
         }
         download();

@@ -456,7 +456,7 @@ function VatOutputRegister() {
 
         const periodRow = worksheet.addRow([
             toDate && fromDate
-                ? `Period: ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+                ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
                 : `Period: All`,
         ])
         periodRow.getCell(1).font = {
@@ -706,7 +706,7 @@ function VatOutputRegister() {
 
             saveAs(blob,
                 toDate && fromDate
-                    ? `vat_output_register : ${fromDate ? moment(fromDate).format("DD/MM/YYYY") : "-"} To ${toDate ? moment(toDate).format("DD/MM/YYYY") : "Present"}`
+                    ? `vat_output_register : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
                     : `vat_output_register: Present `,);
         }
 
