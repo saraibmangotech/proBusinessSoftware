@@ -27,7 +27,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
-import { PrimaryButton } from 'components/Buttons';
+import { PrimaryButton, SwitchButton } from 'components/Buttons';
 import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -42,6 +42,7 @@ import { adjustSectionValue } from '@mui/x-date-pickers/internals/hooks/useField
 import SystemServices from 'services/System';
 import LockIcon from '@mui/icons-material/Lock';
 import UserServices from 'services/User';
+import FinanceServices from 'services/Finance';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -115,7 +116,7 @@ function UserList() {
   const contentRef = useRef(null);
 
 
-  const tableHead = [{ name: 'Create Date', key: '' }, { name: 'User Name ', key: 'name' },{ name: 'Employee ID', key: 'employee_id' }, { name: 'User Role', key: '' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const tableHead = [{ name: 'Create Date', key: '' }, { name: 'User Name ', key: 'name' }, { name: 'Employee ID', key: 'employee_id' }, { name: 'User Role', key: '' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
 
@@ -154,7 +155,7 @@ function UserList() {
     try {
       const Page = page ? page : currentPage
       const Limit = limit ? limit : pageLimit
-      const Filter = filter ?  { ...filters, ...filter } : null;
+      const Filter = filter ? { ...filters, ...filter } : null;
       setCurrentPage(Page)
       setPageLimit(Limit)
       setFilters(Filter)
@@ -167,7 +168,7 @@ function UserList() {
       const { data } = await UserServices.getUsers(params)
       setUserList(data?.users?.rows)
       setTotalCount(data?.users?.count)
-      console.log(formatPermissionData(data?.permissions)) 
+      console.log(formatPermissionData(data?.permissions))
       setPermissions(formatPermissionData(data?.permissions))
       data?.permissions.forEach(e => {
         if (e?.route && e?.identifier && e?.permitted) {
@@ -178,7 +179,7 @@ function UserList() {
     } catch (error) {
       showErrorToast(error)
     } finally {
-    setLoader(false)
+      setLoader(false)
     }
   }
 
@@ -190,7 +191,7 @@ function UserList() {
     try {
       let obj = {
         id: selectedID,
-        is_active:status
+        is_active: status
       }
 
 
@@ -221,7 +222,40 @@ function UserList() {
 
 
 
+  // *For Update Account Status
+  const updateAccountStatus = async (id, status) => {
+    const shallowCopy = [...UserList];
+    let accountIndex = shallowCopy.findIndex(item => item.id == id);
 
+    if (accountIndex != -1) {
+      shallowCopy[accountIndex].is_active = status;
+    }
+
+    setUserList(shallowCopy)
+
+
+    try {
+      let obj = {
+        id: id,
+        is_active: status
+      }
+    
+    
+      const promise = UserServices.updateUser(obj);
+
+            showPromiseToast(
+                promise,
+                'Saving...',
+                'Added Successfully',
+                'Something Went Wrong'
+            );
+
+
+      // getAccounts()
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
 
 
 
@@ -275,7 +309,7 @@ function UserList() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>User Management</Typography>
         {true && <PrimaryButton
-         bgcolor={'#001f3f'}
+          bgcolor={'#001f3f'}
           title="Create User"
           onClick={() => navigate('/create-user')}
           loading={loading}
@@ -301,15 +335,15 @@ function UserList() {
                     </Grid> */}
           <Grid item xs={6} display={'flex'} justifyContent={'flex-end'} gap={2} >
             <PrimaryButton
-             bgcolor={"#0076bf"}
-             textcolor={Colors.white}
+              bgcolor={"#0076bf"}
+              textcolor={Colors.white}
               // border={`1px solid ${Colors.primary}`}
               title="Reset"
-              onClick={() => {setValue('search', ''); getUserRole(1,'',null);  }}
+              onClick={() => { setValue('search', ''); getUserRole(1, '', null); }}
               loading={loading}
             />
             <PrimaryButton
-             bgcolor={'#001f3f'}
+              bgcolor={'#001f3f'}
               title="Search"
               onClick={() => handleFilter()}
               loading={loading}
@@ -327,7 +361,7 @@ function UserList() {
 
 
             {(
-               (
+              (
                 <Fragment>
                   <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5} fileName='Import Customers' >
 
@@ -383,14 +417,11 @@ function UserList() {
 
                                 </Cell>
                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                  <Box component={'div'} onClick={() => { 
-                                    if(permissions?.status_update){
-                                      setDeleteDialog(true); setSelectedID(item?.id)
-                                    }
-                                     }} sx={{ cursor: 'pointer', display: 'flex !important', justifyContent: 'flex-start !important' }}>
-                                    <Box component={'img'} src={item?.is_active ? Images.successIcon : Images.errorIcon} width={'13px'}></Box>
-                                    {item?.is_active ? "Activated" : 'Deactivated'}
-                                  </Box>
+                                  <SwitchButton
+
+                                    isChecked={item?.is_active}
+                                    setIsChecked={() => updateAccountStatus(item.id, !item?.is_active)}
+                                  />
 
 
                                 </Cell>
