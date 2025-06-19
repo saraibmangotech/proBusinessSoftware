@@ -1,665 +1,409 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, tableCellClasses, IconButton, CircularProgress, Chip, Grid, InputLabel,
-    FormControl,
-    Select,
-    MenuItem,
-    ListItemText,
-    Tooltip,
-    Checkbox,
-    InputAdornment,
-    TextField,
-} from '@mui/material';
+"use client"
 
-import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
-import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
-import Colors from 'assets/Style/Colors';
-import { CircleLoading } from 'components/Loaders';
-import { ErrorToaster, SuccessToaster } from 'components/Toaster';
-import FinanceStatusDialog from 'components/Dialog/FinanceStatusDialog';
-import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
-import AllocateDialog from 'components/Dialog/AllocateDialog';
-import CustomerServices from 'services/Customer';
-import { makeStyles } from '@mui/styles';
-import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
-import InputField from 'components/Input';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { addPermission } from 'redux/slices/navigationDataSlice';
-import SimpleDialog from 'components/Dialog/SimpleDialog';
-import { PrimaryButton } from 'components/Buttons';
-import SelectField from 'components/Select';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import SearchIcon from '@mui/icons-material/Search';
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { PDFExport } from '@progress/kendo-react-pdf';
-import moment from 'moment';
-import LabelCustomInput from 'components/Input/LabelCustomInput';
-import { showErrorToast, showPromiseToast } from 'components/NewToaster';
-import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
-import DataTable from 'components/DataTable';
-import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import { useAuth } from 'context/UseContext';
+import { useCallback, useRef, useState } from "react"
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  tableCellClasses,
+  Grid,
+  Checkbox,
+  TextField,
+} from "@mui/material"
+
+import styled from "@emotion/styled"
+import { useNavigate } from "react-router-dom"
+import { makeStyles } from "@mui/styles"
+import { useForm } from "react-hook-form"
 
 // *For Table Style
-const Row = styled(TableRow)(({ theme }) => ({
-    border: 0,
-
-}));
-
 const Cell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-        border: '1px solid #EEEEEE',
-        padding: '15px',
-        textAlign: 'left',
-        whiteSpace: 'nowrap',
-        color: '#434343',
-        paddingRight: '50px',
-        background: 'transparent',
-        fontWeight: 'bold'
-
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-
-        textWrap: 'nowrap',
-        padding: '5px !important',
-        paddingLeft: '15px !important',
-
-        '.MuiBox-root': {
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '.MuiBox-root': {
-                cursor: 'pointer'
-            }
-        },
-        'svg': {
-            width: 'auto',
-            height: '24px',
-        },
-        '.MuiTypography-root': {
-            textTransform: 'capitalize',
-            fontFamily: FontFamily.NunitoRegular,
-            textWrap: 'nowrap',
-        },
-        '.MuiButtonBase-root': {
-            padding: '8px',
-            width: '28px',
-            height: '28px',
-        }
-    },
-}));
+  [`&.${tableCellClasses.head}`]: {
+    fontSize: 11,
+    fontFamily: "Public Sans",
+    border: "1px solid #EEEEEE",
+    padding: "6px",
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    color: "#ffffff",
+    backgroundColor: "#1e3a8a",
+    fontWeight: "bold",
+    minWidth: "70px",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 11,
+    fontFamily: "Public Sans",
+    textWrap: "nowrap",
+    padding: "3px !important",
+    textAlign: "center",
+    border: "1px solid #EEEEEE",
+    backgroundColor: "#ffffff",
+  },
+}))
 
 const useStyles = makeStyles({
-    loaderWrap: {
-        display: 'flex',
-        height: 100,
-        '& svg': {
-            width: '40px !important',
-            height: '40px !important'
-        }
-    }
+  autoColumn: {
+    backgroundColor: "#e3f2fd !important",
+  },
+  manualColumn: {
+    backgroundColor: "#fff3e0 !important",
+  },
+  gpssaColumn: {
+    backgroundColor: "#ffff00 !important",
+  },
 })
 
 function SalaryList() {
+  const navigate = useNavigate()
+  const classes = useStyles()
+  const contentRef = useRef(null)
 
-    const navigate = useNavigate();
-    const classes = useStyles();
-    const dispatch = useDispatch();
-    const contentRef = useRef(null);
-    const [status, setStatus] = useState(null)
-    const [statusDialog, setStatusDialog] = useState(false)
-    const [selectedData, setSelectedData] = useState(null)
-    const [tableLoader, setTableLoader] = useState(false)
-    const { user } = useAuth()
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        getValues,
-        reset,
-    } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    getValues,
+    reset,
+  } = useForm()
 
-    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+  const [selectedRows, setSelectedRows] = useState(new Set())
 
+  // Exact column configuration from the image
+  const columnConfig = [
+    { key: "employeeName", header: "Employee Name", type: "auto" },
+    { key: "employeeId", header: "Employee ID", type: "auto" },
+    { key: "salaryPaid", header: "Salary Paid", type: "auto" },
+    { key: "commission", header: "Commission", type: "auto" },
+    { key: "otherAdd", header: "Other Add", type: "manual" },
+    { key: "al", header: "AL", type: "manual" },
+    { key: "sl", header: "SL", type: "manual" },
+    { key: "arrear", header: "Arrear", type: "auto" },
+    { key: "gpssaEmp", header: "GPSSA", type: "auto", isGpssa: true },
+    { key: "gpssaEmr", header: "GPSSA", type: "auto", isGpssa: true },
+    { key: "staffAdvance", header: "Staff Advance", type: "manual" },
+    { key: "lateComm", header: "Late Comm", type: "auto" },
+    { key: "additional", header: "Additional", type: "manual" },
+    { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
+    { key: "unpaidLeave", header: "Unpaid Leave", type: "auto" },
+    { key: "totalPay", header: "Total pay", type: "auto" },
+    { key: "commissionFinal", header: "Commission", type: "manual" },
+    { key: "netSalary", header: "Net Salary", type: "auto" },
+  ]
 
-    const [loader, setLoader] = useState(false);
+  // Initial salary data with employee names and IDs
+  const initialData = [
+    {
+      id: "1",
+      employeeName: "John Doe",
+      employeeId: "EMP001",
+      salaryPaid: 5500,
+      commission: 3765,
+      otherAdd: 0,
+      al: 0,
+      sl: 0,
+      arrear: 0,
+      gpssaEmp: 0,
+      gpssaEmr: 1000,
+      staffAdvance: 59,
+      lateComm: 0,
+      additional: 0,
+      salaryDeduction: 8000,
+      unpaidLeave: 0,
+      totalPay: 9212,
+      commissionFinal: 0,
+      netSalary: 9212,
+    },
+    {
+      id: "2",
+      employeeName: "Jane Smith",
+      employeeId: "EMP002",
+      salaryPaid: 8000,
+      commission: 30055,
+      otherAdd: 1200,
+      al: 0,
+      sl: 0,
+      arrear: 880,
+      gpssaEmp: 0,
+      gpssaEmr: 1000,
+      staffAdvance: 163,
+      lateComm: 0,
+      additional: 0,
+      salaryDeduction: 8000,
+      unpaidLeave: 0,
+      totalPay: 30212,
+      commissionFinal: 7791,
+      netSalary: 22421,
+    },
+    {
+      id: "3",
+      employeeName: "Mike Johnson",
+      employeeId: "EMP003",
+      salaryPaid: 2500,
+      commission: 0,
+      otherAdd: 0,
+      al: 0,
+      sl: 0,
+      arrear: 0,
+      gpssaEmp: 0,
+      gpssaEmr: 0,
+      staffAdvance: 0,
+      lateComm: 0,
+      additional: 0,
+      salaryDeduction: 0,
+      unpaidLeave: 0,
+      totalPay: 2500,
+      commissionFinal: 0,
+      netSalary: 2500,
+    },
+    {
+      id: "4",
+      employeeName: "Sarah Wilson",
+      employeeId: "EMP004",
+      salaryPaid: 2500,
+      commission: 0,
+      otherAdd: 0,
+      al: 0,
+      sl: 0,
+      arrear: 0,
+      gpssaEmp: 0,
+      gpssaEmr: 0,
+      staffAdvance: 0,
+      lateComm: 0,
+      additional: 0,
+      salaryDeduction: 0,
+      unpaidLeave: 0,
+      totalPay: 2500,
+      commissionFinal: 0,
+      netSalary: 2500,
+    },
+    {
+      id: "5",
+      employeeName: "David Brown",
+      employeeId: "EMP005",
+      salaryPaid: 5000,
+      commission: 6305,
+      otherAdd: 0,
+      al: 0,
+      sl: 0,
+      arrear: 0,
+      gpssaEmp: 0,
+      gpssaEmr: 0,
+      staffAdvance: 0,
+      lateComm: 0,
+      additional: 0,
+      salaryDeduction: 0,
+      unpaidLeave: 0,
+      totalPay: 11305,
+      commissionFinal: 0,
+      netSalary: 11305,
+    },
+  ]
 
-    const [confirmationDialog, setConfirmationDialog] = useState(false)
+  const [data, setData] = useState(initialData)
 
-    // *For Customer Queue
-    const [customerQueue, setCustomerQueue] = useState([]);
+  // Handle input changes for manual fields
+  const handleInputChange = useCallback((id, field, value) => {
+    const numericValue = Number.parseFloat(value) || 0
 
+    setData((prevData) =>
+      prevData.map((row) => {
+        if (row.id === id) {
+          const updatedRow = { ...row, [field]: numericValue }
 
+          // Calculate total pay (sum of relevant fields)
+          const totalPay =
+            updatedRow.salaryPaid +
+            updatedRow.commission +
+            updatedRow.otherAdd +
+            updatedRow.al +
+            updatedRow.sl +
+            updatedRow.arrear +
+            updatedRow.gpssaEmr
 
-    const [totalCount, setTotalCount] = useState(0);
-    const [pageLimit, setPageLimit] = useState(50);
-    const [currentPage, setCurrentPage] = useState(1);
+          // Calculate net salary (total pay minus deductions)
+          const deductions =
+            updatedRow.staffAdvance +
+            updatedRow.lateComm +
+            updatedRow.additional +
+            updatedRow.salaryDeduction +
+            updatedRow.unpaidLeave +
+            updatedRow.commissionFinal
 
+          updatedRow.totalPay = totalPay
+          updatedRow.netSalary = totalPay - deductions
 
-
-    // *For Filters
-    const [filters, setFilters] = useState({});
-
-    // *For Permissions
-    const [permissions, setPermissions] = useState();
-
-    const [sort, setSort] = useState('desc')
-
-    // *For Get Customer Queue
-
-
-
-
-
-
-
-    const getCustomerQueue = async (page, limit, filter) => {
-        setLoader(true)
-
-        try {
-
-            let params = {
-                page: 1,
-                limit: 999999,
-
-
-            }
-
-            const { data } = await CustomerServices.getReceptionsList(params)
-            setCustomerQueue(data?.rows)
-
-        } catch (error) {
-            showErrorToast(error)
-        } finally {
-            setLoader(false)
+          return updatedRow
         }
-    }
+        return row
+      }),
+    )
+  }, [])
 
+  // Handle row selection
+  const handleRowSelect = useCallback((rowId, checked) => {
+    setSelectedRows((prev) => {
+      const newSet = new Set(prev)
+      if (checked) {
+        newSet.add(rowId)
+      } else {
+        newSet.delete(rowId)
+      }
+      return newSet
+    })
+  }, [])
 
+  // Handle select all
+  const handleSelectAll = useCallback(
+    (checked) => {
+      if (checked) {
+        setSelectedRows(new Set(data.map((row) => row.id)))
+      } else {
+        setSelectedRows(new Set())
+      }
+    },
+    [data],
+  )
 
+  const renderCell = (row, column) => {
+    const value = row[column.key]
 
-
-
-    const handleSort = (key) => {
-        let data = {
-            sort_by: key,
-            sort_order: sort
-        }
-        Debounce(() => getCustomerQueue(1, '', data));
-    }
-
-
-
-    // *For Handle Filter
-
-    const handleFilter = () => {
-        let data = {
-            search: getValues('search')
-        }
-        Debounce(() => getCustomerQueue(1, '', data));
-    }
-    const handleDelete = async (item) => {
-
-
-        try {
-            let params = { reception_id: selectedData?.id }
-
-
-            const { message } = await CustomerServices.deleteReception(params)
-
-            SuccessToaster(message);
-            getCustomerQueue()
-        } catch (error) {
-            showErrorToast(error)
-        } finally {
-            // setLoader(false)
-        }
-    }
-    const UpdateStatus = async () => {
-        try {
-            let obj = {
-                customer_id: selectedData?.id,
-                is_active: status?.id,
-            };
-
-            const promise = CustomerServices.CustomerStatus(obj);
-            console.log(promise);
-
-            showPromiseToast(
-                promise,
-                "Saving...",
-                "Added Successfully",
-                "Something Went Wrong"
-            );
-
-            // Await the promise and then check its response
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                setStatusDialog(false);
-                setStatus(null)
-                getCustomerQueue();
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const initialData = [
-        {
-            id: "1",
-            masId: "EMP001",
-            desg: "Manager",
-            cnic: "12345-1234567-1",
-            name: "John Doe",
-            days: 30,
-            bsSal: 50000,
-            lve: 2,
-            abs: 1,
-            salPerDay: 1667,
-            absAmt: 1667,
-            ot: 5,
-            otRate: 200,
-            otAmt: 1000,
-            night: 0,
-            aa: 2000,
-            fuel: 1500,
-            arr: 0,
-            ded: 0,
-            loan: 0,
-            tax: 5000,
-            grSal: 52500,
-            adv: 0,
-            netSal: 47500,
-        },
-        {
-            id: "2",
-            masId: "EMP002",
-            desg: "Developer",
-            cnic: "12345-1234567-2",
-            name: "Jane Smith",
-            days: 30,
-            bsSal: 45000,
-            lve: 1,
-            abs: 0,
-            salPerDay: 1500,
-            absAmt: 0,
-            ot: 8,
-            otRate: 180,
-            otAmt: 1440,
-            night: 2,
-            aa: 1800,
-            fuel: 1200,
-            arr: 0,
-            ded: 0,
-            loan: 0,
-            tax: 4500,
-            grSal: 48240,
-            adv: 0,
-            netSal: 43740,
-        },
-    ]
-    const [data, setData] = useState(initialData)
-    const [loading] = useState(false)
-    const [selectedRows, setSelectedRows] = useState(new Set())
-
-    // Memoize the handleInputChange function to prevent unnecessary re-renders
-    const handleInputChange = useCallback((id, field, value) => {
-        const numericValue = Number.parseFloat(value) || 0
-    
-        setData((prevData) =>
-          prevData.map((row) => {
-            if (row.id === id) {
-              // Update the changed field
-              const updatedRow = { ...row, [field]: numericValue }
-    
-              // Recalculate net salary if any of the calculation fields changed
-              if (["arr", "ded", "loan", "tax"].includes(field)) {
-                // NetSal = GrSal + Arr - Ded - Loan - Tax
-                const newNetSal = updatedRow.grSal + updatedRow.arr - updatedRow.ded - updatedRow.loan - updatedRow.tax
-                updatedRow.netSal = newNetSal
-              }
-    
-              return updatedRow
-            }
-            return row
-          }),
+    // Handle text fields (name and ID)
+    if (column.key === "employeeName" || column.key === "employeeId") {
+      if (column.type === "manual") {
+        return (
+          <TextField
+            variant="standard"
+            value={value || ""}
+            onChange={(e) => handleInputChange(row.id, column.key, e.target.value)}
+            InputProps={{
+              disableUnderline: false,
+              style: { fontSize: "11px" },
+            }}
+            sx={{ width: "100%" }}
+            inputProps={{ style: { textAlign: "center" } }}
+          />
         )
-      }, [])
-    
-
-    // Handle individual row selection
-    const handleRowSelect = useCallback((rowId, checked) => {
-        setSelectedRows((prev) => {
-            const newSet = new Set(prev)
-            if (checked) {
-                newSet.add(rowId)
-            } else {
-                newSet.delete(rowId)
-            }
-            return newSet
-        })
-    }, [])
-
-    // Handle select all functionality
-    const handleSelectAll = useCallback(
-        (checked) => {
-            if (checked) {
-                setSelectedRows(new Set(data.map((row) => row.id)))
-            } else {
-                setSelectedRows(new Set())
-            }
-        },
-        [data],
-    )
-
-    // Bulk actions for selected rows
-    const handleDeleteSelected = useCallback(() => {
-        setData((prevData) => prevData.filter((row) => !selectedRows.has(row.id)))
-        setSelectedRows(new Set())
-    }, [selectedRows])
-
-    const handleDuplicateSelected = useCallback(() => {
-        const selectedData = data.filter((row) => selectedRows.has(row.id))
-        const duplicatedRows = selectedData.map((row) => ({
-            ...row,
-            id: `${row.id}_copy_${Date.now()}`,
-            masId: `${row.masId}_COPY`,
-        }))
-        setData((prevData) => [...prevData, ...duplicatedRows])
-        setSelectedRows(new Set())
-    }, [data, selectedRows])
-
-    // Memoize the columns array to prevent table re-rendering
-    const columns = useMemo(
-        () => [
-            // Selection column
-            {
-                header: "Select",
-                accessorKey: "select",
-                isSelection: true,
-            },
-            { header: "Mas.ID", accessorKey: "masId" },
-            { header: "Desg.", accessorKey: "desg" },
-            { header: "CNIC", accessorKey: "cnic" },
-            { header: "Name", accessorKey: "name" },
-            { header: "Days", accessorKey: "days" },
-            { header: "Bs Sal", accessorKey: "bsSal" },
-            { header: "Lve", accessorKey: "lve" },
-            { header: "Abs", accessorKey: "abs" },
-            { header: "Sal/Day", accessorKey: "salPerDay" },
-            { header: "AbsAmt", accessorKey: "absAmt" },
-            { header: "OT", accessorKey: "ot" },
-            { header: "OT Rt", accessorKey: "otRate" },
-            { header: "OT Am", accessorKey: "otAmt" },
-            { header: "Nght", accessorKey: "night" },
-            { header: "AA", accessorKey: "aa" },
-            { header: "Fuel", accessorKey: "fuel" },
-
-            // Editable input columns
-            {
-                header: "Arr.",
-                accessorKey: "arr",
-                isEditable: true,
-            },
-            {
-                header: "Ded.",
-                accessorKey: "ded",
-                isEditable: true,
-            },
-            {
-                header: "Loan",
-                accessorKey: "loan",
-                isEditable: true,
-            },
-            {
-                header: "Tax",
-                accessorKey: "tax",
-                isEditable: true,
-            },
-
-            { header: "GrSal", accessorKey: "grSal" },
-            { header: "Adv", accessorKey: "adv" },
-            { header: "NetSal", accessorKey: "netSal" },
-        ],
-        [],
-    )
-
-    useEffect(() => {
-        getCustomerQueue()
-    }, []);
-
-    if (loading) {
-        return <div className="flex justify-center p-4">Loading...</div>
+      }
+      return (
+        <Typography variant="body2" sx={{ fontSize: "11px" }}>
+          {value || "-"}
+        </Typography>
+      )
     }
 
-
-
-
+    // Handle numeric fields
+    if (column.type === "manual") {
+      return (
+        <TextField
+          type="number"
+          variant="standard"
+          value={value || 0}
+          onChange={(e) => handleInputChange(row.id, column.key, e.target.value)}
+          InputProps={{
+            disableUnderline: false,
+            style: { fontSize: "11px" },
+          }}
+          sx={{ width: "100%" }}
+          inputProps={{ step: "0.01", style: { textAlign: "center" } }}
+        />
+      )
+    }
 
     return (
-        <Box sx={{ p: 3 }}>
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={[
-                                    { id: "Pending", name: "Pending" },
-                                    { id: "In Progress", name: "In Progress" },
+      <Typography variant="body2" sx={{ fontSize: "11px" }}>
+        {typeof value === "number" ? (value === 0 ? "-" : value.toLocaleString()) : value || "-"}
+      </Typography>
+    )
+  }
 
-                                    { id: "Completed", name: "Completed" },
+  const getCellClass = (column) => {
+    if (column.isGpssa) return classes.gpssaColumn
+    return column.type === "auto" ? classes.autoColumn : classes.manualColumn
+  }
 
+  return (
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Salary Calculation</Typography>
+      </Box>
 
-                                ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
-                                }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
-                            />
-                        </Grid>
+      <Box sx={{ width: "100%" }}>
+        <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
+          <Table stickyHeader aria-label="salary calculation table" size="small">
+            <TableHead>
+              {/* Type Row (Auto/Manual) */}
+              {/*<TableRow>*/}
+              {/*  <Cell sx={{ minWidth: 70 }}>Select</Cell>*/}
+              {/*  {columnConfig.map((column, index) => (*/}
+              {/*    <Cell key={`type-${index}`} className={getCellClass(column)}>*/}
+              {/*      {column.type === "auto" ? "Auto" : "Manual"}*/}
+              {/*    </Cell>*/}
+              {/*  ))}*/}
+              {/*</TableRow>*/}
 
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </SimpleDialog>
-            <ConfirmationDialog
-                open={confirmationDialog}
-                onClose={() => setConfirmationDialog(false)}
-                message={"Are You Sure?"}
-                action={() => {
-                    setConfirmationDialog(false);
-                    handleDelete()
-
-                }}
-            />
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={
-
-                                    [
-                                        { id: false, name: "Disabled" },
-                                        { id: true, name: "Enabled" },
-
-                                    ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
-                                }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </SimpleDialog>
-
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salary List</Typography>
-
-
-
-            </Box>
-
-            {/* Filters */}
-            <Box >
-
-
-            <Box sx={{ width: "100%" }}>
-   
-
-      <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
-        <Table stickyHeader aria-label="employee data table" size="small">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.header}
-                  align="left"
-                  sx={{
-                    minWidth: column.isSelection ? 70 : 100,
-                    backgroundColor: "#f5f5f5",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {column.isSelection ? (
-                    <Checkbox
-                      color="primary"
-                      checked={selectedRows.size === data.length && data.length > 0}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                      inputProps={{ "aria-label": "select all rows" }}
-                    />
-                  ) : (
-                    column.header
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow
-                key={row.id}
-                hover
-                selected={selectedRows.has(row.id)}
-                sx={{ "&.Mui-selected": { backgroundColor: "rgba(25, 118, 210, 0.08)" } }}
-              >
-                {columns.map((column) => (
-                  <TableCell key={`${row.id}-${column.header}`} padding="normal">
-                    {column.isSelection ? (
-                      <Checkbox
-                        color="primary"
-                        checked={selectedRows.has(row.id)}
-                        onChange={(e) => handleRowSelect(row.id, e.target.checked)}
-                        inputProps={{ "aria-labelledby": row.id }}
-                      />
-                    ) : column.isEditable ? (
-                      <TextField
-                        type="number"
-                        variant="standard"
-                        value={row[column.accessorKey] || 0}
-                        onChange={(e) => handleInputChange(row.id, column.accessorKey, e.target.value)}
-                        InputProps={{ disableUnderline: false }}
-                        sx={{ width: "100%" }}
-                        inputProps={{ step: "0.01" }}
-                      />
-                    ) : (
-                      <Typography variant="body2">
-                        {typeof row[column.accessorKey] === "number"
-                          ? row[column.accessorKey].toLocaleString()
-                          : row[column.accessorKey]}
-                      </Typography>
-                    )}
-                  </TableCell>
+              {/* Header Row */}
+              <TableRow>
+                <Cell sx={{ minWidth: 70 }}>Select</Cell>
+                {columnConfig.map((column, index) => (
+                  <Cell key={`header-${index}`}>{column.header}</Cell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
-            </Box>
+            </TableHead>
 
-        </Box>
-    );
+            <TableBody>
+              {data.map((row) => (
+                <TableRow key={row.id} hover selected={selectedRows.has(row.id)}>
+                  <Cell>
+                    <Checkbox
+                      color="primary"
+                      size="small"
+                      checked={selectedRows.has(row.id)}
+                      onChange={(e) => handleRowSelect(row.id, e.target.checked)}
+                    />
+                  </Cell>
+                  {columnConfig.map((column, index) => (
+                    <Cell key={`${row.id}-${index}`}>{renderCell(row, column)}</Cell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      {/* Summary */}
+      <Box sx={{ mt: 2, p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}>
+        <Typography variant="h6" gutterBottom>
+          Summary
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <Typography variant="body2">Selected Rows: {selectedRows.size}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="body2">Total Employees: {data.length}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="body2">
+              Total Net Salary: {data.reduce((sum, row) => sum + row.netSalary, 0).toLocaleString()}
+            </Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="body2">
+              Total Pay: {data.reduce((sum, row) => sum + row.totalPay, 0).toLocaleString()}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
+  )
 }
 
-export default SalaryList;
+export default SalaryList

@@ -176,20 +176,7 @@ function JournalVoucherList() {
 
     const columns = [
 
-        {
-            id: "created_at",
-            header: "Registration Date",
-            // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.created_at).format("MM-DD-YYYY"),
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.created_at).format("MM-DD-YYYY")}
-                </Box>
-            ),
-
-
-
-        },
+      
         {
             header: "Cost Center",
             accessorKey: "cost_center",
@@ -959,7 +946,7 @@ function JournalVoucherList() {
                     <Grid item xs={3} display={'flex'} justifyContent={'flex-end'} mt={2} gap={2} >
                         <PrimaryButton
                             bgcolor={Colors.white}
-                            textcolor={Colors.primary}
+                            textcolor={'white'}
                             // border={`1px solid ${Colors.primary}`}
                             title="Reset"
                             onClick={() => { getVouchers(); setValue('search', '') }}

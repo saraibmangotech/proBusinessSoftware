@@ -258,7 +258,7 @@ function CreateUser() {
           <Grid item xs={12} sm={5}>
 
             <InputField
-              label={"Phone :*"}
+              label={"Phone :"}
               size={'small'}
               placeholder={"Phone "}
               type={'number'}
