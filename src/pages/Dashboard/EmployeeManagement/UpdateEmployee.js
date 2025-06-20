@@ -55,11 +55,13 @@ function UpdateEmployee() {
     const { id } = useParams()
 
     const { register, handleSubmit, formState: { errors }, control, getValues, watch, setError, setValue, reset,
-        clearErrors, } = useForm({ defaultValues: {
-            overtime: '', // include all controlled fields here
-            leftJob: '',
-            // other fields
-          },});
+        clearErrors, } = useForm({
+            defaultValues: {
+                overtime: '', // include all controlled fields here
+                leftJob: '',
+                // other fields
+            },
+        });
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -77,6 +79,9 @@ function UpdateEmployee() {
     const [isActive, setIsActive] = useState('');
     const [leftJob, setLeftJob] = useState('');
     const [overtime, setOvertime] = useState('');
+    const [costCenters, setCostCenters] = useState([])
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [isLocal, setisLocal] = useState(true)
     const theme = useTheme();
     function getStyles(name, personName, theme) {
         return {
@@ -162,6 +167,13 @@ function UpdateEmployee() {
                     has_left_job: leftJob == 'yes' ? true : false,
                     date_of_leaving: leavingDate,
                     leaving_reason: formData?.reason,
+                    branch: formData?.branch,
+                    visa: formData?.visa,
+                    work_permit: formData?.work_permit,
+                    iban: formData?.iban,
+                    routing: formData?.routing,
+                    is_local: isLocal,
+                    cost_center: selectedCostCenter?.name
                 }
 
             }
@@ -249,13 +261,20 @@ function UpdateEmployee() {
             setValue('basicSalary', details?.basic_salary || '');
             setValue('designation', details?.designation || '');
             setValue('department', details?.department || '');
-            setIsActive( details?.is_active ? 'yes' : 'no')
+            setIsActive(details?.is_active ? 'yes' : 'no')
             setOvertime(details?.is_overtime_eligible ? "yes" : "no")
             setLeftJob(details?.has_left_job ? "yes" : "no")
             setValue('isActive', details?.is_active ? 'yes' : 'no');
             setValue("leftJob", details?.has_left_job ? "yes" : "no");
             setValue("overtime", details?.is_overtime_eligible ? "yes" : "no");
             setValue('reason', details?.leaving_reason || '');
+            setValue('iban', details?.iban || '');
+            setValue('branch', details?.branch || '');
+            setValue('visa', details?.visa || '');
+            setValue('work_permit', details?.iban || '');
+            setValue('routing', details?.routing || '');
+            setisLocal( details?.is_local)
+            setSelectedCostCenter({id:details?.cost_center,name:details?.cost_center})
             console.log(moment(details?.date_of_birth).format('MM/DD/YYYY'));
 
             setDob(details?.date_of_birth ? new Date(details?.date_of_birth) : null)
@@ -276,8 +295,22 @@ function UpdateEmployee() {
             console.error("Error fetching employee data:", error);
         }
     };
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
 
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
     useEffect(() => {
+        getCostCenters()
         getData()
         getCategoryList()
         getRoles()
@@ -306,7 +339,7 @@ function UpdateEmployee() {
 
             <Box component="form" onSubmit={handleSubmit(UpdateEmployee)} >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'flex-end' }}>
-                    <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Create Employee</Typography>
+                    <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update Employee</Typography>
 
                 </Box>
                 <Box>
@@ -768,6 +801,77 @@ function UpdateEmployee() {
 
 
                     </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Branch:*"}
+                            size="small"
+                            placeholder="Branch"
+                            error={errors?.branch?.message}
+                            register={register("branch", {
+                                required: "Please enter branch.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Visa:*"}
+                            size="small"
+                            placeholder="Visa"
+                            error={errors?.visa?.message}
+                            register={register("visa", {
+                                required: "Please enter visa.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Work Permit:*"}
+                            size="small"
+                            placeholder="Work Permit"
+                            error={errors?.work_permit?.message}
+                            register={register("work_permit", {
+                                required: "Please enter work permit.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"IBAN:*"}
+                            size="small"
+                            placeholder="IBAN"
+                            error={errors?.iban?.message}
+                            register={register("iban", {
+                                required: "Please enter IBAN.",
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <SelectField
+
+                            size={"small"}
+                            label={"Cost Center"}
+                            options={costCenters}
+                            selected={selectedCostCenter}
+                            onSelect={(value) => {
+                                setSelectedCostCenter(value);
+                            }}
+                            register={register("costCenter")}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Routing:*"}
+                            size="small"
+                            placeholder="Routing"
+                            error={errors?.routing?.message}
+                            register={register("routing", {
+                                required: "Please enter routing.",
+                            })}
+                        />
+                    </Grid>
                 </Grid>
                 <Box>
                     <Box display="flex" alignItems="center" mt={2}>
@@ -783,81 +887,103 @@ function UpdateEmployee() {
 
 
 
-                <Grid item xs={12} sm={2.8}>
-        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Active :*</InputLabel>
-        <Controller
-          name="isActive"
-          control={control}
-          rules={{ required: "Please select an option" }}
-          render={({ field }) => (
-            <RadioGroup
-              row
-              {...field}
-              value={isActive}
-              onChange={(e) => {
-                setIsActive(e.target.value);
-                field.onChange(e);
-              }}
-            >
-              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-            </RadioGroup>
-          )}
-        />
-        {errors.isActive && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isActive.message}</Typography>}
-      </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Active :*</InputLabel>
+                        <Controller
+                            name="isActive"
+                            control={control}
+                            rules={{ required: "Please select an option" }}
+                            render={({ field }) => (
+                                <RadioGroup
+                                    row
+                                    {...field}
+                                    value={isActive}
+                                    onChange={(e) => {
+                                        setIsActive(e.target.value);
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                                </RadioGroup>
+                            )}
+                        />
+                        {errors.isActive && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isActive.message}</Typography>}
+                    </Grid>
 
-      {/* Has Left Job */}
-      <Grid item xs={12} sm={2.8}>
-        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Has Left Job :*</InputLabel>
-        <Controller
-          name="leftJob"
-          control={control}
-          rules={{ required: "Please select an option" }}
-          render={({ field }) => (
-            <RadioGroup
-              row
-              {...field}
-              value={leftJob}
-              onChange={(e) => {
-                setLeftJob(e.target.value);
-                field.onChange(e);
-              }}
-            >
-              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-            </RadioGroup>
-          )}
-        />
-        {errors.leftJob && <Typography color="error" sx={{ fontSize: 12 }}>{errors.leftJob.message}</Typography>}
-      </Grid>
+                    {/* Has Left Job */}
+                    <Grid item xs={12} sm={2.8}>
+                        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Has Left Job :*</InputLabel>
+                        <Controller
+                            name="leftJob"
+                            control={control}
+                            rules={{ required: "Please select an option" }}
+                            render={({ field }) => (
+                                <RadioGroup
+                                    row
+                                    {...field}
+                                    value={leftJob}
+                                    onChange={(e) => {
+                                        setLeftJob(e.target.value);
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                                </RadioGroup>
+                            )}
+                        />
+                        {errors.leftJob && <Typography color="error" sx={{ fontSize: 12 }}>{errors.leftJob.message}</Typography>}
+                    </Grid>
 
-      {/* Overtime */}
-      <Grid item xs={12} sm={2.8}>
-        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Overtime Eligible :*</InputLabel>
-        <Controller
-          name="overtime"
-          control={control}
-          rules={{ required: "Please select an option" }}
-          render={({ field }) => (
-            <RadioGroup
-              row
-              {...field}
-              value={overtime}
-              onChange={(e) => {
-                setOvertime(e.target.value);
-                field.onChange(e);
-              }}
-            >
-              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-            </RadioGroup>
-          )}
-        />
-        {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
-      </Grid>
+                    {/* Overtime */}
+                    <Grid item xs={12} sm={2.8}>
+                        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Overtime Eligible :*</InputLabel>
+                        <Controller
+                            name="overtime"
+                            control={control}
+                            rules={{ required: "Please select an option" }}
+                            render={({ field }) => (
+                                <RadioGroup
+                                    row
+                                    {...field}
+                                    value={overtime}
+                                    onChange={(e) => {
+                                        setOvertime(e.target.value);
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                                </RadioGroup>
+                            )}
+                        />
+                        {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Local :*</InputLabel>
+                        <Controller
+                            name="isLocal"
+                            control={control}
+                            rules={{ required: "Please select an option" }}
+                            render={({ field }) => (
+                                <RadioGroup
+                                    row
+                                    {...field}
+                                    value={isLocal}
+                                    onChange={(e) => {
+                                        setisLocal(e.target.value);
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                                </RadioGroup>
+                            )}
+                        />
+                        {errors.isLocal && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isLocal.message}</Typography>}
+                    </Grid>
 
-                    <Grid item xs={12} sm={2.8}></Grid>
                     <Grid item xs={12} sm={2.8}>
                         <DatePicker
                             label={"Next Airfare Due Date:*"}

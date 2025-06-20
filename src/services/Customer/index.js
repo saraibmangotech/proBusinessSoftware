@@ -6,6 +6,10 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+    updateEmployeePassword: async (obj) => {
+    const data = await post(routes.updateEmployeePassword, obj);
+    return data;
+  },
   UpdatePaidReceipt: async (obj) => {
     const data = await patch(routes.UpdatePaidReceipt, obj);
     return data;

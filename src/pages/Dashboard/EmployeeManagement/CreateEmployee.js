@@ -72,6 +72,9 @@ function CreateEmployee() {
   const [isActive, setIsActive] = useState('');
   const [leftJob, setLeftJob] = useState('');
   const [overtime, setOvertime] = useState('');
+  const [costCenters, setCostCenters] = useState([])
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [isLocal, setisLocal] = useState(true)
   const theme = useTheme();
   function getStyles(name, personName, theme) {
     return {
@@ -152,10 +155,17 @@ function CreateEmployee() {
           designation: formData?.designation,
           department: formData?.department,
           is_active: isActive == 'yes' ? true : false,
-          is_overtime_eligible:overtime == 'yes' ? true : false,
+          is_overtime_eligible: overtime == 'yes' ? true : false,
           has_left_job: leftJob == 'yes' ? true : false,
           date_of_leaving: leavingDate,
           leaving_reason: formData?.reason,
+          branch: formData?.branch,
+          visa: formData?.visa,
+          work_permit: formData?.work_permit,
+          iban: formData?.iban,
+          routing: formData?.routing,
+          is_local: isLocal,
+          cost_center:selectedCostCenter?.name
         }
 
       }
@@ -205,7 +215,23 @@ function CreateEmployee() {
       showErrorToast(error)
     }
   }
+
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 999999,
+      };
+
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters(data?.cost_centers);
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
   useEffect(() => {
+    getCostCenters()
     getCategoryList()
     getRoles()
   }, [])
@@ -695,6 +721,84 @@ function CreateEmployee() {
 
 
           </Grid>
+
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Branch:*"}
+              size="small"
+              placeholder="Branch"
+              error={errors?.branch?.message}
+              register={register("branch", {
+                required: "Please enter branch.",
+              })}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Visa:*"}
+              size="small"
+              placeholder="Visa"
+              error={errors?.visa?.message}
+              register={register("visa", {
+                required: "Please enter visa.",
+              })}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Work Permit:*"}
+              size="small"
+              placeholder="Work Permit"
+              error={errors?.work_permit?.message}
+              register={register("work_permit", {
+                required: "Please enter work permit.",
+              })}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"IBAN:*"}
+              size="small"
+              placeholder="IBAN"
+              error={errors?.iban?.message}
+              register={register("iban", {
+                required: "Please enter IBAN.",
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+            <SelectField
+
+              size={"small"}
+              label={"Cost Center"}
+              options={costCenters}
+              selected={selectedCostCenter}
+              onSelect={(value) => {
+                setSelectedCostCenter(value);
+              }}
+              register={register("costCenter")}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Routing:*"}
+              size="small"
+              placeholder="Routing"
+              error={errors?.routing?.message}
+              register={register("routing", {
+                required: "Please enter routing.",
+              })}
+            />
+          </Grid>
+
+
+
+
+
+
         </Grid>
         <Box>
           <Box display="flex" alignItems="center" mt={2}>
@@ -710,80 +814,104 @@ function CreateEmployee() {
 
 
 
-        <Grid item xs={12} sm={2.8}>
-        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Active :*</InputLabel>
-        <Controller
-          name="isActive"
-          control={control}
-          rules={{ required: "Please select an option" }}
-          render={({ field }) => (
-            <RadioGroup
-              row
-              {...field}
-              value={isActive}
-              onChange={(e) => {
-                setIsActive(e.target.value);
-                field.onChange(e);
-              }}
-            >
-              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-            </RadioGroup>
-          )}
-        />
-        {errors.isActive && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isActive.message}</Typography>}
-      </Grid>
+          <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Active :*</InputLabel>
+            <Controller
+              name="isActive"
+              control={control}
+              rules={{ required: "Please select an option" }}
+              render={({ field }) => (
+                <RadioGroup
+                  row
+                  {...field}
+                  value={isActive}
+                  onChange={(e) => {
+                    setIsActive(e.target.value);
+                    field.onChange(e);
+                  }}
+                >
+                  <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                </RadioGroup>
+              )}
+            />
+            {errors.isActive && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isActive.message}</Typography>}
+          </Grid>
 
-      {/* Has Left Job */}
-      <Grid item xs={12} sm={2.8}>
-        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Has Left Job :*</InputLabel>
-        <Controller
-          name="leftJob"
-          control={control}
-          rules={{ required: "Please select an option" }}
-          render={({ field }) => (
-            <RadioGroup
-              row
-              {...field}
-              value={leftJob}
-              onChange={(e) => {
-                setLeftJob(e.target.value);
-                field.onChange(e);
-              }}
-            >
-              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-            </RadioGroup>
-          )}
-        />
-        {errors.leftJob && <Typography color="error" sx={{ fontSize: 12 }}>{errors.leftJob.message}</Typography>}
-      </Grid>
+          {/* Has Left Job */}
+          <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Has Left Job :*</InputLabel>
+            <Controller
+              name="leftJob"
+              control={control}
+              rules={{ required: "Please select an option" }}
+              render={({ field }) => (
+                <RadioGroup
+                  row
+                  {...field}
+                  value={leftJob}
+                  onChange={(e) => {
+                    setLeftJob(e.target.value);
+                    field.onChange(e);
+                  }}
+                >
+                  <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                </RadioGroup>
+              )}
+            />
+            {errors.leftJob && <Typography color="error" sx={{ fontSize: 12 }}>{errors.leftJob.message}</Typography>}
+          </Grid>
 
-      {/* Overtime */}
-      <Grid item xs={12} sm={2.8}>
-        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Overtime Eligible :*</InputLabel>
-        <Controller
-          name="overtime"
-          control={control}
-          rules={{ required: "Please select an option" }}
-          render={({ field }) => (
-            <RadioGroup
-              row
-              {...field}
-              value={overtime}
-              onChange={(e) => {
-                setOvertime(e.target.value);
-                field.onChange(e);
-              }}
-            >
-              <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-            </RadioGroup>
-          )}
-        />
-        {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
-      </Grid>
-          <Grid item xs={12} sm={2.8}></Grid>
+          {/* Overtime */}
+          <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Overtime Eligible :*</InputLabel>
+            <Controller
+              name="overtime"
+              control={control}
+              rules={{ required: "Please select an option" }}
+              render={({ field }) => (
+                <RadioGroup
+                  row
+                  {...field}
+                  value={overtime}
+                  onChange={(e) => {
+                    setOvertime(e.target.value);
+                    field.onChange(e);
+                  }}
+                >
+                  <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                </RadioGroup>
+              )}
+            />
+            {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
+          </Grid>
+
+          <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Local :*</InputLabel>
+            <Controller
+              name="isLocal"
+              control={control}
+              rules={{ required: "Please select an option" }}
+              render={({ field }) => (
+                <RadioGroup
+                  row
+                  {...field}
+                  value={isLocal}
+                  onChange={(e) => {
+                    setisLocal(e.target.value);
+                    field.onChange(e);
+                  }}
+                >
+                  <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                </RadioGroup>
+              )}
+            />
+            {errors.isLocal && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isLocal.message}</Typography>}
+          </Grid>
+
           <Grid item xs={12} sm={2.8}>
             <DatePicker
               label={"Next Airfare Due Date:*"}

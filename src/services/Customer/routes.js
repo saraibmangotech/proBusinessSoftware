@@ -160,7 +160,8 @@ const routes = {
   RefundInvoice:'sales/receipts/refund',
   getPaidReceiptDetail:'sales/receipts/invoice/details',
   UpdatePaidReceipt:'sales/receipts/updatePaymentMethod',
-  customerPaymentUpdate:'payments/customer/update'
+  customerPaymentUpdate:'payments/customer/update',
+  updateEmployeePassword:'/hrms/employees/changePassword'
 
 
 };

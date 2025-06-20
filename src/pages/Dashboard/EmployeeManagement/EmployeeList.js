@@ -43,7 +43,7 @@ import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import { useAuth } from 'context/UseContext';
 import FinanceServices from 'services/Finance';
 import BuildIcon from '@mui/icons-material/Build';
-
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -117,8 +117,14 @@ function EmployeeList() {
     const contentRef = useRef(null);
     const [status, setStatus] = useState(null)
     const [statusDialog, setStatusDialog] = useState(false)
+    const [statusDialog2, setStatusDialog2] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [inputError, setInputError] = useState(false)
+
+
     const { user } = useAuth()
     const {
         register,
@@ -128,7 +134,17 @@ function EmployeeList() {
         getValues,
         reset,
     } = useForm();
+    const {
+        register: register2,
+        handleSubmit: handleSubmit2,
+        formState: { errors: errors2 },
+        setValue: setValue2,
+        getValues: getValues2,
+        reset: reset2,
+        watch: watch2
+    } = useForm();
 
+    const password = watch2("password")
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
     // *For Update Account Status
     const updateAccountStatus = async (id, status) => {
@@ -287,7 +303,36 @@ function EmployeeList() {
         }
     };
 
+    const UpdateStatus2 = async () => {
+        try {
+            let obj = {
+                user_id: selectedData?.user_id,
+                password: getValues2('password'),
+               
+            };
 
+            const promise = CustomerServices.updateEmployeePassword(obj);
+            console.log(promise);
+
+            showPromiseToast(
+                promise,
+                "Saving...",
+                "Added Successfully",
+                "Something Went Wrong"
+            );
+
+            // Await the promise and then check its response
+            const response = await promise;
+            if (response?.responseCode === 200) {
+                setStatusDialog2(false);
+                setStatus(null)
+                getCustomerQueue();
+                reset2()
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
     const columns = [
         {
             header: "SR No.",
@@ -375,6 +420,16 @@ function EmployeeList() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="Update Password" arrow>
+                        <IconButton
+                            onClick={() => {
+                                setSelectedData(row?.original);
+                                setStatusDialog2(true);
+                            }}
+                        >
+                            <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Adjust Leaves" arrow>
                         <IconButton
                             onClick={() => {
@@ -407,6 +462,74 @@ function EmployeeList() {
 
     return (
         <Box sx={{ p: 3 }}>
+            <SimpleDialog open={statusDialog2} onClose={() => setStatusDialog2(false)} title={"Change Password?"}>
+                <Box component="form" onSubmit={handleSubmit2(UpdateStatus2)}>
+                    <Grid container spacing={2}>
+
+                        <Grid item xs={12} sm={12}>
+                            <InputField
+                                size="small"
+                                label="Password :*"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter Your Password"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
+                                                {showPassword ? <Visibility color="primary" /> : <VisibilityOff color="primary" />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                error={errors2.password?.message || (inputError && "You have entered an invalid email or password.")}
+                                register={register2("password", {
+                                    required: "Please enter the password.",
+                                })}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+                            <InputField
+                                size="small"
+                                label="Confirm Password :*"
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="Enter Your Confirm Password"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton edge="end" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                                {showConfirmPassword ? <Visibility color="primary" /> : <VisibilityOff color="primary" />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                error={
+                                    errors2.confirmpassword?.message || (inputError && "You have entered an invalid email or password.")
+                                }
+                                register={register2("confirmpassword", {
+                                    required: "Please enter the confirm password.",
+                                    validate: (value) => value === password || "Passwords do not match.",
+                                })}
+                            />
+                        </Grid>
+                        <Grid container sx={{ justifyContent: "center" }}>
+                            <Grid
+                                item
+                                xs={6}
+                                sm={6}
+                                sx={{
+                                    mt: 2,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: "25px",
+                                }}
+                            >
+                                <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
+                                <PrimaryButton onClick={() => setStatusDialog2(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </SimpleDialog>
             <SimpleDialog
                 open={statusDialog}
                 onClose={() => setStatusDialog(false)}

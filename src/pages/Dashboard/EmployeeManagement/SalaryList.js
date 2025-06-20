@@ -13,21 +13,30 @@ import {
   Typography,
   tableCellClasses,
   Grid,
-  Checkbox,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  OutlinedInput,
+  IconButton,
+  ListSubheader,
+  InputAdornment,
 } from "@mui/material"
 
 import styled from "@emotion/styled"
 import { useNavigate } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
 import { useForm } from "react-hook-form"
+import DeleteIcon from "@mui/icons-material/Delete"
+import SearchIcon from "@mui/icons-material/Search"
 
 // *For Table Style
 const Cell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     fontSize: 11,
     fontFamily: "Public Sans",
-    border: "1px solid #EEEEEE",
     padding: "6px",
     textAlign: "center",
     whiteSpace: "nowrap",
@@ -73,9 +82,134 @@ function SalaryList() {
     reset,
   } = useForm()
 
-  const [selectedRows, setSelectedRows] = useState(new Set())
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([])
+  const [searchText, setSearchText] = useState("")
 
-  // Exact column configuration from the image
+  // Available employees list (this would typically come from an API)
+  const availableEmployees = [
+    {
+      id: "1",
+      employeeName: "John Doe",
+      employeeId: "EMP001",
+      department: "Sales",
+      position: "Sales Manager",
+      basicSalary: 5500,
+    },
+    {
+      id: "2",
+      employeeName: "Jane Smith",
+      employeeId: "EMP002",
+      department: "Marketing",
+      position: "Marketing Executive",
+      basicSalary: 8000,
+    },
+    {
+      id: "3",
+      employeeName: "Mike Johnson",
+      employeeId: "EMP003",
+      department: "IT",
+      position: "Software Developer",
+      basicSalary: 2500,
+    },
+    {
+      id: "4",
+      employeeName: "Sarah Wilson",
+      employeeId: "EMP004",
+      department: "HR",
+      position: "HR Manager",
+      basicSalary: 2500,
+    },
+    {
+      id: "5",
+      employeeName: "David Brown",
+      employeeId: "EMP005",
+      department: "Finance",
+      position: "Accountant",
+      basicSalary: 5000,
+    },
+    {
+      id: "6",
+      employeeName: "Alice Johnson",
+      employeeId: "EMP006",
+      department: "HR",
+      position: "HR Assistant",
+      basicSalary: 4500,
+    },
+    {
+      id: "7",
+      employeeName: "Bob Wilson",
+      employeeId: "EMP007",
+      department: "IT",
+      position: "System Administrator",
+      basicSalary: 6000,
+    },
+    {
+      id: "8",
+      employeeName: "Carol Davis",
+      employeeId: "EMP008",
+      department: "Finance",
+      position: "Financial Analyst",
+      basicSalary: 3500,
+    },
+    {
+      id: "9",
+      employeeName: "Daniel Brown",
+      employeeId: "EMP009",
+      department: "Marketing",
+      position: "Marketing Manager",
+      basicSalary: 4000,
+    },
+    {
+      id: "10",
+      employeeName: "Eva Martinez",
+      employeeId: "EMP010",
+      department: "Operations",
+      position: "Operations Manager",
+      basicSalary: 5500,
+    },
+    {
+      id: "11",
+      employeeName: "Frank Taylor",
+      employeeId: "EMP011",
+      department: "Sales",
+      position: "Sales Representative",
+      basicSalary: 3200,
+    },
+    {
+      id: "12",
+      employeeName: "Grace Lee",
+      employeeId: "EMP012",
+      department: "IT",
+      position: "Frontend Developer",
+      basicSalary: 4800,
+    },
+    {
+      id: "13",
+      employeeName: "Henry Clark",
+      employeeId: "EMP013",
+      department: "Finance",
+      position: "Senior Accountant",
+      basicSalary: 4200,
+    },
+    {
+      id: "14",
+      employeeName: "Ivy Rodriguez",
+      employeeId: "EMP014",
+      department: "Marketing",
+      position: "Content Writer",
+      basicSalary: 3800,
+    },
+    {
+      id: "15",
+      employeeName: "Jack Thompson",
+      employeeId: "EMP015",
+      department: "Operations",
+      position: "Logistics Coordinator",
+      basicSalary: 3600,
+    },
+  ]
+
+  // Updated column configuration with action column
   const columnConfig = [
     { key: "employeeName", header: "Employee Name", type: "auto" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
@@ -95,118 +229,101 @@ function SalaryList() {
     { key: "totalPay", header: "Total pay", type: "auto" },
     { key: "commissionFinal", header: "Commission", type: "manual" },
     { key: "netSalary", header: "Net Salary", type: "auto" },
+    // New administrative columns - all auto
+    { key: "routingCode", header: "ROUTING CODE", type: "auto" },
+    { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
+    { key: "workPermit", header: "WORK PERMIT", type: "auto" },
+    { key: "visa", header: "Visa", type: "auto" },
+    { key: "branch", header: "BRANCH", type: "auto" },
+    { key: "remark", header: "Remark", type: "auto" },
+    { key: "minutesLate", header: "Minutes Late", type: "auto" },
+    { key: "alDay", header: "AL Day", type: "auto" },
+    { key: "actions", header: "Actions", type: "action" },
   ]
 
-  // Initial salary data with employee names and IDs
-  const initialData = [
-    {
-      id: "1",
-      employeeName: "John Doe",
-      employeeId: "EMP001",
-      salaryPaid: 5500,
-      commission: 3765,
-      otherAdd: 0,
-      al: 0,
-      sl: 0,
-      arrear: 0,
-      gpssaEmp: 0,
-      gpssaEmr: 1000,
-      staffAdvance: 59,
-      lateComm: 0,
-      additional: 0,
-      salaryDeduction: 8000,
-      unpaidLeave: 0,
-      totalPay: 9212,
-      commissionFinal: 0,
-      netSalary: 9212,
-    },
-    {
-      id: "2",
-      employeeName: "Jane Smith",
-      employeeId: "EMP002",
-      salaryPaid: 8000,
-      commission: 30055,
-      otherAdd: 1200,
-      al: 0,
-      sl: 0,
-      arrear: 880,
-      gpssaEmp: 0,
-      gpssaEmr: 1000,
-      staffAdvance: 163,
-      lateComm: 0,
-      additional: 0,
-      salaryDeduction: 8000,
-      unpaidLeave: 0,
-      totalPay: 30212,
-      commissionFinal: 7791,
-      netSalary: 22421,
-    },
-    {
-      id: "3",
-      employeeName: "Mike Johnson",
-      employeeId: "EMP003",
-      salaryPaid: 2500,
+  // Start with empty table
+  const [data, setData] = useState([])
+
+  // Filter employees based on search text
+  const filteredEmployees = availableEmployees.filter((employee) => {
+    const searchLower = searchText.toLowerCase()
+    return (
+      employee.employeeName.toLowerCase().includes(searchLower) ||
+      employee.employeeId.toLowerCase().includes(searchLower) ||
+      employee.department.toLowerCase().includes(searchLower) ||
+      employee.position.toLowerCase().includes(searchLower)
+    )
+  })
+
+  // Generate default employee data
+  const generateDefaultEmployeeData = (employee) => {
+    return {
+      id: employee.id,
+      employeeName: employee.employeeName,
+      employeeId: employee.employeeId,
+      salaryPaid: employee.basicSalary || 0,
       commission: 0,
       otherAdd: 0,
       al: 0,
       sl: 0,
       arrear: 0,
       gpssaEmp: 0,
-      gpssaEmr: 0,
+      gpssaEmr: Math.round(employee.basicSalary * 0.03) || 0, // 3% of basic salary
       staffAdvance: 0,
       lateComm: 0,
       additional: 0,
       salaryDeduction: 0,
       unpaidLeave: 0,
-      totalPay: 2500,
+      totalPay: employee.basicSalary || 0,
       commissionFinal: 0,
-      netSalary: 2500,
-    },
-    {
-      id: "4",
-      employeeName: "Sarah Wilson",
-      employeeId: "EMP004",
-      salaryPaid: 2500,
-      commission: 0,
-      otherAdd: 0,
-      al: 0,
-      sl: 0,
-      arrear: 0,
-      gpssaEmp: 0,
-      gpssaEmr: 0,
-      staffAdvance: 0,
-      lateComm: 0,
-      additional: 0,
-      salaryDeduction: 0,
-      unpaidLeave: 0,
-      totalPay: 2500,
-      commissionFinal: 0,
-      netSalary: 2500,
-    },
-    {
-      id: "5",
-      employeeName: "David Brown",
-      employeeId: "EMP005",
-      salaryPaid: 5000,
-      commission: 6305,
-      otherAdd: 0,
-      al: 0,
-      sl: 0,
-      arrear: 0,
-      gpssaEmp: 0,
-      gpssaEmr: 0,
-      staffAdvance: 0,
-      lateComm: 0,
-      additional: 0,
-      salaryDeduction: 0,
-      unpaidLeave: 0,
-      totalPay: 11305,
-      commissionFinal: 0,
-      netSalary: 11305,
-    },
-  ]
+      netSalary: employee.basicSalary || 0,
+      // Default administrative data
+      routingCode: "000000000",
+      salaryIban: "AE000000000000000000000",
+      workPermit: "",
+      visa: "PBMS",
+      branch: "Main Branch",
+      remark: "New Employee",
+      minutesLate: 0,
+      alDay: 0,
+    }
+  }
 
-  const [data, setData] = useState(initialData)
+  // Handle employee selection change
+  const handleEmployeeSelectionChange = (event) => {
+    const selectedIds = event.target.value
+    setSelectedEmployeeIds(selectedIds)
+
+    // Add new employees to table
+    const currentEmployeeIds = new Set(data.map((row) => row.id))
+    const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id))
+
+    if (newEmployeeIds.length > 0) {
+      const newEmployees = newEmployeeIds.map((id) => {
+        const employee = availableEmployees.find((emp) => emp.id === id)
+        return generateDefaultEmployeeData(employee)
+      })
+      setData((prevData) => [...prevData, ...newEmployees])
+    }
+
+    // Remove employees that are no longer selected
+    const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id))
+    if (removedEmployeeIds.length > 0) {
+      setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
+    }
+  }
+
+  // Handle remove employee
+  const handleRemoveEmployee = (employeeId) => {
+    setData((prevData) => prevData.filter((row) => row.id !== employeeId))
+    setSelectedEmployeeIds((prevIds) => prevIds.filter((id) => id !== employeeId))
+  }
+
+  // Handle search input change
+  const handleSearchChange = (event) => {
+    event.stopPropagation() // Prevent event bubbling
+    setSearchText(event.target.value)
+  }
 
   // Handle input changes for manual fields
   const handleInputChange = useCallback((id, field, value) => {
@@ -246,36 +363,34 @@ function SalaryList() {
     )
   }, [])
 
-  // Handle row selection
-  const handleRowSelect = useCallback((rowId, checked) => {
-    setSelectedRows((prev) => {
-      const newSet = new Set(prev)
-      if (checked) {
-        newSet.add(rowId)
-      } else {
-        newSet.delete(rowId)
-      }
-      return newSet
-    })
-  }, [])
-
-  // Handle select all
-  const handleSelectAll = useCallback(
-    (checked) => {
-      if (checked) {
-        setSelectedRows(new Set(data.map((row) => row.id)))
-      } else {
-        setSelectedRows(new Set())
-      }
-    },
-    [data],
-  )
-
   const renderCell = (row, column) => {
     const value = row[column.key]
 
-    // Handle text fields (name and ID)
-    if (column.key === "employeeName" || column.key === "employeeId") {
+    // Handle action column
+    if (column.key === "actions") {
+      return (
+        <IconButton
+          size="small"
+          onClick={() => handleRemoveEmployee(row.id)}
+          sx={{ color: "#ff1744" }}
+          title="Remove Employee"
+        >
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+      )
+    }
+
+    // Handle text fields (name, ID, and administrative text fields)
+    if (
+      column.key === "employeeName" ||
+      column.key === "employeeId" ||
+      column.key === "routingCode" ||
+      column.key === "salaryIban" ||
+      column.key === "workPermit" ||
+      column.key === "visa" ||
+      column.key === "branch" ||
+      column.key === "remark"
+    ) {
       if (column.type === "manual") {
         return (
           <TextField
@@ -292,7 +407,10 @@ function SalaryList() {
         )
       }
       return (
-        <Typography variant="body2" sx={{ fontSize: "11px" }}>
+        <Typography
+          variant="body2"
+          sx={{ fontSize: "11px", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis" }}
+        >
           {value || "-"}
         </Typography>
       )
@@ -323,34 +441,131 @@ function SalaryList() {
     )
   }
 
-  const getCellClass = (column) => {
-    if (column.isGpssa) return classes.gpssaColumn
-    return column.type === "auto" ? classes.autoColumn : classes.manualColumn
-  }
-
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, alignItems: "center" }}>
         <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Salary Calculation</Typography>
+      </Box>
+
+      {/* Employee Multi-Select Dropdown with Search */}
+      <Box sx={{ mb: 3 }}>
+        <FormControl fullWidth>
+          <InputLabel id="employee-select-label">Select Employees</InputLabel>
+          <Select
+            labelId="employee-select-label"
+            multiple
+            value={selectedEmployeeIds}
+            onChange={handleEmployeeSelectionChange}
+            input={<OutlinedInput label="Select Employees" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => {
+                  const employee = availableEmployees.find((emp) => emp.id === value)
+                  return <Chip key={value} label={`${employee?.employeeName} (${employee?.employeeId})`} size="small" />
+                })}
+              </Box>
+            )}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 400,
+                },
+              },
+              // Prevent menu from closing when clicking on search input
+              autoFocus: false,
+            }}
+            onClose={() => setSearchText("")} // Clear search when dropdown closes
+          >
+            {/* Search Input */}
+            <ListSubheader
+              sx={{
+                backgroundColor: "white",
+                zIndex: 1,
+                position: "sticky",
+                top: 0,
+              }}
+            >
+              <TextField
+                size="small"
+                placeholder="Search employees..."
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                value={searchText}
+                onChange={handleSearchChange}
+                onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
+                onKeyDown={(e) => {
+                  // Prevent dropdown from closing on any key except Escape
+                  if (e.key !== "Escape") {
+                    e.stopPropagation()
+                  }
+                  // Clear search on Escape
+                  if (e.key === "Escape") {
+                    setSearchText("")
+                  }
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#1976d2",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#1976d2",
+                    },
+                  },
+                }}
+              />
+            </ListSubheader>
+
+            {/* Employee Options */}
+            {filteredEmployees.length > 0 ? (
+              filteredEmployees.map((employee) => (
+                <MenuItem
+                  key={employee.id}
+                  value={employee.id}
+                  sx={{
+                    whiteSpace: "normal",
+                    wordWrap: "break-word",
+                    minHeight: "auto",
+                    py: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {employee.employeeName} ({employee.employeeId})
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {employee.department} - {employee.position} - Salary: {employee.basicSalary.toLocaleString()}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </MenuItem>
+              ))
+            ) : searchText ? (
+              <MenuItem disabled>
+                <Typography variant="body2" color="textSecondary">
+                  No employees found matching "{searchText}"
+                </Typography>
+              </MenuItem>
+            ) : null}
+          </Select>
+        </FormControl>
       </Box>
 
       <Box sx={{ width: "100%" }}>
         <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
           <Table stickyHeader aria-label="salary calculation table" size="small">
             <TableHead>
-              {/* Type Row (Auto/Manual) */}
-              {/*<TableRow>*/}
-              {/*  <Cell sx={{ minWidth: 70 }}>Select</Cell>*/}
-              {/*  {columnConfig.map((column, index) => (*/}
-              {/*    <Cell key={`type-${index}`} className={getCellClass(column)}>*/}
-              {/*      {column.type === "auto" ? "Auto" : "Manual"}*/}
-              {/*    </Cell>*/}
-              {/*  ))}*/}
-              {/*</TableRow>*/}
-
-              {/* Header Row */}
               <TableRow>
-                <Cell sx={{ minWidth: 70 }}>Select</Cell>
                 {columnConfig.map((column, index) => (
                   <Cell key={`header-${index}`}>{column.header}</Cell>
                 ))}
@@ -358,50 +573,56 @@ function SalaryList() {
             </TableHead>
 
             <TableBody>
-              {data.map((row) => (
-                <TableRow key={row.id} hover selected={selectedRows.has(row.id)}>
-                  <Cell>
-                    <Checkbox
-                      color="primary"
-                      size="small"
-                      checked={selectedRows.has(row.id)}
-                      onChange={(e) => handleRowSelect(row.id, e.target.checked)}
-                    />
+              {data.length === 0 ? (
+                <TableRow>
+                  <Cell colSpan={columnConfig.length} sx={{ textAlign: "center", py: 4 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      No employees selected. Please select employees from the dropdown above.
+                    </Typography>
                   </Cell>
-                  {columnConfig.map((column, index) => (
-                    <Cell key={`${row.id}-${index}`}>{renderCell(row, column)}</Cell>
-                  ))}
                 </TableRow>
-              ))}
+              ) : (
+                data.map((row) => (
+                  <TableRow key={row.id} hover>
+                    {columnConfig.map((column, index) => (
+                      <Cell key={`${row.id}-${index}`}>{renderCell(row, column)}</Cell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
       </Box>
 
       {/* Summary */}
-      <Box sx={{ mt: 2, p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}>
-        <Typography variant="h6" gutterBottom>
-          Summary
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Typography variant="body2">Selected Rows: {selectedRows.size}</Typography>
+      {data.length > 0 && (
+        <Box sx={{ mt: 2, p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}>
+          <Typography variant="h6" gutterBottom>
+            Summary
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={3}>
+              <Typography variant="body2">Total Employees: {data.length}</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="body2">
+                Total Basic Salary: {data.reduce((sum, row) => sum + row.salaryPaid, 0).toLocaleString()}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="body2">
+                Total Net Salary: {data.reduce((sum, row) => sum + row.netSalary, 0).toLocaleString()}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="body2">
+                Total Pay: {data.reduce((sum, row) => sum + row.totalPay, 0).toLocaleString()}
+              </Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={3}>
-            <Typography variant="body2">Total Employees: {data.length}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="body2">
-              Total Net Salary: {data.reduce((sum, row) => sum + row.netSalary, 0).toLocaleString()}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="body2">
-              Total Pay: {data.reduce((sum, row) => sum + row.totalPay, 0).toLocaleString()}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      )}
     </Box>
   )
 }
