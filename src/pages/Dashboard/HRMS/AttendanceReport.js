@@ -484,9 +484,13 @@ export default function AttendanceTable() {
     const [selectedDate, setSelectedDate] = useState(moment())
     const [attendanceData, setAttendanceData] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [transformedData, setTransformedData] = useState(null)
     // Transform attendance data for easier use
-    let transformedData = attendanceData?.attendance?.map((employee) => {
-        console.log(employee, 'employee');
+    
+
+useEffect(() => {
+  setTransformedData(attendanceData?.attendance?.map((employee) => {
+ 
 
         return {
             id: employee.user_id,
@@ -501,10 +505,11 @@ export default function AttendanceTable() {
                 }
             }),
         }
-    })
-    console.log(transformedData, 'transformedDatatransformedData');
+    }))
+}, [attendanceData])
 
     useEffect(() => {
+        
         setNameFilter('')
     }, [])
 
