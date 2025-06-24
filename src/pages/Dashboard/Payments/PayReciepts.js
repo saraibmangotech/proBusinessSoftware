@@ -682,6 +682,7 @@ function PayReceipts() {
         {
             header: "Status",
             accessorKey: "is_paid",
+            accessorFn: (row) => row?.is_paid ? 'Paid' : 'Unpaid',
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {row?.original?.is_paid ? 'Paid' : 'Unpaid'}
@@ -705,6 +706,16 @@ function PayReceipts() {
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {moment(row.original.created_at).format("DD/MM/YYYY")}
+                </Box>
+            ),
+        },
+        {
+            id: "invoice_date",
+            header: "Invoice Date",
+            accessorFn: (row) => moment(row.invoice_date).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.invoice_date).format("DD/MM/YYYY")}
                 </Box>
             ),
         },
@@ -822,11 +833,11 @@ function PayReceipts() {
                     )}
 
 
-                    {[1000, 3, 2].includes(user?.role_id) && (!row?.original?.invoice_number?.includes('TSL')) && (row?.original?.is_paid )&& (
+                    {[1000, 3, 2].includes(user?.role_id) && (!row?.original?.invoice_number?.includes('TSL')) && (row?.original?.is_paid) && (
                         <Tooltip title="Update Payment">
                             <IconButton
                                 onClick={() => {
-                                   navigate(`/update-payment-method/${row?.original?.id}`)
+                                    navigate(`/update-payment-method/${row?.original?.id}`)
                                 }}
                                 sx={{
                                     backgroundColor: "#f9f9f9",
@@ -914,7 +925,7 @@ function PayReceipts() {
         worksheet.mergeCells("A2:G2")
 
         const dateRow = worksheet.addRow([
-            `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
+            `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
         ])
         dateRow.getCell(1).font = {
             name: "Arial",
@@ -927,7 +938,7 @@ function PayReceipts() {
 
         const periodRow = worksheet.addRow([
             toDate && fromDate
-                ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
+                ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
                 : `Period: All`,
         ])
         periodRow.getCell(1).font = {
@@ -943,7 +954,7 @@ function PayReceipts() {
         worksheet.addRow([])
 
         // Define headers based on the columns structure (excluding Actions column)
-        const headers = ["Invoice#", "Customer", "Token Number", "Total Amount", "Status", "Created By", "Created At"]
+        const headers = ["Invoice#", "Customer", "Token Number", "Total Amount", "Status", "Created By", "Created At", "Invoice Date"]
 
         // Add headers with professional styling
         const headerRow = worksheet.addRow(headers)
@@ -999,6 +1010,7 @@ function PayReceipts() {
                 status,
                 item?.creator?.name || "",
                 item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "",
+                item?.invoice_date ? moment(item?.invoice_date).format("DD/MM/YYYY") : "",
             ])
 
             // Add to total
@@ -1146,7 +1158,7 @@ function PayReceipts() {
             })
             saveAs(blob,
                 toDate && fromDate
-                    ? `paid_receipts : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
+                    ? `paid_receipts : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
                     : `paid_receipts: Present `,);
 
         }

@@ -161,7 +161,8 @@ const routes = {
   getPaidReceiptDetail:'sales/receipts/invoice/details',
   UpdatePaidReceipt:'sales/receipts/updatePaymentMethod',
   customerPaymentUpdate:'payments/customer/update',
-  updateEmployeePassword:'/hrms/employees/changePassword'
+  updateEmployeePassword:'/hrms/employees/changePassword',
+  markAttendance:'/users/attendance/markManual'
 
 
 };
