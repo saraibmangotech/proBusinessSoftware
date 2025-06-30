@@ -839,65 +839,72 @@ function AccountConsolidatedProStatement() {
 
     // Process statements data to create table rows
     const processStatementsData = (statements) => {
-        const result = []
+    const result = [];
 
-        statements.forEach((account) => {
-            if (account.account && account.account.name) {
-                // Add account header
+    statements.forEach((account) => {
+        if (account.account && account.account.name) {
+            const isNegate = account.account.primary_account_id === 700328;
+
+            // Add account header
+            result.push({
+                isAccountHeader: true,
+                id: `header-${account.account.id}`,
+                account: account.account,
+            });
+
+            // Add opening balance row if available
+            if (account.opening_balance !== null && account.opening_balance !== undefined) {
+                const openingBalance = Number.parseFloat(account.opening_balance || 0.0);
                 result.push({
-                    isAccountHeader: true,
-                    id: `header-${account.account.id}`,
-                    account: account.account,
-                })
-
-                // Add opening balance row if available
-                if (account.opening_balance !== null && account.opening_balance !== undefined) {
-                    result.push({
-                        type: { type_name: "" },
-                        id: `opening-${account.account.id}`,
-                        isOpeningBalance: true,
-                        debit: 0.0,
-                        credit: 0.0,
-                        allocated: 0.0,
-                        runningBalance: account.opening_balance || 0.0,
-                    })
-                }
-
-                // Add statement entries if available
-                let totalDebit = 0
-                let totalCredit = 0
-                let runningBalance = Number.parseFloat(account.opening_balance || 0)
-
-                if (account.statement && account.statement.length > 0) {
-                    account.statement.forEach((entry) => {
-                        const debit = Number.parseFloat(entry.debit || 0)
-                        const credit = Number.parseFloat(entry.credit || 0)
-
-                        runningBalance = Number.parseFloat((runningBalance + debit - credit).toFixed(2))
-                        totalDebit += debit
-                        totalCredit += credit
-
-                        result.push({
-                            ...entry,
-                            runningBalance: runningBalance.toFixed(2),
-                        })
-                    })
-                }
-
-                // Add total row
-                result.push({
-                    id: `total-${account.account.id}`,
-                    isTotal: true,
-                    debit: totalDebit,
-                    credit: totalCredit,
-                    allocated: "0.00",
-                    runningBalance: runningBalance.toFixed(2),
-                })
+                    type: { type_name: "" },
+                    id: `opening-${account.account.id}`,
+                    isOpeningBalance: true,
+                    debit: 0.0,
+                    credit: 0.0,
+                    allocated: 0.0,
+                    runningBalance: isNegate ? -1 * openingBalance : openingBalance,
+                    account: account.account, // required later in Excel for balance negation
+                });
             }
-        })
 
-        return result
-    }
+            // Add statement entries if available
+            let totalDebit = 0;
+            let totalCredit = 0;
+            let runningBalance = Number.parseFloat(account.opening_balance || 0);
+
+            if (account.statement && account.statement.length > 0) {
+                account.statement.forEach((entry) => {
+                    const debit = Number.parseFloat(entry.debit || 0);
+                    const credit = Number.parseFloat(entry.credit || 0);
+
+                    runningBalance = Number.parseFloat((runningBalance + debit - credit).toFixed(2));
+                    totalDebit += debit;
+                    totalCredit += credit;
+
+                    result.push({
+                        ...entry,
+                        runningBalance: isNegate ? -1 * runningBalance : runningBalance,
+                        account: account.account, // required in Excel
+                    });
+                });
+            }
+
+            // Add total row
+            result.push({
+                id: `total-${account.account.id}`,
+                isTotal: true,
+                debit: totalDebit,
+                credit: totalCredit,
+                allocated: "0.00",
+                runningBalance: isNegate ? -1 * runningBalance : runningBalance,
+                account: account.account, // required in Excel
+            });
+        }
+    });
+
+    return result;
+};
+
 
     // useEffect(() => {
     //     getCustomerQueue(1, 999999, {})

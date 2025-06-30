@@ -399,7 +399,7 @@ const prepareExcelData = (data) => {
                 "Opening Balance",
                 Number.parseFloat(row.debit || 0), // Use number directly
                 Number.parseFloat(row.credit || 0), // Use number directly
-                Number.parseFloat(row.runningBalance || 0), // Use number directly
+                row?.account?.primary_account_id == 700328  ? -1 *Number.parseFloat(row.runningBalance || 0) : Number.parseFloat(row.runningBalance || 0), // Use number directly
             ]);
             dataRow.getCell(4).font = { name: "Arial", size: 10, bold: true };
             
@@ -869,66 +869,76 @@ const prepareExcelData = (data) => {
     }
 
     // Process statements data to create table rows
-    const processStatementsData = (statements) => {
-        const result = []
+const processStatementsData = (statements) => {
+    const result = [];
 
-        statements.forEach((account) => {
-            if (account.account && account.account.name) {
-                // Add account header
+    statements.forEach((account) => {
+        if (account.account && account.account.name) {
+            const isPrimary700328 = account?.account?.primary_account_id == 700328;
+
+            // Add account header
+            result.push({
+                isAccountHeader: true,
+                id: `header-${account.account.id}`,
+                account: account.account,
+            });
+
+            // Add opening balance row if available
+            if (account.opening_balance !== null && account.opening_balance !== undefined) {
+                let openingBalance = Number.parseFloat(account.opening_balance || 0);
+                if (isPrimary700328) openingBalance *= -1;
+
                 result.push({
-                    isAccountHeader: true,
-                    id: `header-${account.account.id}`,
+                    type: { type_name: "" },
+                    id: `opening-${account.account.id}`,
+                    isOpeningBalance: true,
                     account: account.account,
-                })
-
-                // Add opening balance row if available
-                if (account.opening_balance !== null && account.opening_balance !== undefined) {
-                    result.push({
-                        type: { type_name: "" },
-                        id: `opening-${account.account.id}`,
-                        isOpeningBalance: true,
-                        debit: 0.0,
-                        credit: 0.0,
-                        allocated: 0.0,
-                        runningBalance: account.opening_balance || 0.0,
-                    })
-                }
-
-                // Add statement entries if available
-                let totalDebit = 0
-                let totalCredit = 0
-                let runningBalance = Number.parseFloat(account.opening_balance || 0)
-
-                if (account.statement && account.statement.length > 0) {
-                    account.statement.forEach((entry) => {
-                        const debit = Number.parseFloat(entry.debit || 0)
-                        const credit = Number.parseFloat(entry.credit || 0)
-
-                        runningBalance = Number.parseFloat((runningBalance + debit - credit).toFixed(2))
-                        totalDebit += debit
-                        totalCredit += credit
-
-                        result.push({
-                            ...entry,
-                            runningBalance: runningBalance.toFixed(2),
-                        })
-                    })
-                }
-
-                // Add total row
-                result.push({
-                    id: `total-${account.account.id}`,
-                    isTotal: true,
-                    debit: totalDebit,
-                    credit: totalCredit,
-                    allocated: "0.00",
-                    runningBalance: runningBalance.toFixed(2),
-                })
+                    debit: 0.0,
+                    credit: 0.0,
+                    allocated: 0.0,
+                    runningBalance: openingBalance.toFixed(2),
+                });
             }
-        })
 
-        return result
-    }
+            // Add statement entries if available
+            let totalDebit = 0;
+            let totalCredit = 0;
+            let runningBalance = Number.parseFloat(account.opening_balance || 0);
+
+            if (account.statement && account.statement.length > 0) {
+                account.statement.forEach((entry) => {
+                    const debit = Number.parseFloat(entry.debit || 0);
+                    const credit = Number.parseFloat(entry.credit || 0);
+
+                    runningBalance = Number.parseFloat((runningBalance + debit - credit).toFixed(2));
+                    totalDebit += debit;
+                    totalCredit += credit;
+
+                    result.push({
+                        ...entry,
+                        runningBalance: isPrimary700328
+                            ? (-1 * runningBalance).toFixed(2)
+                            : runningBalance.toFixed(2),
+                    });
+                });
+            }
+
+            // Add total row
+            const finalRunningBalance = isPrimary700328 ? -1 * runningBalance : runningBalance;
+            result.push({
+                id: `total-${account.account.id}`,
+                isTotal: true,
+                debit: totalDebit,
+                credit: totalCredit,
+                allocated: "0.00",
+                runningBalance: finalRunningBalance.toFixed(2),
+            });
+        }
+    });
+
+    return result;
+};
+
 
     useEffect(() => {
         getCustomerQueue(1, 999999, {})
@@ -1330,7 +1340,8 @@ const prepareExcelData = (data) => {
                                                 <td
                                                     className={`number-cell ${Number.parseFloat(row.runningBalance || 0) >= 0 ? "positive" : "negative"}`}
                                                 >
-                                                    {row.runningBalance || "0.00"}
+                                                    {console.log(row,'rowrow')}
+                                                    {  Number.parseFloat(row.runningBalance || 0)}
                                                 </td>
                                             </tr>
                                         )

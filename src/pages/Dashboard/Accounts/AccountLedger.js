@@ -357,7 +357,7 @@ function AccountLedger() {
                               {item?.credit}
                             </Cell>
                             <Cell>
-                              {Balance?.toFixed(2)}
+                              {item?.account?.primary_account_id == 700328  ? -1 *Balance?.toFixed(2) :Balance?.toFixed(2)}
                             </Cell>
                             {/* <Cell>
                               <Box

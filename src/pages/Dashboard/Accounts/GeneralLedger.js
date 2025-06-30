@@ -481,7 +481,7 @@ function GeneralLedger() {
             item?.comment ?? "-",
             debit.toFixed(2),
             credit.toFixed(2),
-            runningBalance.toFixed(2)
+           item?.account?.primary_account_id == 700328  ? (-1 * runningBalance).toFixed(2) : runningBalance.toFixed(2) 
         ]);
 
         // Style data rows
@@ -862,7 +862,7 @@ function GeneralLedger() {
                                 <Cell className="pdf-table">{item?.comment ?? "-"}</Cell>
                                 <Cell className="pdf-table">{parseFloat(item?.debit).toFixed(2)}</Cell>
                                 <Cell className="pdf-table">{parseFloat(item?.credit).toFixed(2)}</Cell>
-                                <Cell className="pdf-table">{Balance?.toFixed(2)}</Cell>
+                                <Cell className="pdf-table">{item?.primary_account_id == 700328  ? (- 1 * Balance).toFixed(2) : Balance?.toFixed(2)}</Cell>
                                 <Cell className="pdf-table">
                                   <IconButton
                                     onClick={() =>
