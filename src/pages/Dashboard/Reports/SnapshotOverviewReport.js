@@ -377,8 +377,9 @@ function SnapshotOverviewReport() {
         { description: "Credit Card Collection", value: parseFloat(customerQueue.totalCard).toFixed(2) },
         { description: "Bank Transfer Collection", value: parseFloat(customerQueue.totalBank).toFixed(2) },
         { description: "Online Payment Collection", value: parseFloat(customerQueue.totalNetwork).toFixed(2) },
+        { description: "Customers Advance Collection", value: parseFloat(customerQueue.totalAdvancePayments).toFixed(2) },
        // Conditionally include Mohre
-        { description: "Net Collection", value: (parseFloat(customerQueue.totalCash) + parseFloat(customerQueue.totalCard) + parseFloat(customerQueue.totalBank) + parseFloat(customerQueue.totalMohre ||0)+ parseFloat(customerQueue.totalNetwork)).toFixed(2) },
+        { description: "Net Collection", value: (parseFloat(customerQueue.totalCash) + parseFloat(customerQueue.totalCard) + parseFloat(customerQueue.totalBank) + parseFloat(customerQueue.totalMohre ||0)+ parseFloat(customerQueue.totalNetwork) + parseFloat(customerQueue.totalAdvancePayments)).toFixed(2) },
     ];
 
     if (agencyType[process.env.REACT_APP_TYPE]?.category == "TASHEEL") {
@@ -523,6 +524,7 @@ function SnapshotOverviewReport() {
             { description: "Credit Card Collection", value: Number.parseFloat(customerQueue.totalCard).toFixed(2) },
             { description: "Bank Transfer Collection", value: Number.parseFloat(customerQueue.totalBank).toFixed(2) },
             { description: "Online Payment Collection", value: Number.parseFloat(customerQueue.totalNetwork).toFixed(2) },
+            { description: "Customers Advance Collection", value: Number.parseFloat(customerQueue.totalAdvancePayments).toFixed(2) },
             {
                 description: "Net Collection",
                 value: (
@@ -530,7 +532,8 @@ function SnapshotOverviewReport() {
                     Number.parseFloat(customerQueue.totalCard) +
                     Number.parseFloat(customerQueue.totalBank) +
                     Number.parseFloat(customerQueue.totalMohre || 0) +
-                    Number.parseFloat(customerQueue.totalNetwork)
+                    Number.parseFloat(customerQueue.totalNetwork) +
+                    Number.parseFloat(customerQueue.totalAdvancePayments)
                 ).toFixed(2),
             },
         ];
@@ -1077,6 +1080,14 @@ function SnapshotOverviewReport() {
                                             {CommaSeparator(parseFloat(customerQueue?.totalNetwork).toFixed(2))}
                                         </Cell>
                                     </Row>
+                                    <Row sx={{ border: "1px solid #EEEEEE !important" }}>
+                                        <Cell style={{ textAlign: "left" }} className="pdf-table">
+                                            Customers Advance Collection
+                                        </Cell>
+                                        <Cell style={{ textAlign: "left" }} className="pdf-table">
+                                            {CommaSeparator(parseFloat(customerQueue?.totalAdvancePayments).toFixed(2))}
+                                        </Cell>
+                                    </Row>
                                     {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" &&<Row sx={{ border: "1px solid #EEEEEE !important" }}>
                                         <Cell style={{ textAlign: "left" }} className="pdf-table">
                                             Total Mohre Receivable
@@ -1095,6 +1106,7 @@ function SnapshotOverviewReport() {
                                                 parseFloat(customerQueue?.totalCard) +
                                                 parseFloat(customerQueue?.totalBank) +
                                                 parseFloat(customerQueue.totalMohre ||0) +
+                                                parseFloat(customerQueue.totalAdvancePayments ||0) +
                                                 parseFloat(customerQueue?.totalNetwork)
                                             ).toFixed(2))}
                                         </Cell>

@@ -936,7 +936,7 @@ function PreSalesList() {
       }
 
       const dataRow = worksheet.addRow([
-        index + 1, // SR No.
+        item?.id, // SR No.
         item?.customer_name || "",
         item?.token_number || "",
         calculatedTotalAmount.toFixed(2),
