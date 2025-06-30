@@ -211,7 +211,6 @@ const prepareExcelData = (data) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Supplier Consolidated Statement");
 
-    // Set professional header and footer
     worksheet.headerFooter.oddHeader =
         '&C&"Arial,Bold"&18SUPPLIER CONSOLIDATED STATEMENT\n' +
         '&C&"Arial,Regular"&12Your Company Name\n' +
@@ -230,215 +229,87 @@ const prepareExcelData = (data) => {
 
     worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter;
 
-    // Set page setup for professional printing
     worksheet.pageSetup = {
-        paperSize: 9, // A4
+        paperSize: 9,
         orientation: "landscape",
         fitToPage: true,
         fitToWidth: 1,
         fitToHeight: 0,
-        margins: {
-            left: 0.7,
-            right: 0.7,
-            top: 1.0,
-            bottom: 1.0,
-            header: 0.3,
-            footer: 0.5,
-        },
+        margins: { left: 0.7, right: 0.7, top: 1.0, bottom: 1.0, header: 0.3, footer: 0.5 },
     };
 
-    // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["SUPPLIER CONSOLIDATED STATEMENT"]);
-    titleRow.getCell(1).font = {
-        name: "Arial",
-        size: 16,
-        bold: true,
-        color: { argb: "2F4F4F" },
-    };
-    titleRow.getCell(1).alignment = { horizontal: "center" };
+    worksheet.addRow(["SUPPLIER CONSOLIDATED STATEMENT"]).getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } };
     worksheet.mergeCells("A1:G1");
 
-    const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"]);
-    companyRow.getCell(1).font = {
-        name: "Arial",
-        size: 14,
-        bold: true,
-        color: { argb: "4472C4" },
-    };
-    companyRow.getCell(1).alignment = { horizontal: "center" };
+    const company = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+        ? "PREMIUM BUSINESSMEN SERVICES"
+        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC";
+    worksheet.addRow([company]).getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } };
     worksheet.mergeCells("A2:G2");
 
-    const dateRow = worksheet.addRow([
-        `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
+    worksheet.addRow([
+        `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
     ]);
-    dateRow.getCell(1).font = {
-        name: "Arial",
-        size: 10,
-        italic: true,
-        color: { argb: "666666" },
-    };
-    dateRow.getCell(1).alignment = { horizontal: "center" };
     worksheet.mergeCells("A3:G3");
-
-    // Add empty row for spacing
     worksheet.addRow([]);
 
-    // Add report information section
-    const startOfYear = moment().startOf('year').format("MM/DD/YYYY");
-    const endOfYear = moment().endOf('year').format("MM/DD/YYYY");
-
-    // Print out date
-    const printDateRow = worksheet.addRow(["Print Out Date:", moment().format("MM/DD/YYYY HH:mm"), "", "", "", "", ""]);
-    printDateRow.getCell(1).font = { name: "Arial", size: 10, bold: true };
-    printDateRow.getCell(2).font = { name: "Arial", size: 10 };
-
-    // Fiscal year
-    const fiscalYearRow = worksheet.addRow(["Fiscal Year:", `${startOfYear} - ${endOfYear} (Active)`, "", "", "", "", ""]);
-    fiscalYearRow.getCell(1).font = { name: "Arial", size: 10, bold: true };
-    fiscalYearRow.getCell(2).font = { name: "Arial", size: 10 };
-
-    // Period
-    const periodRow = worksheet.addRow([
-        "Period:",
-        `${moment(fromDate).format("MM/DD/YYYY")} - ${moment(toDate).format("MM/DD/YYYY")}`,
-        "",
-        "",
-        "",
-        "",
-        "",
-    ]);
-    periodRow.getCell(1).font = { name: "Arial", size: 10, bold: true };
-    periodRow.getCell(2).font = { name: "Arial", size: 10 };
-
-    // Supplier selection info
-    const supplierRow = worksheet.addRow(["Supplier:", selectedUser ? 'Selected Suppliers' : "All", "", "", "", "", ""]);
-    supplierRow.getCell(1).font = { name: "Arial", size: 10, bold: true };
-    supplierRow.getCell(2).font = { name: "Arial", size: 10 };
-
-    // Currency
-    const currencyRow = worksheet.addRow(["Currency:", "AED", "", "", "", "", ""]);
-    currencyRow.getCell(1).font = { name: "Arial", size: 10, bold: true };
-    currencyRow.getCell(2).font = { name: "Arial", size: 10 };
-
-    // Add empty rows for spacing
+    worksheet.addRow(["Print Out Date:", moment().format("MM/DD/YYYY HH:mm")]);
+    worksheet.addRow(["Fiscal Year:", `${moment().startOf('year').format("MM/DD/YYYY")} - ${moment().endOf('year').format("MM/DD/YYYY")} (Active)`]);
+    worksheet.addRow(["Period:", `${moment(fromDate).format("MM/DD/YYYY")} - ${moment(toDate).format("MM/DD/YYYY")}`]);
+    worksheet.addRow(["Supplier:", selectedUser ? "Selected Suppliers" : "All"]);
+    worksheet.addRow(["Currency:", "AED"]);
     worksheet.addRow([]);
 
-    // Add selected suppliers names if available
-    if (selectedUser && selectedUser && selectedUser?.length > 0) {
-        const supplierLabelRow = worksheet.addRow(["Selected Suppliers:"]);
-        supplierLabelRow.getCell(1).font = { 
-            name: "Arial", 
-            size: 11, 
-            bold: true,
-            color: { argb: "2F4F4F" }
-        };
-        
-        // Add each supplier name in a separate row with indentation
-        selectedUser?.forEach(supplier => {
-            const supplierNameRow = worksheet.addRow([`   • ${supplier.name || supplier}`]);
-            supplierNameRow.getCell(1).font = { name: "Arial", size: 10 };
-        });
-        
-        // Add empty row after supplier list
+    if (selectedUser && selectedUser.length > 0) {
+        worksheet.addRow(["Selected Suppliers:"]).getCell(1).font = { name: "Arial", size: 11, bold: true, color: { argb: "2F4F4F" } };
+        selectedUser.forEach(supplier => worksheet.addRow([`   • ${supplier.name || supplier}`]));
         worksheet.addRow([]);
     }
 
-    // Add table headers
     const headers = ["Type", "#", "Date", "Due Date", "Debit", "Credit", "Balance"];
     const headerRow = worksheet.addRow(headers);
     headerRow.eachCell((cell) => {
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "2F4F4F" }, // Dark slate gray
-        };
-        cell.font = {
-            name: "Arial",
-            bold: true,
-            color: { argb: "FFFFFF" },
-            size: 11,
-        };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "2F4F4F" } };
+        cell.font = { name: "Arial", bold: true, color: { argb: "FFFFFF" }, size: 11 };
         cell.alignment = { horizontal: "center", vertical: "middle" };
-        cell.border = {
-            top: { style: "thin", color: { argb: "000000" } },
-            left: { style: "thin", color: { argb: "000000" } },
-            bottom: { style: "thin", color: { argb: "000000" } },
-            right: { style: "thin", color: { argb: "000000" } },
-        };
+        cell.border = { top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" } };
     });
 
-    // Process the actual table data
     data.forEach((row) => {
         let dataRow;
 
-        // Account Header Row
         if (row.isAccountHeader) {
-            dataRow = worksheet.addRow([row.account.name, "", "", "", "", "", ""]);
-            dataRow.getCell(1).font = {
-                name: "Arial",
-                size: 11,
-                bold: true,
-                color: { argb: "2F4F4F" },
-            };
-            dataRow.getCell(1).fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "E8E8E8" },
-            };
+            dataRow = worksheet.addRow([row.account.name]);
+            dataRow.getCell(1).font = { name: "Arial", size: 11, bold: true, color: { argb: "2F4F4F" } };
+            dataRow.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "E8E8E8" } };
             return;
         }
 
-        // Opening Balance Row - FIXED: Use numbers instead of strings
         if (row.isOpeningBalance) {
-            dataRow = worksheet.addRow([
-                "",
-                "",
-                "",
-                "Opening Balance",
-                Number.parseFloat(row.debit || 0), // Use number directly
-                Number.parseFloat(row.credit || 0), // Use number directly
-                row?.account?.primary_account_id == 700328  ? -1 *Number.parseFloat(row.runningBalance || 0) : Number.parseFloat(row.runningBalance || 0), // Use number directly
-            ]);
-            dataRow.getCell(4).font = { name: "Arial", size: 10, bold: true };
+            console.log(row?.account?.primary_account_id,'rowowowoww');
             
-            // Format numeric columns
-            [5, 6, 7].forEach(colNum => {
-                dataRow.getCell(colNum).numFmt = "#,##0.00";
-                dataRow.getCell(colNum).alignment = { horizontal: "right" };
+            const balance =  Number.parseFloat(row.runningBalance || 0);
+                console.log(row?.account?.primary_account_id,balance,'balancebalancebalance');
+                
+            dataRow = worksheet.addRow(["", "", "", "Opening Balance", Number(row.debit || 0), Number(row.credit || 0), balance]);
+            dataRow.getCell(4).font = { name: "Arial", size: 10, bold: true };
+            [5, 6, 7].forEach(i => {
+                dataRow.getCell(i).numFmt = "#,##0.00";
+                dataRow.getCell(i).alignment = { horizontal: "right" };
             });
             return;
         }
 
-        // Total Row - FIXED: Use numbers instead of strings
         if (row.isTotal) {
-            dataRow = worksheet.addRow([
-                "Total",
-                "",
-                "",
-                "",
-                Number.parseFloat(row.debit || 0), // Use number directly
-                Number.parseFloat(row.credit || 0), // Use number directly
-                Number.parseFloat(row.runningBalance || 0), // Use number directly
-            ]);
-            
-            // Style total row
-            dataRow.eachCell((cell, colNumber) => {
-                if (colNumber === 1 || colNumber >= 5) {
-                    cell.fill = {
-                        type: "pattern",
-                        pattern: "solid",
-                        fgColor: { argb: "D9D9D9" },
-                    };
-                    cell.font = {
-                        name: "Arial",
-                        bold: true,
-                        size: 10,
-                    };
-                    
-                    // Format numeric columns
-                    if (colNumber >= 5) {
+            const balance = row?.account?.primary_account_id == 700328
+                ? -1 * Number.parseFloat(row.runningBalance || 0)
+                : Number.parseFloat(row.runningBalance || 0);
+            dataRow = worksheet.addRow(["Total", "", "", "", Number(row.debit || 0), Number(row.credit || 0), balance]);
+            dataRow.eachCell((cell, i) => {
+                if (i === 1 || i >= 5) {
+                    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D9D9D9" } };
+                    cell.font = { name: "Arial", bold: true, size: 10 };
+                    if (i >= 5) {
                         cell.numFmt = "#,##0.00";
                         cell.alignment = { horizontal: "right" };
                     }
@@ -447,114 +318,62 @@ const prepareExcelData = (data) => {
             return;
         }
 
-        // Regular Transaction Row - FIXED: Use numbers instead of strings
-        const type =
-            row?.type?.type_name === "Receipt Payment"
-                ? Number.parseFloat(row?.debit || 0) > 0
-                    ? "Invoice"
-                    : "Payment"
-                : row?.type?.type_name || "-";
-
-        const number =
-            row?.entry?.reference_no?.split("-")[1] || (row?.journal_id ? row?.series_id + row?.journal_id : "-");
-
+        const type = row?.type?.type_name === "Receipt Payment"
+            ? Number(row?.debit || 0) > 0 ? "Invoice" : "Payment"
+            : row?.type?.type_name || "-";
+        const number = row?.entry?.reference_no?.split("-")[1] || (row?.journal_id ? row?.series_id + row?.journal_id : "-");
         const date = row.created_at ? moment(row.created_at).format("YYYY-MM-DD") : "";
         const dueDate = row.created_at ? moment(row.created_at).format("YYYY-MM-DD") : "";
 
+        const balance = row?.account?.primary_account_id == 700328
+            ? -1 * Number(row.runningBalance || 0)
+            : Number(row.runningBalance || 0);
+
         dataRow = worksheet.addRow([
-            type,
-            number,
-            date,
-            dueDate,
-            Number.parseFloat(row?.debit || 0), // Use number directly
-            Number.parseFloat(row?.credit || 0), // Use number directly
-            Number.parseFloat(row.runningBalance || 0), // Use number directly
+            type, number, date, dueDate,
+            Number(row?.debit || 0),
+            Number(row?.credit || 0),
+            balance,
         ]);
 
-        // Style regular data rows
-        dataRow.eachCell((cell, colNumber) => {
+        dataRow.eachCell((cell, col) => {
             cell.font = { name: "Arial", size: 10 };
-            cell.alignment = {
-                horizontal: colNumber >= 5 ? "right" : "left", // Amount columns right-aligned
-                vertical: "middle",
-            };
-            cell.border = {
-                top: { style: "hair", color: { argb: "CCCCCC" } },
-                left: { style: "hair", color: { argb: "CCCCCC" } },
-                bottom: { style: "hair", color: { argb: "CCCCCC" } },
-                right: { style: "hair", color: { argb: "CCCCCC" } },
-            };
-
-            // Format amount columns
-            if (colNumber >= 5 && colNumber <= 7) {
-                cell.numFmt = '#,##0.00';
-            }
+            cell.alignment = { horizontal: col >= 5 ? "right" : "left", vertical: "middle" };
+            cell.border = { top: { style: "hair" }, left: { style: "hair" }, bottom: { style: "hair" }, right: { style: "hair" } };
+            if (col >= 5 && col <= 7) cell.numFmt = "#,##0.00";
         });
     });
 
-    // Add Grand Total Row - FIXED: Use numbers instead of strings
     if (data.length > 0) {
         const grandTotals = calculateGrandTotals(data);
+        const isNegate = data.some(d => d?.account?.primary_account_id == 700328);
+        const grandBalance = isNegate ? -1 * grandTotals.balance : grandTotals.balance;
+
         const grandTotalRow = worksheet.addRow([
-            "Grand Total",
-            "",
-            "",
-            "",
-            grandTotals.debit, // Use number directly
-            grandTotals.credit, // Use number directly
-            grandTotals.balance, // Use number directly
+            "Grand Total", "", "", "", grandTotals.debit, grandTotals.credit, grandBalance,
         ]);
 
-        // Style grand total row
-        grandTotalRow.eachCell((cell, colNumber) => {
-            if (colNumber === 1 || colNumber >= 5) {
-                cell.fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor: { argb: "000000" }, // Black
-                };
-                cell.font = {
-                    name: "Arial",
-                    bold: true,
-                    color: { argb: "FFFFFF" },
-                    size: 11,
-                };
-                cell.border = {
-                    top: { style: "medium", color: { argb: "000000" } },
-                    left: { style: "medium", color: { argb: "000000" } },
-                    bottom: { style: "medium", color: { argb: "000000" } },
-                    right: { style: "medium", color: { argb: "000000" } },
-                };
-
-                if (colNumber >= 5) {
-                    cell.numFmt = '#,##0.00';
-                    cell.alignment = { horizontal: "right", vertical: "middle" };
-                } else {
-                    cell.alignment = { horizontal: "center", vertical: "middle" };
-                }
+        grandTotalRow.eachCell((cell, col) => {
+            if (col === 1 || col >= 5) {
+                cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "000000" } };
+                cell.font = { name: "Arial", bold: true, color: { argb: "FFFFFF" }, size: 11 };
+                cell.border = { top: { style: "medium" }, left: { style: "medium" }, bottom: { style: "medium" }, right: { style: "medium" } };
+                if (col >= 5) cell.numFmt = "#,##0.00";
+                cell.alignment = { horizontal: col >= 5 ? "right" : "center", vertical: "middle" };
             }
         });
     }
 
-    // Set column widths
     worksheet.columns = [
-        { width: 15 }, // Type
-        { width: 12 }, // #
-        { width: 12 }, // Date
-        { width: 12 }, // Due Date
-        { width: 12 }, // Debit
-        { width: 12 }, // Credit
-        { width: 15 }, // Balance
+        { width: 15 }, { width: 12 }, { width: 12 },
+        { width: 12 }, { width: 12 }, { width: 12 }, { width: 15 },
     ];
 
-    // Add workbook properties
     workbook.creator = "Finance Department";
     workbook.lastModifiedBy = "Finance System";
     workbook.created = new Date();
     workbook.modified = new Date();
     workbook.lastPrinted = new Date();
-
-    // Set workbook properties
     workbook.properties = {
         title: "Supplier Consolidated Statement",
         subject: "Financial Report",
@@ -564,50 +383,33 @@ const prepareExcelData = (data) => {
         company: "Your Company Name",
     };
 
-    // Add empty rows for spacing before footer
     worksheet.addRow([]);
     worksheet.addRow([]);
-
-    // Add the electronically generated report text with black border
     const reportRow = worksheet.addRow(["This is electronically generated report"]);
-    reportRow.getCell(1).font = {
-        name: "Arial",
-        size: 12,
-        bold: false,
-        color: { argb: "000000" },
-    };
+    reportRow.getCell(1).font = { name: "Arial", size: 12, color: { argb: "000000" } };
     reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" };
     reportRow.getCell(1).border = {
-        top: { style: "medium", color: { argb: "000000" } },
-        left: { style: "medium", color: { argb: "000000" } },
-        bottom: { style: "medium", color: { argb: "000000" } },
-        right: { style: "medium", color: { argb: "000000" } },
+        top: { style: "medium" }, left: { style: "medium" },
+        bottom: { style: "medium" }, right: { style: "medium" }
     };
     worksheet.mergeCells(`A${reportRow.number}:G${reportRow.number}`);
 
-    // Add powered by line
     const poweredByRow = worksheet.addRow(["Powered by : MangotechDevs.ae"]);
-    poweredByRow.getCell(1).font = {
-        name: "Arial",
-        size: 10,
-        italic: true,
-        color: { argb: "666666" },
-    };
+    poweredByRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } };
     poweredByRow.getCell(1).alignment = { horizontal: "center" };
     worksheet.mergeCells(`A${poweredByRow.number}:G${poweredByRow.number}`);
-
-    // Add empty row for spacing
     worksheet.addRow([]);
 
     const download = async () => {
         const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { 
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+        const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         });
         saveAs(blob, 'Supplier_Consolidated_Statement.xlsx');
     };
     download();
 };
+
 
 
 
