@@ -518,6 +518,9 @@ const UpdateEmployee= lazy(() =>
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
+const Holidays= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/Holidays")
+);
 
 
 // Prepaid Expense Region
@@ -559,6 +562,10 @@ const AdminRoutes = [
   {
     path: "/system-settings",
     component: <SystemSettings />,
+  },
+    {
+    path: "/holidays",
+    component: <Holidays />,
   },
   {
     path: "/attendance-report",
