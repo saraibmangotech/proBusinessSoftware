@@ -222,7 +222,7 @@ function LeaveList() {
         }
     }
 
-    const getEmployeeDetail = async (id,newData) => {
+    const getEmployeeDetail = async (id, newData) => {
 
 
         try {
@@ -233,14 +233,18 @@ function LeaveList() {
 
             console.log(data);
             setEmployeeData(data?.employee)
+            let leaveBalance = Math.floor(data?.employee?.leaves_balance)
             let appliedDays = parseFloat(newData?.total_days)
-            let approvedDays = Math.floor(data?.employee?.leaves_balance)
-            console.log(appliedDays,'appliedDays');
-            
+            let approvedDays = appliedDays > leaveBalance ?
+                leaveBalance :
+                appliedDays
+            console.log(appliedDays, 'appliedDays');
+            setValue('leaves', leaveBalance)
             setValue('applied', appliedDays)
-            setValue('approved', data?.employee?.leaves_balance)
-            setValue('absent', appliedDays - approvedDays)
-            setValue('balanced', Math.floor(data?.employee?.leaves_balance) - approvedDays)
+            setValue('approved',
+                approvedDays)
+            setValue('absent', appliedDays > leaveBalance ? leaveBalance - appliedDays : 0)
+            setValue('balanced', Math.floor(leaveBalance) - approvedDays)
 
 
         } catch (error) {
@@ -305,6 +309,17 @@ function LeaveList() {
 
 
         },
+         {
+            id: "created_at",
+            header: "Requested Date",
+            // Remove accessorKey and fix accessorFn to use row directly
+            accessorFn: (row) => moment(row.created_at).format("DD/MM/YYYY"),
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.created_at).format("DD/MM/YYYY")}
+                </Box>
+            ),
+        },
         {
             id: "start_date",
             header: "Start Date",
@@ -340,12 +355,12 @@ function LeaveList() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                    {row?.original?.status?.toLowerCase() == 'pending' && <Box
+                    { <Box
                         component={'div'}
                         sx={{ cursor: 'pointer' }}
                         onClick={() => {
                             setSelectedData(row?.original)
-                            getEmployeeDetail(row?.original?.user_id,row?.original)
+                            getEmployeeDetail(row?.original?.user_id, row?.original)
                             if (row?.original?.status?.toLowerCase() == 'pending') {
                                 setStatusDialog(true)
                             }
@@ -450,6 +465,23 @@ function LeaveList() {
                         <Grid item xs={12} sm={12}>
 
                             <InputField
+                                label={"Employee Leaves :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Employee Leaves "}
+                                error={errors?.leaves?.message}
+                                register={register("leaves", {
+                                    required:
+                                        "Please enter leaves."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={6} sm={6}>
+
+                            <InputField
                                 label={"Applied Days :"}
                                 size={'small'}
                                 disabled={true}
@@ -464,7 +496,7 @@ function LeaveList() {
 
 
                         </Grid>
-                        <Grid item xs={12} sm={12}>
+                        <Grid item xs={6} sm={6}>
 
                             <InputField
                                 label={"Approved Days :"}
@@ -481,7 +513,7 @@ function LeaveList() {
 
 
                         </Grid>
-                        <Grid item xs={12} sm={12}>
+                        <Grid item xs={6} sm={6}>
 
                             <InputField
                                 label={"Absent Days :"}
@@ -498,7 +530,7 @@ function LeaveList() {
 
 
                         </Grid>
-                        <Grid item xs={12} sm={12}>
+                        <Grid item xs={6} sm={6}>
 
                             <InputField
                                 label={"Balanced Days :"}
