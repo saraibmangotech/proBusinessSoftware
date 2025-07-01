@@ -239,16 +239,16 @@ function UserList() {
         id: id,
         is_active: status
       }
-    
-    
+
+
       const promise = UserServices.updateUser(obj);
 
-            showPromiseToast(
-                promise,
-                'Saving...',
-                'Added Successfully',
-                'Something Went Wrong'
-            );
+      showPromiseToast(
+        promise,
+        'Saving...',
+        'Added Successfully',
+        'Something Went Wrong'
+      );
 
 
       // getAccounts()
@@ -427,7 +427,17 @@ function UserList() {
                                 </Cell>
                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                   <Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
-
+                                    <Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
+                                      {true && <Box component={'div'} onClick={() => {
+                                        if (item?.name != 'Staff' || item?.name != 'Customer' || item?.name != "Agent") {
+                                          navigate(`/user-permission/${item?.id}`, {
+                                            state: { roleId: item?.role_id }
+                                          });
+                                        }
+                                      }}>
+                                        <LockIcon />
+                                      </Box>}
+                                    </Box>
                                     {true && <Box component={'img'} src={Images.editIcon} onClick={() => navigate(
                                       `/update-user`,
                                       { state: item }

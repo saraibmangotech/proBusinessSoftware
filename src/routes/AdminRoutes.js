@@ -181,6 +181,9 @@ const SubRoleList = lazy(() => import("pages/Dashboard/SubRoleManagement/RoleLis
 const Permission = lazy(() =>
   import("pages/Dashboard/RoleManagement/Permission")
 );
+const UserPermissions = lazy(() =>
+  import("pages/Dashboard/UserManagement/UserPermissions")
+);
 const SubPermission = lazy(() =>
   import("pages/Dashboard/SubRoleManagement/Permission")
 );
@@ -1086,6 +1089,10 @@ const AdminRoutes = [
   {
     path: "/permission/:id",
     component: <Permission />,
+  },
+  {
+    path: "/user-permission/:id",
+    component: <UserPermissions />,
   },
   {
     path: "/sub-permission/:id",
