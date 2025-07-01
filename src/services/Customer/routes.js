@@ -162,7 +162,11 @@ const routes = {
   UpdatePaidReceipt:'sales/receipts/updatePaymentMethod',
   customerPaymentUpdate:'payments/customer/update',
   updateEmployeePassword:'/hrms/employees/changePassword',
-  markAttendance:'/users/attendance/markManual'
+  markAttendance:'/users/attendance/markManual',
+  getHolidays:'/hrms/holidays',
+  addHoliday:'/hrms/holidays/add',
+  updateHoliday:'/hrms/holidays/update',
+  deleteHoliday:'/hrms/holidays/delete'
 
 
 };

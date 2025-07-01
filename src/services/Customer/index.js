@@ -6,6 +6,10 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+    addHoliday: async (obj) => {
+    const data = await post(routes.addHoliday, obj);
+    return data;
+  },
     markAttendance: async (obj) => {
     const data = await post(routes.markAttendance, obj);
     return data;
@@ -32,6 +36,10 @@ const CustomerServices = {
   },
   invoiceDateUpdate: async (obj) => {
     const data = await patch(routes.invoiceDateUpdate, obj);
+    return data;
+  },
+  updateHoliday: async (obj) => {
+    const data = await patch(routes.updateHoliday, obj);
     return data;
   },
   CreateSaleReceipt2: async (obj) => {
@@ -116,6 +124,10 @@ const CustomerServices = {
   },
   DeleteProduct: async (obj) => {
     const data = await deleted(routes.DeleteProduct, obj);
+    return data;
+  },
+    deleteHoliday: async (obj) => {
+    const data = await deleted(routes.deleteHoliday, obj);
     return data;
   },
   DeleteProductCategory: async (obj) => {
@@ -272,6 +284,10 @@ const CustomerServices = {
   },
   getDetailedCollectionReport: async (params) => {
     const data = await get(routes.getDetailedCollectionReport, params);
+    return data;
+  },
+  getHolidays: async (params) => {
+    const data = await get(routes.getHolidays, params);
     return data;
   },
   getVoidReceipts: async (params) => {
