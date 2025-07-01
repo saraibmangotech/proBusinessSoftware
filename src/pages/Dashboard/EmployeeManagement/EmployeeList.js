@@ -333,126 +333,133 @@ function EmployeeList() {
             console.log(error);
         }
     };
-    const columns = [
-        {
-            header: "SR No.",
-            accessorKey: "id",
+  const columns = [
+  {
+    header: "SR No.",
+    accessorKey: "id",
+    
+  },
+  {
+    header: "Employee Code",
+    accessorKey: "employee_code",
+      cell: ({ row }) => (
+      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        {row?.original?.employee_code}
+      </Box>
+    ),
+  },
+  {
+    header: "Name",
+    accessorKey: "user.name", // ✅ Corrected for search
+    cell: ({ row }) => (
+      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        {row?.original?.user?.name}
+      </Box>
+    ),
+  },
+  {
+    header: "Phone",
+    accessorKey: "user.phone", // ✅ Corrected for search
+    cell: ({ row }) => (
+      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        {row?.original?.user?.phone}
+      </Box>
+    ),
+  },
+  {
+    header: "Email",
+    accessorKey: "user.email", // ✅ Corrected for search
+    cell: ({ row }) => (
+      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        {row?.original?.user?.email}
+      </Box>
+    ),
+  },
+  {
+    header: "Designation",
+    accessorKey: "designation", // ✅ already correct
+    cell: ({ row }) => (
+      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        {row?.original?.designation}
+      </Box>
+    ),
+  },
+  {
+    header: "Department",
+    accessorKey: "department", // ✅ already correct
+    cell: ({ row }) => (
+      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+        {row?.original?.department}
+      </Box>
+    ),
+  },
+  {
+    header: "Status",
+    accessorKey: "is_active", // ✅ change this to allow search/filter on active status
+    cell: ({ row }) => (
+      <Box className="pdf-hide" sx={{ display: 'flex', justifyContent: 'center' }}>
+        <SwitchButton
+          sx={{
+            '& .MuiButtonBase-root': {
+              width: '28px',
+              height: '28px'
+            }
+          }}
+          isChecked={row?.original?.is_active}
+          setIsChecked={() => updateAccountStatus(row?.original?.id, !row?.original?.is_active)}
+        />
+      </Box>
+    ),
+  },
+  {
+    header: "Actions",
+    cell: ({ row }) => (
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <Tooltip title="Update Password" arrow>
+          <IconButton
+            onClick={() => {
+              setSelectedData(row?.original);
+              setStatusDialog2(true);
+            }}
+          >
+            <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Adjust Leaves" arrow>
+          <IconButton
+            onClick={() => {
+              setSelectedData(row?.original);
+              setStatusDialog(true);
+            }}
+          >
+            <BuildIcon sx={{ color: 'black', fontSize: '14px' }} />
+          </IconButton>
+        </Tooltip>
+        <Box
+          component="img"
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            navigate(`/employee-detail/${row?.original?.user_id}`);
+            localStorage.setItem("currentUrl", '/customer-detail');
+          }}
+          src={Images.detailIcon}
+          width="35px"
+        />
+        <Box
+          component="img"
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            navigate(`/update-employee/${row?.original?.user_id}`);
+            localStorage.setItem("currentUrl", '/update-customer');
+          }}
+          src={Images.editIcon}
+          width="35px"
+        />
+      </Box>
+    ),
+  },
+];
 
-
-        },
-        {
-            header: "Name",
-            accessorKey: "name",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.user?.name}
-                </Box>
-            ),
-
-
-        },
-        {
-            header: "Phone",
-            accessorKey: "phone",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.user?.phone}
-                </Box>
-            ),
-
-
-
-        },
-        {
-            header: "Email",
-            accessorKey: "email",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.user?.email}
-                </Box>
-            ),
-
-        },
-
-        {
-            header: "Designation",
-            accessorKey: "designation",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.designation}
-                </Box>
-            ),
-
-        },
-
-        {
-            header: "Department",
-            accessorKey: "department",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.department}
-                </Box>
-            ),
-
-        },
-
-        {
-            header: "Status",
-            accessorKey: "department",
-            cell: ({ row }) => (
-                <Box component={'div'} className='pdf-hide' sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <SwitchButton
-                        sx={{
-                            '& .MuiButtonBase-root': {
-                                width: '28px',
-                                height: '28px'
-                            }
-                        }}
-                        isChecked={row?.original?.is_active}
-                        setIsChecked={() => updateAccountStatus(row?.original?.id, !row?.original?.is_active)}
-                    />
-                </Box>
-            ),
-
-        },
-        {
-            header: "Actions",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                          <Tooltip title="Update Password" arrow>
-                        <IconButton
-                            onClick={() => {
-                                setSelectedData(row?.original);
-                                setStatusDialog2(true);
-                            }}
-                        >
-                            <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Adjust Leaves" arrow>
-                        <IconButton
-                            onClick={() => {
-                                setSelectedData(row?.original);
-                                setStatusDialog(true);
-                            }}
-                        >
-                            <BuildIcon sx={{ color: 'black', fontSize: '14px' }} />
-                        </IconButton>
-                    </Tooltip>
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/employee-detail/${row?.original?.user_id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-employee/${row?.original?.user_id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                    <Box>
-
-
-
-                    </Box>
-
-                </Box>
-            ),
-        },
-
-    ]
 
 
 
