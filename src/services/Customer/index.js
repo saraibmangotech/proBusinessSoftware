@@ -126,6 +126,10 @@ const CustomerServices = {
     const data = await deleted(routes.DeleteProduct, obj);
     return data;
   },
+    deleteHoliday: async (obj) => {
+    const data = await deleted(routes.deleteHoliday, obj);
+    return data;
+  },
   DeleteProductCategory: async (obj) => {
     const data = await deleted(routes.DeleteProductCategory, obj);
     return data;

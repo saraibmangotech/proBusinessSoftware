@@ -165,7 +165,8 @@ const routes = {
   markAttendance:'/users/attendance/markManual',
   getHolidays:'/hrms/holidays',
   addHoliday:'/hrms/holidays/add',
-  updateHoliday:'/hrms/holidays/update'
+  updateHoliday:'/hrms/holidays/update',
+  deleteHoliday:'/hrms/holidays/delete'
 
 
 };
