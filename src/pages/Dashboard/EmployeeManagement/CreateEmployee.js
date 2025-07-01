@@ -75,6 +75,7 @@ function CreateEmployee() {
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const [isLocal, setisLocal] = useState(true)
+  const [selectedTimeDetection, setSelectedTimeDetection] = useState({id:'Time',name:'Time'})
   const theme = useTheme();
   function getStyles(name, personName, theme) {
     return {
@@ -145,7 +146,7 @@ function CreateEmployee() {
 
           grace_period_minutes: formData?.graceMonths,
           minimum_required_hours: formData?.minHours,
-          short_time_deduction_type: formData?.shortTimeDec,
+          short_time_deduction_type: selectedTimeDetection?.id,
           personal_time_minutes_per_month: formData?.personalMintPerMonth,
           leave_allocation_per_month: formData?.leavesPerMonth,
           eligible_for_airfare: formData?.eligibleForAirfare == 'yes' ? true : false,
@@ -165,7 +166,7 @@ function CreateEmployee() {
           iban: formData?.iban,
           routing: formData?.routing,
           is_local: isLocal,
-          cost_center:selectedCostCenter?.name
+          cost_center: selectedCostCenter?.name
         }
 
       }
@@ -673,17 +674,16 @@ function CreateEmployee() {
 
           </Grid>
           <Grid item xs={12} sm={2.8}>
+            <SelectField
 
-            <InputField
-              label={"Short Time Deduction Time :*"}
-              size={'small'}
-              placeholder={"Short Time Deduction Time"}
-              error={errors?.shortTimeDec?.message}
-              register={register("shortTimeDec", {
-                required:
-                  "Please enter short time deduction."
-
-              })}
+              size={"small"}
+              label={"Short Time Deduction Type"}
+              options={[{id:'Time',name:'TIme'},{id:'Hours',name:'Hours'}]}
+              selected={selectedTimeDetection}
+              onSelect={(value) => {
+                setSelectedTimeDetection(value);
+              }}
+              register={register("timedetection")}
             />
 
 

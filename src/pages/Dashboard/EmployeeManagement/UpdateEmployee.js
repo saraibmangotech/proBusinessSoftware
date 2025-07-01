@@ -76,6 +76,7 @@ function UpdateEmployee() {
     const [airFareDueDate, setAirFareDueDate] = useState(null)
     const [probEndDate, setProbEndDate] = useState(null)
     const [leavingDate, setLeavingDate] = useState(null)
+    const [selectedTimeDetection, setSelectedTimeDetection] = useState(null)
     const [isActive, setIsActive] = useState('');
     const [leftJob, setLeftJob] = useState('');
     const [overtime, setOvertime] = useState('');
@@ -153,7 +154,7 @@ function UpdateEmployee() {
 
                     grace_period_minutes: formData?.graceMonths,
                     minimum_required_hours: formData?.minHours,
-                    short_time_deduction_type: formData?.shortTimeDec,
+                    short_time_deduction_type: setSelectedTimeDetection?.id,
                     personal_time_minutes_per_month: formData?.personalMintPerMonth,
                     leave_allocation_per_month: formData?.leavesPerMonth,
                     eligible_for_airfare: formData?.eligibleForAirfare == 'yes' ? true : false,
@@ -253,7 +254,8 @@ function UpdateEmployee() {
             setValue('status', details?.employment_status || '');
             setValue('graceMonths', details?.grace_period_minutes || '');
             setValue('minHours', details?.minimum_required_hours || '');
-            setValue('shortTimeDec', details?.short_time_deduction_type || '');
+            setValue('timedetection', details?.short_time_deduction_type || '');
+            setSelectedTimeDetection({id:details?.short_time_deduction_type,name:details?.short_time_deduction_type})
             setValue('personalMintPerMonth', details?.personal_time_minutes_per_month || '');
             setValue('leavesPerMonth', details?.leave_allocation_per_month || '');
             setValue('eligibleForAirfare', details?.eligible_for_airfare ? 'yes' : 'no');
@@ -273,8 +275,8 @@ function UpdateEmployee() {
             setValue('visa', details?.visa || '');
             setValue('work_permit', details?.iban || '');
             setValue('routing', details?.routing || '');
-            setisLocal( details?.is_local)
-            setSelectedCostCenter({id:details?.cost_center,name:details?.cost_center})
+            setisLocal(details?.is_local)
+            setSelectedCostCenter({ id: details?.cost_center, name: details?.cost_center })
             console.log(moment(details?.date_of_birth).format('MM/DD/YYYY'));
 
             setDob(details?.date_of_birth ? new Date(details?.date_of_birth) : null)
@@ -754,16 +756,16 @@ function UpdateEmployee() {
                     </Grid>
                     <Grid item xs={12} sm={2.8}>
 
-                        <InputField
-                            label={"Short Time Deduction Time :*"}
-                            size={'small'}
-                            placeholder={"Short Time Deduction Time"}
-                            error={errors?.shortTimeDec?.message}
-                            register={register("shortTimeDec", {
-                                required:
-                                    "Please enter short time deduction."
+                        <SelectField
 
-                            })}
+                            size={"small"}
+                            label={"Short Time Deduction Type"}
+                            options={[{ id: 'Time', name: 'TIme' }, { id: 'Hours', name: 'Hours' }]}
+                            selected={selectedTimeDetection}
+                            onSelect={(value) => {
+                                setSelectedTimeDetection(value);
+                            }}
+                            register={register("timedetection")}
                         />
 
 
