@@ -593,7 +593,7 @@ export default function AttendanceTable() {
                                 gap: "25px",
                             }}
                         >
-                            <PrimaryButton bgcolor={Colors.primary} disabled={shifts.length == 0} onClick={() => UpdateHours()} title="Yes,Confirm" />
+                            <PrimaryButton bgcolor={Colors.primary}  onClick={() => UpdateHours()} title="Yes,Confirm" />
                             <PrimaryButton onClick={() => setDialog(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
                         </Grid>
                     </Grid>
