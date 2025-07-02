@@ -167,6 +167,9 @@ function UpdateEmployee() {
                     is_overtime_eligible: overtime == 'yes' ? true : false,
                     has_left_job: leftJob == 'yes' ? true : false,
                     date_of_leaving: leavingDate,
+                    transport_allowance: formData?.transport_allowance,
+                    housing_allowance: formData?.housing_allowance,
+                    other_allowance: formData?.other_allowance,
                     leaving_reason: formData?.reason,
                     branch: formData?.branch,
                     visa: formData?.visa,
@@ -255,9 +258,12 @@ function UpdateEmployee() {
             setValue('graceMonths', details?.grace_period_minutes || '');
             setValue('minHours', details?.minimum_required_hours || '');
             setValue('timedetection', details?.short_time_deduction_type || '');
-            setSelectedTimeDetection({id:details?.short_time_deduction_type,name:details?.short_time_deduction_type})
+            setSelectedTimeDetection({ id: details?.short_time_deduction_type, name: details?.short_time_deduction_type })
             setValue('personalMintPerMonth', details?.personal_time_minutes_per_month || '');
             setValue('leavesPerMonth', details?.leave_allocation_per_month || '');
+            setValue('transport_allowance', details?.transport_allowance);
+            setValue('other_allowance', details?.other_allowance);
+            setValue('other_allowance', details?.other_allowance);
             setValue('eligibleForAirfare', details?.eligible_for_airfare ? 'yes' : 'no');
             setValue('airfaireCycleYear', details?.airfare_cycle_years || '');
             setValue('basicSalary', details?.basic_salary || '');
@@ -1034,6 +1040,57 @@ function UpdateEmployee() {
                             register={register("basicSalary", {
                                 required:
                                     "Please enter basic salary."
+
+                            })}
+                        />
+
+
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+
+                        <InputField
+                            label={"Housing Allowance :*"}
+                            size={'small'}
+                            type={'number'}
+                            placeholder={"  Housing Allowance  "}
+                            error={errors?.housing_allowance?.message}
+                            register={register("housing_allowance", {
+                                required:
+                                    "Please enter housing allowance."
+
+                            })}
+                        />
+
+
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+
+                        <InputField
+                            label={" Transport Allowance :*"}
+                            size={'small'}
+                            type={'number'}
+                            placeholder={"  Transport Allowance "}
+                            error={errors?.transport_allowance?.message}
+                            register={register("transport_allowance", {
+                                required:
+                                    "Please enter transport allowance."
+
+                            })}
+                        />
+
+
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+
+                        <InputField
+                            label={" Other Allowance :*"}
+                            size={'small'}
+                            type={'number'}
+                            placeholder={" Other Allowance "}
+                            error={errors?.other_allowance?.message}
+                            register={register("other_allowance", {
+                                required:
+                                    "Please enter other allowance."
 
                             })}
                         />
