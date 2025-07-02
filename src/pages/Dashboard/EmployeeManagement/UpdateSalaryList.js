@@ -297,7 +297,7 @@ function UpdateSalaryList() {
 
             const obj = {
                 id: id,
-          
+
                 salaries: transformedData
             };
 
@@ -405,19 +405,21 @@ function UpdateSalaryList() {
                         updatedRow.otherAdd +
                         updatedRow.al +
                         updatedRow.sl +
-                        updatedRow.arrear +
-                        updatedRow.gpssaEmp
+                        updatedRow.arrear
+
 
                     // Calculate net salary (total pay minus deductions)
                     const deductions =
                         updatedRow.staffAdvance +
                         updatedRow.lateComm +
+
                         updatedRow.additional +
                         updatedRow.salaryDeduction +
                         updatedRow.unpaidLeave +
-                        updatedRow.commissionFinal
+                        updatedRow.commissionFinal +
+                        updatedRow.gpssaEmp
 
-                    updatedRow.totalPay = totalPay
+                    updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal)
                     updatedRow.netSalary = totalPay - deductions
 
                     return updatedRow
@@ -528,7 +530,7 @@ function UpdateSalaryList() {
                                 <TableRow>
                                     <Cell colSpan={columnConfig.length} sx={{ textAlign: "center", py: 4 }}>
                                         <Typography variant="body2" color="textSecondary">
-                                           No Data
+                                            No Data
                                         </Typography>
                                     </Cell>
                                 </TableRow>

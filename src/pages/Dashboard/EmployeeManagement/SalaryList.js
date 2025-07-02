@@ -124,9 +124,10 @@ function SalaryList() {
     { key: "employeeName", header: "Employee Name", type: "auto" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
     { key: "salaryPaid", header: "Salary Basic", type: "auto" },
-    { key: "housing", header: "Housing Allowance", type: "auto" },
-    { key: "transport", header: "Transport Allowance", type: "auto" },
-    { key: "others", header: "Others", type: "auto" },
+    { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
+    { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
+    { key: "other_allowance", header: "Others", type: "auto" },
+    { key: "salaryPackage", header: "Salary Package", type: "auto" },
     { key: "commission", header: "Commission", type: "auto" },
     { key: "otherAdd", header: "Other Add", type: "manual" },
     { key: "al", header: "AL/SL", type: "manual" },
@@ -213,6 +214,7 @@ function SalaryList() {
       housing_allowance: parseFloat(salary?.employee?.housing_allowance || 0),
       transport_allowance: parseFloat(salary?.employee?.transport_allowance || 0),
       other_allowance: parseFloat(salary?.employee?.other_allowance || 0),
+      salaryPackage: parseFloat(salary?.salaryPackage || 0),
       otherAdd: 0,
       al: 0,
       sl: 0,
@@ -289,10 +291,10 @@ function SalaryList() {
             setData((prevData) => {
               const updatedIds = newEmployeeDataArray.map((emp) => emp.id);
               const filteredData = prevData.filter((row) => !updatedIds.includes(row.id));
-              console.log(filteredData,'filteredData');
+              console.log(filteredData, 'filteredData');
               console.log([...filteredData, ...newEmployeeDataArray]);
-              
-              
+
+
               return [...filteredData, ...newEmployeeDataArray];
             });
 
@@ -304,7 +306,7 @@ function SalaryList() {
           return generateDefaultEmployeeData2(salary);
         })
       );
-      
+
     }
 
     const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id));
@@ -421,27 +423,28 @@ function SalaryList() {
 
           // Calculate total pay (sum of relevant fields)
           const totalPay =
-            updatedRow.housing +
-            updatedRow.transport +
-            updatedRow.others +
+            updatedRow.housing_allowance +
+            updatedRow.transport_allowance +
+            updatedRow.other_allowance +
             updatedRow.salaryPaid +
             updatedRow.commission +
             updatedRow.otherAdd +
             updatedRow.al +
-            updatedRow.sl +
-            updatedRow.arrear +
-            updatedRow.gpssaEmp
+            
+            updatedRow.arrear 
+            
 
           // Calculate net salary (total pay minus deductions)
           const deductions =
             updatedRow.staffAdvance +
+            updatedRow.gpssaEmp +
             updatedRow.lateComm +
             updatedRow.additional +
             updatedRow.salaryDeduction +
             updatedRow.unpaidLeave +
             updatedRow.commissionFinal
 
-          updatedRow.totalPay = totalPay
+          updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal)
           updatedRow.netSalary = totalPay - deductions
 
           return updatedRow

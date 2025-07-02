@@ -263,7 +263,7 @@ function UpdateEmployee() {
             setValue('leavesPerMonth', details?.leave_allocation_per_month || '');
             setValue('transport_allowance', details?.transport_allowance);
             setValue('other_allowance', details?.other_allowance);
-            setValue('other_allowance', details?.other_allowance);
+            setValue('housing_allowance', details?.housing_allowance);
             setValue('eligibleForAirfare', details?.eligible_for_airfare ? 'yes' : 'no');
             setValue('airfaireCycleYear', details?.airfare_cycle_years || '');
             setValue('basicSalary', details?.basic_salary || '');
