@@ -9,7 +9,9 @@ const routes = {
   getSubUsers:'/customers/users',
   CreateSubUser:'/customers/users/add',
   CreateEmployee:'/hrms/employees/add',
-  UpdateEmployee:'/hrms/employees/update'
+  UpdateEmployee:'/hrms/employees/update',
+  CreateSalary:'/hrms/payroll/add',
+  UpdateSalary:'/hrms/payroll/update'
   
 };
 

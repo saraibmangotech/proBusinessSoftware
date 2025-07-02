@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   Box,
   Paper,
@@ -31,6 +31,14 @@ import { makeStyles } from "@mui/styles"
 import { useForm } from "react-hook-form"
 import DeleteIcon from "@mui/icons-material/Delete"
 import SearchIcon from "@mui/icons-material/Search"
+import { showErrorToast, showPromiseToast } from "components/NewToaster"
+import CustomerServices from "services/Customer"
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs from "dayjs"
+import moment from "moment"
+import { PrimaryButton } from "components/Buttons"
+import UserServices from "services/User"
 
 // *For Table Style
 const Cell = styled(TableCell)(({ theme }) => ({
@@ -84,130 +92,30 @@ function SalaryList() {
 
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([])
   const [searchText, setSearchText] = useState("")
+  const [employess, setEmployess] = useState([])
+  const [selectedMonth, setSelectedMonth] = useState(dayjs());
 
-  // Available employees list (this would typically come from an API)
-  const availableEmployees = [
-    {
-      id: "1",
-      employeeName: "John Doe",
-      employeeId: "EMP001",
-      department: "Sales",
-      position: "Sales Manager",
-      basicSalary: 5500,
-    },
-    {
-      id: "2",
-      employeeName: "Jane Smith",
-      employeeId: "EMP002",
-      department: "Marketing",
-      position: "Marketing Executive",
-      basicSalary: 8000,
-    },
-    {
-      id: "3",
-      employeeName: "Mike Johnson",
-      employeeId: "EMP003",
-      department: "IT",
-      position: "Software Developer",
-      basicSalary: 2500,
-    },
-    {
-      id: "4",
-      employeeName: "Sarah Wilson",
-      employeeId: "EMP004",
-      department: "HR",
-      position: "HR Manager",
-      basicSalary: 2500,
-    },
-    {
-      id: "5",
-      employeeName: "David Brown",
-      employeeId: "EMP005",
-      department: "Finance",
-      position: "Accountant",
-      basicSalary: 5000,
-    },
-    {
-      id: "6",
-      employeeName: "Alice Johnson",
-      employeeId: "EMP006",
-      department: "HR",
-      position: "HR Assistant",
-      basicSalary: 4500,
-    },
-    {
-      id: "7",
-      employeeName: "Bob Wilson",
-      employeeId: "EMP007",
-      department: "IT",
-      position: "System Administrator",
-      basicSalary: 6000,
-    },
-    {
-      id: "8",
-      employeeName: "Carol Davis",
-      employeeId: "EMP008",
-      department: "Finance",
-      position: "Financial Analyst",
-      basicSalary: 3500,
-    },
-    {
-      id: "9",
-      employeeName: "Daniel Brown",
-      employeeId: "EMP009",
-      department: "Marketing",
-      position: "Marketing Manager",
-      basicSalary: 4000,
-    },
-    {
-      id: "10",
-      employeeName: "Eva Martinez",
-      employeeId: "EMP010",
-      department: "Operations",
-      position: "Operations Manager",
-      basicSalary: 5500,
-    },
-    {
-      id: "11",
-      employeeName: "Frank Taylor",
-      employeeId: "EMP011",
-      department: "Sales",
-      position: "Sales Representative",
-      basicSalary: 3200,
-    },
-    {
-      id: "12",
-      employeeName: "Grace Lee",
-      employeeId: "EMP012",
-      department: "IT",
-      position: "Frontend Developer",
-      basicSalary: 4800,
-    },
-    {
-      id: "13",
-      employeeName: "Henry Clark",
-      employeeId: "EMP013",
-      department: "Finance",
-      position: "Senior Accountant",
-      basicSalary: 4200,
-    },
-    {
-      id: "14",
-      employeeName: "Ivy Rodriguez",
-      employeeId: "EMP014",
-      department: "Marketing",
-      position: "Content Writer",
-      basicSalary: 3800,
-    },
-    {
-      id: "15",
-      employeeName: "Jack Thompson",
-      employeeId: "EMP015",
-      department: "Operations",
-      position: "Logistics Coordinator",
-      basicSalary: 3600,
-    },
-  ]
+
+  const getCustomerQueue = async (page, limit, filter) => {
+
+
+    try {
+
+      let params = {
+        page: 1,
+        limit: 999999,
+
+
+      }
+
+      const { data } = await CustomerServices.getEmployees(params)
+      setEmployess(data?.employees?.rows)
+
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
+
 
   // Updated column configuration with action column
   const columnConfig = [
@@ -216,18 +124,18 @@ function SalaryList() {
     { key: "salaryPaid", header: "Salary Paid", type: "auto" },
     { key: "commission", header: "Commission", type: "auto" },
     { key: "otherAdd", header: "Other Add", type: "manual" },
-    { key: "al", header: "AL", type: "manual" },
-    { key: "sl", header: "SL", type: "manual" },
+    { key: "al", header: "AL/SL", type: "manual" },
+
     { key: "arrear", header: "Arrear", type: "auto" },
     { key: "gpssaEmp", header: "GPSSA", type: "auto", isGpssa: true },
-    { key: "gpssaEmr", header: "GPSSA", type: "auto", isGpssa: true },
+
     { key: "staffAdvance", header: "Staff Advance", type: "manual" },
-    { key: "lateComm", header: "Late Comm", type: "auto" },
+    { key: "lateComm", header: "Late Coming", type: "auto" },
     { key: "additional", header: "Additional", type: "manual" },
     { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
-    { key: "unpaidLeave", header: "Unpaid Leave", type: "auto" },
+    { key: "unpaidLeave", header: "Unpaid Detection", type: "auto" },
     { key: "totalPay", header: "Total pay", type: "auto" },
-    { key: "commissionFinal", header: "Commission", type: "manual" },
+    { key: "commissionFinal", header: "Commission Return", type: "manual" },
     { key: "netSalary", header: "Net Salary", type: "auto" },
     // New administrative columns - all auto
     { key: "routingCode", header: "ROUTING CODE", type: "auto" },
@@ -235,7 +143,7 @@ function SalaryList() {
     { key: "workPermit", header: "WORK PERMIT", type: "auto" },
     { key: "visa", header: "Visa", type: "auto" },
     { key: "branch", header: "BRANCH", type: "auto" },
-    { key: "remark", header: "Remark", type: "auto" },
+
     { key: "minutesLate", header: "Minutes Late", type: "auto" },
     { key: "alDay", header: "AL Day", type: "auto" },
     { key: "actions", header: "Actions", type: "action" },
@@ -245,73 +153,175 @@ function SalaryList() {
   const [data, setData] = useState([])
 
   // Filter employees based on search text
-  const filteredEmployees = availableEmployees.filter((employee) => {
-    const searchLower = searchText.toLowerCase()
+  const filteredEmployees = employess.filter((employee) => {
+    const searchLower = searchText?.toLowerCase()
     return (
-      employee.employeeName.toLowerCase().includes(searchLower) ||
-      employee.employeeId.toLowerCase().includes(searchLower) ||
-      employee.department.toLowerCase().includes(searchLower) ||
-      employee.position.toLowerCase().includes(searchLower)
+      employee?.user?.name?.toLowerCase().includes(searchLower) 
+ 
     )
   })
 
   // Generate default employee data
-  const generateDefaultEmployeeData = (employee) => {
+  const generateDefaultEmployeeData = (employee, salary) => {
+    console.log(salary, 'employeeemployee')
     return {
+      user_id: employee?.user_id,
       id: employee.id,
-      employeeName: employee.employeeName,
-      employeeId: employee.employeeId,
-      salaryPaid: employee.basicSalary || 0,
-      commission: 0,
+      employeeName: employee.first_name + employee.last_name,
+      employeeId: salary.employee?.employee_code,
+      salaryPaid: parseFloat(salary.basicSalary) || 0,
+      commission: parseFloat(salary?.commission),
       otherAdd: 0,
       al: 0,
       sl: 0,
       arrear: 0,
-      gpssaEmp: 0,
-      gpssaEmr: Math.round(employee.basicSalary * 0.03) || 0, // 3% of basic salary
+      gpssaEmp: parseFloat(salary?.pension || 0),
+
       staffAdvance: 0,
-      lateComm: 0,
+      lateComm: parseFloat(salary?.lateDeduction),
       additional: 0,
       salaryDeduction: 0,
-      unpaidLeave: 0,
-      totalPay: employee.basicSalary || 0,
+      unpaidLeave: parseFloat(salary?.absentDeduction || 0),
+      totalPay: parseFloat(salary?.netSalary) || 0,
       commissionFinal: 0,
-      netSalary: employee.basicSalary || 0,
+      netSalary: parseFloat(salary.netSalary) || 0,
       // Default administrative data
-      routingCode: "000000000",
-      salaryIban: "AE000000000000000000000",
-      workPermit: "",
-      visa: "PBMS",
-      branch: "Main Branch",
+      routingCode: salary?.employee?.routing,
+      salaryIban: salary?.employee?.iban,
+      workPermit: salary?.employee?.work_permit,
+      visa: salary?.employee?.visa,
+      branch: salary?.employee?.branch,
       remark: "New Employee",
-      minutesLate: 0,
-      alDay: 0,
+      minutesLate: parseFloat(salary?.totalShortMinutes || 0),
+      alDay: parseFloat(salary?.approvedLeaveDays || 0),
     }
   }
 
   // Handle employee selection change
-  const handleEmployeeSelectionChange = (event) => {
-    const selectedIds = event.target.value
-    setSelectedEmployeeIds(selectedIds)
+  // const handleEmployeeSelectionChange = (event) => {
+  //   const selectedIds = event.target.value
+  //   console.log(selectedIds,'selectedIds');
 
-    // Add new employees to table
-    const currentEmployeeIds = new Set(data.map((row) => row.id))
-    const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id))
+  //   setSelectedEmployeeIds(selectedIds)
+
+  //   // Add new employees to table
+  //   const currentEmployeeIds = new Set(data.map((row) => row.id))
+  //   const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id))
+
+  //   if (newEmployeeIds.length > 0) {
+  //     const newEmployees = newEmployeeIds.map((id) => {
+  //       const employee = employess.find((emp) => emp.id === id)
+  //       return generateDefaultEmployeeData(employee)
+  //     })
+  //     setData((prevData) => [...prevData, ...newEmployees])
+  //   }
+
+  //   // Remove employees that are no longer selected
+  //   const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id))
+  //   if (removedEmployeeIds.length > 0) {
+  //     setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
+  //   }
+  // }
+  const handleEmployeeSelectionChange2 = async (event) => {
+    const selectedIds = event.target.value;
+    setSelectedEmployeeIds(selectedIds);
+
+    const currentEmployeeIds = new Set(data.map((row) => row.id));
+    const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id));
 
     if (newEmployeeIds.length > 0) {
-      const newEmployees = newEmployeeIds.map((id) => {
-        const employee = availableEmployees.find((emp) => emp.id === id)
-        return generateDefaultEmployeeData(employee)
-      })
-      setData((prevData) => [...prevData, ...newEmployees])
+      const newEmployees = await Promise.all(
+        newEmployeeIds.map(async (id) => {
+          const employee = employess.find((emp) => emp.id === id);
+          let salary = 0;
+
+          try {
+            const { data } = await CustomerServices.employeeSalaryDetail({ user_id: employee.user_id, month: moment(selectedMonth).month() + 1, year: moment(selectedMonth).year() });
+            salary = data?.results[0] || 0;
+            console.log(data);
+
+          } catch (error) {
+            console.error(`Failed to fetch salary for ${employee.user_id}`, error);
+          }
+
+          return generateDefaultEmployeeData(employee, salary);
+        })
+      );
+      console.log(newEmployees, 'newEmployees');
+
+
+      setData((prevData) => [...prevData, ...newEmployees]);
     }
 
-    // Remove employees that are no longer selected
-    const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id))
+    const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id));
     if (removedEmployeeIds.length > 0) {
-      setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
+      setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)));
     }
-  }
+  };
+
+  const CreateSalary = async (formData) => {
+    try {
+      const transformedData = data.map((item) => ({
+        user_id: item.user_id,
+        salary_paid: item.salaryPaid,
+        commission: item.commission,
+        other_add: item.otherAdd,
+        al: item.al,
+        sl: item.sl,
+        arrear: item.arrear,
+        gpssa_emp: item.gpssaEmp,
+      
+        staff_advance: item.staffAdvance,
+        late_comm: item.lateComm,
+        additional: item.additional,
+        salary_deduction: item.salaryDeduction,
+        unpaid_leave: item.unpaidLeave,
+        total_pay: item.totalPay,
+        commission_final: item.commissionFinal,
+        net_salary: item.netSalary,
+        routing_code: item.routingCode,
+        salary_iban: item.salaryIban,
+        work_permit: item.workPermit,
+        visa: item.visa,
+        branch: item.branch,
+        remark: item.remark,
+        minutes_late: item.minutesLate,
+        al_day: item.alDay,
+      }));
+
+      console.log(transformedData);
+
+      console.log(data);
+
+
+      const obj = {
+        status: 'Pending',
+        month: moment(selectedMonth).month() + 1,
+        year: moment(selectedMonth).year(),
+        salaries: transformedData
+      };
+
+      const promise = UserServices.CreateSalary(obj);
+
+      showPromiseToast(
+        promise,
+        'Saving ...',
+        'Success',
+        'Something Went Wrong'
+      );
+
+      const response = await promise;
+
+      if (response?.responseCode === 200) {
+         navigate('/salary-list');
+      }
+    } catch (error) {
+
+      console.log(error);
+
+    }
+  };
+
 
   // Handle remove employee
   const handleRemoveEmployee = (employeeId) => {
@@ -324,6 +334,11 @@ function SalaryList() {
     event.stopPropagation() // Prevent event bubbling
     setSearchText(event.target.value)
   }
+
+  useEffect(() => {
+    getCustomerQueue()
+  }, [])
+
 
   // Handle input changes for manual fields
   const handleInputChange = useCallback((id, field, value) => {
@@ -342,7 +357,7 @@ function SalaryList() {
             updatedRow.al +
             updatedRow.sl +
             updatedRow.arrear +
-            updatedRow.gpssaEmr
+            updatedRow.gpssaEmp
 
           // Calculate net salary (total pay minus deductions)
           const deductions =
@@ -365,6 +380,7 @@ function SalaryList() {
 
   const renderCell = (row, column) => {
     const value = row[column.key]
+
 
     // Handle action column
     if (column.key === "actions") {
@@ -411,7 +427,7 @@ function SalaryList() {
           variant="body2"
           sx={{ fontSize: "11px", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis" }}
         >
-          {value || "-"}
+          {value }
         </Typography>
       )
     }
@@ -436,7 +452,7 @@ function SalaryList() {
 
     return (
       <Typography variant="body2" sx={{ fontSize: "11px" }}>
-        {typeof value === "number" ? (value === 0 ? "-" : value.toLocaleString()) : value || "-"}
+        {typeof value === "number" ? (value === 0 ? "-" : value?.toLocaleString()) : value || "-"}
       </Typography>
     )
   }
@@ -448,119 +464,143 @@ function SalaryList() {
       </Box>
 
       {/* Employee Multi-Select Dropdown with Search */}
-      <Box sx={{ mb: 3 }}>
-        <FormControl fullWidth>
-          <InputLabel id="employee-select-label">Select Employees</InputLabel>
-          <Select
-            labelId="employee-select-label"
-            multiple
-            value={selectedEmployeeIds}
-            onChange={handleEmployeeSelectionChange}
-            input={<OutlinedInput label="Select Employees" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => {
-                  const employee = availableEmployees.find((emp) => emp.id === value)
-                  return <Chip key={value} label={`${employee?.employeeName} (${employee?.employeeId})`} size="small" />
-                })}
-              </Box>
-            )}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 400,
-                },
-              },
-              // Prevent menu from closing when clicking on search input
-              autoFocus: false,
-            }}
-            onClose={() => setSearchText("")} // Clear search when dropdown closes
-          >
-            {/* Search Input */}
-            <ListSubheader
-              sx={{
-                backgroundColor: "white",
-                zIndex: 1,
-                position: "sticky",
-                top: 0,
-              }}
-            >
-              <TextField
-                size="small"
-                placeholder="Search employees..."
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                value={searchText}
-                onChange={handleSearchChange}
-                onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
-                onKeyDown={(e) => {
-                  // Prevent dropdown from closing on any key except Escape
-                  if (e.key !== "Escape") {
-                    e.stopPropagation()
-                  }
-                  // Clear search on Escape
-                  if (e.key === "Escape") {
-                    setSearchText("")
-                  }
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "#e0e0e0",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "#1976d2",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#1976d2",
+      <Grid container xs={12} spacing={2}>
+        <Grid item xs={6}>
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel id="employee-select-label">Select Employees</InputLabel>
+              <Select
+                labelId="employee-select-label"
+                multiple
+                value={selectedEmployeeIds}
+                onChange={handleEmployeeSelectionChange2}
+                input={<OutlinedInput label="Select Employees" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => {
+                      const employee = employess.find((emp) => emp.id === value)
+                      return <Chip key={value} label={`${employee?.user?.name} `} size="small" />
+                    })}
+                  </Box>
+                )}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 400,
                     },
                   },
+                  // Prevent menu from closing when clicking on search input
+                  autoFocus: false,
                 }}
-              />
-            </ListSubheader>
-
-            {/* Employee Options */}
-            {filteredEmployees.length > 0 ? (
-              filteredEmployees.map((employee) => (
-                <MenuItem
-                  key={employee.id}
-                  value={employee.id}
+                onClose={() => setSearchText("")} // Clear search when dropdown closes
+              >
+                {/* Search Input */}
+                <ListSubheader
                   sx={{
-                    whiteSpace: "normal",
-                    wordWrap: "break-word",
-                    minHeight: "auto",
-                    py: 1,
+                    backgroundColor: "white",
+                    zIndex: 1,
+                    position: "sticky",
+                    top: 0,
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        {employee.employeeName} ({employee.employeeId})
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {employee.department} - {employee.position} - Salary: {employee.basicSalary.toLocaleString()}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </MenuItem>
-              ))
-            ) : searchText ? (
-              <MenuItem disabled>
-                <Typography variant="body2" color="textSecondary">
-                  No employees found matching "{searchText}"
-                </Typography>
-              </MenuItem>
-            ) : null}
-          </Select>
-        </FormControl>
-      </Box>
+                  <TextField
+                    size="small"
+                    placeholder="Search employees..."
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
+                    onKeyDown={(e) => {
+                      // Prevent dropdown from closing on any key except Escape
+                      if (e.key !== "Escape") {
+                        e.stopPropagation()
+                      }
+                      // Clear search on Escape
+                      if (e.key === "Escape") {
+                        setSearchText("")
+                      }
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#e0e0e0",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#1976d2",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#1976d2",
+                        },
+                      },
+                    }}
+                  />
+                </ListSubheader>
 
+                {/* Employee Options */}
+                {filteredEmployees.length > 0 ? (
+                  filteredEmployees.map((employee) => (
+                    <MenuItem
+                      key={employee.id}
+                      value={employee.id}
+                      sx={{
+                        whiteSpace: "normal",
+                        wordWrap: "break-word",
+                        minHeight: "auto",
+                        py: 1,
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                            {employee?.user?.name}
+                          </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            Salary: {employee.basic_salary?.toLocaleString()}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </MenuItem>
+                  ))
+                ) : searchText ? (
+                  <MenuItem disabled>
+                    <Typography variant="body2" color="textSecondary">
+                      No employees found matching "{searchText}"
+                    </Typography>
+                  </MenuItem>
+                ) : null}
+              </Select>
+            </FormControl>
+          </Box>
+        </Grid>
+
+
+        <Grid item xs={6}>
+          <Box sx={{ mb: 3 }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                views={['year', 'month']}
+                disabled={data?.length > 0}
+                label="Select Month & Year"
+                minDate={dayjs('2000-01-01')}
+                maxDate={dayjs('2100-12-31')}
+                value={selectedMonth}
+                onChange={(newValue) => {
+                  setSelectedMonth(new Date(newValue)); console.log(newValue, 'newValuenewValue');
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </LocalizationProvider>
+          </Box>
+        </Grid>
+
+      </Grid>
       <Box sx={{ width: "100%" }}>
         <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
           <Table stickyHeader aria-label="salary calculation table" size="small">
@@ -607,22 +647,33 @@ function SalaryList() {
             </Grid>
             <Grid item xs={3}>
               <Typography variant="body2">
-                Total Basic Salary: {data.reduce((sum, row) => sum + row.salaryPaid, 0).toLocaleString()}
+                Total Basic Salary: {data.reduce((sum, row) => sum + row.salaryPaid, 0)?.toLocaleString()}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="body2">
-                Total Net Salary: {data.reduce((sum, row) => sum + row.netSalary, 0).toLocaleString()}
+                Total Net Salary: {data.reduce((sum, row) => sum + row.netSalary, 0)?.toLocaleString()}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="body2">
-                Total Pay: {data.reduce((sum, row) => sum + row.totalPay, 0).toLocaleString()}
+                Total Pay: {data.reduce((sum, row) => sum + row.totalPay, 0)?.toLocaleString()}
               </Typography>
             </Grid>
           </Grid>
         </Box>
       )}
+      <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+        <PrimaryButton
+          bgcolor={'#001f3f'}
+          title="Create"
+          onClick={() => CreateSalary()}
+
+          disabled={data?.length == 0}
+
+        />
+
+      </Box>
     </Box>
   )
 }

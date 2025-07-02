@@ -6,6 +6,14 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+    getSalaries: async (params) => {
+    const data = await get(routes.getSalaries, params);
+    return data;
+  },
+    getSalaryDetail: async (params) => {
+    const data = await get(routes.getSalaryDetail, params);
+    return data;
+  },
     addHoliday: async (obj) => {
     const data = await post(routes.addHoliday, obj);
     return data;
@@ -36,6 +44,10 @@ const CustomerServices = {
   },
   invoiceDateUpdate: async (obj) => {
     const data = await patch(routes.invoiceDateUpdate, obj);
+    return data;
+  },
+  updateSalaryStatus: async (obj) => {
+    const data = await patch(routes.updateSalaryStatus, obj);
     return data;
   },
   updateHoliday: async (obj) => {
@@ -264,6 +276,10 @@ const CustomerServices = {
   },
   getAgents: async (params) => {
     const data = await get(routes.getAgents, params);
+    return data;
+  },
+  employeeSalaryDetail: async (params) => {
+    const data = await get(routes.employeeSalaryDetail, params);
     return data;
   },
   getInventory: async (params) => {

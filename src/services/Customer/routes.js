@@ -166,7 +166,11 @@ const routes = {
   getHolidays:'/hrms/holidays',
   addHoliday:'/hrms/holidays/add',
   updateHoliday:'/hrms/holidays/update',
-  deleteHoliday:'/hrms/holidays/delete'
+  deleteHoliday:'/hrms/holidays/delete',
+  employeeSalaryDetail:'/hrms/payroll/calculate',
+  getSalaries:'/hrms/payroll',
+  updateSalaryStatus:'/hrms/payroll/updateStatus',
+  getSalaryDetail:'/hrms/payroll/details'
 
 
 };

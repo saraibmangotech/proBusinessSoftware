@@ -678,7 +678,7 @@ function CreateEmployee() {
 
               size={"small"}
               label={"Short Time Deduction Type"}
-              options={[{id:'Time',name:'TIme'},{id:'Hours',name:'Hours'}]}
+              options={[{id:'Time',name:'Time'},{id:'Hours',name:'Hours'}]}
               selected={selectedTimeDetection}
               onSelect={(value) => {
                 setSelectedTimeDetection(value);
@@ -1009,7 +1009,7 @@ function CreateEmployee() {
               size={"small"}
               error={errors?.leavingDate?.message}
               register={register("leavingDate", {
-                required: leavingDate ? false : 'Date is required'
+                required: false
               })}
               onChange={(date) => {
                 setValue("leavingDate", date)
@@ -1028,7 +1028,7 @@ function CreateEmployee() {
               error={errors?.reason?.message}
               register={register("reason", {
                 required:
-                  "Please enter reason."
+                  false
 
               })}
             />

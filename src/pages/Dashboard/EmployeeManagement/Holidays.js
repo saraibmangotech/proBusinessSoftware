@@ -33,10 +33,11 @@ function Holidays() {
     const [description, setDescription] = useState(null)
     const [confirmationDialog, setConfirmationDialog] = useState(null)
     const [id, setId] = useState(null)
+    const [selectedMonth, setSelectedMonth] = useState(null)
     // ✅ Fetch and map holidays
     const fetchLeaves = async (
-        year = moment().year(),
-        month = moment().month() + 1 // month is zero-indexed
+        year = moment(selectedMonth).year(),
+        month = moment(selectedMonth).month() + 1 // month is zero-indexed
     ) => {
         try {
             const params = { year, month };
@@ -100,7 +101,7 @@ function Holidays() {
 
         try {
             const params = {
-                date: selectedDate,
+                date: moment(selectedDate).startOf("day").add(6, "hours"),
                 description: description,
                 name: name,
             };
@@ -150,6 +151,7 @@ function Holidays() {
             const { message } = await CustomerServices.updateHoliday(params);
             SuccessToaster(message);
             setOpenDialog2(false);
+
             fetchLeaves();
         } catch (err) {
             showErrorToast("Failed to mark as holiday");
@@ -159,7 +161,7 @@ function Holidays() {
     const handleMonthChange = (newDate) => {
         const month = moment(newDate).month() + 1; // month is 0-indexed
         const year = moment(newDate).year();
-
+        setSelectedMonth(newDate)
         // Optional: console.log or fetch holidays for new month
         console.log("Changed to:", month, year);
 
