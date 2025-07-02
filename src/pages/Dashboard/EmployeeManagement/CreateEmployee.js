@@ -161,6 +161,9 @@ function CreateEmployee() {
           date_of_leaving: leavingDate,
           leaving_reason: formData?.reason,
           branch: formData?.branch,
+          transport_allowance: formData?.transport_allowance,
+          housing_allowance: formData?.housing_allowance,
+          other_allowance: formData?.other_allowance,
           visa: formData?.visa,
           work_permit: formData?.work_permit,
           iban: formData?.iban,
@@ -960,6 +963,57 @@ function CreateEmployee() {
               register={register("basicSalary", {
                 required:
                   "Please enter basic salary."
+
+              })}
+            />
+
+
+          </Grid>
+            <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={"Housing Allowance :*"}
+              size={'small'}
+              type={'number'}
+              placeholder={"  Housing Allowance  "}
+              error={errors?.housing_allowance?.message}
+              register={register("housing_allowance", {
+                required:
+                  "Please enter housing allowance."
+
+              })}
+            />
+
+
+          </Grid>
+            <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Transport Allowance :*"}
+              size={'small'}
+              type={'number'}
+              placeholder={"  Transport Allowance "}
+              error={errors?.transport_allowance?.message}
+              register={register("transport_allowance", {
+                required:
+                  "Please enter transport allowance."
+
+              })}
+            />
+
+
+          </Grid>
+            <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Other Allowance :*"}
+              size={'small'}
+              type={'number'}
+              placeholder={" Other Allowance "}
+              error={errors?.other_allowance?.message}
+              register={register("other_allowance", {
+                required:
+                  "Please enter other allowance."
 
               })}
             />
