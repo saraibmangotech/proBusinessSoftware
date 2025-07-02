@@ -123,7 +123,10 @@ function SalaryList() {
   const columnConfig = [
     { key: "employeeName", header: "Employee Name", type: "auto" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
-    { key: "salaryPaid", header: "Salary Paid", type: "auto" },
+    { key: "salaryPaid", header: "Salary Basic", type: "auto" },
+    { key: "housing", header: "Housing Allowance", type: "manual" },
+    { key: "transport", header: "Transport Allowance", type: "manual" },
+    { key: "others", header: "Others", type: "manual" },
     { key: "commission", header: "Commission", type: "auto" },
     { key: "otherAdd", header: "Other Add", type: "manual" },
     { key: "al", header: "AL/SL", type: "manual" },
@@ -207,6 +210,9 @@ function SalaryList() {
       employeeId: salary.employee?.employee_code,
       salaryPaid: parseFloat(salary.basicSalary) || 0,
       commission: parseFloat(salary?.commission),
+      housing: 0,
+      transport: 0,
+      others: 0,
       otherAdd: 0,
       al: 0,
       sl: 0,
@@ -280,7 +286,16 @@ function SalaryList() {
             );
             console.log(newEmployeeDataArray, 'newEmployeeDataArray');
 
-            setData((prevData) => [...prevData, ...newEmployeeDataArray]);
+            setData((prevData) => {
+              const updatedIds = newEmployeeDataArray.map((emp) => emp.id);
+              const filteredData = prevData.filter((row) => !updatedIds.includes(row.id));
+              console.log(filteredData,'filteredData');
+              console.log([...filteredData, ...newEmployeeDataArray]);
+              
+              
+              return [...filteredData, ...newEmployeeDataArray];
+            });
+
 
           } catch (error) {
             console.error(`Failed to fetch salary for ${employee.user_id}`, error);
@@ -289,10 +304,7 @@ function SalaryList() {
           return generateDefaultEmployeeData2(salary);
         })
       );
-      console.log(newEmployees, 'newEmployees');
-
-
-      setData((prevData) => [...prevData, ...newEmployees]);
+      
     }
 
     const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id));
@@ -409,6 +421,9 @@ function SalaryList() {
 
           // Calculate total pay (sum of relevant fields)
           const totalPay =
+            updatedRow.housing +
+            updatedRow.transport +
+            updatedRow.others +
             updatedRow.salaryPaid +
             updatedRow.commission +
             updatedRow.otherAdd +
