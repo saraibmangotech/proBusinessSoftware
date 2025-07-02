@@ -253,6 +253,9 @@ function SalariesList() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
+useEffect(() => {
+ getCustomerQueue()
+}, [])
 
 
     // *For Handle Filter
