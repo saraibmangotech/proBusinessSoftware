@@ -94,7 +94,9 @@ function SalaryList() {
   const [searchText, setSearchText] = useState("")
   const [employess, setEmployess] = useState([])
   const [selectedMonth, setSelectedMonth] = useState(dayjs());
-
+  const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+  const [costCenters, setCostCenters] = useState([])
+  const [filtertedCostCenters, setFiltertedCostCenters] = useState([])
 
   const getCustomerQueue = async (page, limit, filter) => {
 
@@ -156,8 +158,8 @@ function SalaryList() {
   const filteredEmployees = employess.filter((employee) => {
     const searchLower = searchText?.toLowerCase()
     return (
-      employee?.user?.name?.toLowerCase().includes(searchLower) 
- 
+      employee?.user?.name?.toLowerCase().includes(searchLower)
+
     )
   })
 
@@ -168,6 +170,40 @@ function SalaryList() {
       user_id: employee?.user_id,
       id: employee.id,
       employeeName: employee.first_name + employee.last_name,
+      employeeId: salary.employee?.employee_code,
+      salaryPaid: parseFloat(salary.basicSalary) || 0,
+      commission: parseFloat(salary?.commission),
+      otherAdd: 0,
+      al: 0,
+      sl: 0,
+      arrear: 0,
+      gpssaEmp: parseFloat(salary?.pension || 0),
+
+      staffAdvance: 0,
+      lateComm: parseFloat(salary?.lateDeduction),
+      additional: 0,
+      salaryDeduction: 0,
+      unpaidLeave: parseFloat(salary?.absentDeduction || 0),
+      totalPay: parseFloat(salary?.netSalary) || 0,
+      commissionFinal: 0,
+      netSalary: parseFloat(salary.netSalary) || 0,
+      // Default administrative data
+      routingCode: salary?.employee?.routing,
+      salaryIban: salary?.employee?.iban,
+      workPermit: salary?.employee?.work_permit,
+      visa: salary?.employee?.visa,
+      branch: salary?.employee?.branch,
+      remark: "New Employee",
+      minutesLate: parseFloat(salary?.totalShortMinutes || 0),
+      alDay: parseFloat(salary?.approvedLeaveDays || 0),
+    }
+  }
+  const generateDefaultEmployeeData2 = (salary) => {
+    console.log(salary, 'employeeemployee')
+    return {
+      user_id: salary?.employee?.user_id,
+      id: salary?.employee?.id,
+      employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
       employeeId: salary.employee?.employee_code,
       salaryPaid: parseFloat(salary.basicSalary) || 0,
       commission: parseFloat(salary?.commission),
@@ -237,14 +273,20 @@ function SalaryList() {
 
           try {
             const { data } = await CustomerServices.employeeSalaryDetail({ user_id: employee.user_id, month: moment(selectedMonth).month() + 1, year: moment(selectedMonth).year() });
-            salary = data?.results[0] || 0;
-            console.log(data);
+            let salaries = data?.results;
+
+            const newEmployeeDataArray = salaries.map((salary) =>
+              generateDefaultEmployeeData2(salary)
+            );
+            console.log(newEmployeeDataArray, 'newEmployeeDataArray');
+
+            setData((prevData) => [...prevData, ...newEmployeeDataArray]);
 
           } catch (error) {
             console.error(`Failed to fetch salary for ${employee.user_id}`, error);
           }
 
-          return generateDefaultEmployeeData(employee, salary);
+          return generateDefaultEmployeeData2(salary);
         })
       );
       console.log(newEmployees, 'newEmployees');
@@ -270,7 +312,7 @@ function SalaryList() {
         sl: item.sl,
         arrear: item.arrear,
         gpssa_emp: item.gpssaEmp,
-      
+
         staff_advance: item.staffAdvance,
         late_comm: item.lateComm,
         additional: item.additional,
@@ -313,7 +355,7 @@ function SalaryList() {
       const response = await promise;
 
       if (response?.responseCode === 200) {
-         navigate('/salary-list');
+        navigate('/salary-list');
       }
     } catch (error) {
 
@@ -334,8 +376,24 @@ function SalaryList() {
     event.stopPropagation() // Prevent event bubbling
     setSearchText(event.target.value)
   }
+  const getCostCenters = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 999999,
+      };
 
+      const { data } = await CustomerServices.getCostCenters(params);
+      setCostCenters(data?.cost_centers);
+      setFiltertedCostCenters(data?.cost_centers)
+      setSelectedCostCenter(null)
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
   useEffect(() => {
+    getCostCenters()
     getCustomerQueue()
   }, [])
 
@@ -427,7 +485,7 @@ function SalaryList() {
           variant="body2"
           sx={{ fontSize: "11px", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis" }}
         >
-          {value }
+          {value}
         </Typography>
       )
     }
@@ -460,12 +518,12 @@ function SalaryList() {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, alignItems: "center" }}>
-        <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Salary Calculation</Typography>
+        <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Create Payroll</Typography>
       </Box>
 
       {/* Employee Multi-Select Dropdown with Search */}
       <Grid container xs={12} spacing={2}>
-        <Grid item xs={6}>
+        <Grid item xs={3}>
           <Box sx={{ mb: 3 }}>
             <FormControl fullWidth>
               <InputLabel id="employee-select-label">Select Employees</InputLabel>
@@ -579,7 +637,105 @@ function SalaryList() {
             </FormControl>
           </Box>
         </Grid>
+        <Grid item xs={3}>
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel id="cost-center-select-label">Select Cost Center</InputLabel>
+              <Select
+                labelId="cost-center-select-label"
+                value={selectedCostCenter}
+                onChange={async (e) => {
+                  const selectedId = e.target.value;
+                  setSelectedCostCenter(selectedId);
 
+                  const selectedCenter = costCenters.find(center => center.id === selectedId);
+
+                  try {
+                    const { data } = await CustomerServices.employeeSalaryDetail({
+
+                      cost_center: selectedCenter?.name || '',
+                      month: moment(selectedMonth).month() + 1,
+                      year: moment(selectedMonth).year(),
+                    });
+
+                    const salaries = data?.results || [];
+
+                    const newEmployeeDataArray = salaries.map((salary) =>
+                      generateDefaultEmployeeData2(salary)
+                    );
+                    console.log(newEmployeeDataArray, 'newEmployeeDataArray');
+
+                    setData((prevData) => [...prevData, ...newEmployeeDataArray]);
+
+                    // Do something with `newEmployeeDataArray`, like:
+                    // setData(newEmployeeDataArray); or merge with existing data
+
+                  } catch (error) {
+                    console.error('Error fetching salary details:', error);
+                  }
+                }}
+
+                input={<OutlinedInput label="Select Cost Center" />}
+                renderValue={(selected) => {
+                  const center = costCenters.find((c) => c.id === selected);
+                  return center ? center.name : '';
+                }}
+                MenuProps={{
+                  PaperProps: { style: { maxHeight: 400 } },
+                  autoFocus: false,
+                }}
+                onClose={() => setSearchText('')}
+              >
+                {/* Search Input */}
+                <ListSubheader
+                  sx={{
+                    backgroundColor: "white",
+                    zIndex: 1,
+                    position: "sticky",
+                    top: 0,
+                  }}
+                >
+                  <TextField
+                    size="small"
+                    placeholder="Search cost centers..."
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Escape') e.stopPropagation();
+                      if (e.key === 'Escape') setSearchText('');
+                    }}
+                  />
+                </ListSubheader>
+
+                {/* Cost Center Options */}
+                {filtertedCostCenters.length > 0 ? (
+                  filtertedCostCenters.map((center) => (
+                    <MenuItem key={center.id} value={center.id}>
+                      {center.name}
+                    </MenuItem>
+                  ))
+                ) : searchText ? (
+                  <MenuItem disabled>
+                    <Typography variant="body2" color="textSecondary">
+                      No cost centers found matching "{searchText}"
+                    </Typography>
+                  </MenuItem>
+                ) : null}
+              </Select>
+            </FormControl>
+          </Box>
+
+
+        </Grid>
 
         <Grid item xs={6}>
           <Box sx={{ mb: 3 }}>
