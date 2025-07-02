@@ -10,6 +10,10 @@ const RoleServices = {
     const data = await get(routes.getRoles, params);
     return data;
   },
+   getUserRolesPermissions: async (params) => {
+    const data = await get(routes.getUserRolesPermissions, params);
+    return data;
+  },
   updateRole: async (obj) => {
     const data = await patch(routes.updateRole, obj);
     return data;
@@ -28,6 +32,10 @@ const RoleServices = {
   },
   updateRolesPermissions: async (obj) => {
     const data = await post(routes.updateRolesPermissions, obj);
+    return data;
+  },
+   updateUserRolesPermissions: async (obj) => {
+    const data = await post(routes.updateUserRolesPermissions, obj);
     return data;
   },
 }

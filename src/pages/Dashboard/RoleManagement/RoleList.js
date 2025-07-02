@@ -378,7 +378,7 @@ console.log(params);
 																<Cell style={{ textAlign: 'left' }} className="pdf-table">
 																	{item?.system_default ?
 																		<Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
-																			{permissions?.permission &&  <Box component={'div'} onClick={() => {
+																			{true &&  <Box component={'div'} onClick={() => {
 																				if(item?.name != 'Staff' || item?.name !='Customer' || item?.name !="Agent"){
 																					navigate(`/permission/${item?.id}`)
 																				}
