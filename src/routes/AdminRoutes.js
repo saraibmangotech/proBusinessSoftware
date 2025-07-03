@@ -509,6 +509,9 @@ const SalariesList= lazy(() =>
 const UpdateSalaryList= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/UpdateSalaryList")
 );
+const DetailSalaryList= lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/DetailSalaryList")
+);
 const ConsolidatedProStatement= lazy(() =>
   import("pages/Dashboard/Accounts/ProConsolidatedStatement")
 );
@@ -620,6 +623,10 @@ const AdminRoutes = [
    {
     path: "/update-payroll/:id",
     component: <UpdateSalaryList />,
+  },
+    {
+    path: "/salary-detail/:id",
+    component: <DetailSalaryList />,
   },
    {
     path: "/salary-list",

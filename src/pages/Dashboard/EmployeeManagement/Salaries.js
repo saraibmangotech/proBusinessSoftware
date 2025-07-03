@@ -216,14 +216,14 @@ function SalariesList() {
 
     const getCustomerQueue = async (date) => {
         setLoader(true)
-        console.log(date,'selectedMonth');
-        
+        console.log(date, 'selectedMonth');
+
 
         try {
 
             let params = {
-                month: date ?  moment(date).month() + 1 : moment().month() + 1 ,
-                year: date ?  moment(date).year() : moment().year(),
+                month: date ? moment(date).month() + 1 : moment().month() + 1,
+                year: date ? moment(date).year() : moment().year(),
                 limit: 999999,
 
 
@@ -253,9 +253,9 @@ function SalariesList() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
-useEffect(() => {
- getCustomerQueue()
-}, [])
+    useEffect(() => {
+        getCustomerQueue()
+    }, [])
 
 
     // *For Handle Filter
@@ -378,42 +378,42 @@ useEffect(() => {
                 </Box>
             ),
         },
-     {
-  header: "Status",
-  accessorKey: "status",
-  cell: ({ row }) => {
-    const status = row?.original?.status?.toUpperCase();
+        {
+            header: "Status",
+            accessorKey: "status",
+            cell: ({ row }) => {
+                const status = row?.original?.status?.toUpperCase();
 
-    // Define color for each status
-    const statusColorMap = {
-      APPROVED: "#4caf50", // green
-      PENDING: "#ff9800",  // orange
-      REJECTED: "#f44336", // red
-    };
+                // Define color for each status
+                const statusColorMap = {
+                    APPROVED: "#4caf50", // green
+                    PENDING: "#ff9800",  // orange
+                    REJECTED: "#f44336", // red
+                };
 
-    return (
-      <Box
-        component={'div'}
-        onClick={() => {
-          setSelectedData(row?.original);
-          if (status === 'PENDING') {
-            setStatusDialog(true);
-          }
-        }}
-        sx={{
-          cursor: "pointer",
-          display: "flex",
-          gap: 2,
-          color: statusColorMap[status] || "black", // fallback to black
-          fontWeight: 600,
-          textTransform: "capitalize"
-        }}
-      >
-        {row?.original?.status}
-      </Box>
-    );
-  },
-},
+                return (
+                    <Box
+                        component={'div'}
+                        onClick={() => {
+                            setSelectedData(row?.original);
+                            if (status === 'PENDING') {
+                                setStatusDialog(true);
+                            }
+                        }}
+                        sx={{
+                            cursor: "pointer",
+                            display: "flex",
+                            gap: 2,
+                            color: statusColorMap[status] || "black", // fallback to black
+                            fontWeight: 600,
+                            textTransform: "capitalize"
+                        }}
+                    >
+                        {row?.original?.status}
+                    </Box>
+                );
+            },
+        },
 
 
         {
@@ -422,7 +422,7 @@ useEffect(() => {
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
 
-
+                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/salary-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
                     {row?.original?.status == 'Pending' && <Box
                         component="img"
                         sx={{ cursor: "pointer" }}
@@ -441,7 +441,7 @@ useEffect(() => {
 
 
 
- 
+
 
     return (
         <Box sx={{ p: 3 }}>
