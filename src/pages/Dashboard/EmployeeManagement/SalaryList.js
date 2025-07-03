@@ -326,6 +326,9 @@ function SalaryList() {
         sl: item.sl,
         arrear: item.arrear,
         gpssa_emp: item.gpssaEmp,
+        housing_allowance:item?.housing_allowance,
+        transport_allowance:item?.transport_allowance,
+        other_allowance:item?.other_allowance,
 
         staff_advance: item.staffAdvance,
         late_comm: item.lateComm,
