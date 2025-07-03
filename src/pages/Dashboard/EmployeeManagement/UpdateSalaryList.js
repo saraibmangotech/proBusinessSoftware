@@ -119,36 +119,40 @@ function UpdateSalaryList() {
 
 
     // Updated column configuration with action column
-    const columnConfig = [
-        { key: "employeeName", header: "Employee Name", type: "auto" },
-        { key: "employeeId", header: "Employee ID", type: "auto" },
-        { key: "salaryPaid", header: "Salary Paid", type: "auto" },
-        { key: "commission", header: "Commission", type: "auto" },
-        { key: "otherAdd", header: "Other Add", type: "manual" },
-        { key: "al", header: "AL/SL", type: "manual" },
+  const columnConfig = [
+    { key: "employeeName", header: "Employee Name", type: "auto" },
+    { key: "employeeId", header: "Employee ID", type: "auto" },
+    { key: "salaryPaid", header: "Salary Basic", type: "auto" },
+    { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
+    { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
+    { key: "other_allowance", header: "Others", type: "auto" },
+    { key: "salaryPackage", header: "Salary Package", type: "auto" },
+    { key: "commission", header: "Commission", type: "manual" },
+    { key: "otherAdd", header: "Other Add", type: "manual" },
+    { key: "al", header: "AL/SL", type: "manual" },
 
-        { key: "arrear", header: "Arrear", type: "auto" },
-        { key: "gpssaEmp", header: "GPSSA", type: "auto", isGpssa: true },
+    { key: "arrear", header: "Airfare", type: "manual" },
+    { key: "gpssaEmp", header: "GPSSA", type: "manual", isGpssa: true },
 
-        { key: "staffAdvance", header: "Staff Advance", type: "manual" },
-        { key: "lateComm", header: "Late Coming", type: "auto" },
-        { key: "additional", header: "Additional", type: "manual" },
-        { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
-        { key: "unpaidLeave", header: "Unpaid Detection", type: "auto" },
-        { key: "totalPay", header: "Total pay", type: "auto" },
-        { key: "commissionFinal", header: "Commission Return", type: "manual" },
-        { key: "netSalary", header: "Net Salary", type: "auto" },
-        // New administrative columns - all auto
-        { key: "routingCode", header: "ROUTING CODE", type: "auto" },
-        { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
-        { key: "workPermit", header: "WORK PERMIT", type: "auto" },
-        { key: "visa", header: "Visa", type: "auto" },
-        { key: "branch", header: "BRANCH", type: "auto" },
+    { key: "staffAdvance", header: "Staff Advance", type: "manual" },
+    { key: "lateComm", header: "Late Coming", type: "manual" },
+    { key: "additional", header: "Additional", type: "manual" },
+    { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
+    { key: "unpaidLeave", header: "Unpaid Deduction", type: "manual" },
+    { key: "totalPay", header: "Total pay", type: "auto" },
+    { key: "commissionFinal", header: "Commission Return", type: "manual" },
+    { key: "netSalary", header: "Net Salary", type: "auto" },
+    // New administrative columns - all auto
+    { key: "routingCode", header: "ROUTING CODE", type: "auto" },
+    { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
+    { key: "workPermit", header: "WORK PERMIT", type: "auto" },
+    { key: "visa", header: "Visa", type: "auto" },
+    { key: "branch", header: "BRANCH", type: "auto" },
 
-        { key: "minutesLate", header: "Minutes Late", type: "auto" },
-        { key: "alDay", header: "AL Day", type: "auto" },
-        // { key: "actions", header: "Actions", type: "action" },
-    ]
+    { key: "minutesLate", header: "Minutes Late", type: "auto" },
+    { key: "alDay", header: "AL Day", type: "auto" },
+    // { key: "actions", header: "Actions", type: "action" },
+  ]
 
     // Start with empty table
     const [data, setData] = useState([])

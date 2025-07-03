@@ -21,6 +21,7 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import UserServices from "services/User";
 import CustomerServices from "services/Customer";
 import { ErrorToaster } from "components/Toaster";
+import { useAuth } from "context/UseContext";
 
 const leaveTypes = [{ id: 'Sick Leave', name: "Sick Leave" }, { id: "Casual Leave", name: "Casual Leave" }, { id: "Annual Leave", name: "Annual Leave" }];
 
@@ -30,6 +31,7 @@ function CreateLeave() {
     const [startDate, setStartDate] = useState(null)
     const [endDate, setEndDate] = useState(null)
     const [users, setUsers] = useState([])
+        const { user } = useAuth();
     const [selectedUser, setSelectedUser] = useState(null)
     const {
         control,
@@ -105,6 +107,15 @@ function CreateLeave() {
         getUsers()
     }, [])
 
+useEffect(() => {
+    if (user?.role_id === 4) {
+    
+        setSelectedUser(user)
+        setValue('user',user)
+
+    }
+
+}, [user])
 
     return (
         <Box sx={{ p: 3, borderRadius: 3 }}>
@@ -157,6 +168,7 @@ function CreateLeave() {
                         <SelectField size="small"
                             label="Select User :*"
                             options={users}
+                            disabled={user?.role_id == 4}
                             selected={selectedUser}
                             onSelect={(value) => setSelectedUser(value)}
                             error={errors?.user?.message}

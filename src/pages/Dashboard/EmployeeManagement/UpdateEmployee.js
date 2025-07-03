@@ -78,6 +78,7 @@ function UpdateEmployee() {
     const [leavingDate, setLeavingDate] = useState(null)
     const [selectedTimeDetection, setSelectedTimeDetection] = useState(null)
     const [isActive, setIsActive] = useState('');
+    const [isApplicable, setIsApplicable] = useState('')
     const [leftJob, setLeftJob] = useState('');
     const [overtime, setOvertime] = useState('');
     const [costCenters, setCostCenters] = useState([])
@@ -94,7 +95,7 @@ function UpdateEmployee() {
     // Watch both password and confirm password fields for changes
     const password = watch('password', '');
     const confirmPassword = watch('confirmpassword', '');
-    console.log(watch());
+    console.log(errors);
 
     const [personName, setPersonName] = React.useState([]);
 
@@ -174,6 +175,9 @@ function UpdateEmployee() {
                     branch: formData?.branch,
                     visa: formData?.visa,
                     work_permit: formData?.work_permit,
+                    pension_percentage: formData?.pensionPercentage,
+                    pension_applicable: isApplicable == 'yes' ? true : false,
+                    pension_percentage_employer: formData?.pensionPercentageEmp,
                     iban: formData?.iban,
                     routing: formData?.routing,
                     is_local: isLocal,
@@ -262,6 +266,8 @@ function UpdateEmployee() {
             setValue('personalMintPerMonth', details?.personal_time_minutes_per_month || '');
             setValue('leavesPerMonth', details?.leave_allocation_per_month || '');
             setValue('transport_allowance', details?.transport_allowance);
+            setValue('pensionPercentage', details?.pension_percentage);
+            setValue('pensionPercentageEmp', details?.pension_percentage_employer);
             setValue('other_allowance', details?.other_allowance);
             setValue('housing_allowance', details?.housing_allowance);
             setValue('eligibleForAirfare', details?.eligible_for_airfare ? 'yes' : 'no');
@@ -270,6 +276,7 @@ function UpdateEmployee() {
             setValue('designation', details?.designation || '');
             setValue('department', details?.department || '');
             setIsActive(details?.is_active ? 'yes' : 'no')
+            setIsApplicable(details?.is_applicable ? 'yes' : 'no')
             setOvertime(details?.is_overtime_eligible ? "yes" : "no")
             setLeftJob(details?.has_left_job ? "yes" : "no")
             setValue('isActive', details?.is_active ? 'yes' : 'no');
@@ -281,7 +288,7 @@ function UpdateEmployee() {
             setValue('visa', details?.visa || '');
             setValue('work_permit', details?.iban || '');
             setValue('routing', details?.routing || '');
-            setisLocal(details?.is_local)
+            setisLocal(details?.is_local ? "yes" : "no")
             setSelectedCostCenter({ id: details?.cost_center, name: details?.cost_center })
             console.log(moment(details?.date_of_birth).format('MM/DD/YYYY'));
 
@@ -542,22 +549,7 @@ function UpdateEmployee() {
                 </Box>
                 <Grid container spacing={0} mt={3} p={1} gap={'0px 20px'} >
 
-                    <Grid item xs={12} sm={2.8}>
 
-                        <InputField
-                            label={" Employeement Status :*"}
-                            size={'small'}
-                            placeholder={" Status"}
-                            error={errors?.status?.message}
-                            register={register("status", {
-                                required:
-                                    "Please enter status."
-
-                            })}
-                        />
-
-
-                    </Grid>
 
 
                     <Grid item xs={12} sm={2.8}>
@@ -900,7 +892,7 @@ function UpdateEmployee() {
                         <Controller
                             name="isActive"
                             control={control}
-                            rules={{ required: "Please select an option" }}
+                            rules={{ required: isActive ? false : "Please select an option" }}
                             render={({ field }) => (
                                 <RadioGroup
                                     row
@@ -925,7 +917,7 @@ function UpdateEmployee() {
                         <Controller
                             name="leftJob"
                             control={control}
-                            rules={{ required: "Please select an option" }}
+                            rules={{ required: leftJob ? false : "Please select an option" }}
                             render={({ field }) => (
                                 <RadioGroup
                                     row
@@ -950,7 +942,7 @@ function UpdateEmployee() {
                         <Controller
                             name="overtime"
                             control={control}
-                            rules={{ required: "Please select an option" }}
+                            rules={{ required: overtime ? false : "Please select an option" }}
                             render={({ field }) => (
                                 <RadioGroup
                                     row
@@ -968,12 +960,13 @@ function UpdateEmployee() {
                         />
                         {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
                     </Grid>
+
                     <Grid item xs={12} sm={2.8}>
                         <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Local :*</InputLabel>
                         <Controller
                             name="isLocal"
                             control={control}
-                            rules={{ required: "Please select an option" }}
+                            rules={{ required: isLocal ? false : "Please select an option" }}
                             render={({ field }) => (
                                 <RadioGroup
                                     row
@@ -991,7 +984,29 @@ function UpdateEmployee() {
                         />
                         {errors.isLocal && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isLocal.message}</Typography>}
                     </Grid>
-
+                    <Grid item xs={12} sm={2.8}>
+                        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Pension Applicable :*</InputLabel>
+                        <Controller
+                            name="isApplicable"
+                            control={control}
+                            rules={{ required: isApplicable ? false : "Please select an option" }}
+                            render={({ field }) => (
+                                <RadioGroup
+                                    row
+                                    {...field}
+                                    value={isApplicable}
+                                    onChange={(e) => {
+                                        setIsApplicable(e.target.value);
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                                </RadioGroup>
+                            )}
+                        />
+                        {errors.isApplicable && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isApplicable.message}</Typography>}
+                    </Grid>
                     <Grid item xs={12} sm={2.8}>
                         <DatePicker
                             label={"Next Airfare Due Date:*"}
@@ -1091,6 +1106,40 @@ function UpdateEmployee() {
                             register={register("other_allowance", {
                                 required:
                                     "Please enter other allowance."
+
+                            })}
+                        />
+
+
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+
+                        <InputField
+                            label={" Pension Percentage :"}
+                            size={'small'}
+                            type={'number'}
+                            placeholder={"  Pension Percentage "}
+                            error={errors?.pensionPercentage?.message}
+                            register={register("pensionPercentage", {
+                                required:
+                                    false
+
+                            })}
+                        />
+
+
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+
+                        <InputField
+                            label={" Pension Percentage Employer :"}
+                            size={'small'}
+                            type={'number'}
+                            placeholder={"  Pension Percentage Employer "}
+                            error={errors?.pensionPercentageEmp?.message}
+                            register={register("pensionPercentageEmp", {
+                                required:
+                                    false
 
                             })}
                         />

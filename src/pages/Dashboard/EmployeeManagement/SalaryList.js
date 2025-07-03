@@ -128,18 +128,18 @@ function SalaryList() {
     { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
     { key: "other_allowance", header: "Others", type: "auto" },
     { key: "salaryPackage", header: "Salary Package", type: "auto" },
-    { key: "commission", header: "Commission", type: "auto" },
+    { key: "commission", header: "Commission", type: "manual" },
     { key: "otherAdd", header: "Other Add", type: "manual" },
     { key: "al", header: "AL/SL", type: "manual" },
 
-    { key: "arrear", header: "Arrear", type: "auto" },
-    { key: "gpssaEmp", header: "GPSSA", type: "auto", isGpssa: true },
+    { key: "arrear", header: "Airfare", type: "manual" },
+    { key: "gpssaEmp", header: "GPSSA", type: "manual", isGpssa: true },
 
     { key: "staffAdvance", header: "Staff Advance", type: "manual" },
-    { key: "lateComm", header: "Late Coming", type: "auto" },
+    { key: "lateComm", header: "Late Coming", type: "manual" },
     { key: "additional", header: "Additional", type: "manual" },
     { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
-    { key: "unpaidLeave", header: "Unpaid Detection", type: "auto" },
+    { key: "unpaidLeave", header: "Unpaid Deduction", type: "manual" },
     { key: "totalPay", header: "Total pay", type: "auto" },
     { key: "commissionFinal", header: "Commission Return", type: "manual" },
     { key: "netSalary", header: "Net Salary", type: "auto" },
@@ -638,7 +638,7 @@ function SalaryList() {
                             {employee?.user?.name}
                           </Typography>
                           <Typography variant="caption" color="textSecondary">
-                            Salary: {employee.basic_salary?.toLocaleString()}
+                            Salary: {parseFloat(employee?.basic_salary || 0)+parseFloat(employee?.housing_allowance || 0)+parseFloat(employee?.other_allowance || 0)+parseFloat(employee?.transport_allowance || 0)}
                           </Typography>
                         </Box>
                       </Box>

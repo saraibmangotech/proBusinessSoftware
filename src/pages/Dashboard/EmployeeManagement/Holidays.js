@@ -36,8 +36,8 @@ function Holidays() {
     const [selectedMonth, setSelectedMonth] = useState(null)
     // ✅ Fetch and map holidays
     const fetchLeaves = async (
-        year = moment(selectedMonth).year(),
-        month = moment(selectedMonth).month() + 1 // month is zero-indexed
+        year =selectedMonth ?  moment(selectedMonth).year() : moment().year() ,
+        month = selectedMonth ? moment(selectedMonth).month() + 1 :  moment().month() + 1 // month is zero-indexed
     ) => {
         try {
             const params = { year, month };
