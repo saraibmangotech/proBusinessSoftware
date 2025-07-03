@@ -326,12 +326,12 @@ function SalaryList() {
         sl: item.sl,
         arrear: item.arrear,
         gpssa_emp: item.gpssaEmp,
-        housing_allowance:item?.housing_allowance,
-        transport_allowance:item?.transport_allowance,
-        other_allowance:item?.other_allowance,
-
-        staff_advance: item.staffAdvance,
-        late_comm: item.lateComm,
+        housing_allowance: item?.housing_allowance,
+        transport_allowance: item?.transport_allowance,
+        other_allowance: item?.other_allowance,
+        salary_package: item?.salaryPackage,
+        staff_advance: item?.staffAdvance,
+        late_comm: item?.lateComm,
         additional: item.additional,
         salary_deduction: item.salaryDeduction,
         unpaid_leave: item.unpaidLeave,
@@ -433,9 +433,9 @@ function SalaryList() {
             updatedRow.commission +
             updatedRow.otherAdd +
             updatedRow.al +
-            
-            updatedRow.arrear 
-            
+
+            updatedRow.arrear
+
 
           // Calculate net salary (total pay minus deductions)
           const deductions =
@@ -641,7 +641,7 @@ function SalaryList() {
                             {employee?.user?.name}
                           </Typography>
                           <Typography variant="caption" color="textSecondary">
-                            Salary: {parseFloat(employee?.basic_salary || 0)+parseFloat(employee?.housing_allowance || 0)+parseFloat(employee?.other_allowance || 0)+parseFloat(employee?.transport_allowance || 0)}
+                            Salary: {parseFloat(employee?.basic_salary || 0) + parseFloat(employee?.housing_allowance || 0) + parseFloat(employee?.other_allowance || 0) + parseFloat(employee?.transport_allowance || 0)}
                           </Typography>
                         </Box>
                       </Box>

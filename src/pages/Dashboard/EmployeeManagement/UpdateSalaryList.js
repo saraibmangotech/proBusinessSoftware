@@ -373,7 +373,10 @@ function UpdateSalaryList() {
                     totalPay: parseFloat(salary?.total_pay) || 0,
                     commissionFinal: parseFloat(salary?.commission_final) || 0,
                     netSalary: parseFloat(salary?.net_salary) || 0,
-
+                    housing_allowance: parseFloat(salary?.housing_allowance || 0),
+                    transport_allowance: parseFloat(salary?.transport_allowance || 0),
+                    other_allowance: parseFloat(salary?.other_allowance || 0),
+                     salaryPackage: parseFloat(salary?.salary_package || 0),
                     routingCode: employee?.routing || salary?.routing_code || "",
                     salaryIban: employee?.iban || salary?.salary_iban || "",
                     workPermit: employee?.work_permit || salary?.work_permit || "",
