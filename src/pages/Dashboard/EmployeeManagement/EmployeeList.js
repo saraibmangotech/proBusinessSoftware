@@ -435,16 +435,7 @@ function EmployeeList() {
             <BuildIcon sx={{ color: 'black', fontSize: '14px' }} />
           </IconButton>
         </Tooltip>
-        <Box
-          component="img"
-          sx={{ cursor: "pointer" }}
-          onClick={() => {
-            navigate(`/employee-detail/${row?.original?.user_id}`);
-            localStorage.setItem("currentUrl", '/customer-detail');
-          }}
-          src={Images.detailIcon}
-          width="35px"
-        />
+       
         <Box
           component="img"
           sx={{ cursor: "pointer" }}

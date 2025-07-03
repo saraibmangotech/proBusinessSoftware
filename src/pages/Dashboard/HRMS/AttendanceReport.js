@@ -330,6 +330,7 @@ export default function AttendanceTable() {
             if (response?.responseCode === 200) {
                 setDialog(false)
                 setShifts([])
+                getAttendance(moment().format("MMMM"), moment().format("YYYY"))
             }
         } catch (error) {
             console.log(error)
@@ -357,12 +358,12 @@ export default function AttendanceTable() {
 
 
     const handleCellClick = useCallback((employee, dateStr, logs) => {
-        if(logs?.length > 0){
+        if (logs?.length > 0) {
 
             const convertedShifts = logs?.map(shift => {
                 const checkInMinutes = parseFloat(shift.check_in);
                 const checkOutMinutes = shift.check_out ? parseFloat(shift.check_out) : null;
-    
+
                 return {
                     ...shift,
                     check_in: moment.utc().startOf('day').add(checkInMinutes, 'minutes').format('HH:mm'),
@@ -373,7 +374,7 @@ export default function AttendanceTable() {
             });
             setShifts(convertedShifts)
         }
-        else{
+        else {
             setShifts([])
         }
         console.log(dateStr, 'dateStr');
@@ -593,7 +594,7 @@ export default function AttendanceTable() {
                                 gap: "25px",
                             }}
                         >
-                            <PrimaryButton bgcolor={Colors.primary}  onClick={() => UpdateHours()} title="Yes,Confirm" />
+                            <PrimaryButton bgcolor={Colors.primary} onClick={() => UpdateHours()} title="Yes,Confirm" />
                             <PrimaryButton onClick={() => setDialog(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
                         </Grid>
                     </Grid>
@@ -866,7 +867,8 @@ export default function AttendanceTable() {
                                         color: theme.palette.primary.main,
                                         position: "sticky",
                                         left: 0,
-                                        zIndex: 2,
+                                        top: 0, // 👈 Make it sticky on scroll
+                                        zIndex: 3, // 👈 Ensure it's above other cells
                                         minWidth: 200,
                                         background: "rgb(243 248 253)",
                                     }}
@@ -884,9 +886,12 @@ export default function AttendanceTable() {
                                             color: theme.palette.primary.main,
                                             minWidth: 100,
                                             padding: "8px 4px",
-                                            border: "none !important",
                                             fontSize: "0.75rem",
                                             lineHeight: 2,
+                                            position: "sticky",
+                                            top: 0,
+                                            zIndex: 2,
+                                            background: "rgb(243 248 253)",
                                         }}
                                     >
                                         {day.format("D")} <br />
@@ -895,6 +900,7 @@ export default function AttendanceTable() {
                                 ))}
                             </TableRow>
                         </TableHead>
+
                         <TableBody>
                             {filteredData?.length > 0 ? (
                                 filteredData.map((employee) => (

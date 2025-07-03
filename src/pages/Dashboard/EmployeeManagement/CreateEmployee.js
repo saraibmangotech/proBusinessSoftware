@@ -69,13 +69,14 @@ function CreateEmployee() {
   const [airFareDueDate, setAirFareDueDate] = useState(null)
   const [probEndDate, setProbEndDate] = useState(null)
   const [leavingDate, setLeavingDate] = useState(null)
-  const [isActive, setIsActive] = useState('');
-  const [leftJob, setLeftJob] = useState('');
-  const [overtime, setOvertime] = useState('');
+  const [isActive, setIsActive] = useState('yes');
+  const [isApplicable, setIsApplicable] = useState('yes')
+  const [leftJob, setLeftJob] = useState('no');
+  const [overtime, setOvertime] = useState('no');
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
-  const [isLocal, setisLocal] = useState(true)
-  const [selectedTimeDetection, setSelectedTimeDetection] = useState({id:'Time',name:'Time'})
+  const [isLocal, setisLocal] = useState('no')
+  const [selectedTimeDetection, setSelectedTimeDetection] = useState({ id: 'Time', name: 'Time' })
   const theme = useTheme();
   function getStyles(name, personName, theme) {
     return {
@@ -156,6 +157,7 @@ function CreateEmployee() {
           designation: formData?.designation,
           department: formData?.department,
           is_active: isActive == 'yes' ? true : false,
+
           is_overtime_eligible: overtime == 'yes' ? true : false,
           has_left_job: leftJob == 'yes' ? true : false,
           date_of_leaving: leavingDate,
@@ -168,6 +170,9 @@ function CreateEmployee() {
           work_permit: formData?.work_permit,
           iban: formData?.iban,
           routing: formData?.routing,
+          pension_percentage: formData?.pensionPercentage,
+          pension_applicable: isApplicable == 'yes' ? true : false,
+          pension_percentage_employer: formData?.pensionPercentageEmp,
           is_local: isLocal,
           cost_center: selectedCostCenter?.name
         }
@@ -458,22 +463,7 @@ function CreateEmployee() {
         </Box>
         <Grid container spacing={0} mt={3} p={1} gap={'0px 20px'} >
 
-          <Grid item xs={12} sm={2.8}>
-
-            <InputField
-              label={" Employeement Status :*"}
-              size={'small'}
-              placeholder={" Status"}
-              error={errors?.status?.message}
-              register={register("status", {
-                required:
-                  "Please enter status."
-
-              })}
-            />
-
-
-          </Grid>
+ 
 
 
           <Grid item xs={12} sm={2.8}>
@@ -681,7 +671,7 @@ function CreateEmployee() {
 
               size={"small"}
               label={"Short Time Deduction Type"}
-              options={[{id:'Time',name:'Time'},{id:'Hours',name:'Hours'}]}
+              options={[{ id: 'Time', name: 'Time' }, { id: 'Hours', name: 'Hours' }]}
               selected={selectedTimeDetection}
               onSelect={(value) => {
                 setSelectedTimeDetection(value);
@@ -822,7 +812,7 @@ function CreateEmployee() {
             <Controller
               name="isActive"
               control={control}
-              rules={{ required: "Please select an option" }}
+              rules={{ required: isActive ? false : "Please select an option" }}
               render={({ field }) => (
                 <RadioGroup
                   row
@@ -847,7 +837,7 @@ function CreateEmployee() {
             <Controller
               name="leftJob"
               control={control}
-              rules={{ required: "Please select an option" }}
+              rules={{ required: leftJob ? false : "Please select an option" }}
               render={({ field }) => (
                 <RadioGroup
                   row
@@ -872,7 +862,7 @@ function CreateEmployee() {
             <Controller
               name="overtime"
               control={control}
-              rules={{ required: "Please select an option" }}
+              rules={{ required: overtime ? false : "Please select an option" }}
               render={({ field }) => (
                 <RadioGroup
                   row
@@ -896,7 +886,7 @@ function CreateEmployee() {
             <Controller
               name="isLocal"
               control={control}
-              rules={{ required: "Please select an option" }}
+              rules={{ required: isLocal ? false : "Please select an option" }}
               render={({ field }) => (
                 <RadioGroup
                   row
@@ -914,7 +904,29 @@ function CreateEmployee() {
             />
             {errors.isLocal && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isLocal.message}</Typography>}
           </Grid>
-
+          <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Pension Applicable :*</InputLabel>
+            <Controller
+              name="isApplicable"
+              control={control}
+              rules={{ required: isApplicable ? false : "Please select an option" }}
+              render={({ field }) => (
+                <RadioGroup
+                  row
+                  {...field}
+                  value={isApplicable}
+                  onChange={(e) => {
+                    setIsApplicable(e.target.value);
+                    field.onChange(e);
+                  }}
+                >
+                  <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                </RadioGroup>
+              )}
+            />
+            {errors.isApplicable && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isApplicable.message}</Typography>}
+          </Grid>
           <Grid item xs={12} sm={2.8}>
             <DatePicker
               label={"Next Airfare Due Date:*"}
@@ -969,7 +981,7 @@ function CreateEmployee() {
 
 
           </Grid>
-            <Grid item xs={12} sm={2.8}>
+          <Grid item xs={12} sm={2.8}>
 
             <InputField
               label={"Housing Allowance :*"}
@@ -986,7 +998,7 @@ function CreateEmployee() {
 
 
           </Grid>
-            <Grid item xs={12} sm={2.8}>
+          <Grid item xs={12} sm={2.8}>
 
             <InputField
               label={" Transport Allowance :*"}
@@ -1003,7 +1015,7 @@ function CreateEmployee() {
 
 
           </Grid>
-            <Grid item xs={12} sm={2.8}>
+          <Grid item xs={12} sm={2.8}>
 
             <InputField
               label={" Other Allowance :*"}
@@ -1014,6 +1026,40 @@ function CreateEmployee() {
               register={register("other_allowance", {
                 required:
                   "Please enter other allowance."
+
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Pension Percentage :"}
+              size={'small'}
+              type={'number'}
+              placeholder={"  Pension Percentage "}
+              error={errors?.pensionPercentage?.message}
+              register={register("pensionPercentage", {
+                required:
+                  false
+
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Pension Percentage Employer :"}
+              size={'small'}
+              type={'number'}
+              placeholder={"  Pension Percentage Employer "}
+              error={errors?.pensionPercentageEmp?.message}
+              register={register("pensionPercentageEmp", {
+                required:
+                  false
 
               })}
             />
@@ -1058,7 +1104,7 @@ function CreateEmployee() {
 
           <Grid item xs={12} sm={2.8}>
             <DatePicker
-              label={"Leaving Date:*"}
+              label={"Leaving Date:"}
               value={leavingDate}
               size={"small"}
               error={errors?.leavingDate?.message}
@@ -1075,7 +1121,7 @@ function CreateEmployee() {
           <Grid item xs={12} sm={2.8}>
 
             <InputField
-              label={" Leaving Reason :*"}
+              label={" Leaving Reason :"}
               size={'small'}
 
               placeholder={"  Leaving Reason "}
