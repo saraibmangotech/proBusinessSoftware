@@ -2012,6 +2012,57 @@ function Header() {
 
       ])
     }
+    else if(user?.role_id == 4){
+      setNavigationData([
+       
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            
+              {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+              
+            
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+
+
+
+          ],
+        },
+       
+
+
+      ])
+    }
     else {
       setNavigationData([
 
