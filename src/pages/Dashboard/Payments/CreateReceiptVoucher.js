@@ -505,6 +505,10 @@ function CreateReceiptVoucher() {
 
             setIsCreditDisabled(false);
             setIsDebitDisabled(false);
+                     setSelectedAccount(null);
+         setSelectedCostCenter(null)
+         setValue('description', '')
+         setValue('amount', '')
 
             return updatedRows;
         });
@@ -711,7 +715,7 @@ function CreateReceiptVoucher() {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                type="submit"
+                                            
                                                 onClick={() => updateItem(getValues('description'), getValues('amount'))}
                                                 sx={{
                                                     textTransform: "capitalize",
@@ -733,6 +737,7 @@ function CreateReceiptVoucher() {
                                                     setValue("amount", "");
                                                     setValue("description", "");
                                                     setSelectedAccount(null);
+                                                    setSelectedCostCenter(null)
                                                     setValue("quantity", "");
                                                 }}
                                                 sx={{
@@ -772,7 +777,7 @@ function CreateReceiptVoucher() {
                                             console.log(item);
                                             setSelectedIndex(index)
                                             setValue("id", item?.id);
-                                            setSelectedAccount(item?.selectedAccount)
+                                              setSelectedAccount({id:item?.account_id,name:item?.name})
                                             setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                             setValue("description", item?.description);
                                             setValue("amount", item?.amount);
