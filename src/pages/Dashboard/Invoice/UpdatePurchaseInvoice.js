@@ -418,6 +418,7 @@ function UpdatePurchaseInvoice() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
+                    comments: formData?.comments,
                     invoice_prefix: formData?.invoicePrefix,
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
@@ -1003,6 +1004,7 @@ function UpdatePurchaseInvoice() {
             setValue1('vendor', detail?.vendor)
             setValue1('invoiceNumber', detail?.invoice_number)
             setValue1('refInvoiceNumber', detail?.ref_invoice_number)
+            setValue1('comments', detail?.comments)
             console.log(detail?.vendor?.name);
 
             setValue1('name', detail?.vendor?.name)
@@ -1162,6 +1164,18 @@ function UpdatePurchaseInvoice() {
 
                                         register={register1("address")}
                                         error={errors1?.address?.message}
+                                    />
+                                </Grid>
+
+                                 <Grid item md={12} sm={12} xs={12}>
+                                    <InputField
+                                        label="Comments"
+                                        size="small"
+                                        placeholder="Comments"
+
+
+                                        register={register1("comments")}
+                                        error={errors1?.comments?.message}
                                     />
                                 </Grid>
                             </Grid>

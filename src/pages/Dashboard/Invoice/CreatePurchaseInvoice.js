@@ -417,6 +417,7 @@ function CreatePurchaseInvoice() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
+                    comments: formData?.comments,
                     invoice_prefix: formData?.invoicePrefix,
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
@@ -548,6 +549,7 @@ function CreatePurchaseInvoice() {
             setValue1("display_customer", data?.token?.customer_name);
             setValue1("email", data?.token?.email);
             setValue1("address", data?.token?.address);
+            setValue1("comments", data?.token?.comments || "");
             if (value === "token") {
                 setValue1("mobileValue", data?.token?.mobile);
             }
@@ -983,6 +985,7 @@ function CreatePurchaseInvoice() {
             setValue1("display_customer", detail?.token?.customer_name);
             setValue1("email", detail?.token?.email);
             setValue1("address", detail?.token?.address);
+            setValue1("comments", detail?.token?.comments || "");
 
             setAccounts(detail?.accounts?.rows);
 
@@ -1144,6 +1147,15 @@ function CreatePurchaseInvoice() {
                                         disabled={true}
 
                                         register={register1("address")}
+                                        error={errors1?.address?.message}
+                                    />
+                                </Grid>
+                                <Grid item md={12} sm={12} xs={12}>
+                                    <InputField
+                                        label="Comments"
+                                        size="small"
+                                        placeholder="Comments"
+                                        register={register1("comments")}
                                         error={errors1?.address?.message}
                                     />
                                 </Grid>
