@@ -330,7 +330,7 @@ export default function AttendanceTable() {
             if (response?.responseCode === 200) {
                 setDialog(false)
                 setShifts([])
-                getAttendance(moment().format("MMMM"), moment().format("YYYY"))
+                getAttendance(moment(selectedDate).format("MMMM"), moment().format("YYYY"))
             }
         } catch (error) {
             console.log(error)

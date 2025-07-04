@@ -155,13 +155,14 @@ function UpdateEmployee() {
 
                     grace_period_minutes: formData?.graceMonths,
                     minimum_required_hours: formData?.minHours,
-                    short_time_deduction_type: setSelectedTimeDetection?.id,
+                    short_time_deduction_type: selectedTimeDetection?.id,
                     personal_time_minutes_per_month: formData?.personalMintPerMonth,
                     leave_allocation_per_month: formData?.leavesPerMonth,
                     eligible_for_airfare: formData?.eligibleForAirfare == 'yes' ? true : false,
                     airfare_cycle_years: formData?.airfaireCycleYear,
                     next_airfare_due_date: airFareDueDate,
                     basic_salary: formData?.basicSalary,
+                 
                     designation: formData?.designation,
                     department: formData?.department,
                     is_active: isActive == 'yes' ? true : false,
@@ -568,22 +569,7 @@ function UpdateEmployee() {
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={" Probation Period Months :*"}
-                            size={'small'}
-                            placeholder={" probation"}
-                            error={errors?.probation?.message}
-                            register={register("probation", {
-                                required:
-                                    "Please enter probation."
-
-                            })}
-                        />
-
-
-                    </Grid>
+                 
                     <Grid item xs={12} sm={2.8}>
                         <DatePicker
                             label={"Probation Period End Date:*"}
@@ -984,29 +970,70 @@ function UpdateEmployee() {
                         />
                         {errors.isLocal && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isLocal.message}</Typography>}
                     </Grid>
-                    <Grid item xs={12} sm={2.8}>
-                        <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Pension Applicable :*</InputLabel>
-                        <Controller
-                            name="isApplicable"
-                            control={control}
-                            rules={{ required: isApplicable ? false : "Please select an option" }}
-                            render={({ field }) => (
-                                <RadioGroup
-                                    row
-                                    {...field}
-                                    value={isApplicable}
-                                    onChange={(e) => {
-                                        setIsApplicable(e.target.value);
-                                        field.onChange(e);
-                                    }}
-                                >
-                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
-                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
-                                </RadioGroup>
-                            )}
-                        />
-                        {errors.isApplicable && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isApplicable.message}</Typography>}
-                    </Grid>
+               <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Pension Applicable :*</InputLabel>
+            <Controller
+              name="isApplicable"
+              control={control}
+              rules={{ required: isApplicable ? false : "Please select an option" }}
+              render={({ field }) => (
+                <RadioGroup
+                  row
+                  {...field}
+                  value={isApplicable}
+                  onChange={(e) => {
+                    setIsApplicable(e.target.value);
+                    if (e.target.value == 'no') {
+                      setValue('pensionPercentage',0)
+                      setValue('pensionPercentageEmp',0)
+                      
+                    }
+                    field.onChange(e);
+                  }}
+                >
+                  <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                </RadioGroup>
+              )}
+            />
+            {errors.isApplicable && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isApplicable.message}</Typography>}
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Pension Percentage :"}
+              size={'small'}
+              type={'number'}
+              disabled={isApplicable == 'no'}
+              placeholder={"  Pension Percentage "}
+              error={errors?.pensionPercentage?.message}
+              register={register("pensionPercentage", {
+                required:
+                  false
+
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Pension Percentage Employer :"}
+              size={'small'}
+              type={'number'}
+           disabled={isApplicable == 'no'}
+              placeholder={"  Pension Percentage Employer "}
+              error={errors?.pensionPercentageEmp?.message}
+              register={register("pensionPercentageEmp", {
+                required:
+                  false
+
+              })}
+            />
+
+
+          </Grid>
                     <Grid item xs={12} sm={2.8}>
                         <DatePicker
                             label={"Next Airfare Due Date:*"}
@@ -1112,40 +1139,7 @@ function UpdateEmployee() {
 
 
                     </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={" Pension Percentage :"}
-                            size={'small'}
-                            type={'number'}
-                            placeholder={"  Pension Percentage "}
-                            error={errors?.pensionPercentage?.message}
-                            register={register("pensionPercentage", {
-                                required:
-                                    false
-
-                            })}
-                        />
-
-
-                    </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={" Pension Percentage Employer :"}
-                            size={'small'}
-                            type={'number'}
-                            placeholder={"  Pension Percentage Employer "}
-                            error={errors?.pensionPercentageEmp?.message}
-                            register={register("pensionPercentageEmp", {
-                                required:
-                                    false
-
-                            })}
-                        />
-
-
-                    </Grid>
+                 
                     <Grid item xs={12} sm={2.8}>
 
                         <InputField
