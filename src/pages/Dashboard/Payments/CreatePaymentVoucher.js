@@ -505,9 +505,13 @@ function CreatePaymentVoucher() {
 
             setIsCreditDisabled(false);
             setIsDebitDisabled(false);
-
+        setSelectedAccount(null);
+        setSelectedCostCenter(null)
+        setValue('description', '')
+        setValue('amount', '')
             return updatedRows;
         });
+
     };
 
     // *For Get Customer Queue
@@ -597,7 +601,7 @@ function CreatePaymentVoucher() {
                             register={register1("Voucher")}
                         />
                     </Grid>
-                  
+
 
                 </Grid>
 
@@ -645,18 +649,18 @@ function CreatePaymentVoucher() {
                                 {errors.service && <span style={{ color: "red" }}>{errors.service.message}</span>}
                             </TableCell>
                             <TableCell>
-                            <SelectField
-                            size="small"
-                            
-                            options={costCenters}
-                            selected={selectedCostCenter}
-                            onSelect={(value) => {
-                                setSelectedCostCenter(value)
+                                <SelectField
+                                    size="small"
 
-                            }}
-                            register={register("costcenter", { required: "costcenter is required" })}
-                            error={errors?.costcenter?.message}
-                        />
+                                    options={costCenters}
+                                    selected={selectedCostCenter}
+                                    onSelect={(value) => {
+                                        setSelectedCostCenter(value)
+
+                                    }}
+                                    register={register("costcenter", { required: "costcenter is required" })}
+                                    error={errors?.costcenter?.message}
+                                />
                             </TableCell>
                             <TableCell>
                                 <InputField
@@ -712,7 +716,7 @@ function CreatePaymentVoucher() {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                type="submit"
+
                                                 onClick={() => updateItem(getValues('description'), getValues('amount'))}
                                                 sx={{
                                                     textTransform: "capitalize",
@@ -733,6 +737,7 @@ function CreatePaymentVoucher() {
                                                     setValue("id", "");
                                                     setValue("amount", "");
                                                     setValue("description", "");
+                                                    setSelectedCostCenter(null)
                                                     setSelectedAccount(null);
                                                     setValue("quantity", "");
                                                 }}
@@ -773,8 +778,8 @@ function CreatePaymentVoucher() {
                                             console.log(item);
                                             setSelectedIndex(index)
                                             setValue("id", item?.id);
-                                            setSelectedAccount(item?.selectedAccount)
-                                            setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
+                                            setSelectedAccount({ id: item?.account_id, name: item?.name })
+                                            setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                             setValue("description", item?.description);
                                             setValue("amount", item?.amount);
                                             console.log(item?.service)
