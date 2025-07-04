@@ -759,7 +759,7 @@ function UpdatePaymentVoucher() {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                type="submit"
+                                               
                                                 onClick={() => updateItem(getValues('description'), getValues('amount'))}
                                                 sx={{
                                                     textTransform: "capitalize",
