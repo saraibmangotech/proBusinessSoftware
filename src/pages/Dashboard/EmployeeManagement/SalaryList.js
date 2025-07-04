@@ -289,14 +289,25 @@ function SalaryList() {
             console.log(newEmployeeDataArray, 'newEmployeeDataArray');
 
             setData((prevData) => {
+
               const updatedIds = newEmployeeDataArray.map((emp) => emp.id);
               const filteredData = prevData.filter((row) => !updatedIds.includes(row.id));
-              console.log(filteredData, 'filteredData');
-              console.log([...filteredData, ...newEmployeeDataArray]);
 
 
-              return [...filteredData, ...newEmployeeDataArray];
+              const combinedData = [...filteredData, ...newEmployeeDataArray];
+
+
+              const uniqueByUserIdMap = new Map();
+              for (const row of combinedData) {
+                uniqueByUserIdMap.set(row.user_id, row);
+              }
+
+              // Convert back to array
+              const uniqueData = Array.from(uniqueByUserIdMap.values());
+
+              return uniqueData;
             });
+
 
 
           } catch (error) {
@@ -419,42 +430,48 @@ function SalaryList() {
   const handleInputChange = useCallback((id, field, value) => {
     const numericValue = Number.parseFloat(value) || 0
 
-    setData((prevData) =>
-      prevData.map((row) => {
+    setData((prevData) => {
+      // Remove duplicate user_ids, keeping the first occurrence
+      const seenUserIds = new Set();
+      const uniqueData = prevData.filter((row) => {
+        if (seenUserIds.has(row.user_id)) return false;
+        seenUserIds.add(row.user_id);
+        return true;
+      });
+
+      // Now update the matching row
+      return uniqueData.map((row) => {
         if (row.id === id) {
-          const updatedRow = { ...row, [field]: numericValue }
+          const updatedRow = { ...row, [field]: numericValue };
 
-          // Calculate total pay (sum of relevant fields)
           const totalPay =
-            updatedRow.housing_allowance +
-            updatedRow.transport_allowance +
-            updatedRow.other_allowance +
-            updatedRow.salaryPaid +
-            updatedRow.commission +
-            updatedRow.otherAdd +
-            updatedRow.al +
+            (updatedRow.housing_allowance || 0) +
+            (updatedRow.transport_allowance || 0) +
+            (updatedRow.other_allowance || 0) +
+            (updatedRow.salaryPaid || 0) +
+            (updatedRow.commission || 0) +
+            (updatedRow.otherAdd || 0) +
+            (updatedRow.al || 0) +
+            (updatedRow.arrear || 0);
 
-            updatedRow.arrear
-
-
-          // Calculate net salary (total pay minus deductions)
           const deductions =
-            updatedRow.staffAdvance +
-            updatedRow.gpssaEmp +
-            updatedRow.lateComm +
-            updatedRow.additional +
-            updatedRow.salaryDeduction +
-            updatedRow.unpaidLeave +
-            updatedRow.commissionFinal
+            (updatedRow.staffAdvance || 0) +
+            (updatedRow.gpssaEmp || 0) +
+            (updatedRow.lateComm || 0) +
+            (updatedRow.additional || 0) +
+            (updatedRow.salaryDeduction || 0) +
+            (updatedRow.unpaidLeave || 0) +
+            (updatedRow.commissionFinal || 0);
 
-          updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal)
-          updatedRow.netSalary = totalPay - deductions
+          updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal || 0);
+          updatedRow.netSalary = totalPay - deductions;
 
-          return updatedRow
+          return updatedRow;
         }
-        return row
-      }),
-    )
+        return row;
+      });
+    });
+
   }, [])
 
   const renderCell = (row, column) => {
@@ -686,7 +703,18 @@ function SalaryList() {
                     );
                     console.log(newEmployeeDataArray, 'newEmployeeDataArray');
 
-                    setData((prevData) => [...prevData, ...newEmployeeDataArray]);
+                    setData((prevData) => {
+                      const combinedData = [...prevData, ...newEmployeeDataArray];
+
+                      
+                      const uniqueByUserId = new Map();
+                      for (const row of combinedData) {
+                        uniqueByUserId.set(row.user_id, row); 
+                      }
+
+                      return Array.from(uniqueByUserId.values());
+                    });
+
 
                     // Do something with `newEmployeeDataArray`, like:
                     // setData(newEmployeeDataArray); or merge with existing data
