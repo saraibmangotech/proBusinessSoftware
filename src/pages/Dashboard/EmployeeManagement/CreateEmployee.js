@@ -463,7 +463,7 @@ function CreateEmployee() {
         </Box>
         <Grid container spacing={0} mt={3} p={1} gap={'0px 20px'} >
 
- 
+
 
 
           <Grid item xs={12} sm={2.8}>
@@ -482,22 +482,7 @@ function CreateEmployee() {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
-            <InputField
-              label={" Probation Period Months :*"}
-              size={'small'}
-              placeholder={" probation"}
-              error={errors?.probation?.message}
-              register={register("probation", {
-                required:
-                  "Please enter probation."
-
-              })}
-            />
-
-
-          </Grid>
           <Grid item xs={12} sm={2.8}>
             <DatePicker
               label={"Probation Period End Date:*"}
@@ -917,6 +902,11 @@ function CreateEmployee() {
                   value={isApplicable}
                   onChange={(e) => {
                     setIsApplicable(e.target.value);
+                    if (e.target.value == 'no') {
+                      setValue('pensionPercentage',0)
+                      setValue('pensionPercentageEmp',0)
+                      
+                    }
                     field.onChange(e);
                   }}
                 >
@@ -926,6 +916,42 @@ function CreateEmployee() {
               )}
             />
             {errors.isApplicable && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isApplicable.message}</Typography>}
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Pension Percentage :"}
+              size={'small'}
+              type={'number'}
+              disabled={isApplicable == 'no'}
+              placeholder={"  Pension Percentage "}
+              error={errors?.pensionPercentage?.message}
+              register={register("pensionPercentage", {
+                required:
+                  false
+
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Pension Percentage Employer :"}
+              size={'small'}
+              type={'number'}
+           disabled={isApplicable == 'no'}
+              placeholder={"  Pension Percentage Employer "}
+              error={errors?.pensionPercentageEmp?.message}
+              register={register("pensionPercentageEmp", {
+                required:
+                  false
+
+              })}
+            />
+
+
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <DatePicker
@@ -1032,40 +1058,7 @@ function CreateEmployee() {
 
 
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
-            <InputField
-              label={" Pension Percentage :"}
-              size={'small'}
-              type={'number'}
-              placeholder={"  Pension Percentage "}
-              error={errors?.pensionPercentage?.message}
-              register={register("pensionPercentage", {
-                required:
-                  false
-
-              })}
-            />
-
-
-          </Grid>
-          <Grid item xs={12} sm={2.8}>
-
-            <InputField
-              label={" Pension Percentage Employer :"}
-              size={'small'}
-              type={'number'}
-              placeholder={"  Pension Percentage Employer "}
-              error={errors?.pensionPercentageEmp?.message}
-              register={register("pensionPercentageEmp", {
-                required:
-                  false
-
-              })}
-            />
-
-
-          </Grid>
           <Grid item xs={12} sm={2.8}>
 
             <InputField
