@@ -277,7 +277,7 @@ function UpdateEmployee() {
             setValue('designation', details?.designation || '');
             setValue('department', details?.department || '');
             setIsActive(details?.is_active ? 'yes' : 'no')
-            setIsApplicable(details?.is_applicable ? 'yes' : 'no')
+            setIsApplicable(details?.pension_applicable ? 'yes' : 'no')
             setOvertime(details?.is_overtime_eligible ? "yes" : "no")
             setLeftJob(details?.has_left_job ? "yes" : "no")
             setValue('isActive', details?.is_active ? 'yes' : 'no');
