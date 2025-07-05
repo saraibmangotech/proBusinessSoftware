@@ -333,7 +333,7 @@ function CreateReceiptVoucher() {
                 entries: rows,
                 voucher_number: getValues1('Voucher'),
                 payment_method: selectedParentAccount?.name,
-                cost_center: selectedCostCenter?.name
+                 cost_center: rows[0]?.cost_center
             }
 
             console.log(obj);
@@ -658,7 +658,7 @@ function CreateReceiptVoucher() {
                                         setSelectedCostCenter(value)
 
                                     }}
-                                    register={register("costcenter", { required: "costcenter is required" })}
+                                    register={register("costcenter", { required: false})}
                                     error={errors?.costcenter?.message}
                                 />
                             </TableCell>

@@ -334,7 +334,7 @@ function UpdateReceiptVoucher() {
                 authorization_code: formData?.remarks,
                 entries: rows,
                 payment_method: selectedParentAccount?.name,
-                cost_center: selectedCostCenter?.name
+                cost_center: rows[0]?.cost_center
             }
 
             console.log(obj);
@@ -694,7 +694,7 @@ function UpdateReceiptVoucher() {
                                         setSelectedCostCenter(value)
 
                                     }}
-                                    register={register("costcenter", { required: "costcenter is required" })}
+                                    register={register("costcenter", { required: false })}
                                     error={errors?.costcenter?.message}
                                 />
                             </TableCell>
@@ -751,7 +751,7 @@ function UpdateReceiptVoucher() {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                             
+
                                                 onClick={() => updateItem(getValues('description'), getValues('amount'))}
                                                 sx={{
                                                     textTransform: "capitalize",

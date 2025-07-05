@@ -1,4 +1,4 @@
-import { IconButton, Grid, Box, Button, Typography } from "@mui/material";
+import { IconButton, Grid, Box, Button, Typography, FormControlLabel, InputLabel, Checkbox } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import FinanceServices from "services/Finance";
 import HierarchicalSelectField from "components/Select2";
+import Colors from "assets/Style/Colors";
 
 const CreateDebitNote = () => {
     const { register, setValue, formState: { errors }, handleSubmit } = useForm();
@@ -22,7 +23,7 @@ const CreateDebitNote = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [costCenters, setCostCenters] = useState([])
     const [selectedCostCenter, setSelectedCostCenter] = useState(null)
-
+    const [isVatEnabled, setIsVatEnabled] = useState(true)
     const [error, setError] = useState("")
     // *For Accounts
     const [accounts, setAccounts] = useState([]);
@@ -306,11 +307,19 @@ const CreateDebitNote = () => {
                                 // custom onChange logic here
                                 // custom onChange logic here
                                 const value = parseFloat(e.target.value) || 0;
-                                setValue("Vat", (value * 0.05).toFixed(2));
-                                let total = parseFloat(value * 0.05) + parseFloat(value)
-                                console.log(total);
+                                if (isVatEnabled) {
+                                    setValue("Vat", (value * 0.05).toFixed(2));
+                                    let total = parseFloat(value * 0.05) + parseFloat(value)
+                                    console.log(total);
+                                    setValue("totalAmount", total);
+                                }
+                                else {
+                                    setValue("Vat", (0).toFixed(2));
+                                    let total = parseFloat(0) + parseFloat(value)
+                                    console.log(total);
+                                    setValue("totalAmount", total);
+                                }
 
-                                setValue("totalAmount", total);
                             },
                         })}
                         error={!!errors?.totalCreditAmount}
@@ -318,7 +327,31 @@ const CreateDebitNote = () => {
                     />
 
                 </Grid>
+                <Grid item xs={12} md={2}>
+                    <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
 
+                        Enable VAT
+                    </InputLabel>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={isVatEnabled}
+                                {...register("vatEnabled")}
+                                onChange={(e) => {
+                                    setIsVatEnabled(e.target.checked)
+                                    if (!e.target.checked) {
+                                        setValue("Vat", 0); // Set VAT to 0 if unchecked
+                                        console.log(e.target.checked);
+
+
+                                    }
+                                }}
+                            />
+                        }
+
+                    />
+
+                </Grid>
                 <Grid item xs={12} md={2}>
                     <InputField
                         label="Vat"
@@ -352,7 +385,7 @@ const CreateDebitNote = () => {
                     />
                 </Grid>
                 {/* Credit Note Details */}
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <InputField
