@@ -339,7 +339,7 @@ function UpdatePaymentVoucher() {
                 authorization_code: formData?.remarks,
                 entries: rows,
                 payment_method: selectedParentAccount?.name,
-                cost_center: selectedCostCenter?.name
+                cost_center: rows[0]?.cost_center
             }
 
             console.log(obj, 'objobj');
@@ -705,7 +705,7 @@ function UpdatePaymentVoucher() {
                                         setSelectedCostCenter(value)
 
                                     }}
-                                    register={register1("costcenter", { required: "costcenter is required" })}
+                                    register={register1("costcenter", { required: false })}
                                     error={errors1?.costcenter?.message}
                                 />
                             </TableCell>
@@ -825,7 +825,7 @@ function UpdatePaymentVoucher() {
                                             setSelectedIndex(index)
                                             setValue("id", item?.id);
                                             setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
-                                            setSelectedAccount({id:item?.account_id,name:item?.name})
+                                            setSelectedAccount({ id: item?.account_id, name: item?.name })
                                             setValue("description", item?.description);
                                             setValue("amount", item?.amount);
                                             console.log(item?.service)

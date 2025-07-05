@@ -1,4 +1,4 @@
-import { IconButton, Grid, Box, Button, Typography } from "@mui/material";
+import { IconButton, Grid, Box, Button, Typography, FormControlLabel, Checkbox, InputLabel } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
@@ -9,14 +9,18 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster";
 import CustomerServices from "services/Customer";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import Colors from "assets/Style/Colors";
 
 const CreateCreditNote = () => {
-  const { register, setValue, formState: { errors }, handleSubmit } = useForm();
+  const { register, setValue, formState: { errors }, handleSubmit, watch } = useForm();
   const [fieldsDisabled, setFieldsDisabled] = useState(false);
   const [date, setDate] = useState(null);
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const navigate = useNavigate()
+  const [isVatEnabled, setIsVatEnabled] = useState(true)
+
+
   // *For Customer Booking
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -39,7 +43,7 @@ const CreateCreditNote = () => {
         amount: formData?.totalCreditAmount,
         tax_amount: formData?.Vat,
         total_amount: formData?.totalAmount,
-        cost_center:selectedCostCenter?.name
+        cost_center: selectedCostCenter?.name
       }
 
       const promise = CustomerServices.CreateNote(obj);
@@ -187,7 +191,7 @@ const CreateCreditNote = () => {
                 selected={selectedCostCenter}
                 onSelect={(value) => {
                   setSelectedCostCenter(value)
-                  
+
                 }}
                 register={register("costcenter", { required: "costcenter is required" })}
                 error={errors?.costcenter?.message}
@@ -242,11 +246,20 @@ const CreateCreditNote = () => {
               onChange: (e) => {
                 // custom onChange logic here
                 const value = parseFloat(e.target.value) || 0;
-                setValue("Vat", (value * 0.05).toFixed(2));
-                let total = parseFloat(value * 0.05) + parseFloat(value)
-                console.log(total);
+                if (isVatEnabled) {
+                  setValue("Vat", (value * 0.05).toFixed(2));
+                  let total = parseFloat(value * 0.05) + parseFloat(value)
+                  console.log(total);
+                  setValue("totalAmount", total);
+                }
+                else {
+                  setValue("Vat", (0).toFixed(2));
+                  let total = parseFloat(0) + parseFloat(value)
+                  console.log(total);
+                  setValue("totalAmount", total);
+                }
 
-                setValue("totalAmount", total);
+              
               },
             })}
             error={!!errors?.totalCreditAmount}
@@ -254,7 +267,31 @@ const CreateCreditNote = () => {
           />
 
         </Grid>
+        <Grid item xs={12} md={2}>
+          <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
 
+            Enable VAT
+          </InputLabel>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isVatEnabled}
+                {...register("vatEnabled")}
+                onChange={(e) => {
+                  setIsVatEnabled(e.target.checked)
+                  if (!e.target.checked) {
+                    setValue("Vat", 0); // Set VAT to 0 if unchecked
+                    console.log(e.target.checked);
+
+
+                  }
+                }}
+              />
+            }
+
+          />
+
+        </Grid>
         <Grid item xs={12} md={2}>
           <InputField
             label="Vat"
@@ -278,7 +315,7 @@ const CreateCreditNote = () => {
         </Grid>
 
         {/* Credit Note Details */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={4}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <InputField
