@@ -12,7 +12,7 @@ import moment from "moment";
 import Colors from "assets/Style/Colors";
 
 const CreateCreditNote = () => {
-  const { register, setValue, formState: { errors }, handleSubmit, watch } = useForm();
+  const { register, setValue, formState: { errors }, handleSubmit, watch, getValues } = useForm();
   const [fieldsDisabled, setFieldsDisabled] = useState(false);
   const [date, setDate] = useState(null);
   const [costCenters, setCostCenters] = useState([])
@@ -259,7 +259,7 @@ const CreateCreditNote = () => {
                   setValue("totalAmount", total);
                 }
 
-              
+
               },
             })}
             error={!!errors?.totalCreditAmount}
@@ -267,7 +267,7 @@ const CreateCreditNote = () => {
           />
 
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} md={1}>
           <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
 
             Enable VAT
@@ -283,6 +283,17 @@ const CreateCreditNote = () => {
                     setValue("Vat", 0); // Set VAT to 0 if unchecked
                     console.log(e.target.checked);
 
+                    let total = parseFloat(0) + parseFloat(getValues('totalCreditAmount'))
+                    console.log(total,'total');
+                    setValue("totalAmount", total);
+                  }
+                  else {
+                    let vat = parseFloat(getValues('totalCreditAmount') * 0.05)
+                    setValue("Vat", vat); // Set VAT to 0 if unchecked
+                    console.log(e.target.checked);
+                    let total = parseFloat(vat) + parseFloat(getValues('totalCreditAmount'))
+                    console.log(total);
+                    setValue("totalAmount", total);
 
                   }
                 }}

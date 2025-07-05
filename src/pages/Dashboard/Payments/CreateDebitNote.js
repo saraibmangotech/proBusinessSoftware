@@ -14,7 +14,7 @@ import HierarchicalSelectField from "components/Select2";
 import Colors from "assets/Style/Colors";
 
 const CreateDebitNote = () => {
-    const { register, setValue, formState: { errors }, handleSubmit } = useForm();
+    const { register, setValue, formState: { errors }, handleSubmit, getValues } = useForm();
     const [fieldsDisabled, setFieldsDisabled] = useState(false);
     const [date, setDate] = useState(null);
 
@@ -327,7 +327,7 @@ const CreateDebitNote = () => {
                     />
 
                 </Grid>
-                <Grid item xs={12} md={2}>
+                <Grid item xs={12} md={1}>
                     <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
 
                         Enable VAT
@@ -341,8 +341,19 @@ const CreateDebitNote = () => {
                                     setIsVatEnabled(e.target.checked)
                                     if (!e.target.checked) {
                                         setValue("Vat", 0); // Set VAT to 0 if unchecked
+
                                         console.log(e.target.checked);
 
+                                        let total = parseFloat(0) + parseFloat(getValues('totalCreditAmount'))
+                                        console.log(total);
+                                        setValue("totalAmount", total);
+                                    } else {
+                                        let vat = parseFloat(getValues('totalCreditAmount') * 0.05)
+                                        setValue("Vat", vat); // Set VAT to 0 if unchecked
+                                        console.log(e.target.checked);
+                                        let total = parseFloat(getValues('totalCreditAmount') * 0.05) + parseFloat(getValues('totalCreditAmount'))
+                                        console.log(total);
+                                        setValue("totalAmount", total);
 
                                     }
                                 }}
@@ -373,7 +384,7 @@ const CreateDebitNote = () => {
 
                     />
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={5}>
 
                     <HierarchicalSelectField
                         label={'Select Credit Account'}
@@ -385,7 +396,7 @@ const CreateDebitNote = () => {
                     />
                 </Grid>
                 {/* Credit Note Details */}
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={6}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <InputField
