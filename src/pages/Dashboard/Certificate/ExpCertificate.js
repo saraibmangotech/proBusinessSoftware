@@ -17,7 +17,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Images } from "assets"
 
 
-const Certificate = () => {
+const ExpCertificate = () => {
     const contentRef = useRef(null)
     const { state } = useLocation()
     const navigate = useNavigate()
@@ -107,7 +107,7 @@ const Certificate = () => {
         setLoading(true)
         try {
             const obj = {
-                type: "salary",                //"experience"
+                type: "experience",                //"experience"
                 reference_number: state?.reference,
                 to: state?.to,
                 forField: state?.for,
@@ -119,7 +119,7 @@ const Certificate = () => {
             showPromiseToast(promise, "Saving ...", "Success", "Something Went Wrong")
             const response = await promise
             if (response?.responseCode === 200) {
-                navigate("/salary-certificate")
+                navigate("/experience-certificate")
             }
         } catch (error) {
             console.error("Error creating certificate:", error)
@@ -271,9 +271,9 @@ const Certificate = () => {
                     <div class="certificate-title">SALARY CERTIFICATE</div>
 
                     <div class="content">
-                        <p>This is to certify that <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.department}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}/span> inclusive.</p>
+                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">"Legal Assistant"</span> in our esteemed organization from <span class="employee-details">1st September 2022</span> to <span class="employee-details">present</span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
 
-                    <p>This certificate has been issued at the request of the employee, for whatever purpose it may serve him without any legal obligation to the company.</p>
+                        <p>We found him/her to be honest, hardworking and of good conduct. We wish him/her all the best in his/her future endeavors.</p>
                     </div>
 
                   
@@ -484,4 +484,4 @@ const Certificate = () => {
     )
 }
 
-export default Certificate
+export default ExpCertificate

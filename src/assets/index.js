@@ -6,6 +6,8 @@ export const FontFamily = {
 };
 
 export const Images = {
+	tasheel:require("./Images/tasheel.jpeg"),
+	aldeed:require("./Images/aldeed.png"),
 	headerRightImage:require("./Images/headerRightImage.png"),
 	headerLeftImage:require("./Images/headerLeftImage.png"),
 	invoiceIcon:require("./Images/invoiceIcon.png"),

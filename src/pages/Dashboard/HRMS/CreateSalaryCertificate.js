@@ -140,9 +140,9 @@ function CreateSalaryCertificate() {
     const [payment, setPayment] = useState(null)
     const [selectedVisa, setSelectedVisa] = useState()
     const [selectedItem, setSelectedItem] = useState(null);
-    const [newData, setNewData] = useState(null)
 
-    const tableHead = [{ name: 'Select', key: 'created_at' }, { name: ' Name', key: 'commission_monthly' }, { name: 'Basic Salary', key: 'commission_monthly' }, { name: 'Housing Allowance', key: 'commission_monthly' }, { name: 'Transport Allowance', key: 'created_at' }, { name: 'Other Allowance', key: 'created_at' }, { name: 'Total Salary', key: 'commission_monthly' }, { name: 'Visa Status', key: 'commission_monthly' }]
+
+    const tableHead = [{ name: 'Select', key: 'created_at' }, { name: 'Vr No.', key: 'name' }, { name: 'Customer', key: 'commission_visa' }, { name: 'Candidate Name', key: 'commission_monthly' }, { name: 'Basic Salary', key: 'commission_monthly' }, { name: 'Allowance', key: 'commission_monthly' }, { name: 'Total Salary', key: 'commission_monthly' }, { name: 'Visa Status', key: 'commission_monthly' }]
 
 
     const allowFilesType = [
@@ -159,7 +159,7 @@ function CreateSalaryCertificate() {
 
     // *For Customer Queue
     const [candidates, setCandidates] = useState([]);
-    const [certificateDialog, setCertificateDialog] = useState(false)
+
 
 
     // *For setPermissions
@@ -260,19 +260,19 @@ function CreateSalaryCertificate() {
             let params = {
                 page: Page,
                 limit: Limit,
-                // customer_id: user?.user_type == 'C' ? user?.customer_id : null,
+                customer_id: user?.user_type == 'C' ? user?.customer_id : null,
             }
             params = { ...params, ...Filter }
 
-            const { data } = await CustomerServices.getEmployees(params)
-            setCandidates(data?.employees?.rows)
-            setTotalCount(data?.employees?.count)
-            // setPermissions(formatPermissionData(data?.permissions))
-            // data?.permissions.forEach(e => {
-            //   if (e?.route && e?.identifier && e?.permitted) {
-            //     dispatch(addPermission(e?.route));
-            //   }
-            // })
+            const { data } = await CustomerServices.getCandidateLists(params)
+            setCandidates(data?.rows)
+            setTotalCount(data?.count)
+            setPermissions(formatPermissionData(data?.permissions))
+            data?.permissions.forEach(e => {
+              if (e?.route && e?.identifier && e?.permitted) {
+                dispatch(addPermission(e?.route));
+              }
+            })
 
         } catch (error) {
             showErrorToast(error)
@@ -300,14 +300,6 @@ function CreateSalaryCertificate() {
         Debounce(() => getCandidateList(1, '', data));
     }
 
-    const CreateCertificate = (formData) => {
-        setNewData(formData)
-        navigate(
-            `/certificate-pdf`,
-            { state: {...selectedItem,...formData} }
-        )
-
-    }
     const handleSort = (key) => {
         let data = {
             sort_by: key,
@@ -325,92 +317,30 @@ function CreateSalaryCertificate() {
 
     return (
         <Box sx={{ p: 3 }}>
-            <SimpleDialog
-                open={certificateDialog}
-                onClose={() => setCertificateDialog(false)}
-                title={'Create Certificate?'}
-            >
-                <Box component="form" onSubmit={handleSubmit2(CreateCertificate)}>
-                    <Grid container >
 
-
-
-                        <Grid item xs={12} sm={12} mt={2}>
-                            <InputField
-                                label={"Reference No :*"}
-                                size={'small'}
-                               
-                                placeholder={"Reference No"}
-                                error={errors2?.reference?.message}
-                                register={register2("reference", {
-                                    required:
-                                        'reference is required.'
-
-                                })}
-                            />
-                        </Grid>
-                    
-
-                        <Grid item xs={12} sm={12} mt={2}>
-                            <InputField
-                                label={"To :*"}
-                                size={'small'}
-                               
-                                placeholder={"To"}
-                                error={errors2?.to?.message}
-                                register={register2("to", {
-                                    required:
-                                        'to is required.'
-
-                                })}
-                            />
-                        </Grid>
-                        
-                        <Grid item xs={12} sm={12} mt={2}>
-                            <InputField
-                                label={"For :*"}
-                                size={'small'}
-                               
-                                placeholder={"For"}
-                                error={errors2?.for?.message}
-                                register={register2("for", {
-                                    required:
-                                        'for is required.'
-
-                                })}
-                            />
-                        </Grid>
-                      
-                        <Grid container sx={{ justifyContent: 'center' }}>
-                            <Grid item xs={6} sm={6} sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', gap: '25px' }}>
-                                <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
-                                <PrimaryButton onClick={() => { setCertificateDialog(false) }} bgcolor={'#FF1F25'} title="No,Cancel" />
-                            </Grid>
-                        </Grid>
-
-                    </Grid>
-                </Box>
-            </SimpleDialog>
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Create Salary Certificate</Typography>
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
-                    {true && <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="Download Salary Certificate"
-                        disabled={selectedItem ? false : true}
-                        onClick={() => {
-                            console.log(selectedItem);
-                            setCertificateDialog(true)
+                        {permissions?.generate && <PrimaryButton
+                            bgcolor={Colors.buttonBg}
+                            title="Download Salary Certificate"
+                            disabled={selectedItem ? false : true}
+                            onClick={()=> {
+                                console.log(selectedItem);
+                                navigate(
+                                    `/certificate-pdf`,
+                                    { state: selectedItem }
+                                  )
+                              
+                               }}
 
-                        }}
 
+                        />}
 
-                    />}
-
-                </Box>
+                    </Box>
 
             </Box>
 
@@ -439,7 +369,7 @@ function CreateSalaryCertificate() {
                             loading={loading}
                         />
                         <PrimaryButton
-                            bgcolor={'#001f3f'}
+                            bgcolor={Colors.buttonBg}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}
@@ -493,37 +423,36 @@ function CreateSalaryCertificate() {
                                                                 border: '1px solid #EEEEEE !important',
                                                             }}
                                                         >
-                                                            <Cell style={{ textAlign: 'center', paddingLeft: '0px !important' }} className="pdf-table">
+                                                            <Cell style={{ textAlign: 'center' ,paddingLeft:'0px !important'}}  className="pdf-table">
                                                                 <input
                                                                     type="radio"
                                                                     checked={selectedItem?.id === item?.id}
                                                                     onChange={() => handleRadioChange(item)}
-                                                                    style={{ cursor: 'pointer' }}
+                                                                    style={{cursor:'pointer'}}
                                                                 />
                                                             </Cell>
-
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                {item?.user?.name}
+                                                                {item?.visa_request?.id + "-" + item?.id}
                                                             </Cell>
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                {item?.basic_salary}
+                                                                {item?.visa_request?.customer?.name}
                                                             </Cell>
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                {item?.housing_allowance}
+                                                                {item?.name}
                                                             </Cell>
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                {item?.transport_allowance}
+                                                                {item?.salary_basic}
                                                             </Cell>
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                {item?.other_allowance}
+                                                                {item?.salary_allowance}
                                                             </Cell>
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                {parseFloat(item?.basic_salary || 0) + parseFloat(item?.housing_allowance || 0) + parseFloat(item?.transport_allowance || 0) + parseFloat(item?.other_allowance || 0)}
+                                                                {item?.salary_total}
                                                             </Cell>
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                                                 <Box component={'div'} sx={{ cursor: 'pointer', display: 'flex  !important', justifyContent: 'flex-start  !important' }} onClick={() => { setPaymentDialog(true); setSelectedVisa(item) }}>
                                                                     <Box component={'img'} src={item?.visa_status == 'active' ? Images.successIcon : Images.errorIcon} width={'13px'}></Box>
-                                                                    {item?.visa_status == 'active' ? 'Active' : 'Inactive'}
+                                                                    {item?.visa_status == 'active' ? 'Active' :  'Inactive'}
                                                                 </Box>
                                                             </Cell>
                                                         </Row>

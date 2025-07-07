@@ -6,6 +6,9 @@ import UpdateServiceInvoice from "pages/Dashboard/AddOnServices/UpdateServiceInv
 import Certificate from "pages/Dashboard/Certificate/Certificate";
 import CreateSalaryCertificate from "pages/Dashboard/Certificate/CreateSalaryCertificate";
 import SalaryCertificate from "pages/Dashboard/Certificate/SalaryCertificate";
+import ExpCertificate from "pages/Dashboard/Certificate/ExpCertificate";
+import CreateExpCertificate from "pages/Dashboard/Certificate/CreateExpCertificate";
+import ExperienceCertificate from "pages/Dashboard/Certificate/ExperienceCertificate";
 import VehicleAvailableForTT from "pages/Dashboard/Client/VehiclesAvailableForTT";
 import UpdateAgent from "pages/Dashboard/Commission/UpdateAgent";
 import GalaxyCustomers from "pages/Dashboard/Customers/GalaxyCustomers";
@@ -1319,6 +1322,18 @@ const AdminRoutes = [
   {
     path: "/certificate-pdf",
     component: <Certificate />,
+  },
+   {
+    path: "/experience-certificate",
+    component: <ExperienceCertificate />,
+  },
+  {
+    path: "/create-new-experience-certificate",
+    component: <CreateExpCertificate />,
+  },
+  {
+    path: "/exp-certificate-pdf",
+    component: <ExpCertificate />,
   },
   {
     path: "/update-service-invoice/:id",

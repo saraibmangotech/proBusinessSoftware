@@ -113,7 +113,7 @@ const useStyles = makeStyles({
     }
 })
 
-function SalaryCertificate() {
+function ExperienceCertificate() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const {
         register: register2,
@@ -615,4 +615,4 @@ function SalaryCertificate() {
     );
 }
 
-export default SalaryCertificate;
+export default ExperienceCertificate;

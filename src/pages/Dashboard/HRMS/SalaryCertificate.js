@@ -140,7 +140,7 @@ function SalaryCertificate() {
     const [selectedVisa, setSelectedVisa] = useState()
 
 
-    const tableHead = [{ name: 'Date', key: 'created_at' },{ name: 'Customer Name', key: 'name' }, { name: 'Candidate Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }, { name: 'Signed Salary Certificate', key: 'commission_visa' }, { name: 'Signed Date', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Date', key: 'created_at' }, { name: 'Customer Name', key: 'name' }, { name: 'Candidate Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }, { name: 'Signed Salary Certificate', key: 'commission_visa' }, { name: 'Signed Date', key: 'commission_monthly' }]
 
 
     const allowFilesType = [
@@ -171,7 +171,7 @@ function SalaryCertificate() {
     const [filters, setFilters] = useState({});
 
     // *For Permissions
-    const [permissions, setPermissions] = useState();
+    
 
     const [loading, setLoading] = useState(false)
     const [certificate, setCertificate] = useState()
@@ -276,10 +276,13 @@ function SalaryCertificate() {
             ErrorToaster(error);
         }
     };
+    console.log('asdasdasasdasasdd')
 
     // *For Get Customer Queue
     const getCertificate = async (page, limit, filter) => {
         // setLoader(true)
+        console.log('asdasdasasdad');
+        
         try {
             const Page = page ? page : currentPage
             const Limit = limit ? limit : pageLimit
@@ -290,13 +293,16 @@ function SalaryCertificate() {
             let params = {
                 page: Page,
                 limit: Limit,
-                type:'salary'
+                customer_id: user?.user_type == 'C' ? user?.customer_id : null,
             }
             params = { ...params, ...Filter }
+            console.log(params, 'paramsparamsparams');
 
             const { data } = await CustomerServices.getCertificates(params)
-            setCertificates(data?.certificates?.rows)
-            setTotalCount(data?.certificates?.count)
+            console.log(data);
+            
+            // setCertificates(data?.certificates?.rows || [])
+            // setTotalCount(data?.certificates?.count)
             // console.log(formatPermissionData(data?.permissions))
             // setPermissions(formatPermissionData(data?.permissions))
             // data?.permissions.forEach(e => {
@@ -307,7 +313,10 @@ function SalaryCertificate() {
 
 
         } catch (error) {
+            console.log(error);
             showErrorToast(error)
+            console.log(error);
+            
         } finally {
             // setLoader(false)
         }
@@ -358,7 +367,7 @@ function SalaryCertificate() {
                 <Box component="form" onSubmit={handleSubmit(UpdateCertificate)}>
                     <Grid container justifyContent={'center'} >
                         <Grid item >
-                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>Upload Certificate :*</Typography>
+                            <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>Upload Certificate :*</Typography>
                             <UploadFileSingle
                                 Memo={true}
                                 accept={allowFilesType}
@@ -389,11 +398,11 @@ function SalaryCertificate() {
             </SimpleDialog>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salary Certificate</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salarysss Certificate</Typography>
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
-                   {true && <PrimaryButton
-                       bgcolor={'#001f3f'}
+                    {true && <PrimaryButton
+                        bgcolor={Colors.buttonBg}
                         title="Create New"
                         onClick={() => navigate('/create-new-salary-certificate')}
 
@@ -421,15 +430,15 @@ function SalaryCertificate() {
                     </Grid> */}
                     <Grid item xs={6} display={'flex'} justifyContent={'flex-end'} gap={2} >
                         <PrimaryButton
-                             bgcolor={"#0076bf"}
-                             textcolor={Colors.white}
+                            bgcolor={"#0076bf"}
+                            textcolor={Colors.white}
                             // border={`1px solid ${Colors.primary}`}
                             title="Reset"
-                            onClick={() => {  setValue('search', ''); handleFilter()}}
+                            onClick={() => { setValue('search', ''); handleFilter() }}
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#001f3f'}
+                            bgcolor={Colors.buttonBg}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}
@@ -476,7 +485,7 @@ function SalaryCertificate() {
                                                     </Row>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {certificates.map((item, index) => {
+                                                    {certificates?.length > 0 && certificates?.map((item, index) => {
 
                                                         return (
                                                             <Row
@@ -502,15 +511,15 @@ function SalaryCertificate() {
                                                                         lg={4}
                                                                         sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
                                                                         component={'div'}
-                                                                        onClick={() =>{
-                                                                            if(item?.certificate?.split('_').pop().includes('doc') || item?.certificate?.split('_').pop().includes('xls') ){
+                                                                        onClick={() => {
+                                                                            if (item?.certificate?.split('_').pop().includes('doc') || item?.certificate?.split('_').pop().includes('xls')) {
 
                                                                                 handleDownload(item?.certificate, item?.certificate?.split('_').pop());
-                                                                              }
-                                                                              else{
-                                                                                
-                                                                                window.open(process.env.REACT_APP_IMAGE_BASE_URL+item?.certificate, '_blank');
-                                                                              }
+                                                                            }
+                                                                            else {
+
+                                                                                window.open(process.env.REACT_APP_IMAGE_BASE_URL + item?.certificate, '_blank');
+                                                                            }
                                                                         }}
                                                                         // onClick={() =>  handleDownload(item?.certificate, item?.certificate?.split('_').pop())}
                                                                         key={index}
@@ -527,11 +536,11 @@ function SalaryCertificate() {
                                                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                                                     <>
 
-                                                                        {!item?.signed_certificate ? <label htmlFor="file-upload" onClick={() => { 
-                                                                            if(permissions?.upload){
+                                                                        {!item?.signed_certificate ? <label htmlFor="file-upload" onClick={() => {
+                                                                            if (true) {
                                                                                 setSelectedItem(item); setStatusDialog(true)
                                                                             }
-                                                                             }} style={{ color: '#0F2772', textDecoration: 'underline', cursor: 'pointer' }}>
+                                                                        }} style={{ color: '#0F2772', textDecoration: 'underline', cursor: 'pointer' }}>
                                                                             Upload
                                                                         </label>
                                                                             :
@@ -541,17 +550,17 @@ function SalaryCertificate() {
                                                                                 lg={4}
                                                                                 sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
                                                                                 component={'div'}
-                                                                                
+
                                                                                 // onClick={() => handleDownload(item?.certificate, item?.signed_certificate?.split('_').pop())}
-                                                                                onClick={() =>{
-                                                                                    if(item?.signed_certificate?.split('_').pop().includes('doc') || item?.signed_certificate?.split('_').pop().includes('xls') ){
+                                                                                onClick={() => {
+                                                                                    if (item?.signed_certificate?.split('_').pop().includes('doc') || item?.signed_certificate?.split('_').pop().includes('xls')) {
 
                                                                                         handleDownload(item?.signed_certificate, item?.signed_certificate?.split('_').pop());
-                                                                                      }
-                                                                                      else{
-                                                                                        
-                                                                                        window.open(process.env.REACT_APP_IMAGE_BASE_URL+item?.signed_certificate, '_blank');
-                                                                                      }
+                                                                                    }
+                                                                                    else {
+
+                                                                                        window.open(process.env.REACT_APP_IMAGE_BASE_URL + item?.signed_certificate, '_blank');
+                                                                                    }
                                                                                 }}
                                                                                 key={index}
                                                                             >

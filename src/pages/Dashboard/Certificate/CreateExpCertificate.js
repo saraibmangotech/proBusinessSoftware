@@ -45,9 +45,8 @@ import VisaServices from 'services/Visa';
 import { CloudUpload } from '@mui/icons-material';
 import instance from 'config/axios';
 import routes from 'services/System/routes';
-import UploadFile from 'components/UploadFile';
-import UploadFileSingle from 'components/UploadFileSingle';
 import { useAuth } from 'context/UseContext';
+import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -113,8 +112,10 @@ const useStyles = makeStyles({
     }
 })
 
-function SalaryCertificate() {
+function CreateExpCertificate() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+    // const [handleBlockedNavigation] =
+    // useCallbackPrompt(true)
     const {
         register: register2,
         handleSubmit: handleSubmit2,
@@ -138,9 +139,10 @@ function SalaryCertificate() {
     const [status, setStatus] = useState(null)
     const [payment, setPayment] = useState(null)
     const [selectedVisa, setSelectedVisa] = useState()
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [newData, setNewData] = useState(null)
 
-
-    const tableHead = [{ name: 'Date', key: 'created_at' },{ name: 'Customer Name', key: 'name' }, { name: 'Candidate Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }, { name: 'Signed Salary Certificate', key: 'commission_visa' }, { name: 'Signed Date', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Select', key: 'created_at' }, { name: ' Name', key: 'commission_monthly' }, { name: 'Basic Salary', key: 'commission_monthly' }, { name: 'Housing Allowance', key: 'commission_monthly' }, { name: 'Transport Allowance', key: 'created_at' }, { name: 'Other Allowance', key: 'created_at' }, { name: 'Total Salary', key: 'commission_monthly' }, { name: 'Visa Status', key: 'commission_monthly' }]
 
 
     const allowFilesType = [
@@ -149,21 +151,22 @@ function SalaryCertificate() {
 
     ];
 
-    const [selectedItem, setSelectedItem] = useState()
+
     const [loader, setLoader] = useState(false);
 
     const [sort, setSort] = useState('asc')
 
 
     // *For Customer Queue
-    const [certificates, setCertificates] = useState([]);
-
+    const [candidates, setCandidates] = useState([]);
+    const [certificateDialog, setCertificateDialog] = useState(false)
 
 
     // *For setPermissions
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
+    const { user, userLogout } = useAuth();
 
     const [itemAmount, setItemAmount] = useState()
 
@@ -174,46 +177,8 @@ function SalaryCertificate() {
     const [permissions, setPermissions] = useState();
 
     const [loading, setLoading] = useState(false)
-    const [certificate, setCertificate] = useState()
-    const { user, userLogout } = useAuth();
-
-    const UpdateCertificate = async (path) => {
-        setLoading(true)
-
-        try {
-            let obj = {
-
-                id: selectedItem?.id,
-                signed_certificate: certificate,
-                signed_at: new Date()
-            }
-            console.log(obj);
-            const promise = CustomerServices.UpdateCertificate(obj);
-
-            showPromiseToast(
-                promise,
-                'Saving ...',
-                'Success',
-                'Something Went Wrong'
-            );
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                setStatusDialog(false)
-                setCertificate('')
-                getCertificate()
-            }
 
 
-
-
-
-
-        } catch (error) {
-
-        } finally {
-            setLoading(false);
-        }
-    }
 
 
     // *For Upload Document
@@ -246,12 +211,17 @@ function SalaryCertificate() {
         }
     };
 
+
+
+    const handleRadioChange = (item) => {
+        setSelectedItem(item);
+    };
     const handleUpload = async (file, docs) => {
         setProgress(0);
         try {
             const formData = new FormData();
             formData.append("document", file);
-            console.log(file);
+            console.log(formData);
             const { data } = await instance.post(routes.uploadDocuments, formData, {
                 onUploadProgress: (progressEvent) => {
                     const uploadedBytes = progressEvent.loaded;
@@ -278,7 +248,7 @@ function SalaryCertificate() {
     };
 
     // *For Get Customer Queue
-    const getCertificate = async (page, limit, filter) => {
+    const getCandidateList = async (page, limit, filter) => {
         // setLoader(true)
         try {
             const Page = page ? page : currentPage
@@ -290,21 +260,19 @@ function SalaryCertificate() {
             let params = {
                 page: Page,
                 limit: Limit,
-                type:'salary'
+                // customer_id: user?.user_type == 'C' ? user?.customer_id : null,
             }
             params = { ...params, ...Filter }
 
-            const { data } = await CustomerServices.getCertificates(params)
-            setCertificates(data?.certificates?.rows)
-            setTotalCount(data?.certificates?.count)
-            // console.log(formatPermissionData(data?.permissions))
+            const { data } = await CustomerServices.getEmployees(params)
+            setCandidates(data?.employees?.rows)
+            setTotalCount(data?.employees?.count)
             // setPermissions(formatPermissionData(data?.permissions))
             // data?.permissions.forEach(e => {
-            //     if (e?.route && e?.identifier && e?.permitted) {
-            //         dispatch(addPermission(e?.route));
-            //     }
+            //   if (e?.route && e?.identifier && e?.permitted) {
+            //     dispatch(addPermission(e?.route));
+            //   }
             // })
-
 
         } catch (error) {
             showErrorToast(error)
@@ -329,58 +297,94 @@ function SalaryCertificate() {
         let data = {
             search: getValues('search')
         }
-        Debounce(() => getCertificate(1, '', data));
+        Debounce(() => getCandidateList(1, '', data));
     }
 
+    const CreateCertificate = (formData) => {
+        setNewData(formData)
+        navigate(
+            `/exp-certificate-pdf`,
+            { state: {...selectedItem,...formData} }
+        )
+
+    }
     const handleSort = (key) => {
         let data = {
             sort_by: key,
             sort_order: sort
         }
-        Debounce(() => getCertificate(1, '', data));
+        Debounce(() => getCandidateList(1, '', data));
     }
 
 
 
 
     useEffect(() => {
-        getCertificate()
+        getCandidateList()
     }, []);
 
     return (
         <Box sx={{ p: 3 }}>
-
             <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={'Upload Sign Salary Certificate?'}
+                open={certificateDialog}
+                onClose={() => setCertificateDialog(false)}
+                title={'Create Certificate?'}
             >
-                <Box component="form" onSubmit={handleSubmit(UpdateCertificate)}>
-                    <Grid container justifyContent={'center'} >
-                        <Grid item >
-                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>Upload Certificate :*</Typography>
-                            <UploadFileSingle
-                                Memo={true}
-                                accept={allowFilesType}
-                                error={errors?.certificate?.message}
+                <Box component="form" onSubmit={handleSubmit2(CreateCertificate)}>
+                    <Grid container >
 
-                                file={certificate}
-                                register={register("certificate", {
-                                    required: certificate ? false : 'Upload Certificate',
-                                    onChange: async (e) => {
-                                        const path = await handleUploadDocument(e);
-                                        if (path) {
-                                            setCertificate(path);
-                                        }
-                                    }
+
+
+                        <Grid item xs={12} sm={12} mt={2}>
+                            <InputField
+                                label={"Reference No :*"}
+                                size={'small'}
+                               
+                                placeholder={"Reference No"}
+                                error={errors2?.reference?.message}
+                                register={register2("reference", {
+                                    required:
+                                        'reference is required.'
+
                                 })}
                             />
                         </Grid>
+                    
 
+                        <Grid item xs={12} sm={12} mt={2}>
+                            <InputField
+                                label={"To :*"}
+                                size={'small'}
+                               
+                                placeholder={"To"}
+                                error={errors2?.to?.message}
+                                register={register2("to", {
+                                    required:
+                                        'to is required.'
+
+                                })}
+                            />
+                        </Grid>
+                        
+                        <Grid item xs={12} sm={12} mt={2}>
+                            <InputField
+                                label={"For :*"}
+                                size={'small'}
+                               
+                                placeholder={"For"}
+                                error={errors2?.for?.message}
+                                register={register2("for", {
+                                    required:
+                                        'for is required.'
+
+                                })}
+                            />
+                        </Grid>
+                      
                         <Grid container sx={{ justifyContent: 'center' }}>
                             <Grid item xs={6} sm={6} sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', gap: '25px' }}>
-                                <PrimaryButton disabled={!certificate} bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
-                                <PrimaryButton onClick={() => setStatusDialog(false)} bgcolor={'#FF1F25'} title="No,Cancel" />
+                                <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
+                                <PrimaryButton onClick={() => { setCertificateDialog(false) }} bgcolor={'#FF1F25'} title="No,Cancel" />
                             </Grid>
                         </Grid>
 
@@ -388,14 +392,20 @@ function SalaryCertificate() {
                 </Box>
             </SimpleDialog>
 
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salary Certificate</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Create Experience Certificate</Typography>
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
-                   {true && <PrimaryButton
-                       bgcolor={'#001f3f'}
-                        title="Create New"
-                        onClick={() => navigate('/create-new-salary-certificate')}
+                    {true && <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Download Experience Certificate"
+                        disabled={selectedItem ? false : true}
+                        onClick={() => {
+                            console.log(selectedItem);
+                            setCertificateDialog(true)
+
+                        }}
 
 
                     />}
@@ -421,15 +431,15 @@ function SalaryCertificate() {
                     </Grid> */}
                     <Grid item xs={6} display={'flex'} justifyContent={'flex-end'} gap={2} >
                         <PrimaryButton
-                             bgcolor={"#0076bf"}
-                             textcolor={Colors.white}
+                            bgcolor={Colors.white}
+                            textcolor={Colors.primary}
                             // border={`1px solid ${Colors.primary}`}
                             title="Reset"
-                            onClick={() => {  setValue('search', ''); handleFilter()}}
+                            onClick={() => { getCandidateList(); setValue('search', '') }}
                             loading={loading}
                         />
                         <PrimaryButton
-                           bgcolor={'#001f3f'}
+                            bgcolor={'#001f3f'}
                             title="Search"
                             onClick={() => handleFilter()}
                             loading={loading}
@@ -438,7 +448,7 @@ function SalaryCertificate() {
                 </Grid>
 
                 <Grid item md={11}>
-                    {certificates && <Box>
+                    {candidates && <Box>
 
                         <Grid container mb={2} >
 
@@ -447,7 +457,7 @@ function SalaryCertificate() {
 
 
                         {(
-                            certificates && (
+                            candidates && (
                                 <Fragment>
                                     <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5} fileName='Import Customers' >
 
@@ -464,7 +474,7 @@ function SalaryCertificate() {
 
                                                     <Row>
                                                         {tableHead.map((cell, index) => (
-                                                            <Cell style={{ textAlign: cell?.name == 'Invoice#' ? 'center' : 'left', paddingRight: cell?.name == 'Invoice#' ? '15px' : '50px' }} className="pdf-table"
+                                                            <Cell style={{ textAlign: cell?.name == 'Select' ? 'center' : 'left', paddingRight: cell?.name == 'Select' ? '15px' : '20px' }} className="pdf-table"
                                                                 key={index}
 
                                                             >
@@ -476,110 +486,48 @@ function SalaryCertificate() {
                                                     </Row>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {certificates.map((item, index) => {
+                                                    {candidates.map((item, index) => (
+                                                        <Row
+                                                            key={index}
+                                                            sx={{
+                                                                border: '1px solid #EEEEEE !important',
+                                                            }}
+                                                        >
+                                                            <Cell style={{ textAlign: 'center', paddingLeft: '0px !important' }} className="pdf-table">
+                                                                <input
+                                                                    type="radio"
+                                                                    checked={selectedItem?.id === item?.id}
+                                                                    onChange={() => handleRadioChange(item)}
+                                                                    style={{ cursor: 'pointer' }}
+                                                                />
+                                                            </Cell>
 
-                                                        return (
-                                                            <Row
-                                                                key={index}
-                                                                sx={{
-                                                                    border: '1px solid #EEEEEE !important',
-                                                                }}
-                                                            >
-
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {moment(item?.created_at).format('MM-DD-YYYY')}
-                                                                </Cell>
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.candidate?.customer?.name}
-                                                                </Cell>
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.candidate?.name}
-                                                                </Cell>
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    <Grid
-                                                                        item
-                                                                        md={6}
-                                                                        lg={4}
-                                                                        sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
-                                                                        component={'div'}
-                                                                        onClick={() =>{
-                                                                            if(item?.certificate?.split('_').pop().includes('doc') || item?.certificate?.split('_').pop().includes('xls') ){
-
-                                                                                handleDownload(item?.certificate, item?.certificate?.split('_').pop());
-                                                                              }
-                                                                              else{
-                                                                                
-                                                                                window.open(process.env.REACT_APP_IMAGE_BASE_URL+item?.certificate, '_blank');
-                                                                              }
-                                                                        }}
-                                                                        // onClick={() =>  handleDownload(item?.certificate, item?.certificate?.split('_').pop())}
-                                                                        key={index}
-                                                                    >
-
-                                                                        <Box>
-                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} />
-                                                                        </Box>
-                                                                        <p style={{ textAlign: 'center', lineHeight: '20px', color: '#0F2772', fontWeight: 'bold', fontSize: '12px' }}>
-                                                                            {item?.certificate?.split('_').pop()}
-                                                                        </p>
-                                                                    </Grid>
-                                                                </Cell>
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    <>
-
-                                                                        {!item?.signed_certificate ? <label htmlFor="file-upload" onClick={() => { 
-                                                                            if(permissions?.upload){
-                                                                                setSelectedItem(item); setStatusDialog(true)
-                                                                            }
-                                                                             }} style={{ color: '#0F2772', textDecoration: 'underline', cursor: 'pointer' }}>
-                                                                            Upload
-                                                                        </label>
-                                                                            :
-                                                                            <Grid
-                                                                                item
-                                                                                md={6}
-                                                                                lg={4}
-                                                                                sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
-                                                                                component={'div'}
-                                                                                
-                                                                                // onClick={() => handleDownload(item?.certificate, item?.signed_certificate?.split('_').pop())}
-                                                                                onClick={() =>{
-                                                                                    if(item?.signed_certificate?.split('_').pop().includes('doc') || item?.signed_certificate?.split('_').pop().includes('xls') ){
-
-                                                                                        handleDownload(item?.signed_certificate, item?.signed_certificate?.split('_').pop());
-                                                                                      }
-                                                                                      else{
-                                                                                        
-                                                                                        window.open(process.env.REACT_APP_IMAGE_BASE_URL+item?.signed_certificate, '_blank');
-                                                                                      }
-                                                                                }}
-                                                                                key={index}
-                                                                            >
-
-                                                                                <Box>
-                                                                                    <Box component={'img'} src={Images.docIcon} width={'25px'} />
-                                                                                </Box>
-                                                                                <p style={{ textAlign: 'center', lineHeight: '20px', color: '#0F2772', fontWeight: 'bold', fontSize: '12px' }}>
-                                                                                    {item?.signed_certificate?.split('_').pop()}
-                                                                                </p>
-                                                                            </Grid>}
-                                                                    </>
-
-                                                                </Cell>
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.signed_at && moment(item?.created_at).format('MM-DD-YYYY')}
-                                                                </Cell>
-
-
-
-
-
-
-                                                            </Row>
-
-                                                        );
-                                                    })}
-
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                {item?.user?.name}
+                                                            </Cell>
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                {item?.basic_salary}
+                                                            </Cell>
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                {item?.housing_allowance}
+                                                            </Cell>
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                {item?.transport_allowance}
+                                                            </Cell>
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                {item?.other_allowance}
+                                                            </Cell>
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                {parseFloat(item?.basic_salary || 0) + parseFloat(item?.housing_allowance || 0) + parseFloat(item?.transport_allowance || 0) + parseFloat(item?.other_allowance || 0)}
+                                                            </Cell>
+                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
+                                                                <Box component={'div'} sx={{ cursor: 'pointer', display: 'flex  !important', justifyContent: 'flex-start  !important' }} onClick={() => { setPaymentDialog(true); setSelectedVisa(item) }}>
+                                                                    <Box component={'img'} src={item?.visa_status == 'active' ? Images.successIcon : Images.errorIcon} width={'13px'}></Box>
+                                                                    {item?.visa_status == 'active' ? 'Active' : 'Inactive'}
+                                                                </Box>
+                                                            </Cell>
+                                                        </Row>
+                                                    ))}
                                                 </TableBody>
                                             </Table>
                                         </TableContainer>
@@ -588,10 +536,10 @@ function SalaryCertificate() {
                                     <Pagination
                                         currentPage={currentPage}
                                         pageSize={pageLimit}
-                                        onPageSizeChange={(size) => getCertificate(1, size.target.value)}
-                                        tableCount={certificates?.length}
+                                        onPageSizeChange={(size) => getCandidateList(1, size.target.value)}
+                                        tableCount={candidates.length}
                                         totalCount={totalCount}
-                                        onPageChange={(page) => getCertificate(page, "")}
+                                        onPageChange={(page) => getCandidateList(page, "")}
                                     />
 
                                 </Fragment>
@@ -615,4 +563,4 @@ function SalaryCertificate() {
     );
 }
 
-export default SalaryCertificate;
+export default CreateExpCertificate;

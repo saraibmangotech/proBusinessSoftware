@@ -1,8 +1,8 @@
 const routes = {
   UpdateCertificate:'/customers/certificates/update',
-  CreateCertificate:'/customers/certificates/add',
+  CreateCertificate:'/hrms/certificates/add',
   getCandidateLists:'/customers/candidates',
-  getCertificates:'/customers/certificates',
+  getCertificates:'/hrms/certificates',
   ServiceInvoiceDetail:'/customers/services/details',
   UpdateAddOnservice:'/customers/services/update',
   getInvoices:'/customers/services',
