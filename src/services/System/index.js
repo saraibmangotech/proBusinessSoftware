@@ -6,6 +6,14 @@ const SystemServices = {
     const data = await post(routes.reCaptchaVerify, obj);
     return data;
   },
+   CreateShift: async (obj) => {
+    const data = await post(routes.CreateShift, obj);
+    return data;
+  },
+    AssignEmployee: async (obj) => {
+    const data = await post(routes.AssignEmployee, obj);
+    return data;
+  },
   uploadDocuments: async (obj) => {
     const data = await post(routes.uploadDocuments, obj);
     return data;
@@ -21,6 +29,14 @@ const SystemServices = {
   },
   getRoles: async (params) => {
     const data = await get(routes.getRoles,params);
+    return data;
+  },
+  getAllocations: async (params) => {
+    const data = await get(routes.getAllocations,params);
+    return data;
+  },
+    getNationalities: async (params) => {
+    const data = await get(routes.getNationalities,params);
     return data;
   },
   getStats: async () => {
@@ -49,6 +65,10 @@ const SystemServices = {
   },
   getWebTokens: async () => {
     const data = await post(routes.getWebTokens);
+    return data;
+  },
+   deleteShift: async (obj) => {
+    const data = await deleted(routes.deleteShift,obj);
     return data;
   },
   UpdateRole: async (obj) => {

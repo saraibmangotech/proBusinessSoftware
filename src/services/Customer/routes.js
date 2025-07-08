@@ -170,7 +170,8 @@ const routes = {
   employeeSalaryDetail:'/hrms/payroll/calculate',
   getSalaries:'/hrms/payroll',
   updateSalaryStatus:'/hrms/payroll/updateStatus',
-  getSalaryDetail:'/hrms/payroll/details'
+  getSalaryDetail:'/hrms/payroll/details',
+  getShifts:'/hrms/shifts/'
 
 
 };

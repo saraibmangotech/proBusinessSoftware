@@ -177,7 +177,8 @@ function CreateExpCertificate() {
     const [permissions, setPermissions] = useState();
 
     const [loading, setLoading] = useState(false)
-
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
 
 
 
@@ -304,7 +305,15 @@ function CreateExpCertificate() {
         setNewData(formData)
         navigate(
             `/exp-certificate-pdf`,
-            { state: {...selectedItem,...formData} }
+            {
+                state: {
+                    ...selectedItem,
+                    ...formData,
+                    fromDate: fromDate, 
+                    toDate:toDate
+                },
+            }
+
         )
 
     }
@@ -334,12 +343,23 @@ function CreateExpCertificate() {
                     <Grid container >
 
 
-
+                     
+                        <Grid item xs={12} sm={12}>
+                            <DatePicker
+                                disabled={fromDate ? false : true}
+                                disableFuture={true}
+                                size='small'
+                                minDate={fromDate}
+                                label={'To Date'}
+                                value={toDate}
+                                onChange={(date) => setToDate(new Date(date))}
+                            />
+                        </Grid>
                         <Grid item xs={12} sm={12} mt={2}>
                             <InputField
                                 label={"Reference No :*"}
                                 size={'small'}
-                               
+
                                 placeholder={"Reference No"}
                                 error={errors2?.reference?.message}
                                 register={register2("reference", {
@@ -349,13 +369,13 @@ function CreateExpCertificate() {
                                 })}
                             />
                         </Grid>
-                    
+
 
                         <Grid item xs={12} sm={12} mt={2}>
                             <InputField
                                 label={"To :*"}
                                 size={'small'}
-                               
+
                                 placeholder={"To"}
                                 error={errors2?.to?.message}
                                 register={register2("to", {
@@ -365,12 +385,12 @@ function CreateExpCertificate() {
                                 })}
                             />
                         </Grid>
-                        
+
                         <Grid item xs={12} sm={12} mt={2}>
                             <InputField
                                 label={"For :*"}
                                 size={'small'}
-                               
+
                                 placeholder={"For"}
                                 error={errors2?.for?.message}
                                 register={register2("for", {
@@ -380,7 +400,7 @@ function CreateExpCertificate() {
                                 })}
                             />
                         </Grid>
-                      
+
                         <Grid container sx={{ justifyContent: 'center' }}>
                             <Grid item xs={6} sm={6} sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', gap: '25px' }}>
                                 <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />

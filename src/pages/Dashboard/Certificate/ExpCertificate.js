@@ -112,7 +112,7 @@ const ExpCertificate = () => {
                 to: state?.to,
                 forField: state?.for,
                 employee_id: state?.user_id,
-                content:'12'
+                content: '12'
             }
             console.log(obj)
             const promise = CustomerServices.CreateCertificate(obj)
@@ -145,12 +145,12 @@ const ExpCertificate = () => {
     const exportDOCWithMethod = async () => {
         const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`
         const currentDate = moment().format("D MMM YYYY")
-        const fileName = `${moment().unix()}_${state?.name}-SalaryCertificate.docx`
+        const fileName = `${state?.name}-ExperienceCertificate.docx`
 
         // Convert logo to base64
         let logoBase64 = ""
         try {
-            logoBase64 = await getImageAsBase64(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed )
+            logoBase64 = await getImageAsBase64(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed)
         } catch (error) {
             console.error("Error converting logo to base64:", error)
             // Fallback to placeholder if logo conversion fails
@@ -164,7 +164,7 @@ const ExpCertificate = () => {
             <html>
                 <head>
                     <meta charset="utf-8">
-                    <title>Salary Certificate</title>
+                    <title>Experience Certificate</title>
                     <style>
                         body { 
                             font-family: 'Times New Roman', serif; 
@@ -268,10 +268,13 @@ const ExpCertificate = () => {
                         <div>UAE</div>
                     </div>
 
-                    <div class="certificate-title">SALARY CERTIFICATE</div>
+                    <div class="certificate-title">EXPERIENCE CERTIFICATE</div>
 
-                    <div class="content">
-                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">"Legal Assistant"</span> in our esteemed organization from <span class="employee-details">1st September 2022</span> to <span class="employee-details">present</span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
+                  <div class="content">
+                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}/span> to <span class="employee-details">${moment(state?.toDate).isSame(moment(), 'day')
+                ? 'Present'
+                : moment(state?.toDate).format('DD-MMMM-YYYY')}
+</span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
 
                         <p>We found him/her to be honest, hardworking and of good conduct. We wish him/her all the best in his/her future endeavors.</p>
                     </div>
@@ -322,7 +325,7 @@ const ExpCertificate = () => {
         const reader = new FileReader()
         reader.onload = () => {
             const base64 = reader.result.split(",")[1]
-            sendBlobPreview(base64, `${state?.user?.name}_Salary_Certificate`)
+            sendBlobPreview(base64, `${state?.user?.name}_Experience_Certificate`)
         }
         reader.readAsDataURL(converted)
     }
@@ -362,7 +365,7 @@ const ExpCertificate = () => {
                 <Box sx={{ textAlign: "center", mb: 4, pb: 2 }}>
                     <Box sx={{ mb: 2 }}>
                         <img
-                            src={agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed  }
+                            src={agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed}
                             alt="Company Logo"
                             style={{
                                 width: "150px",
@@ -406,23 +409,27 @@ const ExpCertificate = () => {
                         my: 4,
                     }}
                 >
-                    SALARY CERTIFICATE
+                    EXPERIENCE CERTIFICATE
                 </Typography>
 
                 {/* Main Content */}
                 <Box sx={{ textAlign: "justify", mb: 3 }}>
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
-                        This is to certify that{" "}
-                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || "Employee Name"}</span> •{" "}
-                        <strong>{state?.designation}</strong>, Passport no: <strong>{state?.passport_number || "-"}</strong> is
-                        currently employed by our company since <strong>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</strong> till now, in the capacity of{" "}
-                        <strong>{state?.department}</strong>. His monthly Gross salary is{" "}
-                        <strong>AED {parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}</strong> inclusive.
+                        This is to certify that,{" "}
+                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || "Employee Name"}</span>,
+                        passport no. <span style={{ fontWeight: "bold" }}>{state?.passport_number || "-"}</span>, was working in the
+                        capacity of <span style={{ fontWeight: "bold" }}>{state?.designation}</span> in our esteemed organization from{" "}
+                        <span style={{ fontWeight: "bold" }}>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to{" "}
+                        <span style={{ fontWeight: "bold" }}>{moment(state?.toDate).isSame(moment(), 'day')
+                            ? 'Present'
+                            : moment(state?.toDate).format('DD-MMMM-YYYY')}
+                        </span>. During his/her tenure, he/she has shown dedication,
+                        professionalism and commitment to his/her duties.
                     </Typography>
 
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
-                        This certificate has been issued at the request of the employee, for whatever purpose it may serve him
-                        without any legal obligation to the company.
+                        We found him/her to be honest, hardworking and of good conduct. We wish him/her all the best in his/her
+                        future endeavors.
                     </Typography>
                 </Box>
 

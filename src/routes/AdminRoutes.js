@@ -533,6 +533,12 @@ const UpdateEmployee= lazy(() =>
 const AttendanceTable= lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
+const ShiftManagement= lazy(() =>
+  import("pages/Dashboard/HRMS/ShiftManagement")
+);
+const ShiftAllocations= lazy(() =>
+  import("pages/Dashboard/HRMS/ShiftAllocations")
+);
 const Holidays= lazy(() =>
   import("pages/Dashboard/EmployeeManagement/Holidays")
 );
@@ -1330,6 +1336,14 @@ const AdminRoutes = [
   {
     path: "/create-new-experience-certificate",
     component: <CreateExpCertificate />,
+  },
+  {
+    path: "/shift-management",
+    component: <ShiftManagement />,
+  },
+   {
+    path: "/shift-allocations",
+    component: <ShiftAllocations />,
   },
   {
     path: "/exp-certificate-pdf",

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Autocomplete, InputLabel, TextField, Typography, createFilterOptions } from "@mui/material";
+import { Autocomplete, Box, InputLabel, TextField, Typography, createFilterOptions } from "@mui/material";
 import { Debounce } from "utils";
 
 function SelectField(props) {
@@ -59,7 +59,7 @@ function SelectField(props) {
   }
 
   return (
-    <Fragment>
+    <Box sx={{width:'100%'}}>
       <InputLabel sx={{fontWeight:'bold',color:'#333',fontSize:'16px',mb:'10px'}} error={error && selected === '' && true}>{label}</InputLabel>
       <Autocomplete
         disabled={disabled}
@@ -107,7 +107,7 @@ function SelectField(props) {
       {error && (
         <Typography variant="caption" color="error" sx={{ textAlign: 'left' }}>{error}</Typography>
       )}
-    </Fragment>
+    </Box>
   );
 }
 

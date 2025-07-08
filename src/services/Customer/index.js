@@ -10,6 +10,10 @@ const CustomerServices = {
     const data = await get(routes.getSalaries, params);
     return data;
   },
+   getShifts: async (params) => {
+    const data = await get(routes.getShifts, params);
+    return data;
+  },
     getSalaryDetail: async (params) => {
     const data = await get(routes.getSalaryDetail, params);
     return data;
