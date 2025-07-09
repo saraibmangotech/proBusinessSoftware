@@ -208,7 +208,7 @@ function ConsolidatedProStatement() {
 
 const prepareExcelData = (data) => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Pro Consolidated Statement");
+    const worksheet = workbook.addWorksheet("Consolidated Customer Ledger Report");
 
     // Set professional header and footer
     worksheet.headerFooter.oddHeader =
@@ -247,7 +247,7 @@ const prepareExcelData = (data) => {
     };
 
     // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["PRO CONSOLIDATED STATEMENT"]);
+    const titleRow = worksheet.addRow(["CONSOLIDATED CUSTOMER LEDGER REPORT"]);
     titleRow.getCell(1).font = {
         name: "Arial",
         size: 16,
@@ -555,7 +555,7 @@ const prepareExcelData = (data) => {
 
     // Set workbook properties
     workbook.properties = {
-        title: "Pro Consolidated Statement",
+        title: "Consolidated Customer Ledger Report",
         subject: "Financial Report",
         keywords: "pro consolidated statement, financial, accounting",
         category: "Financial Reports",

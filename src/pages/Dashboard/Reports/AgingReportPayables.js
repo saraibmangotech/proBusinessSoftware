@@ -287,16 +287,7 @@ function AgingReportPayable() {
                 </Box>
             ),
         },
-        {
-            header: "Current",
-            accessorKey: "current",
-            accessorFn: (row) => parseFloat(row?.totals?.current || 0).toFixed(2),
-            cell: ({ row }) => (
-                <Box sx={{ display: "flex", gap: 2 }}>
-                    {parseFloat(row?.original?.totals?.current || 0).toFixed(2)}
-                </Box>
-            ),
-        },
+    
         {
             header: "1-30",
             accessorKey: "oneToThirty",

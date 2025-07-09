@@ -209,7 +209,7 @@ function SupplierConsolidatedProStatement() {
 
 const prepareExcelData = (data) => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Supplier Consolidated Statement");
+    const worksheet = workbook.addWorksheet("Consolidated Supplier  Ledger Report");
 
     worksheet.headerFooter.oddHeader =
         '&C&"Arial,Bold"&18SUPPLIER CONSOLIDATED STATEMENT\n' +
@@ -238,7 +238,7 @@ const prepareExcelData = (data) => {
         margins: { left: 0.7, right: 0.7, top: 1.0, bottom: 1.0, header: 0.3, footer: 0.5 },
     };
 
-    worksheet.addRow(["SUPPLIER CONSOLIDATED STATEMENT"]).getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } };
+    worksheet.addRow(["CONSOLIDATED SUPPLIER  LEDGER REPORT"]).getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } };
     worksheet.mergeCells("A1:G1");
 
     const company = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
@@ -375,7 +375,7 @@ const prepareExcelData = (data) => {
     workbook.modified = new Date();
     workbook.lastPrinted = new Date();
     workbook.properties = {
-        title: "Supplier Consolidated Statement",
+        title: "Consolidated Supplier  Ledger Report",
         subject: "Financial Report",
         keywords: "supplier statement, financial, accounting",
         category: "Financial Reports",
@@ -988,7 +988,7 @@ const processStatementsData = (statements) => {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Supplier Consolidated Statement</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Consolidated Supplier  Ledger Report</Typography>
 
 
 

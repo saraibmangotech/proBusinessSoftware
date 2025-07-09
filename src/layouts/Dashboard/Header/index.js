@@ -1124,18 +1124,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-            {
-              id: 1502,
-              name: "  Payment Supplier Receipts",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/suppliers",
-              route: "/supplier-payment-receipt-list",
-              identifier: null,
-              navigation: true,
-              order_by: 2,
-              lineBreak: true,
-            },
+            
             {
               id: 1502,
               name: "Prepaid Expenses",
@@ -1494,6 +1483,18 @@ function Header() {
               order_by: 33,
             },
             {
+              id: 1502,
+              name: "  Payment Supplier Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/supplier-payment-receipt-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true,
+            },
+            {
               id: 33,
               name: "IFT Vouchers",
               icon: "customer",
@@ -1572,7 +1573,7 @@ function Header() {
             },
             {
               id: 362,
-              name: "Consolidated PRO Statement",
+              name: "Consolidated Customer Ledger Report",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -2211,18 +2212,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-             {
-              id: 1502,
-              name: "  Payment Supplier Receipts",
-              icon: "customer",
-              parent_id: 15,
-              api: "/api/suppliers",
-              route: "/supplier-payment-receipt-list",
-              identifier: null,
-              navigation: true,
-              order_by: 2,
-              lineBreak: true,
-            },
+          
             {
               id: 1502,
               name: "Prepaid Expenses",
@@ -2580,7 +2570,18 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-
+{
+              id: 1502,
+              name: "  Payment Supplier Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/supplier-payment-receipt-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true,
+            },
             {
               id: 33,
               name: "IFT Vouchers",
@@ -2660,7 +2661,7 @@ function Header() {
             },
             {
               id: 362,
-              name: "Consolidated PRO Statement",
+              name: "Consolidated Customer Ledger Report",
               icon: "customer",
               parent_id: 12,
               api: null,
