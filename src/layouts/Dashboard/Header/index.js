@@ -1484,7 +1484,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Supplier Payments",
+              name: "Supplier  On Account Payments",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -1561,7 +1561,7 @@ function Header() {
             },
             {
               id: 360,
-              name: "Consolidated Supplier Statement",
+              name: "Consolidated Supplier Ledger Report",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -2571,7 +2571,7 @@ function Header() {
             },
             {
               id: 33,
-              name: "Supplier Payments",
+              name: "Supplier  On Account Payments",
               icon: "customer",
               parent_id: 12,
               api: null,
@@ -2649,7 +2649,7 @@ function Header() {
             },
             {
               id: 360,
-              name: "Consolidated Supplier Statement",
+              name: "Consolidated Supplier Ledger Report",
               icon: "customer",
               parent_id: 12,
               api: null,
