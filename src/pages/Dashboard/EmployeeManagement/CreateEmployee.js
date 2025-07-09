@@ -15,6 +15,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import SelectField from "components/Select";
 import UserServices from "services/User";
 import SystemServices from "services/System";
+import CloseIcon from '@mui/icons-material/Close';
 import { useCallbackPrompt } from "hooks/useCallBackPrompt";
 import CustomerServices from "services/Customer";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
@@ -60,6 +61,7 @@ function CreateEmployee() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [inputError, setInputError] = useState(false);
   const [roles, setRoles] = useState([])
+  const [selectedDays, setSelectedDays] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null)
   const [buttondisabled, setButtondisabled] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState([])
@@ -76,7 +78,47 @@ function CreateEmployee() {
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const [isLocal, setisLocal] = useState('no')
+  const [shiftType, setShiftType] = useState(null)
+  const [shifts, setShifts] = useState([])
+  const [selectedGender, setSelectedGender] = useState(null)
+  const [selectedShift, setSelectedShift] = useState(null)
+  const [nationalities, setNationalities] = useState([])
+  const [employees, setEmployees] = useState([])
+  const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [selectedNationality, setSelectedNationality] = useState(null)
+  const [approvals, setApprovals] = useState([])
   const [selectedTimeDetection, setSelectedTimeDetection] = useState({ id: 'Time', name: 'Time' })
+  const [approvers, setApprovers] = useState([{ key: 'leave_approver_1', value: '' }]);
+
+  const handleAddApprover = () => {
+    if (approvers.length < 2) {
+      const nextIndex = approvers.length + 1;
+      setApprovers([...approvers, { key: `leave_approver_${nextIndex}`, value: '' }]);
+    }
+  };
+
+  const handleRemoveApprover = (indexToRemove) => {
+    const updated = approvers
+      .filter((_, index) => index !== indexToRemove)
+      .map((item, idx) => ({ ...item, key: `leave_approver_${idx + 1}` }));
+
+    setApprovers(updated);
+  };
+
+ const handleApproverChange = (index, value) => {
+  // Check if value already exists at a different index
+  const isDuplicate = approvers.some((item, i) => i !== index && item.value === value);
+
+  if (isDuplicate) {
+   showErrorToast('This approver is already selected.');
+    return; // Don't update
+  }
+
+  const updated = [...approvers];
+  updated[index].value = value;
+  setApprovers(updated);
+};
+
   const theme = useTheme();
   function getStyles(name, personName, theme) {
     return {
@@ -85,6 +127,15 @@ function CreateEmployee() {
         : theme.typography.fontWeightRegular,
     };
   }
+  const handleChangeDays = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedDays(value);
+    console.log(value, 'valuevalue');
+
+    setValue("workingDays", value);
+  };
   // Watch both password and confirm password fields for changes
   const password = watch('password', '');
   const confirmPassword = watch('confirmpassword', '');
@@ -104,6 +155,22 @@ function CreateEmployee() {
     setPersonName(selectedObjects); // Now you're storing the whole objects
   };
 
+  const addItem = () => {
+    if (!selectedEmployee || !selectedEmployee.user_id) return;
+
+    const isAlreadyAdded = Object.values(approvals).includes(selectedEmployee.user_id);
+
+    if (isAlreadyAdded) {
+      showErrorToast("Approver is already added");
+      return;
+    }
+
+    const currentIndex = Object.keys(approvals).length + 1;
+    const newKey = `leave_approver_${currentIndex}`;
+    const newApprovals = { ...approvals, [newKey]: selectedEmployee.user_id };
+
+    setApprovals(newApprovals);
+  };
 
   const getRoles = async (search) => {
     try {
@@ -118,11 +185,21 @@ function CreateEmployee() {
       showErrorToast(error);
     }
   };
+  const daysOfWeek = [
+    { id: 0, name: 'Sunday' },
+    { id: 1, name: 'Monday' },
+    { id: 2, name: 'Tuesday' },
+    { id: 3, name: 'Wednesday' },
+    { id: 4, name: 'Thursday' },
+    { id: 5, name: 'Friday' },
+    { id: 6, name: 'Saturday' },
+  ];
+
 
 
   // *For Create Role
   const CreateEmployee = async (formData) => {
-    console.log(selectedCategoryObjects);
+    console.log(approvers, 'approversapprovers');
 
     setLoading(true)
     setButtondisabled(true)
@@ -146,10 +223,12 @@ function CreateEmployee() {
           shift_end: moment(formData?.shiftEndTime).format('HH:mm'),
 
           grace_period_minutes: formData?.graceMonths,
-          minimum_required_hours: formData?.minHours,
+          minimum_required_minutes: formData?.minHours,
           short_time_deduction_type: selectedTimeDetection?.id,
           personal_time_minutes_per_month: formData?.personalMintPerMonth,
           leave_allocation_per_month: formData?.leavesPerMonth,
+          emergency_contact_name: formData?.emergencyName,
+          emergency_contact_number: formData?.emergencyContact,
           eligible_for_airfare: formData?.eligibleForAirfare == 'yes' ? true : false,
           airfare_cycle_years: formData?.airfaireCycleYear,
           next_airfare_due_date: airFareDueDate,
@@ -174,7 +253,14 @@ function CreateEmployee() {
           pension_applicable: isApplicable == 'yes' ? true : false,
           pension_percentage_employer: formData?.pensionPercentageEmp,
           is_local: isLocal,
-          cost_center: selectedCostCenter?.name
+          cost_center: selectedCostCenter?.name,
+          shift_type: shiftType?.id,
+          shift_id: selectedShift?.id,
+          working_days: selectedDays.join(','),
+          gender: selectedGender?.id,
+          nationality: selectedNationality?.name,
+          leave_approver_1: approvers[0]?.value,
+          leave_approver_2: approvers[1]?.value ? approvers[1]?.value : null
         }
 
       }
@@ -239,10 +325,91 @@ function CreateEmployee() {
       showErrorToast(error);
     }
   };
+  const getShifts = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 999999,
+      };
+
+      const { data } = await CustomerServices.getShifts(params);
+      setShifts(data?.shifts?.rows);
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+  const handleDeleteApproval = (keyToDelete) => {
+
+    const filteredUserIds = Object.entries(approvals)
+      .filter(([key]) => key !== keyToDelete)
+      .map(([_, userId]) => userId);
+
+
+    const reIndexedApprovals = {};
+    filteredUserIds.forEach((userId, index) => {
+      reIndexedApprovals[`leave_approver_${index + 1}`] = userId;
+    });
+
+    setApprovals(reIndexedApprovals);
+  };
+
+  console.log(approvals);
+
+
+  const getNationalities = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 999999,
+      };
+
+      const { data } = await SystemServices.getNationalities(params);
+      const formattedNationalities = data?.nationalities?.map((item, index) => ({
+        id: item,
+        name: item,
+      }));
+
+      setNationalities(formattedNationalities);
+
+
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
+  const getEmployees = async () => {
+    try {
+      let params = {
+        page: 1,
+        limit: 999999,
+      };
+
+      const { data } = await CustomerServices.getEmployees(params);
+
+      const formattedData = data?.employees?.rows?.map((item, index) => ({
+        ...item,
+        id: item?.id,
+        name: item?.user?.name,
+      }));
+
+
+      setEmployees(formattedData);
+
+
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
   useEffect(() => {
+    getEmployees()
     getCostCenters()
+    getNationalities()
     getCategoryList()
     getRoles()
+    getShifts()
   }, [])
 
   const selectedCategoryObjects = categories.filter((category) => selectedCategory.includes(category.id))
@@ -373,8 +540,77 @@ function CreateEmployee() {
               }}
             />
           </Grid>
+          <Grid item xs={12} sm={2.8}>
+            <SelectField
+
+              size={"small"}
+              label={"Gender"}
+              options={[{ id: 'Male', name: 'Male' }, { id: 'Female', name: 'Female' }]}
+              selected={selectedGender}
+              onSelect={(value) => {
+                setSelectedGender(value);
+              }}
+              register={register("gender", {
+                required: 'gender is required'
+              })}
+            />
 
 
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+            <SelectField
+
+              size={"small"}
+              label={"Nationality"}
+              options={nationalities}
+              selected={selectedNationality}
+              onSelect={(value) => {
+                setSelectedNationality(value);
+              }}
+              register={register("nationality", {
+                required: 'nationality is required'
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={" Emergency Contact Name :*"}
+              size={'small'}
+              placeholder={" Emergency Contact Name"}
+              error={errors?.emergencyName?.message}
+              register={register("emergencyName", {
+                required:
+                  "Please enter name."
+
+              })}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+
+            <InputField
+              label={"Emergency Contact :*"}
+              size={'small'}
+              placeholder={"Emergency Contact "}
+              type={'number'}
+              error={errors?.emergencyContact?.message}
+              register={register("emergencyContact", {
+                required:
+                  false,
+                pattern: {
+                  value: /^05[0-9]{8}$/,
+                  message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
+                }
+
+              })}
+            />
+
+
+          </Grid>
           <Grid item xs={12} sm={2.8}>
             <InputField
               size="small"
@@ -638,9 +874,9 @@ function CreateEmployee() {
           <Grid item xs={12} sm={2.8}>
 
             <InputField
-              label={"Minimum Required Hours :*"}
+              label={"Minimum Required Minutes :*"}
               size={'small'}
-              placeholder={"Minimum Required Hours"}
+              placeholder={"Minimum Required Minutes"}
               error={errors?.minHours?.message}
               register={register("minHours", {
                 required:
@@ -772,10 +1008,93 @@ function CreateEmployee() {
             />
           </Grid>
 
+          <Grid item xs={12} sm={2.8}>
+            <SelectField
+
+              size={"small"}
+              label={"Shift Type "}
+              options={[{ id: 'Fixed', name: 'Fixed' }, { id: 'Roaster', name: 'Roaster' }]}
+              selected={shiftType}
+              onSelect={(value) => {
+                setShiftType(value);
+              }}
+              register={register("shiftType")}
+            />
+
+
+          </Grid>
+
+          {shiftType?.id == 'Fixed' && <Grid item xs={12} sm={2.8}>
+            <SelectField
+
+              size={"small"}
+              label={"Shifts "}
+              options={shifts}
+              selected={selectedShift}
+              onSelect={(value) => {
+                setSelectedShift(value);
+              }}
+              register={register("shift")}
+            />
+
+
+          </Grid>}
+
+          <Grid item xs={12} sm={2.8}>
+            <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
+
+              Working Days
+            </InputLabel>
+            <FormControl
+              fullWidth
+              size="small"
+              sx={{
+                mt: 1,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '8px',
+                  paddingRight: '8px',
+                  height: '40px',
+                  borderColor: '#000',
+                },
+                '& .MuiSelect-select': {
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#000',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#000',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#000',
+                },
+              }}
+            >
+              <Select
+                multiple
+                displayEmpty
+                value={selectedDays}
+                onChange={handleChangeDays}
+                renderValue={(selected) =>
+                  selected.length === 0
+                    ? <span style={{ color: '#aaa' }}>Select Shifts</span>
+                    : selected.map((day) => daysOfWeek.find((d) => d.id === day)?.name).join(', ')
+                }
+              >
+                {daysOfWeek.map((day) => (
+                  <MenuItem key={day.id} value={day.id}>
+                    <Checkbox checked={selectedDays.includes(day.id)} />
+                    <ListItemText primary={day.name} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
 
 
-
+          </Grid>
 
         </Grid>
         <Box>
@@ -903,9 +1222,9 @@ function CreateEmployee() {
                   onChange={(e) => {
                     setIsApplicable(e.target.value);
                     if (e.target.value == 'no') {
-                      setValue('pensionPercentage',0)
-                      setValue('pensionPercentageEmp',0)
-                      
+                      setValue('pensionPercentage', 0)
+                      setValue('pensionPercentageEmp', 0)
+
                     }
                     field.onChange(e);
                   }}
@@ -941,7 +1260,7 @@ function CreateEmployee() {
               label={" Pension Percentage Employer :"}
               size={'small'}
               type={'number'}
-           disabled={isApplicable == 'no'}
+              disabled={isApplicable == 'no'}
               placeholder={"  Pension Percentage Employer "}
               error={errors?.pensionPercentageEmp?.message}
               register={register("pensionPercentageEmp", {
@@ -1129,6 +1448,57 @@ function CreateEmployee() {
 
           </Grid>
         </Grid>
+        <Box display="flex" alignItems="center" mt={2}>
+          <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
+          <Typography variant="subtitle1" sx={{ color: '#2f3b52' }}>
+            Leave Approval Info
+          </Typography>
+
+        </Box>
+        <Divider mt={1} sx={{ borderColor: '#2f3b52' }} />
+        <Grid container xs={12} mt={4} spacing={2}>
+          {approvers.map((approver, index) => (
+            <Grid item xs={6} sm={4} key={approver.key}>
+              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 1 }}>
+
+                <SelectField
+                  size="small"
+                  label={`Leave Approval ${index + 1}`}
+                  options={employees}
+                  selected={employees.find(emp => emp.user_id === approver.value)}
+                  onSelect={(val) => handleApproverChange(index, val.user_id)}
+                  register={register(approver.key, {
+                    required: 'Approver is required',
+                  })}
+                  error={errors?.[approver.key]?.message}
+
+                />
+                {index > 0 && (
+                  <PrimaryButton
+                    bgcolor="#001f3f"
+                    title="Remove"
+                    buttonStyle={{ mt: 2 }}
+                    onClick={() => handleRemoveApprover(index)}
+                  />
+                )}
+              </Box>
+            </Grid>
+          ))}
+
+          {/* Show Add Button only if less than 2 approvers */}
+          {approvers.length < 2 && (
+            <Grid item xs={12} sm={2.8} mt={3.8}>
+              <PrimaryButton
+                bgcolor="#001f3f"
+                title="Add"
+                onClick={handleAddApprover}
+              />
+            </Grid>
+          )}
+
+        </Grid>
+
+
         <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
           <PrimaryButton
             bgcolor={'#001f3f'}

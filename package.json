@@ -50,6 +50,7 @@
     "fslightbox-react": "^1.7.6",
     "generate-pdf-from-react-html": "^1.0.5",
     "history": "^5.3.0",
+    "html-docx-js": "^0.3.1",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.1",
     "is-docker": "^3.0.0",

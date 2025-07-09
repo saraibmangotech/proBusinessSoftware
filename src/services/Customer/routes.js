@@ -1,8 +1,8 @@
 const routes = {
   UpdateCertificate:'/customers/certificates/update',
-  CreateCertificate:'/customers/certificates/add',
+  CreateCertificate:'/hrms/certificates/add',
   getCandidateLists:'/customers/candidates',
-  getCertificates:'/customers/certificates',
+  getCertificates:'/hrms/certificates',
   ServiceInvoiceDetail:'/customers/services/details',
   UpdateAddOnservice:'/customers/services/update',
   getInvoices:'/customers/services',
@@ -170,7 +170,13 @@ const routes = {
   employeeSalaryDetail:'/hrms/payroll/calculate',
   getSalaries:'/hrms/payroll',
   updateSalaryStatus:'/hrms/payroll/updateStatus',
-  getSalaryDetail:'/hrms/payroll/details'
+  getSalaryDetail:'/hrms/payroll/details',
+  getShifts:'/hrms/shifts/',
+  getInventoryLocations:'/products/inventory/locations',
+  CreateLocation:'/products/inventory/locations/add',
+  UpdateLocation:'/products/inventory/locations/update',
+  getAgingReportReceivable:'/reports/aging/receivables',
+  getAgingReportPayable:'/reports/aging/payables'
 
 
 };

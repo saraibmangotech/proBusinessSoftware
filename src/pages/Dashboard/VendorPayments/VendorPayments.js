@@ -881,7 +881,7 @@ function VendorPaymentList() {
             <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
                 <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
                     {" "}
-                    Supplier Payment List
+                    Supplier On Account Payments
                 </Typography>
                 {data?.length > 0 && (
                         <Box sx={{

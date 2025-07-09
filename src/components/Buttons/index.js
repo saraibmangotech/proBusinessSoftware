@@ -26,6 +26,7 @@ export const PrimaryButton = (props) => {
         color: props.textcolor ? props.textcolor : Colors.white, // Apply text color
         fontSize: { xs: 12, md: 14 },
         ...props.buttonStyle,
+        
       }}
     >
       {props.title ? props.title : ''}

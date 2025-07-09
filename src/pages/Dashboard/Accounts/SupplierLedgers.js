@@ -905,6 +905,36 @@ function SupplierLedgers() {
     }
 
   }, [user])
+   const getVendors = async (page, limit, filter) => {
+    // setLoader(true)
+    try {
+      const Page = page ? page : currentPage
+      const Limit = limit ? limit : pageLimit
+      const Filter = filter ? { ...filters, ...filter } : null;
+      setCurrentPage(Page)
+      setPageLimit(Limit)
+      setFilters(Filter)
+      let params = {
+        page: 1,
+        limit: 999999,
+      }
+      params = { ...params, ...Filter }
+
+      const { data } = await CustomerServices.getVendors(params)
+      setUsers(data?.rows)
+
+
+
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      // setLoader(false)
+    }
+  }
+  useEffect(() => {
+   getVendors()
+  }, [])
+  
 
   return (
     <Box sx={{ p: 3 }}>
