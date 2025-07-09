@@ -117,6 +117,8 @@ function ProductUnitList() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [locations, setLocations] = useState([])
+    const [selectedLocation, setSelectedLocation] = useState(null)
     const { state } = useLocation()
     const {
         register,
@@ -189,7 +191,27 @@ function ProductUnitList() {
 
 
 
+    const getInventoryLocations = async (page, limit, filter) => {
+        setLoader(true)
 
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+
+
+            }
+
+            const { data } = await CustomerServices.getInventoryLocations(params)
+            setLocations(data?.rows)
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            setLoader(false)
+        }
+    }
 
 
     const handleSort = (key) => {
@@ -259,6 +281,7 @@ function ProductUnitList() {
                 reference_detail: formData?.reference_detail,
                 assigned_user_id:status?.id,
                 assigned_name:status?.name,
+                location_id:selectedLocation?.id,
                 status:'Assigned'
 
             };
@@ -308,6 +331,16 @@ function ProductUnitList() {
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                     {row?.original?.assignee?.name}
+                </Box>
+            ),
+
+        },
+          {
+            header: "Location",
+            accessorKey: "name",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.location?.name}
                 </Box>
             ),
 
@@ -384,7 +417,7 @@ function ProductUnitList() {
                             loading={loading}
                         />
                     </Box>
-                ) : null           // render nothing when unit_count ≤ 0
+                )         
             ),
 
 },
@@ -396,6 +429,7 @@ function ProductUnitList() {
 useEffect(() => {
     getUsers()
     getCustomerQueue()
+    getInventoryLocations()
 }, []);
 
 return (
@@ -418,7 +452,22 @@ return (
                             }}
                             error={errors?.status?.message}
                             register={register("status", {
-                                required: "Please select status.",
+                                required: selectedLocation ? false : "Please select status.",
+                            })}
+                        />
+                    </Grid>
+                         <Grid item xs={12} sm={12}>
+                        <SelectField
+                            size={"small"}
+                            label={"Select Location :"}
+                            options={locations}
+                            selected={selectedLocation}
+                            onSelect={(value) => {
+                                setSelectedLocation(value);
+                            }}
+                            error={errors?.location?.message}
+                            register={register("location", {
+                                required:status ? false : "Please select location.",
                             })}
                         />
                     </Grid>

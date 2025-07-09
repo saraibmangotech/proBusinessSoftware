@@ -10,8 +10,18 @@ const FinanceServices = {
     const data = await get(routes.getMajorCategories);
     return data;
   },
+  
   getCustomerPaymentDetail: async (params) => {
     const data = await get(routes.getCustomerPaymentDetail,params);
+    return data;
+  },
+  
+   getConsolidatedCustomerReceivable: async (params) => {
+    const data = await get(routes.getConsolidatedCustomerReceivable,params);
+    return data;
+  },
+   getConsolidatedSupplierPayables: async (params) => {
+    const data = await get(routes.getConsolidatedSupplierPayables,params);
     return data;
   },
   getConsolidatedProStatement: async (params) => {

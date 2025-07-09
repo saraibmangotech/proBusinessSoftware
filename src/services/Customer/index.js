@@ -6,12 +6,32 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+  CreateLocation: async (obj) => {
+    const data = await post(routes.CreateLocation, obj);
+    return data;
+  },
+  UpdateLocation: async (obj) => {
+    const data = await patch(routes.UpdateLocation, obj);
+    return data;
+  },
     getSalaries: async (params) => {
     const data = await get(routes.getSalaries, params);
     return data;
   },
+  getAgingReportPayable: async (params) => {
+    const data = await get(routes.getAgingReportPayable, params);
+    return data;
+  },
+     getInventoryLocations: async (params) => {
+    const data = await get(routes.getInventoryLocations, params);
+    return data;
+  },
    getShifts: async (params) => {
     const data = await get(routes.getShifts, params);
+    return data;
+  },
+   getAgingReportReceivable: async (params) => {
+    const data = await get(routes.getAgingReportReceivable, params);
     return data;
   },
     getSalaryDetail: async (params) => {

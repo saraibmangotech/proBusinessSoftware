@@ -171,7 +171,12 @@ const routes = {
   getSalaries:'/hrms/payroll',
   updateSalaryStatus:'/hrms/payroll/updateStatus',
   getSalaryDetail:'/hrms/payroll/details',
-  getShifts:'/hrms/shifts/'
+  getShifts:'/hrms/shifts/',
+  getInventoryLocations:'/products/inventory/locations',
+  CreateLocation:'/products/inventory/locations/add',
+  UpdateLocation:'/products/inventory/locations/update',
+  getAgingReportReceivable:'/reports/aging/receivables',
+  getAgingReportPayable:'/reports/aging/payables'
 
 
 };

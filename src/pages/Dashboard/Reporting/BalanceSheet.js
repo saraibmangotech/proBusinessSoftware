@@ -129,7 +129,7 @@ function BalanceSheet() {
   const [expand, setExpand] = useState([]);
   const [fromDate, setFromDate] = useState();
   const [toDate, setToDate] = useState();
-
+  const [adminOpTotal, setAdminOpTotal] = useState(0)
   let TotalEquity = 0
 
   const getCostCenters = async () => {
@@ -194,7 +194,8 @@ function BalanceSheet() {
       let myData = data?.detail
       setBalanceSheet(data?.detail?.slice(0, -2))
       setFilteredBalanceSheet(data?.detail?.slice(0, -2))
-
+      const e2Total = myData.flatMap(category => category.sub || []).flatMap(sub => sub.accounts || []).filter(account => account.type_code === 'E2').reduce((sum, account) => sum + (parseFloat(account.total_debit || 0) - parseFloat(account.total_credit || 0)), 0);
+      setAdminOpTotal(parseFloat(e2Total))
       const fil = []
       data?.detail.forEach(e => {
         let obj = {
@@ -471,7 +472,7 @@ function BalanceSheet() {
     worksheet.mergeCells("A2:G2")
 
     const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
+      `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
     ])
     dateRow.getCell(1).font = {
       name: "Arial",
@@ -765,7 +766,7 @@ function BalanceSheet() {
       '',
       '',
       '',
-      CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal) + (parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses))).toFixed(2))
+      CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal) + (parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal))).toFixed(2))
     ]);
 
     grandTotalRow.eachCell((cell, colNumber) => {
@@ -849,14 +850,14 @@ function BalanceSheet() {
       description: "Comprehensive balance sheet generated from accounting system",
       company: "Your Company Name",
     }
-  
+
 
     // Add empty row for spacing
     worksheet.addRow([])
     const download = async () => {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      saveAs(blob, ( toDate && fromDate )?   `Balance Sheet : ${fromDate  ? moment(fromDate).format('MM/DD/YYYY') : '-'} To ${toDate  ? moment(toDate).format('MM/DD/YYYY') : 'Present'}` : `Balance Sheet: Present ` ,);
+      saveAs(blob, (toDate && fromDate) ? `Balance Sheet : ${fromDate ? moment(fromDate).format('MM/DD/YYYY') : '-'} To ${toDate ? moment(toDate).format('MM/DD/YYYY') : 'Present'}` : `Balance Sheet: Present `,);
     }
     download();
   };
@@ -1401,7 +1402,8 @@ function BalanceSheet() {
                               {console.log(parseFloat(parseFloat(totalRevenue) - parseFloat(totalExpenses)).toFixed(2), 'asdasd')}
 
                               <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
-                                {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses)).toFixed(2))}
+
+                                {CommaSeparator((parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal)).toFixed(2))}
                               </Typography>
                             </Cell>
                           </Row>
@@ -1421,7 +1423,7 @@ function BalanceSheet() {
                             </Cell>
                             <Cell>
                               <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, color: 'white' }}>
-                                {CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal) + (parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(totalExpenses))).toFixed(2))}
+                                {CommaSeparator(parseFloat(parseFloat(libalTotal) + parseFloat(capitalTotal) + (parseFloat(parseFloat(totalRevenue) - parseFloat(totalCost)) - parseFloat(adminOpTotal))).toFixed(2))}
                               </Typography>
                             </Cell>
                           </Row>

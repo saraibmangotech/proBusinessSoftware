@@ -247,7 +247,9 @@ const CreateReception = lazy(() =>
 const ReceptionList = lazy(() =>
   import("pages/Dashboard/Reception/Receptions")
 );
-
+const InventoryLocations = lazy(() =>
+  import("pages/Dashboard/Settings/InventoryLocations")
+);
 const UpdateServiceItem = lazy(() =>
   import("pages/Dashboard/ServiceItem/UpdateServiceItem")
 );
@@ -348,6 +350,12 @@ const UpdateCustomerPayment = lazy(() =>
 const SnapshotCategoryReport = lazy(() =>
   import("pages/Dashboard/Reports/SnapshotCategoryReport")
 );
+const AgingReportReceivable = lazy(() =>
+  import("pages/Dashboard/Reports/AgingReportReceiveables")
+);
+const AgingReportPayable = lazy(() =>
+  import("pages/Dashboard/Reports/AgingReportPayables")
+);
 const SnapshotOverviewReport = lazy(() =>
   import("pages/Dashboard/Reports/SnapshotOverviewReport")
 );
@@ -360,221 +368,233 @@ const SnapshotEmployeeServiceReport = lazy(() =>
 const CreateCreditNote = lazy(() =>
   import("pages/Dashboard/Payments/CreateCreditNotes")
 );
-const CreateDebitNote= lazy(() =>
+const CreateDebitNote = lazy(() =>
   import("pages/Dashboard/Payments/CreateDebitNote")
 );
-const CreatePaymentVoucher= lazy(() =>
+const CreatePaymentVoucher = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentVoucher")
 );
-const CreateReceiptVoucher= lazy(() =>
+const CreateReceiptVoucher = lazy(() =>
   import("pages/Dashboard/Payments/CreateReceiptVoucher")
 );
-const CreateVendor= lazy(() =>
+const CreateVendor = lazy(() =>
   import("pages/Dashboard/Vendors/CreateVendor")
 );
-const EmployeeWiseSalesReport= lazy(() =>
+const EmployeeWiseSalesReport = lazy(() =>
   import("pages/Dashboard/Reports/EmployeeWiseSalesReport")
 );
-const Vendors= lazy(() =>
+const Vendors = lazy(() =>
   import("pages/Dashboard/Vendors/Vendors")
 );
-const UpdateVendor= lazy(() =>
+const UpdateVendor = lazy(() =>
   import("pages/Dashboard/Vendors/UpadteVendor")
 );
-const VendorDetail= lazy(() =>
+const VendorDetail = lazy(() =>
   import("pages/Dashboard/Vendors/VendorDetail")
 );
-const CreditNotes= lazy(() =>
+const CreditNotes = lazy(() =>
   import("pages/Dashboard/Payments/CreditNotes")
 );
-const DebitNotes= lazy(() =>
+const DebitNotes = lazy(() =>
   import("pages/Dashboard/Payments/DebitNotes")
 );
-const PaymentVouchers= lazy(() =>
+const PaymentVouchers = lazy(() =>
   import("pages/Dashboard/Payments/PaymentVouchers")
 );
-const ReceiptVouchers= lazy(() =>
+const ReceiptVouchers = lazy(() =>
   import("pages/Dashboard/Payments/ReceiptVouchers")
 );
-const Categories= lazy(() =>
+const Categories = lazy(() =>
   import("pages/Dashboard/Category/Categories")
 );
-const CreateProductCategory= lazy(() =>
+const CreateProductCategory = lazy(() =>
   import("pages/Dashboard/Category/CreateCategory")
 );
-const UpdateProductCategory= lazy(() =>
+const UpdateProductCategory = lazy(() =>
   import("pages/Dashboard/Category/UpdateCategory")
 );
-const ProductCategoryDetail= lazy(() =>
+const ProductCategoryDetail = lazy(() =>
   import("pages/Dashboard/Category/CategoryDetail")
 );
-const Products= lazy(() =>
+const Products = lazy(() =>
   import("pages/Dashboard/Product/Products")
 );
-const CreateProduct= lazy(() =>
+const CreateProduct = lazy(() =>
   import("pages/Dashboard/Product/CreateProduct")
 );
-const UpdateProduct= lazy(() =>
+const UpdateProduct = lazy(() =>
   import("pages/Dashboard/Product/UpdateProduct")
 );
-const ProductDetail= lazy(() =>
+const ProductDetail = lazy(() =>
   import("pages/Dashboard/Product/Product-detail")
 );
-const CreatePurchaseInvoice= lazy(() =>
+const CreatePurchaseInvoice = lazy(() =>
   import("pages/Dashboard/Invoice/CreatePurchaseInvoice")
 );
-const PurchaseInvoices= lazy(() =>
+const PurchaseInvoices = lazy(() =>
   import("pages/Dashboard/Invoice/PurchaseInvoices")
 );
-const UpdatePurchaseInvoice= lazy(() =>
+const UpdatePurchaseInvoice = lazy(() =>
   import("pages/Dashboard/Invoice/UpdatePurchaseInvoice")
 );
-const CreatePaymentInvoice= lazy(() =>
+const CreatePaymentInvoice = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentInvoice")
 );
-const SettleInvoices= lazy(() =>
+const SettleInvoices = lazy(() =>
   import("pages/Dashboard/Payments/SettleInvoices")
 );
-const CreateSaleInvoicePayment= lazy(() =>
+const CreateSaleInvoicePayment = lazy(() =>
   import("pages/Dashboard/Payments/CreateSaleInvoicePayment")
 );
-const PaymentInvoices= lazy(() =>
+const PaymentInvoices = lazy(() =>
   import("pages/Dashboard/Payments/PaymentInvoices")
 );
-const PurchaseInvoicePaymentList= lazy(() =>
+const SupplierPaymentReceipts = lazy(() =>
+  import("pages/Dashboard/Payments/SupplierPaymentReceipts")
+);
+const PurchaseInvoicePaymentList = lazy(() =>
   import("pages/Dashboard/Payments/PurchaseInvoicePaymentList")
 );
-const CreateVendorPayment= lazy(() =>
+const CreateVendorPayment = lazy(() =>
   import("pages/Dashboard/VendorPayments/CreateVendorPayment")
 );
-const UpdateVendorPayment= lazy(() =>
+const UpdateVendorPayment = lazy(() =>
   import("pages/Dashboard/VendorPayments/VendorPaymentDetail")
 );
-const VendorPaymentList= lazy(() =>
+const VendorPaymentList = lazy(() =>
   import("pages/Dashboard/VendorPayments/VendorPayments")
 );
-const CustomerLedgers= lazy(() =>
+const CustomerLedgers = lazy(() =>
   import("pages/Dashboard/Accounts/CustomerLedgers")
 );
-const SupplierLedgers= lazy(() =>
+const SupplierLedgers = lazy(() =>
   import("pages/Dashboard/Accounts/SupplierLedgers")
 );
-const UpdateJournalVoucher= lazy(() =>
+const UpdateJournalVoucher = lazy(() =>
   import("pages/Dashboard/Accounts/UpdateJournalVoucher")
 );
-const CreatePrepaidInvoice= lazy(() =>
+const CreatePrepaidInvoice = lazy(() =>
   import("pages/Dashboard/Invoice/CreatePrePaidInvoices")
 );
-const PrepaidInvoices= lazy(() =>
+const PrepaidInvoices = lazy(() =>
   import("pages/Dashboard/Invoice/PrepaidInvoices")
 );
-const UpdatePrepaidInvoices= lazy(() =>
+const UpdatePrepaidInvoices = lazy(() =>
   import("pages/Dashboard/Invoice/UpdatePrepaidInvoice")
 );
 
 
-const UpdateFixedAssets= lazy(() =>
+const UpdateFixedAssets = lazy(() =>
   import("pages/Dashboard/Invoice/UpdateFixedAssets")
 );
-const InventoryList= lazy(() =>
+const InventoryList = lazy(() =>
   import("pages/Dashboard/Product/InventoryList")
 );
-const ProductUnitList= lazy(() =>
+const ProductUnitList = lazy(() =>
   import("pages/Dashboard/Product/ProductUnitList")
 );
-const UpdatePaymentVoucher= lazy(() =>
+const UpdatePaymentVoucher = lazy(() =>
   import("pages/Dashboard/Payments/UpdatePaymentVoucher")
 );
-const UpdateReceiptVoucher= lazy(() =>
+const UpdateReceiptVoucher = lazy(() =>
   import("pages/Dashboard/Payments/UpdateReceiptVoucher")
 );
-const UpdateFundTransferVoucher= lazy(() =>
+const UpdateFundTransferVoucher = lazy(() =>
   import("pages/Dashboard/Finance/UpdateFundTransferVoucher")
 );
-const CreateEmployee= lazy(() =>
+const CreateEmployee = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/CreateEmployee")
 );
-const CreateLeave= lazy(() =>
+const CreateLeave = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/CreateLeave")
 );
-const UpdateLeave= lazy(() =>
+const UpdateLeave = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/UpdateLeave")
 );
-const LeaveList= lazy(() =>
+const LeaveList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/LeaveList")
 );
-const SalaryList= lazy(() =>
+const SalaryList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/SalaryList")
 );
-const SalariesList= lazy(() =>
+const SalariesList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/Salaries")
 );
-const UpdateSalaryList= lazy(() =>
+const UpdateSalaryList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/UpdateSalaryList")
 );
-const DetailSalaryList= lazy(() =>
+const DetailSalaryList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/DetailSalaryList")
 );
-const ConsolidatedProStatement= lazy(() =>
+const ConsolidatedProStatement = lazy(() =>
   import("pages/Dashboard/Accounts/ProConsolidatedStatement")
 );
-const SupplierConsolidatedProStatement= lazy(() =>
+const SupplierConsolidatedProStatement = lazy(() =>
   import("pages/Dashboard/Accounts/SupplierConsolidatedStatement")
 );
-const AccountConsolidatedProStatement= lazy(() =>
+const ConsolidatedSupplierPayables = lazy(() =>
+  import("pages/Dashboard/Accounts/ConsolidatedSupplierPayables")
+);
+const ConsolidatedCustomerReceivable = lazy(() =>
+  import("pages/Dashboard/Accounts/ConsolidatedCustomerReceivable")
+);
+const AccountConsolidatedProStatement = lazy(() =>
   import("pages/Dashboard/Accounts/AccountConsolidatedStatement")
 );
-const EmployeeList= lazy(() =>
+const CashFlowStatement = lazy(() =>
+  import("pages/Dashboard/Accounts/CashFlowStatement")
+);
+const EmployeeList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/EmployeeList")
 );
-const UpdateEmployee= lazy(() =>
+const UpdateEmployee = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/UpdateEmployee")
 );
-const AttendanceTable= lazy(() =>
+const AttendanceTable = lazy(() =>
   import("pages/Dashboard/HRMS/AttendanceReport")
 );
-const ShiftManagement= lazy(() =>
+const ShiftManagement = lazy(() =>
   import("pages/Dashboard/HRMS/ShiftManagement")
 );
-const ShiftAllocations= lazy(() =>
+const ShiftAllocations = lazy(() =>
   import("pages/Dashboard/HRMS/ShiftAllocations")
 );
-const Holidays= lazy(() =>
+const Holidays = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/Holidays")
 );
 
 
 // Prepaid Expense Region
 
-const CreatePrepaidExpense= lazy(() =>
+const CreatePrepaidExpense = lazy(() =>
   import("pages/Dashboard/Invoice/CreatePrepaidExpenseInvoice")
 );
-const PrepaidExpenseList= lazy(() =>
+const PrepaidExpenseList = lazy(() =>
   import("pages/Dashboard/Invoice/PrepaidExpenseList")
 );
-const CreatePrepaidExpensePayment= lazy(() =>
+const CreatePrepaidExpensePayment = lazy(() =>
   import("pages/Dashboard/Payments/CreateFixedAssetPayment")
 );
-const PrepaidExpensePaymentList= lazy(() =>
+const PrepaidExpensePaymentList = lazy(() =>
   import("pages/Dashboard/Payments/FixedAssetPayments")
 );
 
 // Fixed Asset Region
 
-const CreateFixedAsset= lazy(() =>
+const CreateFixedAsset = lazy(() =>
   import("pages/Dashboard/Invoice/CreateFixedAssetInvoice")
 );
-const FixedAssetList= lazy(() =>
+const FixedAssetList = lazy(() =>
   import("pages/Dashboard/Invoice/FixedAssetList")
 );
-const CreateFixedAssetPayment= lazy(() =>
+const CreateFixedAssetPayment = lazy(() =>
   import("pages/Dashboard/Payments/CreateFixedAssetPayment")
 );
-const FixedAssetPaymentList= lazy(() =>
+const FixedAssetPaymentList = lazy(() =>
   import("pages/Dashboard/Payments/FixedAssetPayments")
 );
 
-const FPPaymentHistory= lazy(() =>
+const FPPaymentHistory = lazy(() =>
   import("pages/Dashboard/Payments/FPPaymentHistory")
 );
 
@@ -584,7 +604,7 @@ const AdminRoutes = [
     path: "/system-settings",
     component: <SystemSettings />,
   },
-    {
+  {
     path: "/holidays",
     component: <Holidays />,
   },
@@ -600,7 +620,7 @@ const AdminRoutes = [
     path: "/employee-list",
     component: <EmployeeList />,
   },
- 
+
   {
     path: "/create-service-item",
     component: <CreateServiceItem />,
@@ -629,15 +649,15 @@ const AdminRoutes = [
     path: "/create-payroll",
     component: <SalaryList />,
   },
-   {
+  {
     path: "/update-payroll/:id",
     component: <UpdateSalaryList />,
   },
-    {
+  {
     path: "/salary-detail/:id",
     component: <DetailSalaryList />,
   },
-   {
+  {
     path: "/salary-list",
     component: <SalariesList />,
   },
@@ -678,6 +698,10 @@ const AdminRoutes = [
     component: <InventoryList />,
   },
   {
+    path: "/cash-flow-statement",
+    component: <CashFlowStatement />,
+  },
+  {
     path: "/product-unit-list",
     component: <ProductUnitList />,
   },
@@ -692,6 +716,14 @@ const AdminRoutes = [
   {
     path: "/supplier-consolidated-statement",
     component: <SupplierConsolidatedProStatement />,
+  },
+   {
+    path: "/consolidated-supplier-payable",
+    component: <ConsolidatedSupplierPayables />,
+  },
+   {
+    path: "/consolidated-customer-receivable",
+    component: <ConsolidatedCustomerReceivable />,
   },
   {
     path: "/update-employee/:id",
@@ -712,6 +744,10 @@ const AdminRoutes = [
   {
     path: "/payment-invoice-list",
     component: <PaymentInvoices />,
+  },
+   {
+    path: "/supplier-payment-receipt-list",
+    component: <SupplierPaymentReceipts />,
   },
   {
     path: "/purchase-payment-invoice-list",
@@ -844,6 +880,14 @@ const AdminRoutes = [
   {
     path: "/snapshot-category-report",
     component: <SnapshotCategoryReport />,
+  },
+  {
+    path: "/aging-report-receivable",
+    component: <AgingReportReceivable />,
+  },
+  {
+    path: "/aging-report-payable",
+    component: <AgingReportPayable />,
   },
   {
     path: "/snapshot-overview-report",
@@ -994,13 +1038,13 @@ const AdminRoutes = [
     path: "/create-service-category",
     component: <CreateCategory />,
   },
-  
+
   {
     path: "/update-service-category/:id",
     component: <UpdateCategory />,
   },
   {
-  path: "/service-category-detail/:id",
+    path: "/service-category-detail/:id",
     component: <CategoryDetail />,
   },
   {
@@ -1019,6 +1063,10 @@ const AdminRoutes = [
   {
     path: "/reception-list",
     component: <ReceptionList />,
+  },
+  {
+    path: "/inventory-locations",
+    component: <InventoryLocations />,
   },
   {
     path: "/create-agent",
@@ -1217,7 +1265,7 @@ const AdminRoutes = [
     component: <MonthlyInvoice />,
   },
   {
-    path:"/customer-vise-report",
+    path: "/customer-vise-report",
     component: <CustomerReport />,
 
   },
@@ -1329,7 +1377,7 @@ const AdminRoutes = [
     path: "/certificate-pdf",
     component: <Certificate />,
   },
-   {
+  {
     path: "/experience-certificate",
     component: <ExperienceCertificate />,
   },
@@ -1341,7 +1389,7 @@ const AdminRoutes = [
     path: "/shift-management",
     component: <ShiftManagement />,
   },
-   {
+  {
     path: "/shift-allocations",
     component: <ShiftAllocations />,
   },
@@ -1462,7 +1510,7 @@ const AdminRoutes = [
     path: "/fp-payment-history",
     component: <FPPaymentHistory />,
   },
- 
+
 ];
 
 export default AdminRoutes;
