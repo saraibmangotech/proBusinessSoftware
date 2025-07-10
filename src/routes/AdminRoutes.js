@@ -440,6 +440,9 @@ const UpdatePurchaseInvoice = lazy(() =>
 const CreatePaymentInvoice = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentInvoice")
 );
+const SalesInvoiceSettlement = lazy(() =>
+  import("pages/Dashboard/Payments/SalesInvoiceSettlement")
+);
 const SettleInvoices = lazy(() =>
   import("pages/Dashboard/Payments/SettleInvoices")
 );
@@ -784,6 +787,10 @@ const AdminRoutes = [
   {
     path: "/create-payment-invoice",
     component: <CreatePaymentInvoice />,
+  },
+  {
+    path: "/sales-invoice-settlement",
+    component: <SalesInvoiceSettlement />,
   },
   {
     path: "/create-sale-invoice-payment",
