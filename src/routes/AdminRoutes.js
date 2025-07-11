@@ -247,6 +247,15 @@ const CreateReception = lazy(() =>
 const ReceptionList = lazy(() =>
   import("pages/Dashboard/Reception/Receptions")
 );
+const SalesSettlementList = lazy(() =>
+  import("pages/Dashboard/Payments/SalesSetttlementList")
+);
+const PurchaseSettlementList = lazy(() =>
+  import("pages/Dashboard/Payments/PurchaseSettlementList")
+);
+const EmployeeLeaves = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/EmployeeLeaves")
+);
 const InventoryLocations = lazy(() =>
   import("pages/Dashboard/Settings/InventoryLocations")
 );
@@ -442,6 +451,9 @@ const CreatePaymentInvoice = lazy(() =>
 );
 const SalesInvoiceSettlement = lazy(() =>
   import("pages/Dashboard/Payments/SalesInvoiceSettlement")
+);
+const PurchaseInvoiceSettlement = lazy(() =>
+  import("pages/Dashboard/Payments/PurchaseInvoiceSettlement")
 );
 const SettleInvoices = lazy(() =>
   import("pages/Dashboard/Payments/SettleInvoices")
@@ -792,6 +804,10 @@ const AdminRoutes = [
     path: "/sales-invoice-settlement",
     component: <SalesInvoiceSettlement />,
   },
+   {
+    path: "/purchase-invoice-settlement",
+    component: <PurchaseInvoiceSettlement />,
+  },
   {
     path: "/create-sale-invoice-payment",
     component: <CreateSaleInvoicePayment />,
@@ -1070,6 +1086,18 @@ const AdminRoutes = [
   {
     path: "/reception-list",
     component: <ReceptionList />,
+  },
+  {
+    path: "/sales-settlement-list",
+    component: <SalesSettlementList />,
+  },
+    {
+    path: "/purchase-settlement-list",
+    component: <PurchaseSettlementList />,
+  },
+  {
+    path: "/employee-leaves",
+    component: <EmployeeLeaves />,
   },
   {
     path: "/inventory-locations",

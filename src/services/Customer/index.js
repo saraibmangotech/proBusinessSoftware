@@ -18,12 +18,32 @@ const CustomerServices = {
     const data = await get(routes.getSalaries, params);
     return data;
   },
+  PurchaseInvoiceSettlement: async (obj) => {
+    const data = await post(routes.PurchaseInvoiceSettlement, obj);
+    return data;
+  },
+   SalesInvoiceSettlement: async (obj) => {
+    const data = await post(routes.SalesInvoiceSettlement, obj);
+    return data;
+  },
   getAgingReportPayable: async (params) => {
     const data = await get(routes.getAgingReportPayable, params);
     return data;
   },
+   getPurchaseSettlement: async (params) => {
+    const data = await get(routes.getPurchaseSettlement, params);
+    return data;
+  },
      getInventoryLocations: async (params) => {
     const data = await get(routes.getInventoryLocations, params);
+    return data;
+  },
+    getSalesSettlement: async (params) => {
+    const data = await get(routes.getSalesSettlement, params);
+    return data;
+  },
+  getEmployeeLeaves: async (params) => {
+    const data = await get(routes.getEmployeeLeaves, params);
     return data;
   },
    getShifts: async (params) => {

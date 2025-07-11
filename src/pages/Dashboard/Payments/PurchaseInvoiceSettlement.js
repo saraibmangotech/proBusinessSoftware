@@ -74,18 +74,18 @@ const Cell = styled(TableCell)(({ theme }) => ({
     },
 }));
 
-function SalesInvoiceSettlement() {
+function PurchaseInvoiceSettlement() {
 
     const navigate = useNavigate();
     const { user } = useAuth();
     const { usdExchangeRate, cadExchangeRate } = useSelector((state) => state.navigationReducer);
 
-    const tableHead = ['Select', 'Date', 'Payment ID', 'Customer Name', 'Total Amount', 'Paid', 'Balance', 'Adjustment Status', 'Receiving']
-    const tableHead2 = ['Select', 'Date', 'Invoice Number', 'Customer Name', ' Vat', 'Total Amount', 'Paid', 'Balance', 'Payment Status', 'Receiving']
+    const tableHead = ['Select', 'Date', ' ID', 'Vendor Name', 'Total Amount', 'Paid', 'Balance', 'Adjustment Status', 'Receiving']
+    const tableHead2 = ['Select', 'Date', 'Invoice Number', 'Vendor Name', ' Vat', 'Total Amount', 'Paid', 'Balance', 'Payment Status', 'Receiving']
     const { register, formState: { errors }, handleSubmit, setValue, getValues, trigger, watch } = useForm();
     const { register: register2, getValues: getValues2 } = useForm();
     const { register: register3, handleSubmit: handleSubmit3 } = useForm();
-    const { register: register4, getValues: getValues4, errors: errors4 } = useForm();
+    const { register: register4, getValues: getValues4, errors: errors4, setValue: setValue4, trigger: trigger4 } = useForm();
     const [loader, setLoader] = useState(false);
     const [loading, setLoading] = useState(false);
     const [payments, setPayments] = useState([])
@@ -190,7 +190,7 @@ function SalesInvoiceSettlement() {
         }
     }
     // *For Get Customer Queue
-    const getCustomerQueue = async (page, limit, filter) => {
+    const getVendors = async (page, limit, filter) => {
         setLoader(true)
 
         try {
@@ -202,8 +202,8 @@ function SalesInvoiceSettlement() {
 
             }
 
-            const { data } = await CustomerServices.getCustomerQueue(params)
-            setCustomers(data?.rows)
+            const { data } = await CustomerServices.getVendors(params)
+            setVendors(data?.rows)
 
         } catch (error) {
             showErrorToast(error)
@@ -220,14 +220,14 @@ function SalesInvoiceSettlement() {
             let params = {
                 page: 1,
                 limit: 999999,
-                customer_id: selectedCustomer?.id,
-                account_id: selectedCustomer?.account_id,
+                vendor_id: selectedVendor?.id,
+                account_id: selectedVendor?.account_id,
                 invoice_number: getValues2('invoiceNumber'),
                 is_paid: false
 
             }
 
-            const { data } = await FinanceServices.getCustomerPaymentList(params)
+            const { data } = await FinanceServices.getVendorPaymentList(params)
             setInvoiceList(data?.rows)
 
             setTotalCount(data?.count)
@@ -247,13 +247,13 @@ function SalesInvoiceSettlement() {
             let params = {
                 page: 1,
                 limit: 999999,
-                customer_id: selectedCustomer?.id,
+                vendor_id: selectedVendor?.id,
                 invoice_number: getValues2('invoiceNumber'),
                 is_paid: false
 
             }
 
-            const { data } = await CustomerServices.getInvoices(params)
+            const { data } = await CustomerServices.getPurchaseInvoices(params)
             setInvoiceList2(data?.rows)
 
             setTotalCount(data?.count)
@@ -265,7 +265,6 @@ function SalesInvoiceSettlement() {
             setLoader(false)
         }
     }
-
     const getInvoiceList3 = async (page, limit, filter) => {
         setLoader(true)
         try {
@@ -276,7 +275,7 @@ function SalesInvoiceSettlement() {
                 vendor_id: selectedVendor?.id,
                 invoice_number: getValues2('invoiceNumber'),
                 is_paid: false,
-                type: 'credit_note',
+                type: 'debit_note',
                 is_settled: false
 
             }
@@ -385,14 +384,14 @@ function SalesInvoiceSettlement() {
             if (currentIndex === -1) {
                 const obj = {
                     id: data?.id,
-                    customer_id: data?.customer_id,
-                    customer_name: data?.customer?.name,
+                    vendor_id: data?.vendor_id,
+                    vendor_name: data?.vendor?.name,
                     invoice_id: data?.id,
                     invoiceId: data?.id,
                     invoice_number: data?.invoice_number,
                     invoice_date: data?.invoice_date,
                     total_amount: data?.total_amount,
-                    total_vat: data?.total_vat,
+                    tax: data?.tax,
                     final_amount: data?.final_total,
                     created_by: data?.creator?.id
 
@@ -494,7 +493,6 @@ function SalesInvoiceSettlement() {
         }
     };
 
-
     // *For Get Payment Accounts
     const getPaymentAccounts = async () => {
         try {
@@ -584,24 +582,23 @@ function SalesInvoiceSettlement() {
 
         try {
             let obj = {
-                customer_id: selectedInvoice2[0]?.customer_id,
-                customer_name: selectedInvoice2[0]?.customer?.name,
-
+                vendor_id: selectedInvoice2[0]?.vendor_id,
+                vendor_name: selectedInvoice2[0]?.vendor_name,
                 payments: selectedInvoice,
                 invoices: selectedInvoice2,
                 debit_notes: selectedInvoice3,
-                notes: formData?.notes,
+                notes: getValues('notes'),
                 payment_date: moment(date).format('MM-DD-YYYY'),
 
             };
             console.log(obj, 'objobjobj');
 
 
-            const promise = CustomerServices.SalesInvoiceSettlement(obj)
+            const promise = CustomerServices.PurchaseInvoiceSettlement(obj)
             const response = await promise
             showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
             if (response?.responseCode === 200) {
-
+                // navigate('/payment-invoice-list')
             }
 
 
@@ -834,7 +831,7 @@ function SalesInvoiceSettlement() {
 
         getAccounts()
         getCards()
-        getCustomerQueue()
+        getVendors()
 
 
 
@@ -869,7 +866,7 @@ function SalesInvoiceSettlement() {
             </SimpleDialog>
 
             <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
-                Sales Invoice Settlement
+                Purchase Invoice Settlement
             </Typography>
 
             {/* Filters */}
@@ -879,11 +876,11 @@ function SalesInvoiceSettlement() {
                         <SelectField
                             size={'small'}
 
-                            label={'Select Customer'}
-                            options={customers}
-                            selected={selectedCustomer}
-                            onSelect={(value) => { setSelectedCustomer(value); }}
-                            register={register2("customer")}
+                            label={'Select Vendor'}
+                            options={vendors}
+                            selected={selectedVendor}
+                            onSelect={(value) => { setSelectedVendor(value); }}
+                            register={register2("vendor")}
                         />
                     </Grid>
                     <Grid item xs={12} sm={3}>
@@ -905,8 +902,9 @@ function SalesInvoiceSettlement() {
                             onClick={() => {
                                 getInvoiceList(null, null, null)
 
-                                getInvoiceList3(null, null, null)
+
                                 getInvoiceList2(null, null, null)
+                                getInvoiceList3(null, null, null)
                             }}
                             loading={loading}
                         />
@@ -951,7 +949,7 @@ function SalesInvoiceSettlement() {
 
                                                     <Cell>
                                                         <Tooltip
-                                                            title={item?.customer?.name ?? '-'}
+                                                            title={item?.vendor?.name ?? '-'}
                                                             arrow
                                                             placement="top"
                                                             slotProps={{
@@ -967,7 +965,7 @@ function SalesInvoiceSettlement() {
                                                                 },
                                                             }}
                                                         >
-                                                            {item?.customer?.name?.length > 15 ? item?.customer?.name?.slice(0, 10) + "..." : item?.customer?.name}
+                                                            {item?.vendor?.name?.length > 15 ? item?.vendor?.name?.slice(0, 10) + "..." : item?.vendor?.name}
                                                         </Tooltip>
                                                     </Cell>
 
@@ -1070,14 +1068,12 @@ function SalesInvoiceSettlement() {
                         </TableContainer>
 
 
-                    
-
 
 
                     </Fragment>
                 }
                 <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4, mt: 4 }}>
-                    Credit Notes
+                    Debit Notes
                 </Typography>
 
                 {true &&
@@ -1288,7 +1284,7 @@ function SalesInvoiceSettlement() {
 
                                                     </Cell>
                                                     <Cell>
-                                                        {item?.invoice_date ? moment(item?.invoice_date).format('DD-MMM-YYYY') : ''}
+                                                        {item?.purchase_date ? moment(item?.purchase_date).format('DD-MMM-YYYY') : ''}
                                                     </Cell>
 
                                                     <Cell>
@@ -1296,7 +1292,7 @@ function SalesInvoiceSettlement() {
                                                     </Cell>
                                                     <Cell>
                                                         <Tooltip
-                                                            title={item?.customer?.name ?? '-'}
+                                                            title={item?.vendor?.name ?? '-'}
                                                             arrow
                                                             placement="top"
                                                             slotProps={{
@@ -1312,15 +1308,22 @@ function SalesInvoiceSettlement() {
                                                                 },
                                                             }}
                                                         >
-                                                            {item?.customer?.name?.length > 15 ? item?.customer?.name?.slice(0, 10) + "..." : item?.customer?.name}
+                                                            {item?.vendor?.name?.length > 15 ? item?.vendor?.name?.slice(0, 10) + "..." : item?.vendor?.name}
                                                         </Tooltip>
                                                     </Cell>
 
 
 
                                                     <Cell>
-                                                        {parseFloat(item?.total_vat).toFixed(2) ?? '-'}
+                                                        {(item?.vat_enabled && item?.invoice_items.length > 0)
+                                                            ? parseFloat(
+                                                                item.invoice_items.reduce((sum, i) => sum + parseFloat(i?.tax || 0), 0)
+                                                            ).toFixed(2)
+                                                            : parseFloat(
+                                                                0
+                                                            ).toFixed(2)}
                                                     </Cell>
+
                                                     <Cell>
                                                         {parseFloat(item?.total_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
@@ -1466,8 +1469,8 @@ function SalesInvoiceSettlement() {
                         <PrimaryButton
                             type="submit"
                             name="settle"
-                            disabled={totalAmount == 0 || totalAmount2 == 0}
                             value="invoiceOnly"
+                            disabled={totalAmount == 0 || totalAmount2 == 0}
                             onClick={() => receivePayment()}
                             bgcolor={Colors.primary}
                             title="settle"
@@ -1481,4 +1484,4 @@ function SalesInvoiceSettlement() {
     );
 }
 
-export default SalesInvoiceSettlement;
+export default PurchaseInvoiceSettlement;

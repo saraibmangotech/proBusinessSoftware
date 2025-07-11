@@ -8,8 +8,8 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
-    Button,
 } from '@mui/material';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -30,8 +30,6 @@ import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
 import { PrimaryButton } from 'components/Buttons';
 import SelectField from 'components/Select';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
@@ -43,6 +41,7 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
+import { useAuth } from 'context/UseContext';
 import DatePicker from 'components/DatePicker';
 
 // *For Table Style
@@ -110,7 +109,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PurchaseInvoices() {
+function SalesSettlementList() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -120,6 +119,11 @@ function PurchaseInvoices() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
+    const [selectedUser, setSelectedUser] = useState(null)
+    const [users, setUsers] = useState([])
+    const { user } = useAuth()
     const {
         register,
         handleSubmit,
@@ -129,7 +133,7 @@ function PurchaseInvoices() {
         reset,
     } = useForm();
 
-    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
     const [loader, setLoader] = useState(false);
@@ -155,59 +159,26 @@ function PurchaseInvoices() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
-    const [fromDate, setFromDate] = useState(new Date());
-    const [toDate, setToDate] = useState(new Date());
-
-    const handleFromDate = (newDate) => {
-        try {
-            // eslint-disable-next-line eqeqeq
-            if (newDate == 'Invalid Date') {
-                setFromDate('invalid')
-                return
-            }
-            console.log(newDate, "newDate")
-            setFromDate(new Date(newDate))
-        } catch (error) {
-            ErrorToaster(error)
-        }
-    }
-
-    const handleToDate = (newDate) => {
-        try {
-            // eslint-disable-next-line eqeqeq
-            if (newDate == 'Invalid Date') {
-                setToDate('invalid')
-                return
-            }
-            setToDate(new Date(newDate))
-        } catch (error) {
-            ErrorToaster(error)
-        }
-    }
 
     // *For Get Customer Queue
+
+
+
     const getCustomerQueue = async (page, limit, filter) => {
         setLoader(true)
 
         try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
+
             let params = {
                 page: 1,
                 limit: 999999,
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
-
+                customer_id: selectedUser?.id,
 
             }
 
-            const { data } = await CustomerServices.getPurchaseInvoices(params)
-            console.log(data);
-
+            const { data } = await CustomerServices.getSalesSettlement(params)
             setCustomerQueue(data?.rows)
 
         } catch (error) {
@@ -216,7 +187,6 @@ function PurchaseInvoices() {
             setLoader(false)
         }
     }
-
 
 
 
@@ -245,10 +215,10 @@ function PurchaseInvoices() {
 
 
         try {
-            let params = { id: selectedData?.id }
+            let params = { reception_id: selectedData?.id }
 
 
-            const { message } = await CustomerServices.DeleteProductCategory(params)
+            const { message } = await CustomerServices.deleteReception(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -286,169 +256,105 @@ function PurchaseInvoices() {
             console.log(error);
         }
     };
+    const getUsers = async (page, limit, filter) => {
+        // setLoader(true)
+        try {
+            const Page = page ? page : currentPage
+            const Limit = limit ? limit : pageLimit
+            const Filter = filter ? { ...filters, ...filter } : null;
+            setCurrentPage(Page)
+            setPageLimit(Limit)
+            setFilters(Filter)
+            let params = {
+                page: 1,
+                limit: 999999,
+            }
+            params = { ...params, ...Filter }
+
+            const { data } = await CustomerServices.getCustomerQueue(params)
+            setUsers(data?.rows)
+
+
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            // setLoader(false)
+        }
+    }
+
     const columns = [
         {
-            header: "System #",
-            accessorKey: "invoice_number",
+            header: "SR No.",
+            accessorKey: "id",
 
 
         },
+
         {
-            header: "Invoice Number",
-            accessorKey: "ref_invoice_number",
-
-
-        },
-        {
-            header: "Created Date",
-
-
-            accessorFn: (row) => row?.created_at ? moment(row?.created_at).format("DD/MM/YYYY") : '',
+            header: "Customer",
+            accessorKey: "customer_name",
             cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.created_at ? moment(row?.original?.created_at).format("DD/MM/YYYY") : ''}
-                </Box>
-            ),
-            total: false,
-        },
-        {
-            header: "Purchase Date",
-
-
-            accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.purchase_date ? moment(row?.original?.purchase_date).format("DD/MM/YYYY") : ''}
-                </Box>
-            ),
-            total: false,
-        },
-        {
-            header: "Vendor Name",
-            accessorKey: "name",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {row?.original?.vendor?.name}
-
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.customer?.name}
                 </Box>
             ),
 
 
         },
         {
-            header: "Total Charges",
-            accessorKey: "total_charges",
+            header: "Date",
+            accessorKey: "customer_name",
             cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.total_charges || 0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Tax",
-            accessorKey: "tax",
-            cell: ({ row }) => {
-                const items = row?.original?.invoice_items || [];
-                const vatEnabled = row?.original?.vat_enabled;
-
-                const totalTax = items.reduce((sum, item) => {
-                    const tax = parseFloat(item?.tax || 0);
-                    return sum + tax;
-                }, 0);
-
-                return (
-                    <Box>{vatEnabled ? totalTax.toFixed(2) : (0).toFixed(2)}</Box>
-                );
-            }
-        },
-
-        {
-            header: "Paid",
-            accessorKey: "paid_amount",
-            cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
-            ),
-        },
-
-
-        {
-            header: "Balance",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
-
-                </Box>
-            ),
-
-
-        },
-        {
-            header: "Payment Status",
-            accessorKey: "total_amount",
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
-
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row.original.date).format("DD/MM/YYYY")}
                 </Box>
             ),
 
 
         },
 
+        {
+            header: "Invoice Count",
+            accessorKey: "invoice_count",
+
+
+        },
+        {
+            header: "Note Count",
+            accessorKey: "note_count",
+
+
+        },
+        {
+            header: "Payment Count",
+            accessorKey: "payment_count",
+
+
+        },
 
         {
             header: "Actions",
             cell: ({ row }) => (
 
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
-                    <Box>
-                        {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                    </Box>
-
-
-                    <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="View Receipts"
-                        onClick={() => {
-                            localStorage.setItem("currentUrl", '/create-customer');
-                            navigate('/purchase-payment-invoice-list', {
-                                state: { id: row?.original?.id }, // Replace 123 with your actual ID
-                            });
-                        }}
-                        loading={loading}
-                    />
-
-
-
+                <Box sx={{ display: 'flex', gap: 1 }}>
                     <Tooltip title="Invoice">
                         <IconButton
                             onClick={() => {
-                                window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
-                                    '_blank'
-                                );
+                                console.log('pdf kb banegi?')
                             }}
                             sx={{
                                 backgroundColor: "#f9f9f9",
                                 borderRadius: 2,
                                 border: "1px solid #eee",
-                                width: 35,
-                                height: 35,
+                                width: 40,
+                                height: 40,
                             }}
                         >
-                            <ReceiptIcon color="black" fontSize="10px" />
+                            <ReceiptIcon color="black" fontSize="small" />
                         </IconButton>
                     </Tooltip>
+
 
                 </Box>
             ),
@@ -459,6 +365,7 @@ function PurchaseInvoices() {
 
 
     useEffect(() => {
+        getUsers()
         getCustomerQueue()
     }, []);
 
@@ -530,36 +437,61 @@ function PurchaseInvoices() {
                     </Grid>
                 </Box>
             </SimpleDialog>
+
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Invoice List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Sales Settlement List</Typography>
 
-
+                {true && <PrimaryButton
+                    bgcolor={'#001f3f'}
+                    title="Settle"
+                    onClick={() => { navigate('/sales-invoice-settlement'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    loading={loading}
+                />}
 
             </Box>
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
+                <Grid item xs={12}>
                     <Grid container spacing={1}>
-                        <Grid item xs={5}>
+
+                        <Grid item xs={2.5}>
+                            <SelectField
+                                size={"small"}
+                                label={"Select Customer "}
+                                options={users}
+
+                                selected={selectedUser}
+                                onSelect={(value) => {
+                                    setSelectedUser(value);
+
+                                }}
+                                error={errors?.customer?.message}
+                                register={register("customer", {
+                                    required: "Please select customer account.",
+                                })}
+                            />
+                        </Grid>
+                        <Grid item xs={2.5}>
                             <DatePicker
                                 label={"From Date"}
                                 disableFuture={true}
                                 size="small"
                                 value={fromDate}
-                                onChange={(date) => handleFromDate(date)}
+                                onChange={(date) => setFromDate(new Date(date))}
                             />
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={2.5}>
                             <DatePicker
                                 label={"To Date"}
 
                                 disableFuture={true}
                                 size="small"
                                 value={toDate}
-                                onChange={(date) => handleToDate(date)}
+                                onChange={(date) => setToDate(new Date(date))}
                             />
                         </Grid>
 
-                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
+                        <Grid item xs={1} sx={{ marginTop: "30px" }}>
                             <PrimaryButton
                                 bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}
@@ -572,20 +504,9 @@ function PurchaseInvoices() {
                     </Grid>
                 </Grid>
                 <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                    <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="Create"
 
-                        onClick={() => {
-                            navigate("/create-purchase-invoice");
-                            localStorage.setItem("currentUrl", "/create-customer");
-                        }}
-                        loading={loading}
-                    />
                 </Grid>
             </Grid>
-
-
             {/* Filters */}
             <Box >
 
@@ -597,4 +518,4 @@ function PurchaseInvoices() {
     );
 }
 
-export default PurchaseInvoices;
+export default SalesSettlementList;

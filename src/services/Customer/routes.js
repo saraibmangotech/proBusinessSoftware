@@ -176,7 +176,12 @@ const routes = {
   CreateLocation:'/products/inventory/locations/add',
   UpdateLocation:'/products/inventory/locations/update',
   getAgingReportReceivable:'/reports/aging/receivables',
-  getAgingReportPayable:'/reports/aging/payables'
+  getAgingReportPayable:'/reports/aging/payables',
+  getEmployeeLeaves:'/hrms/employees/leaves',
+  PurchaseInvoiceSettlement:'/purchases/invoice/adjust',
+  SalesInvoiceSettlement:'/sales/invoice/adjust',
+  getSalesSettlement:'sales/invoice/adjustments',
+  getPurchaseSettlement:'purchases/invoice/adjustments'
 
 
 };

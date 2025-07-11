@@ -10,6 +10,10 @@ const SystemServices = {
     const data = await post(routes.CreateShift, obj);
     return data;
   },
+     updateEmployeeLeaves: async (obj) => {
+    const data = await patch(routes.updateEmployeeLeaves, obj);
+    return data;
+  },
     AssignEmployee: async (obj) => {
     const data = await post(routes.AssignEmployee, obj);
     return data;
