@@ -67,7 +67,8 @@ const routes = {
   CreateShift:'/hrms/shifts/add',
   deleteShift:'/hrms/shifts/delete',
   AssignEmployee:'/hrms/shifts/assign',
-  getAllocations:'/hrms/shifts/allocations'
+  getAllocations:'/hrms/shifts/allocations',
+  updateEmployeeLeaves:'/hrms/employees/leaves/update'
   
 };
 

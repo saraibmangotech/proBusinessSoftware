@@ -141,7 +141,7 @@ function GeneralJournalLedger() {
 
 	// *For Filters
 	const [filters, setFilters] = useState({});
-	const [fromDate, setFromDate] = useState();
+	const [fromDate, setFromDate] = useState(new Date());
 	const [toDate, setToDate] = useState();
 
 	// *For Handle Date
@@ -226,7 +226,8 @@ function GeneralJournalLedger() {
 			setFilters(Filter)
 			let params = {
 				page: Page,
-				limit: Limit
+				limit: Limit,
+				from_date:fromDate ?  moment(fromDate).format('DD/MM/YYYY') : ''
 			}
 			params = { ...params, ...Filter }
 			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
@@ -251,7 +252,9 @@ function GeneralJournalLedger() {
 			setFilters(Filter)
 			let params = {
 				page: 1,
-				limit: 99999
+				limit: 99999,
+				search:getValues('search'),
+				from_date:fromDate ?  moment(fromDate).format('DD/MM/YYYY') : ''
 			}
 			params = { ...params, ...Filter }
 			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
@@ -291,7 +294,7 @@ function GeneralJournalLedger() {
 			accounts: '',
 			categories: '',
 			sub_categories: '',
-			form_date: '',
+			from_date: '',
 			to_date: '',
 		}
 		getGeneralJournalLedgers(1, '', filterData)
@@ -750,7 +753,7 @@ function GeneralJournalLedger() {
 
 
 	useEffect(() => {
-		getGeneralJournalLedgers2()
+		// getGeneralJournalLedgers2()
 
 		getAccountsDropDown()
 		getMajorCategories()

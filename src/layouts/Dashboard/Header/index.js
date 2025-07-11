@@ -322,7 +322,17 @@ function Header() {
             navigation: true,
             order_by: 33,
           },
-
+          {
+            id: 33,
+            name: " Sale Settlement List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-settlement-list",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
 
 
         ],
@@ -376,6 +386,17 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
+            {
+            id: 33,
+            name: " Sale Settlement List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-settlement-list",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
 
 
 
@@ -547,7 +568,17 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-
+{
+            id: 33,
+            name: " Sale Settlement List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-settlement-list",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
 
 
 
@@ -784,6 +815,17 @@ function Header() {
               navigation: true,
               order_by: 1,
             },
+            {
+            id: 33,
+            name: " Sale Settlement List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-settlement-list",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
           ],
         },
         {
@@ -930,6 +972,17 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
+            {
+            id: 33,
+            name: " Sale Settlement List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-settlement-list",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
 
 
 
@@ -1067,7 +1120,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
- {
+            {
               id: 1502,
               name: "Inventory Location List",
               icon: "customer",
@@ -1086,6 +1139,17 @@ function Header() {
               parent_id: 15,
               api: "/api/suppliers",
               route: "/purchase-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Purchase Invoice Settlement",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-settlement-list",
               identifier: null,
               navigation: true,
               order_by: 2,
@@ -1124,7 +1188,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-            
+
             {
               id: 1502,
               name: "Prepaid Expenses",
@@ -1292,7 +1356,7 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-             {
+            {
               id: 33,
               name: " Aging Report Payable",
               icon: "customer",
@@ -1303,7 +1367,7 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-             {
+            {
               id: 33,
               name: " Aging Report Receivable",
               icon: "customer",
@@ -1549,7 +1613,7 @@ function Header() {
               navigation: true,
               order_by: 36,
             },
-              {
+            {
               id: 360,
               name: "Cash Flow Statement",
               icon: "customer",
@@ -1593,7 +1657,7 @@ function Header() {
               navigation: true,
               order_by: 36,
             },
-                {
+            {
               id: 362,
               name: " Consolidated Supplier Payable",
               icon: "customer",
@@ -1604,7 +1668,7 @@ function Header() {
               navigation: true,
               order_by: 36,
             },
-               {
+            {
               id: 362,
               name: " Consolidated Customer Receivable",
               icon: "customer",
@@ -2241,6 +2305,17 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
+            {
+            id: 33,
+            name: " Sale Settlement List",
+            icon: "customer",
+            parent_id: 12,
+            api: null,
+            route: "/sales-settlement-list",
+            identifier: null,
+            navigation: true,
+            order_by: 33,
+          },
 
 
 
@@ -2403,6 +2478,17 @@ function Header() {
             },
             {
               id: 1502,
+              name: "Purchase Invoice Settlement",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
               name: " Add Payment",
               icon: "customer",
               parent_id: 15,
@@ -2435,7 +2521,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-          
+
             {
               id: 1502,
               name: "Prepaid Expenses",
@@ -2603,7 +2689,7 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-               {
+            {
               id: 33,
               name: " Aging Report Payable",
               icon: "customer",
@@ -2614,7 +2700,7 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-             {
+            {
               id: 33,
               name: " Aging Report Receivable",
               icon: "customer",
@@ -2793,7 +2879,7 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
-{
+            {
               id: 1502,
               name: "  Payment Supplier Receipts",
               icon: "customer",
@@ -2860,7 +2946,7 @@ function Header() {
               navigation: true,
               order_by: 36,
             },
-             {
+            {
               id: 360,
               name: "Cash Flow Statement",
               icon: "customer",
@@ -2904,7 +2990,7 @@ function Header() {
               navigation: true,
               order_by: 36,
             },
-                {
+            {
               id: 362,
               name: " Consolidated Supplier Payable",
               icon: "customer",
@@ -2915,7 +3001,7 @@ function Header() {
               navigation: true,
               order_by: 36,
             },
-               {
+            {
               id: 362,
               name: " Consolidated Customer Receivable",
               icon: "customer",
