@@ -975,7 +975,7 @@ function PurchaseInvoiceSettlement() {
                                                         {parseFloat(item?.total_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {(parseFloat(item?.total_amount || 0)-parseFloat(item?.adjustment_balance || 0)).toFixed(2) ?? '-'}
+                                                        {(parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0)).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
                                                         {parseFloat(item?.adjustment_balance || 0) ?? '-'}
@@ -985,28 +985,29 @@ function PurchaseInvoiceSettlement() {
                                                             sx={{
                                                                 path: {
                                                                     fill:
-                                                                        parseFloat(item?.adjustment_balance || 0) !== parseFloat(item?.total_amount || 0) &&
-                                                                        parseFloat(item?.adjustment_balance || 0) !== 0 &&
+                                                                        parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) > 0 &&
+                                                                        parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) < parseFloat(item?.total_amount || 0) &&
                                                                         Colors.bluishCyan,
                                                                 },
                                                             }}
                                                         >
-                                                            {parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0) ? (
-                                                                <CheckIcon />
-                                                            ) : parseFloat(item?.adjustment_balance || 0) === 0 ? (
+                                                            {parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0) ? (
                                                                 <PendingIcon />
+                                                            ) : parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) === 0 ? (
+                                                                <CheckIcon />
                                                             ) : (
                                                                 <CheckIcon />
                                                             )}
 
                                                             <Typography variant="body2">
-                                                                {parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0)
+                                                                {parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) === 0
                                                                     ? 'Full'
-                                                                    : parseFloat(item?.adjustment_balance || 0) === 0
+                                                                    : parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0)
                                                                         ? 'UnSettled'
                                                                         : 'Partial'}
                                                             </Typography>
                                                         </Box>
+
 
 
                                                     </Cell>
