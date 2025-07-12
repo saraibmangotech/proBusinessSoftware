@@ -553,6 +553,21 @@ const ConsolidatedSupplierPayables = lazy(() =>
 const ConsolidatedCustomerReceivable = lazy(() =>
   import("pages/Dashboard/Accounts/ConsolidatedCustomerReceivable")
 );
+const EOSReport = lazy(() =>
+  import("pages/Dashboard/Reports/EOSReport")
+);
+const DocumentExpiryReport = lazy(() =>
+  import("pages/Dashboard/Reports/DocExpiryReport")
+);
+const LeaveReport = lazy(() =>
+  import("pages/Dashboard/Reports/LeaveReport")
+);
+const EmployeeStatusReport = lazy(() =>
+  import("pages/Dashboard/Reports/EmployeeStatusReport")
+);
+const NotificationList = lazy(() =>
+  import("pages/Dashboard/Settings/Notifications")
+);
 const AccountConsolidatedProStatement = lazy(() =>
   import("pages/Dashboard/Accounts/AccountConsolidatedStatement")
 );
@@ -732,14 +747,31 @@ const AdminRoutes = [
     path: "/supplier-consolidated-statement",
     component: <SupplierConsolidatedProStatement />,
   },
-   {
+  {
     path: "/consolidated-supplier-payable",
     component: <ConsolidatedSupplierPayables />,
   },
-   {
+  {
     path: "/consolidated-customer-receivable",
     component: <ConsolidatedCustomerReceivable />,
   },
+  {
+    path: "/eos-report",
+    component: <EOSReport />,
+  },
+  {
+    path: "/doc-expiry-report",
+    component: <DocumentExpiryReport />,
+  },
+  {
+    path: "/leave-report",
+    component: <LeaveReport />,
+  },
+    {
+    path: "/employee-status-report",
+    component: <EmployeeStatusReport />,
+  },
+
   {
     path: "/update-employee/:id",
     component: <UpdateEmployee />,
@@ -760,7 +792,7 @@ const AdminRoutes = [
     path: "/payment-invoice-list",
     component: <PaymentInvoices />,
   },
-   {
+  {
     path: "/supplier-payment-receipt-list",
     component: <SupplierPaymentReceipts />,
   },
@@ -801,10 +833,14 @@ const AdminRoutes = [
     component: <CreatePaymentInvoice />,
   },
   {
+    path: "/notifications",
+    component: <NotificationList />,
+  },
+  {
     path: "/sales-invoice-settlement",
     component: <SalesInvoiceSettlement />,
   },
-   {
+  {
     path: "/purchase-invoice-settlement",
     component: <PurchaseInvoiceSettlement />,
   },
@@ -1091,7 +1127,7 @@ const AdminRoutes = [
     path: "/sales-settlement-list",
     component: <SalesSettlementList />,
   },
-    {
+  {
     path: "/purchase-settlement-list",
     component: <PurchaseSettlementList />,
   },
