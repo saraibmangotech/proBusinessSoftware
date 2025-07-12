@@ -273,7 +273,7 @@ function SalesInvoiceSettlement() {
             let params = {
                 page: 1,
                 limit: 999999,
-                vendor_id: selectedVendor?.id,
+                customer_id: selectedCustomer?.id,
                 invoice_number: getValues2('invoiceNumber'),
                 is_paid: false,
                 type: 'credit_note',
@@ -745,7 +745,7 @@ function SalesInvoiceSettlement() {
         if (selectedInvoice2.length > 0) {
 
             console.log(selectedInvoice2, 'selectedInvoice2');
-            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + (invoice.total_amount || 0), 0);
+            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + parseFloat(invoice.total_amount || 0), 0);
 
             console.log(totalAmountUnpaid);
 
@@ -1115,7 +1115,7 @@ function SalesInvoiceSettlement() {
 
                                                     <Cell>
                                                         <Tooltip
-                                                            title={item?.vendor?.name ?? '-'}
+                                                            title={item?.customer?.name ?? '-'}
                                                             arrow
                                                             placement="top"
                                                             slotProps={{
@@ -1131,7 +1131,7 @@ function SalesInvoiceSettlement() {
                                                                 },
                                                             }}
                                                         >
-                                                            {item?.vendor?.name?.length > 15 ? item?.vendor?.name?.slice(0, 10) + "..." : item?.vendor?.name}
+                                                            {item?.customer?.name?.length > 15 ? item?.customer?.name?.slice(0, 10) + "..." : item?.customer?.name}
                                                         </Tooltip>
                                                     </Cell>
 
@@ -1151,24 +1151,24 @@ function SalesInvoiceSettlement() {
                                                             sx={{
                                                                 path: {
                                                                     fill:
-                                                                        (item?.settled_amount ?? 0) !== (item?.total_amount ?? 0) &&
-                                                                        (item?.settled_amount ?? 0) !== 0 &&
+                                                                       parseFloat(item?.settled_amount ?? 0) !== parseFloat(item?.total_amount ?? 0) &&
+                                                                       parseFloat(item?.settled_amount ?? 0) !== 0 &&
                                                                         Colors.bluishCyan,
                                                                 },
                                                             }}
                                                         >
-                                                            {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0) ? (
+                                                            {parseFloat(item?.settled_amount ?? 0) === parseFloat(item?.total_amount ?? 0) ? (
                                                                 <CheckIcon />
-                                                            ) : (item?.settled_amount ?? 0) === 0 ? (
+                                                            ) : parseFloat(item?.settled_amount ?? 0) === 0 ? (
                                                                 <PendingIcon />
                                                             ) : (
                                                                 <CheckIcon />
                                                             )}
 
                                                             <Typography variant="body2">
-                                                                {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0)
+                                                                {parseFloat(item?.settled_amount ?? 0) === parseFloat(item?.total_amount ?? 0)
                                                                     ? 'Paid'
-                                                                    : (item?.settled_amount ?? 0) === 0
+                                                                    : parseFloat(item?.settled_amount ?? 0) === 0
                                                                         ? 'UnPaid'
                                                                         : 'Partial Paid'}
                                                             </Typography>

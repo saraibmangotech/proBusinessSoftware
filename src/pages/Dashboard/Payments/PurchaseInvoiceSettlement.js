@@ -257,7 +257,7 @@ function PurchaseInvoiceSettlement() {
             setInvoiceList2(data?.rows)
 
             setTotalCount(data?.count)
-            setSelectedInvoice([])
+            setSelectedInvoice2([])
 
         } catch (error) {
             ErrorToaster(error)
@@ -742,7 +742,7 @@ function PurchaseInvoiceSettlement() {
         if (selectedInvoice2.length > 0) {
 
             console.log(selectedInvoice2, 'selectedInvoice2');
-            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + (invoice.total_amount || 0), 0);
+            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + parseFloat(invoice.total_amount || 0), 0);
 
             console.log(totalAmountUnpaid);
 
@@ -975,38 +975,39 @@ function PurchaseInvoiceSettlement() {
                                                         {parseFloat(item?.total_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {parseFloat(item?.settled_amount || 0).toFixed(2) ?? '-'}
+                                                        {(parseFloat(item?.total_amount || 0)-parseFloat(item?.adjustment_balance || 0)).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {parseFloat(item?.total_amount || 0) - parseFloat(item?.settled_amount || 0) ?? '-'}
+                                                        {parseFloat(item?.adjustment_balance || 0) ?? '-'}
                                                     </Cell>
                                                     <Cell>
                                                         <Box
                                                             sx={{
                                                                 path: {
                                                                     fill:
-                                                                        (item?.settled_amount ?? 0) !== (item?.total_amount ?? 0) &&
-                                                                        (item?.settled_amount ?? 0) !== 0 &&
+                                                                        parseFloat(item?.adjustment_balance || 0) !== parseFloat(item?.total_amount || 0) &&
+                                                                        parseFloat(item?.adjustment_balance || 0) !== 0 &&
                                                                         Colors.bluishCyan,
                                                                 },
                                                             }}
                                                         >
-                                                            {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0) ? (
+                                                            {parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0) ? (
                                                                 <CheckIcon />
-                                                            ) : (item?.settled_amount ?? 0) === 0 ? (
+                                                            ) : parseFloat(item?.adjustment_balance || 0) === 0 ? (
                                                                 <PendingIcon />
                                                             ) : (
                                                                 <CheckIcon />
                                                             )}
 
                                                             <Typography variant="body2">
-                                                                {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0)
+                                                                {parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0)
                                                                     ? 'Paid'
-                                                                    : (item?.settled_amount ?? 0) === 0
+                                                                    : parseFloat(item?.adjustment_balance || 0) === 0
                                                                         ? 'UnPaid'
                                                                         : 'Partial Paid'}
                                                             </Typography>
                                                         </Box>
+
 
                                                     </Cell>
                                                     <Cell>
