@@ -1001,10 +1001,10 @@ function PurchaseInvoiceSettlement() {
 
                                                             <Typography variant="body2">
                                                                 {parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0)
-                                                                    ? 'Paid'
+                                                                    ? 'Full'
                                                                     : parseFloat(item?.adjustment_balance || 0) === 0
-                                                                        ? 'UnPaid'
-                                                                        : 'Partial Paid'}
+                                                                        ? 'UnSettled'
+                                                                        : 'Partial'}
                                                             </Typography>
                                                         </Box>
 
@@ -1164,10 +1164,10 @@ function PurchaseInvoiceSettlement() {
 
                                                             <Typography variant="body2">
                                                                 {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0)
-                                                                    ? 'Paid'
+                                                                    ? 'Full'
                                                                     : (item?.settled_amount ?? 0) === 0
-                                                                        ? 'UnPaid'
-                                                                        : 'Partial Paid'}
+                                                                        ? 'UnSettled'
+                                                                        : 'Partial'}
                                                             </Typography>
                                                         </Box>
 
@@ -1355,10 +1355,10 @@ function PurchaseInvoiceSettlement() {
 
                                                             <Typography variant="body2">
                                                                 {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0)
-                                                                    ? 'Paid'
+                                                                    ? 'Full'
                                                                     : (item?.settled_amount ?? 0) === 0
-                                                                        ? 'UnPaid'
-                                                                        : 'Partial Paid'}
+                                                                        ? 'UnSettled'
+                                                                        : 'Partial '}
                                                             </Typography>
                                                         </Box>
 
