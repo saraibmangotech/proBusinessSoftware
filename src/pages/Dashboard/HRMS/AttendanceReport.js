@@ -408,6 +408,9 @@ export default function AttendanceTable() {
     useEffect(() => {
         getAttendance(moment().format("MMMM"), moment().format("YYYY"))
     }, [getAttendance])
+     useEffect(() => {
+        getAttendance(moment().format("MMMM"), moment().format("YYYY"))
+    }, [startDate,endDate])
 
     return (
         <Box
