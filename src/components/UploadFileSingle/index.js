@@ -34,15 +34,15 @@ const Input = styled('input')({
     cursor: 'pointer',
 });
 
-function UploadFileSingle({ inputRef, error, accept, register, multiple, style, custom, Memo, file, disabled, onFileChange,className }) {
+function UploadFileSingle({ inputRef, error, accept, register, multiple, style, custom, Memo, file, disabled, onFileChange, className }) {
     const classes = useStyle();
     const [uploadedFile, setUploadedFile] = useState(file);
 
-    let name = uploadedFile?.split('_').pop();
-    let extension = uploadedFile?.split('.').pop();
+    let name = uploadedFile?.name?.split('_').pop();
+    let extension = uploadedFile?.name?.split('.').pop();
 
     const handleDelete = () => {
-        console.log(inputRef,'inputRef');
+        console.log(inputRef, 'inputRef');
         const fileInputs = document.getElementsByClassName('validationClass');
 
         // Loop through all inputs and clear their values
@@ -63,8 +63,8 @@ function UploadFileSingle({ inputRef, error, accept, register, multiple, style, 
     };
 
     useEffect(() => {
-        console.log(file,'asdasdasasdasdasd');
-        
+        console.log(file, 'asdasdasasdasdasd');
+
         setUploadedFile(file);
     }, [file]);
 
@@ -132,8 +132,9 @@ function UploadFileSingle({ inputRef, error, accept, register, multiple, style, 
                                         extension === 'xls' ? Images.uploadXls :
                                             Images.docIcon}
                                 width={'50px'} />
-                            <p onClick={()=>{
-                 window.open(process.env.REACT_APP_IMAGE_BASE_URL + file, '_blank')}} style={{ color: 'blue', width: "80px",cursor:"pointer" }}>{name}</p>
+                            <p onClick={() => {
+                                window.open(process.env.REACT_APP_IMAGE_BASE_URL + file, '_blank')
+                            }} style={{ color: 'blue', width: "80px", cursor: "pointer" }}>{name}</p>
                         </Box>
                     </Box>
                 </Box>

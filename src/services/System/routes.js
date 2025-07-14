@@ -62,7 +62,7 @@ const routes = {
   uploadCVSDraft:"visas/processing/upload",
   getStats:'system/stats',
   getSettings:'/system/settings',
-  getAttendance:'users/attendance/logs',
+  getAttendance:'/users/attendance/logs/v2',
   getNationalities:'/system/nationalities',
   CreateShift:'/hrms/shifts/add',
   deleteShift:'/hrms/shifts/delete',

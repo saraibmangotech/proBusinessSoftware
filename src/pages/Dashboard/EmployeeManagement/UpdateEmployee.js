@@ -27,6 +27,10 @@ import { TextField } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import moment from "moment";
+import instance from "config/axios";
+import routes from "services/System/routes";
+import { getFileSize } from "utils";
+import UploadFile from "components/UploadFile";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -63,6 +67,16 @@ function UpdateEmployee() {
                 // other fields
             },
         });
+
+    const allowFilesType = [
+        'image/png',
+        'image/jpg',
+        'image/jpeg',
+        'application/pdf',
+        'application/vnd.ms-excel',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -94,6 +108,10 @@ function UpdateEmployee() {
     const [nationalities, setNationalities] = useState([])
     const [selectedNationality, setSelectedNationality] = useState(null)
     const [approvals, setApprovals] = useState([])
+    const [isUploading, setIsUploading] = useState(false);
+    const [loader, setLoader] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [uploadedSize, setUploadedSize] = useState(0);
     const theme = useTheme();
     const [selectedDays, setSelectedDays] = useState([]);
     function getStyles(name, personName, theme) {
@@ -103,7 +121,43 @@ function UpdateEmployee() {
                 : theme.typography.fontWeightRegular,
         };
     }
+    const [documents, setDocuments] = useState([
+        {
+            name: "Emirates  IDs",
+            key: "emirates_id",
+            path: "",
+            expiry_date: null,
+            is_required: true
 
+
+        },
+        {
+            name: "Passport ",
+            key: "passport",
+            path: "",
+            expiry_date: null,
+            is_required: true
+        },
+
+        {
+            name: "Visa Copy",
+            key: "visa_copy",
+            path: "",
+            expiry_date: null,
+            is_required: false
+        },
+        {
+            name: "Labor Card",
+            key: "labor",
+            path: "",
+            expiry_date: null,
+            is_required: false
+        },
+
+
+
+    ]
+    )
     const [approvers, setApprovers] = useState([]);
 
     const handleAddApprover = () => {
@@ -121,19 +175,19 @@ function UpdateEmployee() {
         setApprovers(updated);
     };
 
-   const handleApproverChange = (index, value) => {
-    // Check if value already exists at a different index
-    const isDuplicate = approvers.some((item, i) => i !== index && item.value === value);
-  
-    if (isDuplicate) {
-     showErrorToast('This approver is already selected.');
-      return; // Don't update
-    }
-  
-    const updated = [...approvers];
-    updated[index].value = value;
-    setApprovers(updated);
-  };
+    const handleApproverChange = (index, value) => {
+        // Check if value already exists at a different index
+        const isDuplicate = approvers.some((item, i) => i !== index && item.value === value);
+
+        if (isDuplicate) {
+            showErrorToast('This approver is already selected.');
+            return; // Don't update
+        }
+
+        const updated = [...approvers];
+        updated[index].value = value;
+        setApprovers(updated);
+    };
     // Watch both password and confirm password fields for changes
     const password = watch('password', '');
     const confirmPassword = watch('confirmpassword', '');
@@ -218,10 +272,12 @@ function UpdateEmployee() {
                 email: getValues('email'),
                 phone: getValues('phone'),
                 password: getValues('password'),
+                documents: documents,
                 permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
                 role_id: selectedRole?.id,
                 employee_detail: {
                     date_of_joining: doj,
+                    id: newDetails?.id,
                     date_of_birth: dob,
                     probation_period_months: formData?.probation,
                     probation_end_date: probEndDate,
@@ -298,22 +354,7 @@ function UpdateEmployee() {
     }
 
 
-    const addItem = () => {
-        if (!selectedEmployee || !selectedEmployee.user_id) return;
 
-        const isAlreadyAdded = Object.values(approvals).includes(selectedEmployee.user_id);
-
-        if (isAlreadyAdded) {
-            showErrorToast("Approver is already added");
-            return;
-        }
-
-        const currentIndex = Object.keys(approvals).length + 1;
-        const newKey = `leave_approver_${currentIndex}`;
-        const newApprovals = { ...approvals, [newKey]: selectedEmployee.user_id };
-
-        setApprovals(newApprovals);
-    };
     // *For Get Customer Queue
     const getCategoryList = async (page, limit, filter) => {
 
@@ -336,6 +377,131 @@ function UpdateEmployee() {
             showErrorToast(error)
         }
     }
+
+    const handleUpload = async (file, docs) => {
+        setProgress(0);
+        try {
+            const formData = new FormData();
+            formData.append("document", file);
+            console.log(file);
+            const { data } = await instance.post(routes.uploadDocuments, formData, {
+                onUploadProgress: (progressEvent) => {
+                    const uploadedBytes = progressEvent.loaded;
+                    const percentCompleted = Math.round(
+                        (uploadedBytes * 100) / progressEvent.total
+                    );
+
+                    setProgress(percentCompleted);
+                    console.log(getFileSize(uploadedBytes));
+                    setUploadedSize(getFileSize(uploadedBytes));
+                },
+            });
+            if (data) {
+                docs[0].isUpload = true;
+                docs[0].file = data?.data?.nations;
+
+                console.log(data, 'asddasasd');
+                return data?.data?.path
+
+            }
+        } catch (error) {
+            ErrorToaster(error);
+        }
+    };
+    const handleDocArrayUpdate = async (field, value, key) => {
+        console.log(documents);
+
+        if (field === 'path') {
+            const updatedDocuments = documents.map(doc => {
+                if (doc.key === key) {
+                    return { ...doc, path: value }; // Update the path
+                }
+                return doc; // Return the document as is if the key doesn't match
+            });
+            console.log(updatedDocuments);
+            // Assuming you want to update the documents array
+            // You can replace the following line with your state updating logic
+            setDocuments(updatedDocuments)
+        } else {
+            const updatedDocuments = documents.map(doc => {
+                if (doc.key === key) {
+                    return { ...doc, expiry_date: moment(value).format('YYYY-MM-DD') }; // Update the path
+                }
+                return doc; // Return the document as is if the key doesn't match
+            });
+            console.log(updatedDocuments);
+            setDocuments(updatedDocuments)
+            // Handle other fields if needed
+        }
+    }
+    const updateResult = (key, newResult) => {
+
+        console.log(newResult)
+        const updatedDocuments = documents.map(doc => {
+            if (doc.key === key) {
+                return { ...doc, path: newResult }; // Update the path
+            }
+            return doc; // Return the document as is if the key doesn't match
+        });
+        console.log(updatedDocuments, 'updatedDocuments');
+        setDocuments(updatedDocuments)
+    };
+
+    const handleUploadDocument = async (e, key) => {
+        setLoader(key)
+        try {
+            e.preventDefault();
+            let path = "";
+            console.log(e.target.files.length, "length");
+
+            const inputElement = e.target; // Store a reference to the file input element
+
+            for (let i = 0; i < e.target.files.length; i++) {
+                const file = e.target.files[i];
+                let arr = [
+                    {
+                        name: file?.name,
+                        file: "",
+                        type: file?.type.split("/")[1],
+                        size: getFileSize(file.size),
+                        isUpload: false,
+                    },
+                ];
+
+                let maxSize = 10 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    showErrorToast('File Size Must Be Less than 10 MB');
+                } else {
+                    // Add the current date before the file name to ensure uniqueness
+                    const currentDate = new Date().toISOString().split('T')[0]; // e.g., "2024-08-23"
+                    const uniqueFileName = `${currentDate}_${file.name}`;
+
+                    // Create a new file with the date-prefixed name
+                    const newFile = new File([file], uniqueFileName, { type: file.type });
+
+                    // Upload the file with the new name
+                    const uploadedPath = await handleUpload(newFile, arr);
+
+                    if (path) {
+                        path += "," + uploadedPath;
+                    } else {
+                        path = uploadedPath;
+                    }
+                    setLoader(false)
+
+                }
+            }
+
+            console.log(path, "path");
+
+            // Clear the file input after processing
+            inputElement.value = "";
+
+            return path;
+        } catch (error) {
+            ErrorToaster(error);
+        }
+    };
     const parseTime = (timeString) => {
         return timeString && moment(timeString, 'HH:mm').isValid()
             ? moment(timeString, 'HH:mm')
@@ -360,7 +526,10 @@ function UpdateEmployee() {
             setValue('phone', employee?.user?.phone || '');
             setValue('password', ''); // Usually not returned
             console.log(details?.leave_approver_2, 'details?.leave_approver_2');
+            if (employee?.documents?.length > 0) {
+                setDocuments(employee?.documents);
 
+            }
             if (details?.leave_approver_2) {
 
                 setApprovers([
@@ -818,6 +987,46 @@ function UpdateEmployee() {
 
                         </Grid>
                     )}
+                </Grid>
+                <Grid item xs={12}  >
+                    <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: Colors.textColorDarkBlue }}>Documents : </Typography>
+                </Grid>
+                <Grid container spacing={2}>
+                    {documents?.length > 0 && documents?.map((item, index) => (
+
+
+                        <Grid item xs={5} >
+                            <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>{item?.is_required ? item?.name : item?.name + " " + '(If Any)'} : {item?.is_required ? '*' : ''} </Typography>
+                            <UploadFile
+                                Memo={true}
+                                accept={allowFilesType}
+                                file={documents}
+                                multiple={true}
+                                updateResult={updateResult}
+                                fileId={item?.key}
+                                loader={loader}
+                                error={errors[item?.key]?.message}
+                                disabled={isUploading} // Disable while uploading
+                                register={register(`${item?.key}`, {
+                                    required: item?.is_required ? documents.find((item2 => item2?.key == item?.key))?.path != '' ? false :
+                                        "Please upload document." : false,
+                                    onChange: async (e) => {
+                                        setIsUploading(true); // Set uploading to true when the upload starts
+                                        const path = await handleUploadDocument(e, item?.key);
+                                        if (path) {
+                                            handleDocArrayUpdate('path', path, item?.key);
+                                            console.log(path);
+                                        }
+                                        setIsUploading(false); // Reset uploading status when done
+                                    }
+                                })}
+                            />
+
+
+                        </Grid>
+
+
+                    ))}
                 </Grid>
                 <Box>
                     <Box display="flex" alignItems="center" mt={2}>
@@ -1604,7 +1813,7 @@ function UpdateEmployee() {
                                     // ✅ Set value only, not object (you’ll reconstruct object in `SelectField`)
                                     onSelect={(selectedObj) => handleApproverChange(index, selectedObj?.user_id)}
                                     register={register(approver.key, {
-                                        required:approver.value ? false : 'Approver is required' ,
+                                        required: approver.value ? false : 'Approver is required',
                                     })}
                                     error={errors?.[approver.key]?.message}
                                 />
