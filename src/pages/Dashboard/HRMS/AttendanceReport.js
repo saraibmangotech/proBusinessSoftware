@@ -109,7 +109,7 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                     }} sx={{ cursor: "pointer" }}>
                         <Tooltip title={`Duration: ${duration}`} arrow>
                             <Chip
-                                label={isSunday ? "Holiday" : status === "Present" ? duration : status === "A" ? "A" : "L"}
+                                label={status === "Present" ? duration : status}
                                 size="small"
                                 sx={{
                                     fontWeight: 500,
@@ -117,14 +117,12 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                                     width: "100px",
                                     py: 4,
                                     px: 2,
-                                    backgroundColor: isSunday
-                                        ? "#f0f0f0"
-                                        : status === "Present"
+                                    backgroundColor:  status === "Present"
                                             ? "#daffd3"
                                             : status === "A"
                                                 ? "#fee6e4"
                                                 : "#e6f2ff",
-                                    border: `1px solid ${isSunday ? "grey" : status === "Present" ? "green" : status === "A" ? "red" : "#e6f2ff"
+                                    border: `1px solid ${status === "Present" ? "green" : status === "A" ? "red" : "#e6f2ff"
                                         }`,
                                 }}
                             />
@@ -157,7 +155,16 @@ export default function AttendanceTable() {
         control,
         reset,
     } = useForm()
+    const [startDate, setStartDate] = useState(moment().startOf('month').format('YYYY-MM-DD'));
+    const [endDate, setEndDate] = useState(moment().endOf('month').format('YYYY-MM-DD'));
 
+    const handleStartDateChange = (e) => {
+        setStartDate(e.target.value);
+    };
+
+    const handleEndDateChange = (e) => {
+        setEndDate(e.target.value);
+    };
     // Memoize transformed data to prevent recalculation on every render
     const transformedData = useMemo(() => {
         if (!attendanceData?.attendance) return []
@@ -236,7 +243,10 @@ export default function AttendanceTable() {
     const getAttendance = useCallback(async (month, year) => {
         try {
             setLoading(true)
-            const params = { month, year }
+            const params = {
+                start_date: startDate,
+                end_date: endDate
+            }
             const { data } = await SystemServices.getAttendance(params)
             setAttendanceData(data)
         } catch (error) {
@@ -669,16 +679,37 @@ export default function AttendanceTable() {
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth
-                                label="Select Month"
-                                type="month"
+                                label="Start Date"
+                                type="date"
                                 variant="outlined"
                                 size="small"
-                                value={selectedDate.format("YYYY-MM")}
-                                onChange={handleDateChange}
+                                value={startDate}
+                                onChange={handleStartDateChange}
+                                InputLabelProps={{ shrink: true }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <SearchIcon fontSize="small" color={theme.palette.text.secondary} />
+                                            <SearchIcon fontSize="small" />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="End Date"
+                                type="date"
+                                variant="outlined"
+                                size="small"
+                                value={endDate}
+                                onChange={handleEndDateChange}
+                                InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon fontSize="small" />
                                         </InputAdornment>
                                     ),
                                 }}
