@@ -179,7 +179,7 @@ export default function AttendanceTable() {
             attendance:
                 employee.attendance?.map((day) => ({
                     date: day.date,
-                    status: day.logs ? "Present" : day.status === "absent" ? "A" : "Leave",
+                    status: day.logs ? "Present" : day.status ,
                     logs: day?.logs,
                     duration: day.totalDuration,
                 })) || [],
