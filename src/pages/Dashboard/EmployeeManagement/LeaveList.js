@@ -309,7 +309,7 @@ function LeaveList() {
 
 
         },
-         {
+        {
             id: "created_at",
             header: "Requested Date",
             // Remove accessorKey and fix accessorFn to use row directly
@@ -349,13 +349,70 @@ function LeaveList() {
 
         },
         {
+            header: "Type",
+            accessorKey: "type",
+
+
+        },
+        {
+            header: "Document",
+            accessorKey: "document",
+            cell: ({ row }) => {
+                const { document: file, name } = row.original;
+                const extension = file?.split('.').pop().toLowerCase();
+
+                const getIcon = () => {
+                    if (['png', 'jpg', 'jpeg'].includes(extension)) return Images.uploadImage;
+                    if (extension === 'pdf') return Images.uploadPDF;
+                    if (['xls', 'xlsx'].includes(extension)) return Images.uploadXls;
+                    return Images.docIcon;
+                };
+
+                return file ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                            component="img"
+                            src={getIcon()}
+                            alt="file icon"
+                            width="50px"
+                            sx={{ cursor: 'pointer' }}
+                            onClick={() =>
+                                window.open(
+                                    `${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${file}`,
+                                    '_blank'
+                                )
+                            }
+                        />
+                        <p
+                            onClick={() =>
+                                window.open(
+                                    `${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${file}`,
+                                    '_blank'
+                                )
+                            }
+                            style={{
+                                color: 'blue',
+                                width: '80px',
+                                cursor: 'pointer',
+                                margin: 0,
+                            }}
+                        >
+                            {name || 'Document'}
+                        </p>
+                    </Box>
+                ) : null;
+            },
+        }
+        ,
+
+        {
             header: "Status",
             accessorKey: "status",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                    { <Box
+                    {<Box
                         component={'div'}
                         sx={{ cursor: 'pointer' }}
                         onClick={() => {
