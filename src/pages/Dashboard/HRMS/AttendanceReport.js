@@ -159,6 +159,8 @@ export default function AttendanceTable() {
     const [endDate, setEndDate] = useState(moment().endOf('month').format('YYYY-MM-DD'));
 
     const handleStartDateChange = (e) => {
+        console.log(e.target.value);
+        
         setStartDate(e.target.value);
     };
 
@@ -168,7 +170,7 @@ export default function AttendanceTable() {
     // Memoize transformed data to prevent recalculation on every render
     const transformedData = useMemo(() => {
         if (!attendanceData?.attendance) return []
-        console.log(attendanceData, 'attendanceDataattendanceData');
+        
 
         return attendanceData.attendance.map((employee) => ({
             id: employee.user_id,
@@ -177,7 +179,7 @@ export default function AttendanceTable() {
             attendance:
                 employee.attendance?.map((day) => ({
                     date: day.date,
-                    status: day.logs ? "Present" : day.status === "absent" ? "A" : "Leave",
+                    status: day.logs ? "Present" : day.status ,
                     logs: day?.logs,
                     duration: day.totalDuration,
                 })) || [],
@@ -190,10 +192,21 @@ export default function AttendanceTable() {
         return transformedData.filter((employee) => employee.name.toLowerCase().includes(nameFilter.toLowerCase()))
     }, [transformedData, nameFilter])
 
-    // Memoize days in month calculation
-    const daysInMonth = useMemo(() => {
-        return getDaysInMonth(selectedDate.year(), selectedDate.month())
-    }, [selectedDate])
+const daysInMonth = useMemo(() => {
+  const start = moment(startDate);
+  const end = moment(endDate);
+  const days = [];
+
+  const current = start.clone();
+
+  while (current.isSameOrBefore(end, 'day')) {
+    days.push(current.clone()); // 👈 important: push a copy, not reference
+    current.add(1, 'day');
+  }
+
+  return days;
+}, [startDate, endDate]);
+console.log(daysInMonth,'daysInMonthdaysInMonth');
 
     // Memoize summary statistics
     const summaryStats = useMemo(() => {
@@ -240,13 +253,15 @@ export default function AttendanceTable() {
     }, [])
 
     // Optimize API call with useCallback
-    const getAttendance = useCallback(async (month, year) => {
+    const getAttendance = async (month, year) => {
         try {
             setLoading(true)
             const params = {
                 start_date: startDate,
                 end_date: endDate
             }
+            console.log(params,'params');
+            
             const { data } = await SystemServices.getAttendance(params)
             setAttendanceData(data)
         } catch (error) {
@@ -254,7 +269,7 @@ export default function AttendanceTable() {
         } finally {
             setLoading(false)
         }
-    }, [])
+    }
 
     const [shifts, setShifts] = useState([]);
 
@@ -395,21 +410,12 @@ export default function AttendanceTable() {
     }, []);
 
 
-    const handleDateChange = useCallback(
-        (e) => {
-            const newDate = moment(e.target.value, "YYYY-MM")
-            setSelectedDate(newDate)
-            getAttendance(newDate.format("MMMM"), newDate.format("YYYY"))
-        },
-        [getAttendance],
-    )
+    
+    
 
-    // Initial data fetch
-    useEffect(() => {
-        getAttendance(moment().format("MMMM"), moment().format("YYYY"))
-    }, [getAttendance])
+ 
      useEffect(() => {
-        getAttendance(moment().format("MMMM"), moment().format("YYYY"))
+        getAttendance()
     }, [startDate,endDate])
 
     return (
