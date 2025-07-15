@@ -1142,6 +1142,7 @@ function CreateEmployee() {
               label={"Leaves Allocation Per Month :*"}
               size={'small'}
               type={'number'}
+              step={'any'}
               placeholder={"Leaves Allocation Per Month"}
               error={errors?.leavesPerMonth?.message}
               register={register("leavesPerMonth", {
