@@ -55,7 +55,7 @@ function UploadFile({ inputRef, error, accept, register, multiple, style, custom
 
   useEffect(() => {
     let currentFile = file && file.length > 0 && file.find(item => item.key === fileId);
-    let multiPaths = currentFile?.path.split(",");
+    let multiPaths = currentFile?.path?.split(",");
     let result = multiPaths?.length > 0 && multiPaths?.map(item => ({
       extension: item.split('.').pop(),
       name: item.split('_').pop(),

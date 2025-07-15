@@ -325,7 +325,7 @@ function CreateEmployee() {
         permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
         role_id: selectedRole?.id,
         employee_detail: {
-        
+
           date_of_joining: doj,
           date_of_birth: dob,
           probation_period_months: formData?.probation,
@@ -866,46 +866,80 @@ function CreateEmployee() {
             </Grid>
           )}
         </Grid>
+        {console.log(documents,'documents')}
+        
         <Grid item xs={12}  >
           <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: Colors.textColorDarkBlue }}>Documents : </Typography>
         </Grid>
-        <Grid container spacing={2}>
-          {documents?.length > 0 && documents?.map((item, index) => (
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          {documents?.length > 0 &&
+            documents.map((item, index) => (
+              <Grid item xs={12} md={4} key={item.key}>
+                {/* Upload Section */}
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  sx={{ color: Colors.gray }}
+                >
+                  {item?.is_required ? item?.name : `${item?.name} (If Any)`} :{" "}
+                  {item?.is_required ? "*" : ""}
+                </Typography>
+
+                <UploadFile
+                  Memo={true}
+                  accept={allowFilesType}
+                  file={documents}
+                  multiple={true}
+                  updateResult={updateResult}
+                  fileId={item?.key}
+                  loader={loader}
+                  error={errors[item?.key]?.message}
+                  disabled={isUploading}
+                  register={register(`${item?.key}`, {
+                    required: item?.is_required
+                      ? documents.find((item2) => item2?.key === item?.key)?.path !== ""
+                        ? false
+                        : "Please upload document."
+                      : false,
+                    onChange: async (e) => {
+                      setIsUploading(true);
+                      const path = await handleUploadDocument(e, item?.key);
+                      if (path) {
+                        handleDocArrayUpdate("path", path, item?.key);
+                        console.log(path);
+                      }
+                      setIsUploading(false);
+                    },
+                  })}
+                />
+
+                <DatePicker
+                  disablePast={true}
+                  size="small"
+                  label={`${item?.name} Expiry Date :*`}
+                  value={item?.expiry_date ? new Date(item.expiry_date) : null}
+                  error={errors[`${item?.key}_expiry`]?.message}
+                  register={register(`${item?.key}_expiry`, {
+                    required: item?.is_required
+                      ? item?.expiry_date
+                        ? false
+                        : "Please select expiry date."
+                      : false,
+
+                  })}
+                  onChange={(date) => {
 
 
-            <Grid item xs={5} >
-              <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>{item?.is_required ? item?.name : item?.name + " " + '(If Any)'} : {item?.is_required ? '*' : ''} </Typography>
-              <UploadFile
-                Memo={true}
-                accept={allowFilesType}
-                file={documents}
-                multiple={true}
-                updateResult={updateResult}
-                fileId={item?.key}
-                loader={loader}
-                error={errors[item?.key]?.message}
-                disabled={isUploading} // Disable while uploading
-                register={register(`${item?.key}`, {
-                  required: item?.is_required ? documents.find((item2 => item2?.key == item?.key))?.path != '' ? false :
-                    "Please upload document." : false,
-                  onChange: async (e) => {
-                    setIsUploading(true); // Set uploading to true when the upload starts
-                    const path = await handleUploadDocument(e, item?.key);
-                    if (path) {
-                      handleDocArrayUpdate('path', path, item?.key);
-                      console.log(path);
-                    }
-                    setIsUploading(false); // Reset uploading status when done
-                  }
-                })}
-              />
 
-
-            </Grid>
-
-
-          ))}
+                    setValue(`${item?.key}_expiry`, date);
+                    handleDocArrayUpdate("date", date, item?.key);
+                  }}
+                />
+              </Grid>
+            ))}
         </Grid>
+
+
         <Box>
           <Box display="flex" alignItems="center" mt={2}>
             <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
@@ -1730,7 +1764,7 @@ function CreateEmployee() {
         </Box>
       </Box>
 
-    </Box>
+    </Box >
   );
 }
 
