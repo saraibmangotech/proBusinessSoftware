@@ -153,8 +153,8 @@ function EmployeeAttendanceReport() {
     const [data, setData] = useState(null)
     const [employees, setEmployees] = useState([])
     const [selectedEmployee, setSelectedEmployee] = useState(null)
-    const [fromDate, setFromDate] = useState(moment().startOf('month').toDate());
-    const [toDate, setToDate] = useState(moment().endOf('month').toDate());
+    const [fromDate, setFromDate] = useState();
+    const [toDate, setToDate] = useState();
 
     const getData = async (id) => {
         try {

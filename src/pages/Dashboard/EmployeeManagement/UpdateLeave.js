@@ -135,7 +135,7 @@ function UpdateLeave() {
 
             const obj = {
                 id: id,
-                user_id: selectedUser?.id,
+                user_id: selectedUser?.user_id,
                 start_date: startDate,
                 end_date: endDate,
                 total_days: totalDays,
@@ -143,8 +143,8 @@ function UpdateLeave() {
                 type: selectedType?.id,
                 additional_type: selectedAdditionalType?.id,
                 document: doc,
-                first_approver_id: selectedUser?.first_approver_id,
-                second_approver_id: selectedUser?.second_approver_id,
+                first_approver_id: selectedUser?.leave_approver_1,
+                second_approver_id: selectedUser?.leave_approver_2,
             };
             const promise = CustomerServices.UpdateLeave(obj);
 
@@ -176,9 +176,16 @@ function UpdateLeave() {
             }
 
 
-            const { data } = await UserServices.getUsers(params)
-            setUsers(data?.users?.rows)
+            const { data } = await CustomerServices.getEmployees(params)
 
+            const formattedData = data?.employees?.rows?.map((item, index) => ({
+                ...item,
+                id: item?.id,
+                name: item?.user?.name,
+            }));
+
+
+            setUsers(formattedData);
 
 
         } catch (error) {

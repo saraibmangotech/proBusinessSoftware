@@ -123,7 +123,7 @@ function CreateLeave() {
 
     const onSubmit = async (formData) => {
 
-        console.log(formData);
+        console.log(selectedUser,'selectedUser');
         try {
             const start = new Date(startDate);
             const end = new Date(endDate);
@@ -132,7 +132,7 @@ function CreateLeave() {
             const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
 
             const obj = {
-                user_id: selectedUser?.id,
+                user_id: selectedUser?.user_id,
                 start_date: startDate,
                 end_date: endDate,
                 total_days: totalDays,
@@ -140,10 +140,12 @@ function CreateLeave() {
                 type: selectedType?.id,
                 additional_type: selectedAdditionalType?.id,
                 document: doc,
-                first_approver_id: selectedUser?.first_approver_id,
-                second_approver_id: selectedUser?.second_approver_id,
+                first_approver_id: selectedUser?.leave_approver_1,
+                second_approver_id: selectedUser?.leave_approver_2,
 
             };
+            console.log(obj,'objobj');
+            
             const promise = CustomerServices.CreateLeave(obj);
 
             showPromiseToast(
@@ -174,9 +176,16 @@ function CreateLeave() {
             }
 
 
-            const { data } = await UserServices.getUsers(params)
-            setUsers(data?.users?.rows)
+            const { data } = await CustomerServices.getEmployees(params)
 
+            const formattedData = data?.employees?.rows?.map((item, index) => ({
+                ...item,
+                id: item?.id,
+                name: item?.user?.name,
+            }));
+
+
+            setUsers(formattedData);
 
 
         } catch (error) {
