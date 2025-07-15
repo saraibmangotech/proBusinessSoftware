@@ -22,6 +22,10 @@ const CustomerServices = {
     const data = await post(routes.PurchaseInvoiceSettlement, obj);
     return data;
   },
+  getLeaveDetail: async (params) => {
+    const data = await get(routes.getLeaveDetail, params);
+    return data;
+  },
    SalesInvoiceSettlement: async (obj) => {
     const data = await post(routes.SalesInvoiceSettlement, obj);
     return data;

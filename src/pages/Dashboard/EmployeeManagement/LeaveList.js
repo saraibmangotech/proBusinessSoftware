@@ -115,6 +115,7 @@ function LeaveList() {
     const contentRef = useRef(null);
     const [status, setStatus] = useState(null)
     const [statusDialog, setStatusDialog] = useState(false)
+    const [statusDialog2, setStatusDialog2] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
     const { user } = useAuth()
@@ -229,24 +230,119 @@ function LeaveList() {
             let params = { user_id: id }
 
 
-            const { data } = await CustomerServices.getEmployeeDetail(params)
+            const { data } = await CustomerServices.getLeaveDetail(params)
 
-            console.log(data);
+            console.log(data, 'datadatadata');
+            let leaves = data?.leaves
             setEmployeeData(data?.employee)
-            let leaveBalance = Math.floor(data?.employee?.leaves_balance)
-            let appliedDays = parseFloat(newData?.total_days)
-            let approvedDays = appliedDays > leaveBalance ?
-                leaveBalance :
-                appliedDays
-            console.log(appliedDays, 'appliedDays');
-            setValue('leaves', leaveBalance)
-            setValue('applied', appliedDays)
-            setValue('approved',
-                approvedDays)
-            setValue('absent', appliedDays > leaveBalance ? leaveBalance - appliedDays : 0)
-            setValue('balanced', Math.floor(leaveBalance) - approvedDays)
+            if (selectedData?.type == 'Bereavement') {
+                if (selectedData?.additional_type == 'Spouse') {
+                    let leaveBalance = Math.floor(leaves?.bereavement_leave_spouse)
+                    let appliedDays = parseFloat(selectedData?.total_days)
+                    let approvedDays = appliedDays > leaveBalance ?
+                        leaveBalance :
+                        appliedDays
+                    console.log(appliedDays, 'appliedDays');
+                    setValue('leaves', leaveBalance)
+                    setValue('applied', appliedDays)
+                    setValue('approved',
+                        approvedDays)
+                    setValue('balanced',
+                        leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                    setValue('absent',
+                        appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                }
+                else {
+                    let leaveBalance = Math.floor(leaves?.bereavement_leave_other)
+                    let appliedDays = parseFloat(selectedData?.total_days)
+                    let approvedDays = appliedDays > leaveBalance ?
+                        leaveBalance :
+                        appliedDays
+                    console.log(leaveBalance, 'leaveBalance');
+                    setValue('leaves', leaveBalance)
+                    setValue('applied', appliedDays)
+                    setValue('approved',
+                        approvedDays)
+                    setValue('balanced',
+                        leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                    setValue('absent',
+                        appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                }
 
+            }
+            else if (selectedData?.type == 'Annual') {
+                console.log(data, 'leavesleaves');
 
+                let leaveBalance = parseFloat(leaves?.annual_leave_balance)
+                let appliedDays = parseFloat(selectedData?.total_days)
+                let approvedDays = appliedDays > leaveBalance ?
+                    leaveBalance :
+                    appliedDays
+                console.log(appliedDays, 'appliedDays');
+                setValue('leaves', leaveBalance)
+                setValue('applied', appliedDays)
+                setValue('approved',
+                    approvedDays)
+                setValue('balanced',
+                    leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                setValue('absent',
+                    appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+            }
+
+            else if (selectedData?.type == 'Sick') {
+                console.log(data, 'leavesleaves');
+
+                let leaveBalance = parseFloat(leaves?.sick_leave_full_balance || 0) || parseFloat(leaves?.sick_leave_half_balance || 0) || parseFloat(leaves?.sick_leave_unpaid_balance || 0)
+                let appliedDays = parseFloat(selectedData?.total_days)
+                let approvedDays = appliedDays > leaveBalance ?
+                    leaveBalance :
+                    appliedDays
+                console.log(appliedDays, 'appliedDays');
+                setValue('leaves', leaveBalance)
+                setValue('applied', appliedDays)
+                setValue('approved',
+                    approvedDays)
+                setValue('balanced',
+                    leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                setValue('absent',
+                    appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+            }
+            else if (selectedData?.type == 'Maternity') {
+                console.log(data, 'leavesleaves');
+
+                let leaveBalance = parseFloat(leaves?.maternity_leave_full_balance || 0) || parseFloat(leaves?.maternity_leave_half_balance || 0) || parseFloat(leaves?.maternity_leave_unpaid_balance || 0)
+                let appliedDays = parseFloat(selectedData?.total_days)
+                let approvedDays = appliedDays > leaveBalance ?
+                    leaveBalance :
+                    appliedDays
+                console.log(appliedDays, 'appliedDays');
+                setValue('leaves', leaveBalance)
+                setValue('applied', appliedDays)
+                setValue('approved',
+                    approvedDays)
+                setValue('balanced',
+                    leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                setValue('absent',
+                    appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+            }
+            else if (selectedData?.type == 'Paternal') {
+                console.log(data, 'leavesleaves');
+
+                let leaveBalance = parseFloat(leaves?.parental_leave || 0)
+                let appliedDays = parseFloat(selectedData?.total_days)
+                let approvedDays = appliedDays > leaveBalance ?
+                    leaveBalance :
+                    appliedDays
+                console.log(appliedDays, 'appliedDays');
+                setValue('leaves', leaveBalance)
+                setValue('applied', appliedDays)
+                setValue('approved',
+                    approvedDays)
+                setValue('balanced',
+                    leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                setValue('absent',
+                    appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+            }
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -415,14 +511,18 @@ function LeaveList() {
                     {<Box
                         component={'div'}
                         sx={{ cursor: 'pointer' }}
-                        onClick={() => {
-                            setSelectedData(row?.original)
-                            getEmployeeDetail(row?.original?.user_id, row?.original)
-                            if (row?.original?.status?.toLowerCase() == 'pending') {
-                                setStatusDialog(true)
-                            }
+                        onClick={async () => {
+                            setSelectedData(row?.original);
+                            await getEmployeeDetail(row?.original?.user_id, row?.original);
 
+                            const status = row?.original?.status?.toLowerCase();
+                            const type = row?.original?.type?.toLowerCase();
+
+                            if (status === 'pending') {
+                                setStatusDialog(true);
+                            } 
                         }}
+
 
                     >
                         {row?.original?.status} </Box>}
@@ -649,7 +749,164 @@ function LeaveList() {
                     </Grid>
                 </Box>
             </SimpleDialog>
+            <SimpleDialog
+                open={statusDialog2}
+                onClose={() => setStatusDialog2(false)}
+                title={"Change Status?"}
+            >
+                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12}>
+                            <SelectField
+                                size={"small"}
+                                label={"Select Status "}
+                                options={
 
+                                    [
+                                        { id: 'Pending', name: "Pending" },
+                                        { id: 'Approved', name: "Approved" },
+                                        { id: 'Rejected', name: "Rejected" },
+                                    ]}
+                                selected={status}
+                                onSelect={(value) => {
+                                    setStatus(value);
+                                }}
+                                error={errors?.status?.message}
+                                register={register("status", {
+                                    required: "Please select status.",
+                                })}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"Employee Leaves :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Employee Leaves "}
+                                error={errors?.leaves?.message}
+                                register={register("leaves", {
+                                    required:
+                                        "Please enter leaves."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={6} sm={6}>
+
+                            <InputField
+                                label={"Applied Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Applied Days "}
+                                error={errors?.applied?.message}
+                                register={register("applied", {
+                                    required:
+                                        "Please enter applied."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={6} sm={6}>
+
+                            <InputField
+                                label={"Approved Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Approved Days "}
+                                error={errors?.approved?.message}
+                                register={register("approved", {
+                                    required:
+                                        "Please enter approved."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={6} sm={6}>
+
+                            <InputField
+                                label={"Absent Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Absent Days "}
+                                error={errors?.absent?.message}
+                                register={register("absent", {
+                                    required:
+                                        "Please enter absent."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={6} sm={6}>
+
+                            <InputField
+                                label={"Balanced Days :"}
+                                size={'small'}
+                                disabled={true}
+                                placeholder={"Balanced Days "}
+                                error={errors?.balanced?.message}
+                                register={register("balanced", {
+                                    required:
+                                        "Please enter balanced."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+
+                            <InputField
+                                label={"HR Statement :*"}
+                                size={'small'}
+                                multiline
+                                rows={4}
+                                placeholder={"HR Statement "}
+                                error={errors?.statement?.message}
+                                register={register("statement", {
+                                    required:
+                                        "Please enter statement."
+
+                                })}
+                            />
+
+
+                        </Grid>
+                        <Grid container sx={{ justifyContent: "center" }}>
+                            <Grid
+                                item
+                                xs={6}
+                                sm={6}
+                                sx={{
+                                    mt: 2,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: "25px",
+                                }}
+                            >
+                                <PrimaryButton
+                                    bgcolor={Colors.primary}
+                                    title="Yes,Confirm"
+                                    type="submit"
+                                />
+                                <PrimaryButton
+                                    onClick={() => setStatusDialog2(false)}
+                                    bgcolor={"#FF1F25"}
+                                    title="No,Cancel"
+                                />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </SimpleDialog>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Leave List</Typography>
