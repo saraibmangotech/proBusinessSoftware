@@ -791,6 +791,61 @@ function Header() {
               navigation: true,
               order_by: 33,
             },
+            {
+              id: 1502,
+              name: "Purchase Invoice Settlement",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 33,
+              name: " Sale Settlement List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/sales-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 360,
+              name: "Cash Flow Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/cash-flow-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: " Consolidated Supplier Payable",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/consolidated-supplier-payable",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: " Consolidated Customer Receivable",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/consolidated-customer-receivable",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
           ],
         },
         {
@@ -1874,7 +1929,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-              {
+            {
               id: 55,
               name: "Leave  Report",
               icon: "customer",
@@ -1885,7 +1940,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-                {
+            {
               id: 55,
               name: "Employee Status  Report",
               icon: "customer",
@@ -1896,7 +1951,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-                 {
+            {
               id: 55,
               name: "Document Expiry  Report",
               icon: "customer",
@@ -1907,7 +1962,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-                {
+            {
               id: 55,
               name: "Employee Attendance  Report",
               icon: "customer",
@@ -1955,7 +2010,7 @@ function Header() {
               order_by: 13,
               childRoute: [],
             },
-             {
+            {
               id: 14,
               name: "Notifications",
               icon: "customer",
@@ -2058,7 +2113,7 @@ function Header() {
               order_by: 13,
               childRoute: [],
             },
-             {
+            {
               id: 14,
               name: "Notifications",
               icon: "customer",
@@ -3053,7 +3108,7 @@ function Header() {
               order_by: 55,
             },
 
- {
+            {
               id: 55,
               name: "Eos  Report",
               icon: "customer",
@@ -3064,7 +3119,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-              {
+            {
               id: 55,
               name: "Leave  Report",
               icon: "customer",
@@ -3075,7 +3130,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-                {
+            {
               id: 55,
               name: "Employee Status  Report",
               icon: "customer",
@@ -3086,7 +3141,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-                 {
+            {
               id: 55,
               name: "Document Expiry  Report",
               icon: "customer",
@@ -3097,7 +3152,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-             {
+            {
               id: 55,
               name: "Employee Attendance  Report",
               icon: "customer",
@@ -3236,7 +3291,7 @@ function Header() {
               order_by: 13,
               childRoute: [],
             },
-             {
+            {
               id: 14,
               name: "Notifications",
               icon: "customer",
@@ -3249,7 +3304,7 @@ function Header() {
               children: [],
               childRoute: [],
             },
-             {
+            {
               id: 14,
               name: "Notifications",
               icon: "customer",

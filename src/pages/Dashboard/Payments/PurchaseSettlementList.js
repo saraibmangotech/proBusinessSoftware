@@ -440,7 +440,7 @@ function PurchaseSettlementList() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Sales Settlement List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Settlement List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#001f3f'}
                     title="Settle"
