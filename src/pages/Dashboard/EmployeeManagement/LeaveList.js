@@ -518,7 +518,7 @@ function LeaveList() {
                             const status = row?.original?.status?.toLowerCase();
                             const type = row?.original?.type?.toLowerCase();
 
-                            if (status === 'pending') {
+                            if (status === 'pending' && (row?.original?.user_id != user?.id) ) {
                                 setStatusDialog(true);
                             } 
                         }}
