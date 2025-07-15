@@ -1,114 +1,172 @@
-import { Fragment } from "react";
-import { Autocomplete, Box, InputLabel, TextField, Typography, createFilterOptions } from "@mui/material";
-import { Debounce } from "utils";
+"use client"
+
+import { Fragment } from "react"
+import { Autocomplete, Box, InputLabel, TextField, Typography, createFilterOptions } from "@mui/material"
 
 function SelectField(props) {
   const { label, size, disabled, onSearch, addNew, multiple, selected, onSelect, register, error, options } = props
 
-  const filter = createFilterOptions();
+  const filter = createFilterOptions({
+    matchFrom: "any",
+    stringify: (option) => option.name || "",
+    limit: 100,
+  })
 
-  // *For Handle Filter Option
+
   const handleFilterOptions = (options, params) => {
-    const filtered = filter(options, params);
+    const { inputValue } = params
+
    
-    const { inputValue } = params;
-    // *Suggest the creation of a new value
-    const isExisting = options.some((option) => inputValue === option.name);
-    if (inputValue !== '' && !isExisting && addNew) {
-      filtered.push({
+    const filtered = filter(options, params)
+
+   
+    const uniqueOptions = []
+    const seenNames = new Set()
+
+    filtered.forEach((option) => {
+      const optionName = option.name || option
+      if (!seenNames.has(optionName)) {
+        seenNames.add(optionName)
+        uniqueOptions.push(option)
+      }
+    })
+
+    
+
+   
+    const isExisting = uniqueOptions.some((option) => {
+      const optionName = typeof option === "string" ? option : option.name
+      return optionName && optionName.toLowerCase() === inputValue.toLowerCase()
+    })
+
+    if (inputValue !== "" && !isExisting && addNew) {
+      uniqueOptions.push({
         inputValue,
         name: `Add "${inputValue}"`,
-      });
+      })
     }
 
-    return filtered;
+    return uniqueOptions
   }
 
-  // *For Handle Option Label
+  
   const handleOptionLabel = (option) => {
-    // *Value selected with enter, right from the input
-    if (typeof option === 'string') {
-      return option;
+   
+    if (typeof option === "string") {
+      return option
     }
+
     // *Add new option created dynamically
-    if (option.inputValue && addNew) {
-      return option.inputValue;
+    if (option && option.inputValue && addNew) {
+      return option.inputValue
     }
+
     // *Regular option
-    return option.name;
+    return option && option.name ? option.name : ""
   }
 
   // *For Handle Change
-  const handleChange = (newValue) => {
-    if (typeof newValue === 'string') {
+  const handleChange = (event, newValue) => {
+    if (typeof newValue === "string") {
       onSelect(newValue)
       return
     }
+
     if (newValue && newValue.inputValue && addNew) {
-      addNew(newValue?.inputValue)
+      addNew(newValue.inputValue)
       return
     }
-    return onSelect(newValue)
+
+    onSelect(newValue)
   }
 
-  // *For Handle Search
-  const handleSearch = (value) => {
+  
+  const handleSearch = (event, value) => {
     if (onSearch) {
-      Debounce(() => onSearch(value));
+      
+      clearTimeout(handleSearch.timeoutId)
+      handleSearch.timeoutId = setTimeout(() => {
+        onSearch(value)
+      }, 300)
     }
   }
 
   return (
-    <Box sx={{width:'100%'}}>
-      <InputLabel sx={{fontWeight:'bold',color:'#333',fontSize:'16px',mb:'10px'}} error={error && selected === '' && true}>{label}</InputLabel>
+    <Box sx={{ width: "100%" }}>
+      <InputLabel
+        sx={{
+          fontWeight: "bold",
+          color: "#333",
+          fontSize: "16px",
+          mb: "10px",
+        }}
+        error={error && selected === "" && true}
+      >
+        {label}
+      </InputLabel>
+
       <Autocomplete
         disabled={disabled}
         size={size}
         multiple={multiple}
-        isOptionEqualToValue={(option, value) => option?.name === value?.name}
+        isOptionEqualToValue={(option, value) => {
+          if (!option || !value) return false
+
+          if (typeof option === "string" && typeof value === "string") {
+            return option === value
+          }
+
+          const optionName = option.name || option
+          const valueName = value.name || value
+
+          return optionName === valueName
+        }}
         value={selected}
-        options={options}
-        filterOptions={(options, params) => handleFilterOptions(options, params)}
-        getOptionLabel={(option) => handleOptionLabel(option)}
-        onChange={(event, newValue) => handleChange(newValue)}
-        onInputChange={(event, newInputValue) => handleSearch(newInputValue)}
+        options={options || []}
+        filterOptions={handleFilterOptions}
+        getOptionLabel={handleOptionLabel}
+        onChange={handleChange}
+        onInputChange={handleSearch}
         sx={{ mb: !error && 2 }}
         PopperProps={{
           style: { zIndex: 1400 }, // Higher z-index to appear above modal
         }}
-        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+        renderOption={(props, option, { index }) => (
+          <li {...props} key={`${option.name || option}-${index}`}>
+            {typeof option === "string" ? option : option.name}
+          </li>
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset' : {
-                  border:'2px solid black !important',
-                  borderRadius:'12px',
-                }
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  border: "2px solid black !important",
+                  borderRadius: "12px",
+                },
               },
-              position: 'relative', // Ensure proper stacking context
-              zIndex: 1 // Base z-index for the field itself
+              position: "relative", 
+              zIndex: 1, 
             }}
             placeholder={label}
             error={error}
             {...register}
             InputProps={{
               ...params.InputProps,
-              endAdornment: (
-                <Fragment>
-                  {params.InputProps.endAdornment}
-                </Fragment>
-              ),
+              endAdornment: <Fragment>{params.InputProps.endAdornment}</Fragment>,
             }}
           />
         )}
       />
+
       {error && (
-        <Typography variant="caption" color="error" sx={{ textAlign: 'left' }}>{error}</Typography>
+        <Typography variant="caption" color="error" sx={{ textAlign: "left" }}>
+          {error}
+        </Typography>
       )}
     </Box>
-  );
+  )
 }
 
-export default SelectField;
+export default SelectField
