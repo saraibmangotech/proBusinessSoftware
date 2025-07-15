@@ -556,6 +556,9 @@ const ConsolidatedCustomerReceivable = lazy(() =>
 const EOSReport = lazy(() =>
   import("pages/Dashboard/Reports/EOSReport")
 );
+const EmployeeAttendanceReport = lazy(() =>
+  import("pages/Dashboard/Reports/EmployeeAttendanceReport")
+);
 const DocumentExpiryReport = lazy(() =>
   import("pages/Dashboard/Reports/DocExpiryReport")
 );
@@ -758,6 +761,10 @@ const AdminRoutes = [
   {
     path: "/eos-report",
     component: <EOSReport />,
+  },
+  {
+    path: "/employee-attendance-report",
+    component: <EmployeeAttendanceReport />,
   },
   {
     path: "/doc-expiry-report",

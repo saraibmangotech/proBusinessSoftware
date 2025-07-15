@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import { Box, Typography, Grid, FormControl, InputLabel, Select, MenuItem, Chip, InputAdornment } from "@mui/material"
 import {
-  Search as SearchIcon,
-  Download as DownloadIcon,
-  Warning as WarningIcon,
-  Error as ErrorIcon,
+    Search as SearchIcon,
+    Download as DownloadIcon,
+    Warning as WarningIcon,
+    Error as ErrorIcon,
 } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
 import * as XLSX from "xlsx"
@@ -15,597 +15,824 @@ import moment from "moment"
 import DataTable from "components/DataTable"
 import { PrimaryButton } from "components/Buttons"
 import InputField from "components/Input"
-
+import { showErrorToast } from "components/NewToaster"
+import SystemServices from "services/System"
+import CustomerServices from "services/Customer"
+import SelectField from "components/Select"
+import ExcelJS from "exceljs";
 
 // Dummy data for Document Expiry Report
 const documentExpiryData = [
-  {
-    id: 1,
-    employee_id: "EMP001",
-    employee_name: "Ahmed Hassan",
-    department: "Engineering",
-    designation: "Senior Developer",
-    document_type: "Passport",
-    document_number: "A1234567",
-    issue_date: "2019-05-15",
-    expiry_date: "2025-05-15",
-    days_until_expiry: 153,
-    status: "Active",
-    nationality: "UAE",
-  },
-  {
-    id: 2,
-    employee_id: "EMP001",
-    employee_name: "Ahmed Hassan",
-    department: "Engineering",
-    designation: "Senior Developer",
-    document_type: "Visa",
-    document_number: "V7891234",
-    issue_date: "2024-01-10",
-    expiry_date: "2025-01-10",
-    days_until_expiry: 13,
-    status: "Expiring Soon",
-    nationality: "UAE",
-  },
-  {
-    id: 3,
-    employee_id: "EMP002",
-    employee_name: "Sarah Johnson",
-    department: "Marketing",
-    designation: "Marketing Manager",
-    document_type: "Emirates ID",
-    document_number: "784-1985-1234567-8",
-    issue_date: "2020-03-20",
-    expiry_date: "2024-12-15",
-    days_until_expiry: -13,
-    status: "Expired",
-    nationality: "USA",
-  },
-  {
-    id: 4,
-    employee_id: "EMP002",
-    employee_name: "Sarah Johnson",
-    department: "Marketing",
-    designation: "Marketing Manager",
-    document_type: "Driving License",
-    document_number: "DL789456123",
-    issue_date: "2022-06-10",
-    expiry_date: "2025-06-10",
-    days_until_expiry: 183,
-    status: "Active",
-    nationality: "USA",
-  },
-  {
-    id: 5,
-    employee_id: "EMP003",
-    employee_name: "Mohammed Ali",
-    department: "Finance",
-    designation: "Finance Executive",
-    document_type: "Passport",
-    document_number: "B9876543",
-    issue_date: "2020-08-12",
-    expiry_date: "2025-08-12",
-    days_until_expiry: 237,
-    status: "Active",
-    nationality: "Egypt",
-  },
-  {
-    id: 6,
-    employee_id: "EMP003",
-    employee_name: "Mohammed Ali",
-    department: "Finance",
-    designation: "Finance Executive",
-    document_type: "Work Permit",
-    document_number: "WP456789123",
-    issue_date: "2023-11-01",
-    expiry_date: "2025-01-15",
-    days_until_expiry: 18,
-    status: "Expiring Soon",
-    nationality: "Egypt",
-  },
-  {
-    id: 7,
-    employee_id: "EMP004",
-    employee_name: "Lisa Chen",
-    department: "HR",
-    designation: "HR Specialist",
-    document_type: "Visa",
-    document_number: "V1122334",
-    issue_date: "2023-09-05",
-    expiry_date: "2024-12-20",
-    days_until_expiry: -8,
-    status: "Expired",
-    nationality: "China",
-  },
-  {
-    id: 8,
-    employee_id: "EMP004",
-    employee_name: "Lisa Chen",
-    department: "HR",
-    designation: "HR Specialist",
-    document_type: "Emirates ID",
-    document_number: "784-1990-9876543-2",
-    issue_date: "2021-04-15",
-    expiry_date: "2025-04-15",
-    days_until_expiry: 138,
-    status: "Active",
-    nationality: "China",
-  },
-  {
-    id: 9,
-    employee_id: "EMP005",
-    employee_name: "Omar Abdullah",
-    department: "Operations",
-    designation: "Operations Manager",
-    document_type: "Passport",
-    document_number: "C5544332",
-    issue_date: "2019-12-01",
-    expiry_date: "2025-12-01",
-    days_until_expiry: 348,
-    status: "Active",
-    nationality: "Jordan",
-  },
-  {
-    id: 10,
-    employee_id: "EMP005",
-    employee_name: "Omar Abdullah",
-    department: "Operations",
-    designation: "Operations Manager",
-    document_type: "Medical Certificate",
-    document_number: "MC789123456",
-    issue_date: "2024-06-15",
-    expiry_date: "2025-01-05",
-    days_until_expiry: 8,
-    status: "Expiring Soon",
-    nationality: "Jordan",
-  },
-  {
-    id: 11,
-    employee_id: "EMP006",
-    employee_name: "Jennifer Smith",
-    department: "Sales",
-    designation: "Sales Executive",
-    document_type: "Driving License",
-    document_number: "DL456123789",
-    issue_date: "2021-02-14",
-    expiry_date: "2024-11-30",
-    days_until_expiry: -28,
-    status: "Expired",
-    nationality: "UK",
-  },
-  {
-    id: 12,
-    employee_id: "EMP007",
-    employee_name: "Rajesh Kumar",
-    department: "IT",
-    designation: "System Administrator",
-    document_type: "Visa",
-    document_number: "V9988776",
-    issue_date: "2024-08-12",
-    expiry_date: "2025-02-12",
-    days_until_expiry: 56,
-    status: "Active",
-    nationality: "India",
-  },
-  {
-    id: 13,
-    employee_id: "EMP008",
-    employee_name: "Fatima Al-Zahra",
-    department: "Legal",
-    designation: "Legal Advisor",
-    document_type: "Professional License",
-    document_number: "PL123456789",
-    issue_date: "2023-11-30",
-    expiry_date: "2025-01-20",
-    days_until_expiry: 23,
-    status: "Expiring Soon",
-    nationality: "Lebanon",
-  },
+    {
+        id: 1,
+        employee_id: "EMP001",
+        employee_name: "Ahmed Hassan",
+        department: "Engineering",
+        designation: "Senior Developer",
+        document_type: "Passport",
+        document_number: "A1234567",
+        issue_date: "2019-05-15",
+        expiry_date: "2025-05-15",
+        days_until_expiry: 153,
+        status: "Active",
+        nationality: "UAE",
+    },
+    {
+        id: 2,
+        employee_id: "EMP001",
+        employee_name: "Ahmed Hassan",
+        department: "Engineering",
+        designation: "Senior Developer",
+        document_type: "Visa",
+        document_number: "V7891234",
+        issue_date: "2024-01-10",
+        expiry_date: "2025-01-10",
+        days_until_expiry: 13,
+        status: "Expiring Soon",
+        nationality: "UAE",
+    },
+    {
+        id: 3,
+        employee_id: "EMP002",
+        employee_name: "Sarah Johnson",
+        department: "Marketing",
+        designation: "Marketing Manager",
+        document_type: "Emirates ID",
+        document_number: "784-1985-1234567-8",
+        issue_date: "2020-03-20",
+        expiry_date: "2024-12-15",
+        days_until_expiry: -13,
+        status: "Expired",
+        nationality: "USA",
+    },
+    {
+        id: 4,
+        employee_id: "EMP002",
+        employee_name: "Sarah Johnson",
+        department: "Marketing",
+        designation: "Marketing Manager",
+        document_type: "Driving License",
+        document_number: "DL789456123",
+        issue_date: "2022-06-10",
+        expiry_date: "2025-06-10",
+        days_until_expiry: 183,
+        status: "Active",
+        nationality: "USA",
+    },
+    {
+        id: 5,
+        employee_id: "EMP003",
+        employee_name: "Mohammed Ali",
+        department: "Finance",
+        designation: "Finance Executive",
+        document_type: "Passport",
+        document_number: "B9876543",
+        issue_date: "2020-08-12",
+        expiry_date: "2025-08-12",
+        days_until_expiry: 237,
+        status: "Active",
+        nationality: "Egypt",
+    },
+    {
+        id: 6,
+        employee_id: "EMP003",
+        employee_name: "Mohammed Ali",
+        department: "Finance",
+        designation: "Finance Executive",
+        document_type: "Work Permit",
+        document_number: "WP456789123",
+        issue_date: "2023-11-01",
+        expiry_date: "2025-01-15",
+        days_until_expiry: 18,
+        status: "Expiring Soon",
+        nationality: "Egypt",
+    },
+    {
+        id: 7,
+        employee_id: "EMP004",
+        employee_name: "Lisa Chen",
+        department: "HR",
+        designation: "HR Specialist",
+        document_type: "Visa",
+        document_number: "V1122334",
+        issue_date: "2023-09-05",
+        expiry_date: "2024-12-20",
+        days_until_expiry: -8,
+        status: "Expired",
+        nationality: "China",
+    },
+    {
+        id: 8,
+        employee_id: "EMP004",
+        employee_name: "Lisa Chen",
+        department: "HR",
+        designation: "HR Specialist",
+        document_type: "Emirates ID",
+        document_number: "784-1990-9876543-2",
+        issue_date: "2021-04-15",
+        expiry_date: "2025-04-15",
+        days_until_expiry: 138,
+        status: "Active",
+        nationality: "China",
+    },
+    {
+        id: 9,
+        employee_id: "EMP005",
+        employee_name: "Omar Abdullah",
+        department: "Operations",
+        designation: "Operations Manager",
+        document_type: "Passport",
+        document_number: "C5544332",
+        issue_date: "2019-12-01",
+        expiry_date: "2025-12-01",
+        days_until_expiry: 348,
+        status: "Active",
+        nationality: "Jordan",
+    },
+    {
+        id: 10,
+        employee_id: "EMP005",
+        employee_name: "Omar Abdullah",
+        department: "Operations",
+        designation: "Operations Manager",
+        document_type: "Medical Certificate",
+        document_number: "MC789123456",
+        issue_date: "2024-06-15",
+        expiry_date: "2025-01-05",
+        days_until_expiry: 8,
+        status: "Expiring Soon",
+        nationality: "Jordan",
+    },
+    {
+        id: 11,
+        employee_id: "EMP006",
+        employee_name: "Jennifer Smith",
+        department: "Sales",
+        designation: "Sales Executive",
+        document_type: "Driving License",
+        document_number: "DL456123789",
+        issue_date: "2021-02-14",
+        expiry_date: "2024-11-30",
+        days_until_expiry: -28,
+        status: "Expired",
+        nationality: "UK",
+    },
+    {
+        id: 12,
+        employee_id: "EMP007",
+        employee_name: "Rajesh Kumar",
+        department: "IT",
+        designation: "System Administrator",
+        document_type: "Visa",
+        document_number: "V9988776",
+        issue_date: "2024-08-12",
+        expiry_date: "2025-02-12",
+        days_until_expiry: 56,
+        status: "Active",
+        nationality: "India",
+    },
+    {
+        id: 13,
+        employee_id: "EMP008",
+        employee_name: "Fatima Al-Zahra",
+        department: "Legal",
+        designation: "Legal Advisor",
+        document_type: "Professional License",
+        document_number: "PL123456789",
+        issue_date: "2023-11-30",
+        expiry_date: "2025-01-20",
+        days_until_expiry: 23,
+        status: "Expiring Soon",
+        nationality: "Lebanon",
+    },
 ]
 
 function DocumentExpiryReport() {
-  const [loader, setLoader] = useState(false)
-  const [filteredData, setFilteredData] = useState(documentExpiryData)
-  const [filters, setFilters] = useState({
-    department: "",
-    document_type: "",
-    status: "",
-    search: "",
-  })
+    const [loader, setLoader] = useState(false)
+    const [filteredData, setFilteredData] = useState(documentExpiryData)
+    const [filters, setFilters] = useState({
+        department: "",
+        document_type: "",
+        status: "",
+        search: "",
+    })
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    getValues,
-    reset,
-  } = useForm()
+    const [data, setData] = useState([])
+    const [statsData, setStatsData] = useState(null)
+    const [employees, setEmployees] = useState([])
+    const [selectedEmployee, setSelectedEmployee] = useState(null)
+    const getData = async (id) => {
+        // setLoader(true)
+        try {
+            let params = {
+                employee_id: id ? id : '',
+            }
 
-  // Filter options
-  const departments = [...new Set(documentExpiryData.map((doc) => doc.department))]
-  const documentTypes = [...new Set(documentExpiryData.map((doc) => doc.document_type))]
-  const statuses = [...new Set(documentExpiryData.map((doc) => doc.status))]
+            const { data } = await SystemServices.getDocExpiryReport(params);
+            console.log(data);
 
-  // Handle filtering
-  const handleFilter = () => {
-    let filtered = documentExpiryData
+            setData(data?.documents);
 
-    if (filters.search) {
-      filtered = filtered.filter(
-        (doc) =>
-          doc.employee_name.toLowerCase().includes(filters.search.toLowerCase()) ||
-          doc.employee_id.toLowerCase().includes(filters.search.toLowerCase()) ||
-          doc.document_number.toLowerCase().includes(filters.search.toLowerCase()),
-      )
+            setStatsData(data)
+            setFilteredData(data?.documents)
+        } catch (error) {
+            showErrorToast(error);
+        } finally {
+            // setLoader(false)
+        }
+    };
+    const getEmployees = async (page, limit, filter) => {
+        setLoader(true)
+
+        try {
+
+            let params = {
+                page: 1,
+                limit: 999999,
+
+
+            }
+
+            const { data } = await CustomerServices.getEmployees(params)
+            const formattedData = data?.employees?.rows?.map((item, index) => ({
+                ...item,
+                id: item?.id,
+                name: item?.user?.name,
+            }));
+
+
+            setEmployees(formattedData);
+
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            setLoader(false)
+        }
+    }
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        getValues,
+        reset,
+    } = useForm()
+
+    // Filter options
+    const departments = [...new Set(documentExpiryData.map((doc) => doc.department))]
+    const documentTypes = [...new Set(documentExpiryData.map((doc) => doc.document_type))]
+    const statuses = [...new Set(documentExpiryData.map((doc) => doc.status))]
+
+    // Handle filtering
+    const handleFilter = () => {
+        let filtered = documentExpiryData
+
+        if (filters.search) {
+            filtered = filtered.filter(
+                (doc) =>
+                    doc.employee_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+                    doc.employee_id.toLowerCase().includes(filters.search.toLowerCase()) ||
+                    doc.document_number.toLowerCase().includes(filters.search.toLowerCase()),
+            )
+        }
+
+        if (filters.department) {
+            filtered = filtered.filter((doc) => doc.department === filters.department)
+        }
+
+        if (filters.document_type) {
+            filtered = filtered.filter((doc) => doc.document_type === filters.document_type)
+        }
+
+        if (filters.status) {
+            filtered = filtered.filter((doc) => doc.status === filters.status)
+        }
+
+        setFilteredData(filtered)
     }
 
-    if (filters.department) {
-      filtered = filtered.filter((doc) => doc.department === filters.department)
+    // Handle Excel Export
+    // Handle Excel Export - matching table columns exactly
+ const handleExcelExport = async () => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet("Document Expiry Report")
+
+    // Set professional header and footer
+    worksheet.headerFooter.oddHeader =
+      '&C&"Arial,Bold"&18DOCUMENT EXPIRY REPORT\n' +
+      '&C&"Arial,Regular"&12Your Company Name\n' +
+      '&C&"Arial,Regular"&10Period: &D - &T\n' +
+      '&L&"Arial,Regular"&8Generated on: ' +
+      new Date().toLocaleDateString() +
+      "\n" +
+      '&R&"Arial,Regular"&8Page &P of &N'
+
+    worksheet.headerFooter.oddFooter =
+      '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+      '&C&"Arial,Regular"&8This report contains employee data as of ' +
+      new Date().toLocaleDateString() +
+      '&R&"Arial,Regular"&8Generated by: HR Department\n' +
+      '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+
+    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+    // Set page setup for professional printing
+    worksheet.pageSetup = {
+      paperSize: 9, // A4
+      orientation: "landscape",
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 1.0,
+        bottom: 1.0,
+        header: 0.3,
+        footer: 0.3,
+      },
     }
 
-    if (filters.document_type) {
-      filtered = filtered.filter((doc) => doc.document_type === filters.document_type)
+    // Add title section at the top of the worksheet
+    const titleRow = worksheet.addRow(["DOCUMENT EXPIRY REPORT"])
+    titleRow.getCell(1).font = {
+      name: "Arial",
+      size: 16,
+      bold: true,
+      color: { argb: "2F4F4F" },
     }
+    titleRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A1:H1")
 
-    if (filters.status) {
-      filtered = filtered.filter((doc) => doc.status === filters.status)
+    // Dynamic company name based on environment
+    const name =
+      process.env.NEXT_PUBLIC_TYPE === "TASHEEL"
+        ? "PREMIUM BUSINESSMEN SERVICES"
+        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+
+    const companyRow = worksheet.addRow([name])
+    companyRow.getCell(1).font = {
+      name: "Arial",
+      size: 14,
+      bold: true,
+      color: { argb: "4472C4" },
     }
+    companyRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A2:H2")
 
-    setFilteredData(filtered)
+    const dateRow = worksheet.addRow([
+      `Report Generated: ${new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })} at ${new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })}`,
+    ])
+    dateRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    dateRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A3:H3")
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    // Headers matching the table columns exactly
+    const headers = [
+      "Employee ID",
+      "Employee Name",
+      "Department",
+      "Document Type",
+      "Document Number",
+      "Issue Date",
+      "Expiry Date",
+      "Days Until Expiry",
+    ]
+
+    const headerRow = worksheet.addRow(headers)
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "808080" }, // Gray
+      }
+      cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+      cell.alignment = { horizontal: "center", vertical: "middle" }
+      cell.border = {
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
+      }
+    })
+
+    // Add all documents with data matching table columns
+    filteredData?.forEach((doc) => {
+      const daysUntilExpiry = Math.floor((new Date(doc.expiry_date) - new Date()) / (1000 * 60 * 60 * 24))
+
+      const row = worksheet.addRow([
+        doc.employee?.employee_code,
+        doc.employee?.first_name,
+        doc.employee?.department,
+        doc.name,
+        doc.reference_id,
+        new Date(doc.updatedAt).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+        new Date(doc.expiry_date).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+        daysUntilExpiry < 0 ? `${Math.abs(daysUntilExpiry)} days ago` : `${daysUntilExpiry} days`,
+      ])
+
+      // Add borders to all cells
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin", color: { argb: "000000" } },
+          left: { style: "thin", color: { argb: "000000" } },
+          bottom: { style: "thin", color: { argb: "000000" } },
+          right: { style: "thin", color: { argb: "000000" } },
+        }
+        cell.alignment = { horizontal: "center", vertical: "middle" }
+      })
+
+      // Color code expiry date based on days until expiry
+      const expiryDateCell = row.getCell(7)
+      const daysCell = row.getCell(8)
+
+      if (daysUntilExpiry < 0) {
+        // Expired - Red
+        expiryDateCell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "F44336" },
+        }
+        expiryDateCell.font = { color: { argb: "FFFFFF" }, bold: true }
+        daysCell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "F44336" },
+        }
+        daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
+      } else if (daysUntilExpiry <= 30) {
+        // Expiring Soon - Orange
+        expiryDateCell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF9800" },
+        }
+        expiryDateCell.font = { color: { argb: "FFFFFF" }, bold: true }
+        daysCell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF9800" },
+        }
+        daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
+      } else {
+        // Active - Green
+        daysCell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "4CAF50" },
+        }
+        daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
+      }
+    })
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 12 }, // Employee ID
+      { width: 25 }, // Employee Name
+      { width: 15 }, // Department
+      { width: 20 }, // Document Type
+      { width: 20 }, // Document Number
+      { width: 15 }, // Issue Date
+      { width: 15 }, // Expiry Date
+      { width: 18 }, // Days Until Expiry
+    ]
+
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Add the electronic generated report text with black border
+    const reportRow = worksheet.addRow(["This is electronically generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: false,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    const system2 = worksheet.addRow(["Powered By: MangotechDevs.ae"])
+    system2.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    system2.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${system2.number}:H${system2.number}`)
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+    saveAs(
+      blob,
+      `Document_Expiry_Report_${new Date()
+        .toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+        .replace(/\//g, "-")}.xlsx`,
+    )
   }
 
-  // Handle Excel Export
-  const handleExcelExport = () => {
-    const exportData = filteredData.map((doc) => ({
-      "Employee ID": doc.employee_id,
-      "Employee Name": doc.employee_name,
-      Department: doc.department,
-      Designation: doc.designation,
-      Nationality: doc.nationality,
-      "Document Type": doc.document_type,
-      "Document Number": doc.document_number,
-      "Issue Date": moment(doc.issue_date).format("DD/MM/YYYY"),
-      "Expiry Date": moment(doc.expiry_date).format("DD/MM/YYYY"),
-      "Days Until Expiry": doc.days_until_expiry,
-      Status: doc.status,
-    }))
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Document Expiry Report")
-
-    // Auto-size columns
-    const colWidths = Object.keys(exportData[0] || {}).map((key) => ({
-      wch: Math.max(key.length, 15),
-    }))
-    worksheet["!cols"] = colWidths
-
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
-    const data = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
-    saveAs(data, `Document_Expiry_Report_${moment().format("YYYY-MM-DD")}.xlsx`)
-  }
-
-  // Get status chip color and icon
-  const getStatusColor = (status, daysUntilExpiry) => {
-    switch (status.toLowerCase()) {
-      case "expired":
-        return "#f44336"
-      case "expiring soon":
-        return "#ff9800"
-      case "active":
-        return daysUntilExpiry <= 30 ? "#ff9800" : "#4caf50"
-      default:
-        return "#9e9e9e"
+    // Get status chip color and icon
+    const getStatusColor = (status, daysUntilExpiry) => {
+        switch (status?.toLowerCase()) {
+            case "expired":
+                return "#f44336"
+            case "expiring soon":
+                return "#ff9800"
+            case "active":
+                return daysUntilExpiry <= 30 ? "#ff9800" : "#4caf50"
+            default:
+                return "#9e9e9e"
+        }
     }
-  }
 
-  const getStatusIcon = (status) => {
-    switch (status.toLowerCase()) {
-      case "expired":
-        return <ErrorIcon sx={{ fontSize: 16 }} />
-      case "expiring soon":
-        return <WarningIcon sx={{ fontSize: 16 }} />
-      default:
-        return null
+    const getStatusIcon = (status) => {
+        switch (status?.toLowerCase()) {
+            case "expired":
+                return <ErrorIcon sx={{ fontSize: 16 }} />
+            case "expiring soon":
+                return <WarningIcon sx={{ fontSize: 16 }} />
+            default:
+                return null
+        }
     }
-  }
 
-  // DataTable columns configuration
-  const columns = [
-    {
-      header: "Employee ID",
-      accessorKey: "employee_id",
-    },
-    {
-      header: "Employee Name",
-      accessorKey: "employee_name",
-    },
-    {
-      header: "Department",
-      accessorKey: "department",
-    },
-    {
-      header: "Document Type",
-      accessorKey: "document_type",
-      cell: ({ row }) => <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>{row.original.document_type}</Box>,
-    },
-    {
-      header: "Document Number",
-      accessorKey: "document_number",
-      cell: ({ row }) => <Box sx={{ fontFamily: "monospace", fontSize: "12px" }}>{row.original.document_number}</Box>,
-    },
-    {
-      header: "Issue Date",
-      accessorKey: "issue_date",
-      cell: ({ row }) => <Box>{moment(row.original.issue_date).format("DD/MM/YYYY")}</Box>,
-    },
-    {
-      header: "Expiry Date",
-      accessorKey: "expiry_date",
-      cell: ({ row }) => (
-        <Box
-          sx={{
-            color:
-              row.original.days_until_expiry < 0
-                ? "#f44336"
-                : row.original.days_until_expiry <= 30
-                  ? "#ff9800"
-                  : "#333",
-            fontWeight: row.original.days_until_expiry <= 30 ? "bold" : "normal",
-          }}
-        >
-          {moment(row.original.expiry_date).format("DD/MM/YYYY")}
-        </Box>
-      ),
-    },
-    {
-      header: "Days Until Expiry",
-      accessorKey: "days_until_expiry",
-      cell: ({ row }) => (
-        <Box
-          sx={{
-            color:
-              row.original.days_until_expiry < 0
-                ? "#f44336"
-                : row.original.days_until_expiry <= 30
-                  ? "#ff9800"
-                  : "#4caf50",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
-          {row.original.days_until_expiry < 0
-            ? `${Math.abs(row.original.days_until_expiry)} days ago`
-            : `${row.original.days_until_expiry} days`}
-        </Box>
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: ({ row }) => (
-        <Chip
-          label={row.original.status}
-          size="small"
-          icon={getStatusIcon(row.original.status)}
-          sx={{
-            backgroundColor: getStatusColor(row.original.status, row.original.days_until_expiry),
-            color: "white",
-            fontWeight: "bold",
-            "& .MuiChip-icon": {
-              color: "white",
+    // DataTable columns configuration
+    const columns = [
+        {
+            header: "Employee ID",
+            accessorKey: "employee_id",
+            cell: ({ row }) => <Box >{row.original.employee?.employee_code}</Box>,
+        },
+        {
+            header: "Employee Name",
+            accessorKey: "employee_name",
+            cell: ({ row }) => <Box >{row.original.employee?.first_name}</Box>,
+        },
+        {
+            header: "Department",
+            accessorKey: "department",
+            cell: ({ row }) => <Box >{row.original.employee?.department}</Box>,
+        },
+        {
+            header: "Document Type",
+            accessorKey: "name",
+            cell: ({ row }) => <Box sx={{ fontWeight: "bold", color: "#1976d2" }}  >{row.original.name}</Box>,
+        },
+        {
+            header: "Document Number",
+            accessorKey: "reference_id",
+            cell: ({ row }) => <Box sx={{ fontFamily: "monospace", fontSize: "12px" }}>{row.original.reference_id}</Box>,
+        },
+
+        {
+            header: "Issue Date",
+            accessorKey: "updatedAt",
+            cell: ({ row }) => <Box>{moment(row.original.updatedAt).format("DD/MM/YYYY")}</Box>,
+        },
+        {
+            header: "Expiry Date",
+            accessorKey: "expiry_date",
+            cell: ({ row }) => (
+                <Box
+                    sx={{
+                        color:
+                            row.original.days_until_expiry < 0
+                                ? "#f44336"
+                                : row.original.days_until_expiry <= 30
+                                    ? "#ff9800"
+                                    : "#333",
+                        fontWeight: row.original.days_until_expiry <= 30 ? "bold" : "normal",
+                    }}
+                >
+                    {moment(row.original.expiry_date).format("DD/MM/YYYY")}
+                </Box>
+            ),
+        },
+        {
+            header: "Days Until Expiry",
+            accessorKey: "expiry_date", // optional if used only in cell
+            cell: ({ row }) => {
+                const days = moment(row.original.expiry_date).startOf('day').diff(moment().startOf('day'), 'days');
+                return (
+                    <Box
+                        sx={{
+                            color: days < 0 ? "#f44336" : days <= 30 ? "#ff9800" : "#4caf50",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                        }}
+                    >
+                        {days < 0 ? `${Math.abs(days)} days ago` : `${days} days`}
+                    </Box>
+                );
             },
-          }}
-        />
-      ),
-    },
-  ]
+        },
 
-  // Calculate statistics
-  const totalDocuments = filteredData.length
-  const expiredDocuments = filteredData.filter((doc) => doc.status === "Expired").length
-  const expiringSoonDocuments = filteredData.filter((doc) => doc.status === "Expiring Soon").length
-  const activeDocuments = filteredData.filter((doc) => doc.status === "Active").length
 
-  useEffect(() => {
-    handleFilter()
-  }, [filters])
+    ]
 
-  return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Box>
-          <Typography sx={{ fontSize: "28px", fontWeight: "bold", color: "#1976d2", mb: 1 }}>
-            Document Expiry Report
-          </Typography>
-          <Typography sx={{ fontSize: "14px", color: "#666" }}>
-            Employee wise report tracking expiry of documents uploaded
-          </Typography>
+    // Calculate statistics
+    const totalDocuments = filteredData?.length
+    const expiredDocuments = filteredData?.filter((doc) => doc.status === "Expired").length
+    const expiringSoonDocuments = filteredData?.filter((doc) => doc.status === "Expiring Soon").length
+    const activeDocuments = filteredData?.filter((doc) => doc.status === "Active").length
+
+    useEffect(() => {
+        handleFilter()
+    }, [filters])
+
+    useEffect(() => {
+        getEmployees()
+        getData()
+    }, [])
+
+
+    return (
+        <Box sx={{ p: 3 }}>
+            {/* Header */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+                <Box>
+                    <Typography sx={{ fontSize: "28px", fontWeight: "bold", color: "#1976d2", mb: 1 }}>
+                        Document Expiry Report
+                    </Typography>
+                    <Typography sx={{ fontSize: "14px", color: "#666" }}>
+                        Employee wise report tracking expiry of documents uploaded
+                    </Typography>
+                </Box>
+                <PrimaryButton
+                    bgcolor={"#1976d2"}
+                    title="Export to Excel"
+                    onClick={handleExcelExport}
+                    startIcon={<DownloadIcon />}
+                />
+            </Box>
+
+            {/* Summary Cards */}
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: "#e3f2fd",
+                            borderRadius: 2,
+                            border: "1px solid #bbdefb",
+                        }}
+                    >
+                        <Typography sx={{ fontSize: "14px", color: "#1565c0", fontWeight: "bold" }}>Total Documents</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#0d47a1" }}>{totalDocuments}</Typography>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: "#ffebee",
+                            borderRadius: 2,
+                            border: "1px solid #ffcdd2",
+                        }}
+                    >
+                        <Typography sx={{ fontSize: "14px", color: "#c62828", fontWeight: "bold" }}>Expired Documents</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#b71c1c" }}>{statsData?.expiredDocuments}</Typography>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: "#fff3e0",
+                            borderRadius: 2,
+                            border: "1px solid #ffcc02",
+                        }}
+                    >
+                        <Typography sx={{ fontSize: "14px", color: "#ef6c00", fontWeight: "bold" }}>Expiring Soon</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#e65100" }}>
+                            {statsData?.expiringSoon}
+                        </Typography>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: "#e8f5e8",
+                            borderRadius: 2,
+                            border: "1px solid #c8e6c9",
+                        }}
+                    >
+                        <Typography sx={{ fontSize: "14px", color: "#2e7d32", fontWeight: "bold" }}>Active Documents</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#1b5e20" }}>{statsData?.activeDocuments}</Typography>
+                    </Box>
+                </Grid>
+            </Grid>
+
+            {/* Alert Section */}
+            {(expiredDocuments > 0 || expiringSoonDocuments > 0) && (
+                <Box
+                    sx={{
+                        p: 2,
+                        bgcolor: "#fff3cd",
+                        borderRadius: 2,
+                        border: "1px solid #ffeaa7",
+                        mb: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                    }}
+                >
+                    <WarningIcon sx={{ color: "#856404" }} />
+                    <Box>
+                        <Typography sx={{ fontSize: "16px", fontWeight: "bold", color: "#856404" }}>
+                            Document Expiry Alert
+                        </Typography>
+                        <Typography sx={{ fontSize: "14px", color: "#856404" }}>
+                            {expiredDocuments > 0 && `${expiredDocuments} document(s) have expired. `}
+                            {expiringSoonDocuments > 0 && `${expiringSoonDocuments} document(s) are expiring soon.`}
+                            Please take immediate action to renew these documents.
+                        </Typography>
+                    </Box>
+                </Box>
+            )}
+
+            {/* Filters */}
+            <Box
+                sx={{
+                    p: 2,
+                    bgcolor: "#f8f9fa",
+                    borderRadius: 2,
+                    border: "1px solid #e9ecef",
+                    mb: 3,
+                }}
+            >
+                <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 2 }}>Filters</Typography>
+                <Grid container spacing={2} display={'flex'} >
+                    <Grid item xs={12} sm={6} md={3} >
+                        <SelectField size="small"
+                            label="Select Employee "
+                            options={employees}
+
+                            selected={selectedEmployee}
+                            onSelect={(value) => {
+                                console.log(value);
+                                getData(value?.id)
+                                setSelectedEmployee(value)
+                            }}
+
+                        />
+                    </Grid>
+
+                </Grid>
+            </Box>
+
+            {/* Data Table */}
+            <Box>
+                <DataTable loading={loader} data={filteredData} columns={columns} />
+            </Box>
         </Box>
-        <PrimaryButton
-          bgcolor={"#1976d2"}
-          title="Export to Excel"
-          onClick={handleExcelExport}
-          startIcon={<DownloadIcon />}
-        />
-      </Box>
-
-      {/* Summary Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "#e3f2fd",
-              borderRadius: 2,
-              border: "1px solid #bbdefb",
-            }}
-          >
-            <Typography sx={{ fontSize: "14px", color: "#1565c0", fontWeight: "bold" }}>Total Documents</Typography>
-            <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#0d47a1" }}>{totalDocuments}</Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "#ffebee",
-              borderRadius: 2,
-              border: "1px solid #ffcdd2",
-            }}
-          >
-            <Typography sx={{ fontSize: "14px", color: "#c62828", fontWeight: "bold" }}>Expired Documents</Typography>
-            <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#b71c1c" }}>{expiredDocuments}</Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "#fff3e0",
-              borderRadius: 2,
-              border: "1px solid #ffcc02",
-            }}
-          >
-            <Typography sx={{ fontSize: "14px", color: "#ef6c00", fontWeight: "bold" }}>Expiring Soon</Typography>
-            <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#e65100" }}>
-              {expiringSoonDocuments}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "#e8f5e8",
-              borderRadius: 2,
-              border: "1px solid #c8e6c9",
-            }}
-          >
-            <Typography sx={{ fontSize: "14px", color: "#2e7d32", fontWeight: "bold" }}>Active Documents</Typography>
-            <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#1b5e20" }}>{activeDocuments}</Typography>
-          </Box>
-        </Grid>
-      </Grid>
-
-      {/* Alert Section */}
-      {(expiredDocuments > 0 || expiringSoonDocuments > 0) && (
-        <Box
-          sx={{
-            p: 2,
-            bgcolor: "#fff3cd",
-            borderRadius: 2,
-            border: "1px solid #ffeaa7",
-            mb: 3,
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-          }}
-        >
-          <WarningIcon sx={{ color: "#856404" }} />
-          <Box>
-            <Typography sx={{ fontSize: "16px", fontWeight: "bold", color: "#856404" }}>
-              Document Expiry Alert
-            </Typography>
-            <Typography sx={{ fontSize: "14px", color: "#856404" }}>
-              {expiredDocuments > 0 && `${expiredDocuments} document(s) have expired. `}
-              {expiringSoonDocuments > 0 && `${expiringSoonDocuments} document(s) are expiring soon.`}
-              Please take immediate action to renew these documents.
-            </Typography>
-          </Box>
-        </Box>
-      )}
-
-      {/* Filters */}
-      <Box
-        sx={{
-          p: 2,
-          bgcolor: "#f8f9fa",
-          borderRadius: 2,
-          border: "1px solid #e9ecef",
-          mb: 3,
-        }}
-      >
-        <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 2 }}>Filters</Typography>
-        <Grid container spacing={2} display={'flex'} justifyContent={'center'}>
-          <Grid item xs={12} sm={6} md={3} >
-            <InputField
-              size="small"
-              
-              placeholder="Search by name, ID, or document..."
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} mt={1}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Department</InputLabel>
-              <Select
-                value={filters.department}
-                label="Department"
-                onChange={(e) => setFilters({ ...filters, department: e.target.value })}
-              >
-                <MenuItem value="">All Departments</MenuItem>
-                {departments.map((dept) => (
-                  <MenuItem key={dept} value={dept}>
-                    {dept}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} mt={1}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Document Type</InputLabel>
-              <Select
-                value={filters.document_type}
-                label="Document Type"
-                onChange={(e) => setFilters({ ...filters, document_type: e.target.value })}
-              >
-                <MenuItem value="">All Document Types</MenuItem>
-                {documentTypes.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} mt={1}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={filters.status}
-                label="Status"
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              >
-                <MenuItem value="">All Statuses</MenuItem>
-                {statuses.map((status) => (
-                  <MenuItem key={status} value={status}>
-                    {status}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Box>
-
-      {/* Data Table */}
-      <Box>
-        <DataTable loading={loader} data={filteredData} columns={columns} />
-      </Box>
-    </Box>
-  )
+    )
 }
 
 export default DocumentExpiryReport

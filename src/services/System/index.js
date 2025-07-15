@@ -31,8 +31,24 @@ const SystemServices = {
     const data = await get(routes.getBankDetails);
     return data;
   },
+  getEmployeeStatusReport: async () => {
+    const data = await get(routes.getEmployeeStatusReport);
+    return data;
+  },
+  getEOSReport: async () => {
+    const data = await get(routes.getEOSReport);
+    return data;
+  },
   getRoles: async (params) => {
     const data = await get(routes.getRoles,params);
+    return data;
+  },
+   getEmployeeAttendance: async (params) => {
+    const data = await get(routes.getEmployeeAttendance,params);
+    return data;
+  },
+  getDocExpiryReport: async (params) => {
+    const data = await get(routes.getDocExpiryReport,params);
     return data;
   },
   getAllocations: async (params) => {
