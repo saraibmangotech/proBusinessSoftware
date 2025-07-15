@@ -305,10 +305,10 @@ function ShiftAllocations() {
             id: "fromDate",
             header: "From Date",
             // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.fromDate).format("DD/MM/YYYY"),
+            accessorFn: (row) => moment(row.from_date).format("DD/MM/YYYY"),
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.fromDate).format("DD/MM/YYYY")}
+                    {moment(row.original.from_date).format("DD/MM/YYYY")}
                 </Box>
             ),
         },
@@ -316,10 +316,10 @@ function ShiftAllocations() {
             id: "toDate",
             header: "To Date",
             // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.toDate).format("DD/MM/YYYY"),
+            accessorFn: (row) => moment(row.to_date).format("DD/MM/YYYY"),
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.toDate).format("DD/MM/YYYY")}
+                    {moment(row.original.to_date).format("DD/MM/YYYY")}
                 </Box>
             ),
         },

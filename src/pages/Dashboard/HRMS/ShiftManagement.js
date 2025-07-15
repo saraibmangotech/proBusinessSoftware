@@ -257,7 +257,7 @@ const ShiftManagement = () => {
 
             const formattedData = data?.employees?.rows?.map((item, index) => ({
                 ...item,
-                id: item?.id,
+                id: item?.user_id,
                 name: item?.user?.name,
             }));
 
@@ -307,7 +307,7 @@ const ShiftManagement = () => {
                     </Box>
                     <Box>
                         <Typography variant="h6" fontWeight="600" color="text.primary">
-                            Predefined Shift 
+                            Predefined Shift
                         </Typography>
                         <Typography variant="body2" color="text.secondary" fontSize="0.875rem">
                             Create and manage reusable shift for quick assignment
@@ -562,6 +562,9 @@ const ShiftManagement = () => {
                                             value={field.value ? field.value.split(',') : []} // Convert comma string to array
                                             onChange={(e) => {
                                                 const selectedIds = e.target.value;
+                                                console.log(field, 'selectedIds');
+                                                console.log(selectedIds, 'selectedIds');
+
                                                 setSelectedEmployees(selectedIds.join(','))
                                                 field.onChange(selectedIds.join(',')); // Convert back to comma string
                                             }}
