@@ -167,7 +167,7 @@ function EmployeeAttendanceReport() {
             console.log(data);
             setData(data)
         } catch (error) {
-            showErrorToast(error)
+            console.log(error)
         }
     }
 
