@@ -68,7 +68,11 @@ const routes = {
   deleteShift:'/hrms/shifts/delete',
   AssignEmployee:'/hrms/shifts/assign',
   getAllocations:'/hrms/shifts/allocations',
-  updateEmployeeLeaves:'/hrms/employees/leaves/update'
+  updateEmployeeLeaves:'/hrms/employees/leaves/update',
+  getEOSReport:'/hrms/reports/gratuity',
+  getEmployeeStatusReport:'/hrms/reports/employee',
+  getDocExpiryReport:'/hrms/reports/documents',
+  getEmployeeAttendance:'/hrms/reports/attendance'
   
 };
 
