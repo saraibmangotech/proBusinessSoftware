@@ -519,8 +519,8 @@ const downloadExcel = async () => {
         const newShift = {
             id: uuidv4(), // Unique ID
             shift: shifts.length + 1, // Sequential number
-            check_in: moment(formData?.shiftStartTime.endDate()).format('HH:mm'),
-            check_out: formData?.shiftEndTime ? moment(formData?.shiftEndTime.endDate()).format('HH:mm') : null,
+            check_in: moment(formData?.shiftStartTime.toDate()).format('HH:mm'),
+            check_out: formData?.shiftEndTime ? moment(formData?.shiftEndTime.toDate()).format('HH:mm') : null,
         };
 
         setShifts((prevShifts) => [...prevShifts, newShift]);
@@ -604,7 +604,7 @@ const downloadExcel = async () => {
             if (shift.id === shiftId) {
                 return {
                     ...shift,
-                    [field]: moment(newValue.endDate()).format('HH:mm')
+                    [field]: moment(newValue.toDate()).format('HH:mm')
                 };
             }
 
@@ -690,7 +690,7 @@ const downloadExcel = async () => {
                                                 value={value}
                                                 onChange={(newValue) => {
                                                     if (newValue && newValue.isValid && newValue.isValid()) {
-                                                        console.log("Selected Time (24-hour):", moment(newValue.endDate()).format("HH:mm"))
+                                                        console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"))
                                                     } else {
                                                         console.log("Invalid time selected")
                                                     }
@@ -750,7 +750,7 @@ const downloadExcel = async () => {
                                                 }}
                                                 onChange={(newValue) => {
                                                     if (newValue && newValue.isValid && newValue.isValid()) {
-                                                        console.log("Selected Time (24-hour):", moment(newValue?.endDate()).format("HH:mm"))
+                                                        console.log("Selected Time (24-hour):", moment(newValue?.toDate()).format("HH:mm"))
                                                     } else {
                                                         console.log("Invalid time selected")
                                                     }
