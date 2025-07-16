@@ -649,7 +649,7 @@ function DocumentExpiryReport() {
                         fontWeight: row.original.days_until_expiry <= 30 ? "bold" : "normal",
                     }}
                 >
-                    {moment(row.original.expiry_date).format("DD/MM/YYYY")}
+                    {row.original.expiry_date ? moment(row.original.expiry_date).format("DD/MM/YYYY") : '-'}
                 </Box>
             ),
         },
@@ -666,7 +666,7 @@ function DocumentExpiryReport() {
                             textAlign: "center",
                         }}
                     >
-                        {days < 0 ? `${Math.abs(days)} days ago` : `${days} days`}
+                        {row.original.expiry_date ? days < 0 ? `${Math.abs(days)} days ago` : `${days} days` : '-'}
                     </Box>
                 );
             },
@@ -723,7 +723,7 @@ function DocumentExpiryReport() {
                         }}
                     >
                         <Typography sx={{ fontSize: "14px", color: "#1565c0", fontWeight: "bold" }}>Total Documents</Typography>
-                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#0d47a1" }}>{totalDocuments}</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#0d47a1" }}>{totalDocuments || 0}</Typography>
                     </Box>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
@@ -736,7 +736,7 @@ function DocumentExpiryReport() {
                         }}
                     >
                         <Typography sx={{ fontSize: "14px", color: "#c62828", fontWeight: "bold" }}>Expired Documents</Typography>
-                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#b71c1c" }}>{statsData?.expiredDocuments}</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#b71c1c" }}>{statsData?.expiredDocuments || 0}</Typography>
                     </Box>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
@@ -750,7 +750,7 @@ function DocumentExpiryReport() {
                     >
                         <Typography sx={{ fontSize: "14px", color: "#ef6c00", fontWeight: "bold" }}>Expiring Soon</Typography>
                         <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#e65100" }}>
-                            {statsData?.expiringSoon}
+                            {statsData?.expiringSoon || 0}
                         </Typography>
                     </Box>
                 </Grid>
@@ -764,7 +764,7 @@ function DocumentExpiryReport() {
                         }}
                     >
                         <Typography sx={{ fontSize: "14px", color: "#2e7d32", fontWeight: "bold" }}>Active Documents</Typography>
-                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#1b5e20" }}>{statsData?.activeDocuments}</Typography>
+                        <Typography sx={{ fontSize: "24px", fontWeight: "bold", color: "#1b5e20" }}>{statsData?.activeDocuments || 0}</Typography>
                     </Box>
                 </Grid>
             </Grid>
