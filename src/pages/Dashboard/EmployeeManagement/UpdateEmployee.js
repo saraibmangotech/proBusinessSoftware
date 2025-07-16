@@ -546,6 +546,7 @@ function UpdateEmployee() {
             setValue('shiftEndTime', details?.shift_end ? moment(details?.shift_end, 'HH:mm') : null);
             setValue('probation', details?.probation_period_months || '');
             setValue('status', details?.employment_status || '');
+               setValue('passportnumber', details?.passport_number || '');
             setValue('graceMonths', details?.grace_period_minutes || '');
             setValue('minHours', details?.minimum_required_minutes || '');
             setValue('timedetection', details?.short_time_deduction_type || '');
@@ -820,7 +821,22 @@ function UpdateEmployee() {
 
 
                     </Grid>
+                    <Grid item xs={12} sm={2.8}>
 
+                        <InputField
+                            label={" Passport Number :*"}
+                            size={'small'}
+                            placeholder={"Passport Number"}
+                            error={errors?.passportnumber?.message}
+                            register={register("passportnumber", {
+                                required:
+                                    "Please enter passport number."
+
+                            })}
+                        />
+
+
+                    </Grid>
 
 
 
@@ -991,73 +1007,73 @@ function UpdateEmployee() {
                 <Grid item xs={12}  >
                     <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: Colors.textColorDarkBlue }}>Documents : </Typography>
                 </Grid>
-                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                       {documents?.length > 0 &&
-                         documents.map((item, index) => (
-                           <Grid item xs={12} md={4} key={item.key}>
-                             {/* Upload Section */}
-                             <Typography
-                               variant="subtitle1"
-                               fontWeight="bold"
-                               sx={{ color: Colors.gray }}
-                             >
-                               {item?.is_required ? item?.name : `${item?.name} (If Any)`} :{" "}
-                               {item?.is_required ? "*" : ""}
-                             </Typography>
-             
-                             <UploadFile
-                               Memo={true}
-                               accept={allowFilesType}
-                               file={documents}
-                               multiple={true}
-                               updateResult={updateResult}
-                               fileId={item?.key}
-                               loader={loader}
-                               error={errors[item?.key]?.message}
-                               disabled={isUploading}
-                               register={register(`${item?.key}`, {
-                                 required: item?.is_required
-                                   ? documents.find((item2) => item2?.key === item?.key)?.path !== ""
-                                     ? false
-                                     : "Please upload document."
-                                   : false,
-                                 onChange: async (e) => {
-                                   setIsUploading(true);
-                                   const path = await handleUploadDocument(e, item?.key);
-                                   if (path) {
-                                     handleDocArrayUpdate("path", path, item?.key);
-                                     console.log(path);
-                                   }
-                                   setIsUploading(false);
-                                 },
-                               })}
-                             />
-             
-                             <DatePicker
-                               disablePast={true}
-                               size="small"
-                               label={`${item?.name} Expiry Date :*`}
-                               value={item?.expiry_date ? new Date(item.expiry_date) : null}
-                               error={errors[`${item?.key}_expiry`]?.message}
-                               register={register(`${item?.key}_expiry`, {
-                                 required: item?.is_required
-                                   ? item?.expiry_date
-                                     ? false
-                                     : "Please select expiry date."
-                                   : false,
-             
-                               })}
-                               onChange={(date) => {
-             
-             
-             
-                                 setValue(`${item?.key}_expiry`, date);
-                                 handleDocArrayUpdate("date", date, item?.key);
-                               }}
-                             />
-                           </Grid>
-                         ))}
-                     </Grid>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                    {documents?.length > 0 &&
+                        documents.map((item, index) => (
+                            <Grid item xs={12} md={4} key={item.key}>
+                                {/* Upload Section */}
+                                <Typography
+                                    variant="subtitle1"
+                                    fontWeight="bold"
+                                    sx={{ color: Colors.gray }}
+                                >
+                                    {item?.is_required ? item?.name : `${item?.name} (If Any)`} :{" "}
+                                    {item?.is_required ? "*" : ""}
+                                </Typography>
+
+                                <UploadFile
+                                    Memo={true}
+                                    accept={allowFilesType}
+                                    file={documents}
+                                    multiple={true}
+                                    updateResult={updateResult}
+                                    fileId={item?.key}
+                                    loader={loader}
+                                    error={errors[item?.key]?.message}
+                                    disabled={isUploading}
+                                    register={register(`${item?.key}`, {
+                                        required: item?.is_required
+                                            ? documents.find((item2) => item2?.key === item?.key)?.path !== ""
+                                                ? false
+                                                : "Please upload document."
+                                            : false,
+                                        onChange: async (e) => {
+                                            setIsUploading(true);
+                                            const path = await handleUploadDocument(e, item?.key);
+                                            if (path) {
+                                                handleDocArrayUpdate("path", path, item?.key);
+                                                console.log(path);
+                                            }
+                                            setIsUploading(false);
+                                        },
+                                    })}
+                                />
+
+                                <DatePicker
+                                    disablePast={true}
+                                    size="small"
+                                    label={`${item?.name} Expiry Date :*`}
+                                    value={item?.expiry_date ? new Date(item.expiry_date) : null}
+                                    error={errors[`${item?.key}_expiry`]?.message}
+                                    register={register(`${item?.key}_expiry`, {
+                                        required: item?.is_required
+                                            ? item?.expiry_date
+                                                ? false
+                                                : "Please select expiry date."
+                                            : false,
+
+                                    })}
+                                    onChange={(date) => {
+
+
+
+                                        setValue(`${item?.key}_expiry`, date);
+                                        handleDocArrayUpdate("date", date, item?.key);
+                                    }}
+                                />
+                            </Grid>
+                        ))}
+                </Grid>
                 <Box>
                     <Box display="flex" alignItems="center" mt={2}>
                         <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
@@ -1105,126 +1121,7 @@ function UpdateEmployee() {
                             }}
                         />
                     </Grid>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Grid item xs={12} sm={2.8}>
-                            <InputLabel
-                                error={!!errors.shiftStartTime}
-                                sx={{ textTransform: "capitalize", textAlign: "left", fontWeight: 700, color: Colors.gray }}
-                            >
-                                Shift Start Time:*
-                            </InputLabel>
-                            <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
-                                <Controller
-                                    name="shiftStartTime"
-                                    control={control}
-                                    rules={{ required: "Shift Start Time is required" }}
-                                    render={({ field: { onChange, value } }) => (
-                                        <TimePicker
-                                            slotProps={{
-                                                textField: {
-                                                    sx: {
-                                                        borderRadius: "10px !important",
-                                                        border: "2px solid black !important",
-                                                    }
-                                                }
-                                            }}
-                                            value={value}
-                                            onChange={(newValue) => {
-                                                if (newValue && newValue.isValid && newValue.isValid()) {
-                                                    console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"));
-                                                } else {
-                                                    console.log("Invalid time selected");
-                                                }
-                                                onChange(newValue);
-                                            }}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    size="small"
-                                                    error={!!errors.shiftStartTime}
-                                                    helperText={errors.shiftStartTime?.message}
-                                                    sx={{
-                                                        borderRadius: "10px !important",
-                                                        "&.MuiTextField-root": {
-                                                            borderRadius: "10px !important",
-                                                            border: "1px solid black !important",
-                                                            '& fieldset': { border: "1px solid black !important" },
-                                                            "&.Mui-focused svg path": {
-                                                                fill: "#0076bf"
-                                                            }
-                                                        }
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                />
 
-                                <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
-                                    {errors.shiftStartTime?.message}
-                                </Typography>
-                            </FormControl>
-                        </Grid>
-
-                        {/* Shift End Time */}
-                        <Grid item xs={12} sm={2.8}>
-                            <InputLabel
-                                error={!!errors.shiftEndTime}
-                                sx={{ textTransform: "capitalize", textAlign: "left", fontWeight: 700, color: Colors.gray }}
-                            >
-                                Shift End Time:*
-                            </InputLabel>
-                            <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
-                                <Controller
-                                    name="shiftEndTime"
-                                    control={control}
-                                    rules={{ required: "Shift End Time is required" }}
-                                    render={({ field: { onChange, value } }) => (
-                                        <TimePicker
-                                            value={value}
-                                            slotProps={{
-                                                textField: {
-                                                    sx: {
-                                                        borderRadius: "10px !important",
-                                                        border: "2px solid black !important",
-                                                    }
-                                                }
-                                            }}
-                                            onChange={(newValue) => {
-                                                if (newValue && newValue.isValid && newValue.isValid()) {
-                                                    console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"));
-                                                } else {
-                                                    console.log("Invalid time selected");
-                                                }
-                                                onChange(newValue);
-                                            }}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    size="small"
-                                                    error={!!errors.shiftEndTime}
-                                                    helperText={errors.shiftEndTime?.message}
-                                                    sx={{
-                                                        borderRadius: "10px !important",
-                                                        ".MuiOutlinedInput-root": {
-                                                            borderRadius: "10px !important",
-                                                            '& fieldset': { border: "none !important" },
-                                                            "&.Mui-focused svg path": {
-                                                                fill: "#0076bf"
-                                                            }
-                                                        }
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                />
-                                <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
-                                    {errors.shiftEndTime?.message}
-                                </Typography>
-                            </FormControl>
-                        </Grid>
-                    </LocalizationProvider>
                     <Grid item xs={12} sm={2.8}>
 
                         <InputField
@@ -1314,7 +1211,7 @@ function UpdateEmployee() {
                             placeholder="Branch"
                             error={errors?.branch?.message}
                             register={register("branch", {
-                                required: "Please enter branch.",
+                                required: false,
                             })}
                         />
                     </Grid>
@@ -1326,7 +1223,7 @@ function UpdateEmployee() {
                             placeholder="Visa"
                             error={errors?.visa?.message}
                             register={register("visa", {
-                                required: "Please enter visa.",
+                                required: false,
                             })}
                         />
                     </Grid>
@@ -1338,7 +1235,7 @@ function UpdateEmployee() {
                             placeholder="Work Permit"
                             error={errors?.work_permit?.message}
                             register={register("work_permit", {
-                                required: "Please enter work permit.",
+                                required: false,
                             })}
                         />
                     </Grid>
@@ -1350,7 +1247,7 @@ function UpdateEmployee() {
                             placeholder="IBAN"
                             error={errors?.iban?.message}
                             register={register("iban", {
-                                required: "Please enter IBAN.",
+                                required: false,
                             })}
                         />
                     </Grid>
@@ -1374,7 +1271,7 @@ function UpdateEmployee() {
                             placeholder="Routing"
                             error={errors?.routing?.message}
                             register={register("routing", {
-                                required: "Please enter routing.",
+                                required: false,
                             })}
                         />
                     </Grid>
