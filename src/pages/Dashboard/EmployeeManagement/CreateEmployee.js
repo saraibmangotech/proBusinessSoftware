@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, InputAdornment, ListItemText, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Images, SvgIcon, SvgIcon as SvgIconss } from 'assets';
@@ -60,6 +60,25 @@ function CreateEmployee() {
 
   const { register, handleSubmit, formState: { errors }, control, getValues, watch, setError, setValue,
     clearErrors, } = useForm();
+
+
+  const basicSalary = watch("basicSalary") || 0;
+  const housing = watch("housing_allowance") || 0;
+  const transport = watch("transport_allowance") || 0;
+  const other = watch("other_allowance") || 0;
+
+  const totalSalary = useMemo(() => {
+    return (
+      (parseFloat(basicSalary) || 0) +
+      (parseFloat(housing) || 0) +
+      (parseFloat(transport) || 0) +
+      (parseFloat(other) || 0)
+    );
+  }, [basicSalary, housing, transport, other]);
+
+  useEffect(() => {
+    setValue("total_salary", totalSalary);
+  }, [totalSalary, setValue]);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -328,7 +347,7 @@ function CreateEmployee() {
 
           date_of_joining: doj,
           date_of_birth: dob,
-           passport_number: formData?.passportnumber,
+          passport_number: formData?.passportnumber,
           probation_period_months: formData?.probation,
           probation_end_date: probEndDate,
           employment_status: formData?.status,
@@ -700,7 +719,7 @@ function CreateEmployee() {
 
           </Grid>
 
-  <Grid item xs={12} sm={2.8}>
+          <Grid item xs={12} sm={2.8}>
 
             <InputField
               label={" Passport Number :*"}
@@ -882,8 +901,8 @@ function CreateEmployee() {
             </Grid>
           )}
         </Grid>
-        {console.log(documents,'documents')}
-        
+        {console.log(documents, 'documents')}
+
         <Grid item xs={12}  >
           <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: Colors.textColorDarkBlue }}>Documents : </Typography>
         </Grid>
@@ -1003,7 +1022,7 @@ function CreateEmployee() {
               }}
             />
           </Grid>
-        
+
           <Grid item xs={12} sm={2.8}>
 
             <InputField
@@ -1460,72 +1479,66 @@ function CreateEmployee() {
 
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Basic Salary :*"}
-              size={'small'}
-              type={'number'}
+              size={"small"}
+              type={"number"}
               placeholder={"  Basic Salary "}
               error={errors?.basicSalary?.message}
               register={register("basicSalary", {
-                required:
-                  "Please enter basic salary."
-
+                required: "Please enter basic salary.",
               })}
             />
-
-
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
+          <Grid item xs={12} sm={2.8}>
             <InputField
               label={"Housing Allowance :*"}
-              size={'small'}
-              type={'number'}
+              size={"small"}
+              type={"number"}
               placeholder={"  Housing Allowance  "}
               error={errors?.housing_allowance?.message}
               register={register("housing_allowance", {
-                required:
-                  "Please enter housing allowance."
-
+                required: "Please enter housing allowance.",
               })}
             />
-
-
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
+          <Grid item xs={12} sm={2.8}>
             <InputField
-              label={" Transport Allowance :*"}
-              size={'small'}
-              type={'number'}
+              label={"Transport Allowance :*"}
+              size={"small"}
+              type={"number"}
               placeholder={"  Transport Allowance "}
               error={errors?.transport_allowance?.message}
               register={register("transport_allowance", {
-                required:
-                  "Please enter transport allowance."
-
+                required: "Please enter transport allowance.",
               })}
             />
-
-
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
+          <Grid item xs={12} sm={2.8}>
             <InputField
-              label={" Other Allowance :*"}
-              size={'small'}
-              type={'number'}
+              label={"Other Allowance :*"}
+              size={"small"}
+              type={"number"}
               placeholder={" Other Allowance "}
               error={errors?.other_allowance?.message}
               register={register("other_allowance", {
-                required:
-                  "Please enter other allowance."
-
+                required: "Please enter other allowance.",
               })}
             />
+          </Grid>
 
-
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Total Salary"}
+              size={"small"}
+              type={"number"}
+              placeholder={"Total Salary"}
+              disabled
+              value={totalSalary}
+            />
           </Grid>
 
           <Grid item xs={12} sm={2.8}>

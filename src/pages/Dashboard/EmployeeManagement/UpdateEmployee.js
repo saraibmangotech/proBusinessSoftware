@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, InputAdornment, ListItemText, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Images, SvgIcon, SvgIcon as SvgIconss } from 'assets';
@@ -546,7 +546,7 @@ function UpdateEmployee() {
             setValue('shiftEndTime', details?.shift_end ? moment(details?.shift_end, 'HH:mm') : null);
             setValue('probation', details?.probation_period_months || '');
             setValue('status', details?.employment_status || '');
-               setValue('passportnumber', details?.passport_number || '');
+            setValue('passportnumber', details?.passport_number || '');
             setValue('graceMonths', details?.grace_period_minutes || '');
             setValue('minHours', details?.minimum_required_minutes || '');
             setValue('timedetection', details?.short_time_deduction_type || '');
@@ -609,6 +609,24 @@ function UpdateEmployee() {
             console.error("Error fetching employee data:", error);
         }
     };
+
+    const basicSalary = watch("basicSalary") || 0;
+    const housing = watch("housing_allowance") || 0;
+    const transport = watch("transport_allowance") || 0;
+    const other = watch("other_allowance") || 0;
+
+    const totalSalary = useMemo(() => {
+        return (
+            (parseFloat(basicSalary) || 0) +
+            (parseFloat(housing) || 0) +
+            (parseFloat(transport) || 0) +
+            (parseFloat(other) || 0)
+        );
+    }, [basicSalary, housing, transport, other]);
+
+    useEffect(() => {
+        setValue("total_salary", totalSalary);
+    }, [totalSalary, setValue]);
     const getCostCenters = async () => {
         try {
             let params = {
@@ -1580,74 +1598,68 @@ function UpdateEmployee() {
 
 
                     </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={" Basic Salary :*"}
-                            size={'small'}
-                            type={'number'}
-                            placeholder={"  Basic Salary "}
-                            error={errors?.basicSalary?.message}
-                            register={register("basicSalary", {
-                                required:
-                                    "Please enter basic salary."
-
-                            })}
-                        />
-
-
-                    </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={"Housing Allowance :*"}
-                            size={'small'}
-                            type={'number'}
-                            placeholder={"  Housing Allowance  "}
-                            error={errors?.housing_allowance?.message}
-                            register={register("housing_allowance", {
-                                required:
-                                    "Please enter housing allowance."
-
-                            })}
-                        />
-
-
-                    </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={" Transport Allowance :*"}
-                            size={'small'}
-                            type={'number'}
-                            placeholder={"  Transport Allowance "}
-                            error={errors?.transport_allowance?.message}
-                            register={register("transport_allowance", {
-                                required:
-                                    "Please enter transport allowance."
-
-                            })}
-                        />
-
-
-                    </Grid>
-                    <Grid item xs={12} sm={2.8}>
-
-                        <InputField
-                            label={" Other Allowance :*"}
-                            size={'small'}
-                            type={'number'}
-                            placeholder={" Other Allowance "}
-                            error={errors?.other_allowance?.message}
-                            register={register("other_allowance", {
-                                required:
-                                    "Please enter other allowance."
-
-                            })}
-                        />
-
-
-                    </Grid>
+                      <Grid item xs={12} sm={2.8}>
+                                <InputField
+                                  label={" Basic Salary :*"}
+                                  size={"small"}
+                                  type={"number"}
+                                  placeholder={"  Basic Salary "}
+                                  error={errors?.basicSalary?.message}
+                                  register={register("basicSalary", {
+                                    required: "Please enter basic salary.",
+                                  })}
+                                />
+                              </Grid>
+                    
+                              <Grid item xs={12} sm={2.8}>
+                                <InputField
+                                  label={"Housing Allowance :*"}
+                                  size={"small"}
+                                  type={"number"}
+                                  placeholder={"  Housing Allowance  "}
+                                  error={errors?.housing_allowance?.message}
+                                  register={register("housing_allowance", {
+                                    required: "Please enter housing allowance.",
+                                  })}
+                                />
+                              </Grid>
+                    
+                              <Grid item xs={12} sm={2.8}>
+                                <InputField
+                                  label={"Transport Allowance :*"}
+                                  size={"small"}
+                                  type={"number"}
+                                  placeholder={"  Transport Allowance "}
+                                  error={errors?.transport_allowance?.message}
+                                  register={register("transport_allowance", {
+                                    required: "Please enter transport allowance.",
+                                  })}
+                                />
+                              </Grid>
+                    
+                              <Grid item xs={12} sm={2.8}>
+                                <InputField
+                                  label={"Other Allowance :*"}
+                                  size={"small"}
+                                  type={"number"}
+                                  placeholder={" Other Allowance "}
+                                  error={errors?.other_allowance?.message}
+                                  register={register("other_allowance", {
+                                    required: "Please enter other allowance.",
+                                  })}
+                                />
+                              </Grid>
+                    
+                              <Grid item xs={12} sm={2.8}>
+                                <InputField
+                                  label={"Total Salary"}
+                                  size={"small"}
+                                  type={"number"}
+                                  placeholder={"Total Salary"}
+                                  disabled
+                                  value={totalSalary}
+                                />
+                              </Grid>
 
                     <Grid item xs={12} sm={2.8}>
 
