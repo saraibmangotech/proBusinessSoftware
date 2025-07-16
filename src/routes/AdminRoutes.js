@@ -223,7 +223,7 @@ const CategoryDetail = lazy(() =>
 );
 
 const ServiceReport = lazy(() =>
-  import("pages/Dashboard/Reports/ServiceReport")
+  import("pages/Dashboard/Reports/servicereport2")
 );
 
 const CollectionReport = lazy(() =>
