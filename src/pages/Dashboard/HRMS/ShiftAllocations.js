@@ -277,6 +277,12 @@ function ShiftAllocations() {
         {
             header: "Employee Id",
             accessorKey: "employee_id",
+             cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.employee?.employee_id}
+                </Box>
+            ),
+
 
 
         },

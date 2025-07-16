@@ -140,7 +140,7 @@ function ExperienceCertificate() {
     const [selectedVisa, setSelectedVisa] = useState()
 
 
-    const tableHead = [{ name: 'Date', key: 'created_at' }, { name: ' Name', key: 'name' }, { name: 'Experience Certificate', key: 'created_at' }, { name: 'Signed Experience Certificate', key: 'commission_visa' }, { name: 'Signed Date', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Date', key: 'created_at' }, { name: ' Name', key: 'name' }, { name: 'Experience Certificate', key: 'created_at' },  { name: 'Signed Date', key: 'commission_monthly' }]
 
 
     const allowFilesType = [
@@ -353,7 +353,7 @@ function ExperienceCertificate() {
             <SimpleDialog
                 open={statusDialog}
                 onClose={() => setStatusDialog(false)}
-                title={'Upload Sign Salary Certificate?'}
+                title={'Upload Sign Experience Certificate?'}
             >
                 <Box component="form" onSubmit={handleSubmit(UpdateCertificate)}>
                     <Grid container justifyContent={'center'} >
@@ -389,7 +389,7 @@ function ExperienceCertificate() {
             </SimpleDialog>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salary Certificate</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Experience Certificate</Typography>
 
                 <Box sx={{ display: 'flex', gap: '10px' }}>
                     {true && <PrimaryButton
@@ -522,48 +522,7 @@ function ExperienceCertificate() {
                                                                         </p>
                                                                     </Grid>
                                                                 </Cell>
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    <>
-
-                                                                        {!item?.signed_certificate ? <label htmlFor="file-upload" onClick={() => {
-                                                                            if (permissions?.upload) {
-                                                                                setSelectedItem(item); setStatusDialog(true)
-                                                                            }
-                                                                        }} style={{ color: '#0F2772', textDecoration: 'underline', cursor: 'pointer' }}>
-                                                                            Upload
-                                                                        </label>
-                                                                            :
-                                                                            <Grid
-                                                                                item
-                                                                                md={6}
-                                                                                lg={4}
-                                                                                sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
-                                                                                component={'div'}
-
-                                                                                // onClick={() => handleDownload(item?.certificate, item?.signed_certificate?.split('_').pop())}
-                                                                                onClick={() => {
-                                                                                    if (item?.signed_certificate?.split('_').pop().includes('doc') || item?.signed_certificate?.split('_').pop().includes('xls')) {
-
-                                                                                        handleDownload(item?.signed_certificate, item?.signed_certificate?.split('_').pop());
-                                                                                    }
-                                                                                    else {
-
-                                                                                        window.open(process.env.REACT_APP_IMAGE_BASE_URL + item?.signed_certificate, '_blank');
-                                                                                    }
-                                                                                }}
-                                                                                key={index}
-                                                                            >
-
-                                                                                <Box>
-                                                                                    <Box component={'img'} src={Images.docIcon} width={'25px'} />
-                                                                                </Box>
-                                                                                <p style={{ textAlign: 'center', lineHeight: '20px', color: '#0F2772', fontWeight: 'bold', fontSize: '12px' }}>
-                                                                                    {item?.signed_certificate?.split('_').pop()}
-                                                                                </p>
-                                                                            </Grid>}
-                                                                    </>
-
-                                                                </Cell>
+                                                             
                                                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                                                     {item?.signed_at && moment(item?.created_at).format('MM-DD-YYYY')}
                                                                 </Cell>

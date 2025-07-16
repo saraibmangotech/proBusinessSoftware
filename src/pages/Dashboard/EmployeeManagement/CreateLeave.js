@@ -123,7 +123,7 @@ function CreateLeave() {
 
     const onSubmit = async (formData) => {
 
-        console.log(selectedUser,'selectedUser');
+        console.log(selectedUser, 'selectedUser');
         try {
             const start = new Date(startDate);
             const end = new Date(endDate);
@@ -144,8 +144,8 @@ function CreateLeave() {
                 second_approver_id: selectedUser?.leave_approver_2,
 
             };
-            console.log(obj,'objobj');
-            
+            console.log(obj, 'objobj');
+
             const promise = CustomerServices.CreateLeave(obj);
 
             showPromiseToast(
@@ -200,9 +200,13 @@ function CreateLeave() {
 
     useEffect(() => {
         if (user?.role_id === 4) {
+            
+            const findElement = users?.find((item) => item?.user_id === user?.id);
+            console.log('Found Element:', findElement);
 
-            setSelectedUser(user)
-            setValue('user', user)
+
+            setSelectedUser(findElement)
+            setValue('user', findElement)
 
         }
 
