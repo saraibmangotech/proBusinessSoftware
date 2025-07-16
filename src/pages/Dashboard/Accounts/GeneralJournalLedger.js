@@ -227,7 +227,7 @@ function GeneralJournalLedger() {
 			let params = {
 				page: Page,
 				limit: Limit,
-				from_date:fromDate ?  moment(fromDate).format('DD/MM/YYYY') : ''
+				from_date:fromDate ?  moment(fromDate).format('MM-DD-YYYY') : ''
 			}
 			params = { ...params, ...Filter }
 			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
@@ -254,7 +254,7 @@ function GeneralJournalLedger() {
 				page: 1,
 				limit: 99999,
 				search:getValues('search'),
-				from_date:fromDate ?  moment(fromDate).format('DD/MM/YYYY') : ''
+				from_date:fromDate ?  moment(fromDate).format('MM-DD-YYYY') : ''
 			}
 			params = { ...params, ...Filter }
 			const { data } = await FinanceServices.getGeneralJournalLedgers(params)
@@ -517,7 +517,9 @@ function GeneralJournalLedger() {
     titleRow.getCell(1).alignment = { horizontal: "center" };
     worksheet.mergeCells("A1:J1");
 
-    const companyRow = worksheet.addRow(["PREMIUM BUSINESSMEN SERVICES"]);
+    const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+		  ? "PREMIUM BUSINESSMEN SERVICES"
+		  : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"]);
     companyRow.getCell(1).font = {
         name: "Arial",
         size: 14,
@@ -596,7 +598,7 @@ function GeneralJournalLedger() {
 
         const dataRow = worksheet.addRow([
             item?.journal_id ? item?.series_id + item?.journal_id : "-", // Journal ID
-            item?.created_at ? new Date(item.created_at).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-", // Date
+            item?.created_at ? new Date(moment(item.created_at).format("YYYY-MM-DD")) : "-", // Date
             item?.entry?.reference_no ?? "-", // Reference No
             item?.type?.type_name ?? "-", // Type
             item?.account?.account_code ?? "-", // Account Code

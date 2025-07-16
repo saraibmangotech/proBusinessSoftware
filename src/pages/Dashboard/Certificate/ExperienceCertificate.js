@@ -140,7 +140,7 @@ function ExperienceCertificate() {
     const [selectedVisa, setSelectedVisa] = useState()
 
 
-    const tableHead = [{ name: 'Date', key: 'created_at' }, { name: ' Name', key: 'name' }, { name: 'Experience Certificate', key: 'created_at' },  { name: 'Signed Date', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Date', key: 'created_at' }, { name: ' Name', key: 'name' }, { name: 'Experience Certificate', key: 'created_at' }]
 
 
     const allowFilesType = [
@@ -290,7 +290,7 @@ function ExperienceCertificate() {
             let params = {
                 page: Page,
                 limit: Limit,
-                type: 'salary'
+                type: 'experience'
             }
             params = { ...params, ...Filter }
 
@@ -501,14 +501,18 @@ function ExperienceCertificate() {
                                                                         sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
                                                                         component={'div'}
                                                                         onClick={() => {
-                                                                            if (item?.certificate?.split('_').pop().includes('doc') || item?.certificate?.split('_').pop().includes('xls')) {
+                                                                            console.log(item, 'item');
+                                                                            navigate(
+                                                                                `/exp-certificate-pdf`,
+                                                                                {
+                                                                                    state: {
+                                                                                        ...item,
+                                                                                    
+                                                                                      
+                                                                                    },
+                                                                                }
 
-                                                                                handleDownload(item?.certificate, item?.certificate?.split('_').pop());
-                                                                            }
-                                                                            else {
-
-                                                                                window.open(process.env.REACT_APP_IMAGE_BASE_URL + item?.certificate, '_blank');
-                                                                            }
+                                                                            )
                                                                         }}
                                                                         // onClick={() =>  handleDownload(item?.certificate, item?.certificate?.split('_').pop())}
                                                                         key={index}
@@ -521,10 +525,6 @@ function ExperienceCertificate() {
                                                                             {item?.certificate?.split('_').pop()}
                                                                         </p>
                                                                     </Grid>
-                                                                </Cell>
-                                                             
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.signed_at && moment(item?.created_at).format('MM-DD-YYYY')}
                                                                 </Cell>
 
 

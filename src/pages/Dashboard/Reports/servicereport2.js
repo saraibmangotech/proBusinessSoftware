@@ -820,7 +820,7 @@ function ServiceReport() {
       const dataRow = worksheet.addRow([
         item.id || "",
         item?.receipt?.invoice_number || "",
-        item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : "",
+        item?.receipt?.invoice_date ? new Date(moment(item.receipt.invoice_date).format("YYYY-MM-DD")) : null,
         agencyType?.[process.env.REACT_APP_TYPE]?.category || "",
         item?.service?.item_code || "",
         item?.service?.name || "",
@@ -1051,10 +1051,10 @@ function ServiceReport() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-       saveAs(blob,
-         toDate && fromDate
-           ? `Service_Report : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
-           : `Service_Report: Present `);
+      saveAs(blob,
+        toDate && fromDate
+          ? `Service_Report : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
+          : `Service_Report: Present `);
     }
 
     download()
@@ -1141,34 +1141,34 @@ function ServiceReport() {
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Service Report</Typography>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-  {customerQueue?.length > 0 && (
-    <Button
-      onClick={!loaderNew ? () => downloadInvoiceExcel(customerQueue2) : undefined}
-      startIcon={
-        loaderNew ? (
-          <CircularProgress size={20} sx={{ color: "white" }} />
-        ) : (
-          <FileDownload />
-        )
-      }
-      variant="contained"
-      color="primary"
-      disabled={loaderNew}
-      sx={{
-        padding: "10px",
-        textTransform: "capitalize !important",
-        backgroundColor: "#001f3f !important",
-        color: "white !important",
-        fontSize: "12px",
-        ":hover": {
-          backgroundColor: "#001f3f !important",
-        },
-      }}
-    >
-      {loaderNew ? "Loading Data..." : "Export to Excel"}
-    </Button>
-  )}
-</Box>
+          {customerQueue?.length > 0 && (
+            <Button
+              onClick={!loaderNew ? () => downloadInvoiceExcel(customerQueue2) : undefined}
+              startIcon={
+                loaderNew ? (
+                  <CircularProgress size={20} sx={{ color: "white" }} />
+                ) : (
+                  <FileDownload />
+                )
+              }
+              variant="contained"
+              color="primary"
+              disabled={loaderNew}
+              sx={{
+                padding: "10px",
+                textTransform: "capitalize !important",
+                backgroundColor: "#001f3f !important",
+                color: "white !important",
+                fontSize: "12px",
+                ":hover": {
+                  backgroundColor: "#001f3f !important",
+                },
+              }}
+            >
+              {loaderNew ? "Loading Data..." : "Export to Excel"}
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {/* Filters */}
