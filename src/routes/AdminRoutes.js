@@ -256,6 +256,12 @@ const SalesSettlementList = lazy(() =>
 const PurchaseSettlementList = lazy(() =>
   import("pages/Dashboard/Payments/PurchaseSettlementList")
 );
+const FPSettlement = lazy(() =>
+  import("pages/Dashboard/Payments/FPSettlement")
+);
+const FPSettlementList = lazy(() =>
+  import("pages/Dashboard/Payments/FPSettlementList")
+);
 const EmployeeLeaves = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/EmployeeLeaves")
 );
@@ -866,6 +872,14 @@ const AdminRoutes = [
   {
     path: "/sales-invoice-settlement",
     component: <SalesInvoiceSettlement />,
+  },
+  {
+    path: "/fp-settlement",
+    component: <FPSettlement />,
+  },
+  {
+    path: "/fp-settlement-list",
+    component: <FPSettlementList />,
   },
   {
     path: "/purchase-invoice-settlement",
