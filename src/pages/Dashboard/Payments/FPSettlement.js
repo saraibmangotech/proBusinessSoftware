@@ -74,7 +74,7 @@ const Cell = styled(TableCell)(({ theme }) => ({
     },
 }));
 
-function PurchaseInvoiceSettlement() {
+function FPSettlement() {
 
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -253,7 +253,7 @@ function PurchaseInvoiceSettlement() {
 
             }
 
-            const { data } = await CustomerServices.getPurchaseInvoices(params)
+            const { data } = await CustomerServices.getFP(params)
             setInvoiceList2(data?.rows)
 
             setTotalCount(data?.count)
@@ -582,7 +582,7 @@ function PurchaseInvoiceSettlement() {
 
         try {
             let obj = {
-                type:'purchase',
+                type:'fp',
                 vendor_id: selectedInvoice2[0]?.vendor_id,
                 vendor_name: selectedInvoice2[0]?.vendor_name,
                 payments: selectedInvoice,
@@ -1487,4 +1487,4 @@ function PurchaseInvoiceSettlement() {
     );
 }
 
-export default PurchaseInvoiceSettlement;
+export default FPSettlement;

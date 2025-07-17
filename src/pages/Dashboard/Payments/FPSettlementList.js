@@ -109,7 +109,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PurchaseSettlementList() {
+function FPSettlementList() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -519,4 +519,4 @@ function PurchaseSettlementList() {
     );
 }
 
-export default PurchaseSettlementList;
+export default FPSettlementList;
