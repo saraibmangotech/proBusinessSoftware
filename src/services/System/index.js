@@ -55,6 +55,10 @@ const SystemServices = {
     const data = await get(routes.getAllocations,params);
     return data;
   },
+   getShiftDetail: async (params) => {
+    const data = await get(routes.getShiftDetail,params);
+    return data;
+  },
     getNationalities: async (params) => {
     const data = await get(routes.getNationalities,params);
     return data;
