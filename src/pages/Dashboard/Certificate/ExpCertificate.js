@@ -258,7 +258,7 @@ const ExpCertificate = () => {
                     </div>
 
                     <div class="ref-section">
-                        <div class="ref-number">Ref: ${state?.reference}</div>
+                        <div class="ref-number">Ref: ${state?.reference || state?.reference_number}</div>
                         <div class="date">Date: ${currentDate}</div>
                     </div>
 
@@ -271,7 +271,7 @@ const ExpCertificate = () => {
                     <div class="certificate-title">EXPERIENCE CERTIFICATE</div>
 
                   <div class="content">
-                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}/span> to <span class="employee-details">${moment(state?.toDate).isSame(moment(), 'day')
+                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}/span> to <span class="employee-details">${moment(state?.toDate).isSame(moment(), 'day')
                 ? 'Present'
                 : moment(state?.toDate).format('DD-MMMM-YYYY')}
 </span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
@@ -381,7 +381,7 @@ const ExpCertificate = () => {
                 {/* Reference Section */}
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                        Ref: {state?.reference}
+                        Ref: {state?.reference || state?.reference_number}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 2 }}>
                         Date: {moment().format("D MMM YYYY")}
@@ -416,7 +416,7 @@ const ExpCertificate = () => {
                 <Box sx={{ textAlign: "justify", mb: 3 }}>
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
                         This is to certify that,{" "}
-                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || "Employee Name"}</span>,
+                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || state?.employee?.name}</span>,
                         passport no. <span style={{ fontWeight: "bold" }}>{state?.passport_number || "-"}</span>, was working in the
                         capacity of <span style={{ fontWeight: "bold" }}>{state?.designation}</span> in our esteemed organization from{" "}
                         <span style={{ fontWeight: "bold" }}>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to{" "}

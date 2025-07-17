@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, InputAdornment, ListItemText, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Images, SvgIcon, SvgIcon as SvgIconss } from 'assets';
@@ -60,6 +60,25 @@ function CreateEmployee() {
 
   const { register, handleSubmit, formState: { errors }, control, getValues, watch, setError, setValue,
     clearErrors, } = useForm();
+
+
+  const basicSalary = watch("basicSalary") || 0;
+  const housing = watch("housing_allowance") || 0;
+  const transport = watch("transport_allowance") || 0;
+  const other = watch("other_allowance") || 0;
+
+  const totalSalary = useMemo(() => {
+    return (
+      (parseFloat(basicSalary) || 0) +
+      (parseFloat(housing) || 0) +
+      (parseFloat(transport) || 0) +
+      (parseFloat(other) || 0)
+    );
+  }, [basicSalary, housing, transport, other]);
+
+  useEffect(() => {
+    setValue("total_salary", totalSalary);
+  }, [totalSalary, setValue]);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -103,7 +122,7 @@ function CreateEmployee() {
       key: "emirates_id",
       path: "",
       expiry_date: null,
-      is_required: true
+      is_required: false
 
 
     },
@@ -112,7 +131,7 @@ function CreateEmployee() {
       key: "passport",
       path: "",
       expiry_date: null,
-      is_required: true
+      is_required: false
     },
 
     {
@@ -328,6 +347,7 @@ function CreateEmployee() {
 
           date_of_joining: doj,
           date_of_birth: dob,
+          passport_number: formData?.passportnumber,
           probation_period_months: formData?.probation,
           probation_end_date: probEndDate,
           employment_status: formData?.status,
@@ -699,7 +719,22 @@ function CreateEmployee() {
 
           </Grid>
 
+          <Grid item xs={12} sm={2.8}>
 
+            <InputField
+              label={" Passport Number :*"}
+              size={'small'}
+              placeholder={"Passport Number"}
+              error={errors?.passportnumber?.message}
+              register={register("passportnumber", {
+                required:
+                  "Please enter passport number."
+
+              })}
+            />
+
+
+          </Grid>
 
 
           <Grid item xs={12} sm={2.8}>
@@ -866,8 +901,8 @@ function CreateEmployee() {
             </Grid>
           )}
         </Grid>
-        {console.log(documents,'documents')}
-        
+        {console.log(documents, 'documents')}
+
         <Grid item xs={12}  >
           <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: Colors.textColorDarkBlue }}>Documents : </Typography>
         </Grid>
@@ -987,126 +1022,7 @@ function CreateEmployee() {
               }}
             />
           </Grid>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Grid item xs={12} sm={2.8}>
-              <InputLabel
-                error={!!errors.shiftStartTime}
-                sx={{ textTransform: "capitalize", textAlign: "left", fontWeight: 700, color: Colors.gray }}
-              >
-                Shift Start Time:*
-              </InputLabel>
-              <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
-                <Controller
-                  name="shiftStartTime"
-                  control={control}
-                  rules={{ required: "Shift Start Time is required" }}
-                  render={({ field: { onChange, value } }) => (
-                    <TimePicker
-                      slotProps={{
-                        textField: {
-                          sx: {
-                            borderRadius: "10px !important",
-                            border: "2px solid black !important",
-                          }
-                        }
-                      }}
-                      value={value}
-                      onChange={(newValue) => {
-                        if (newValue && newValue.isValid && newValue.isValid()) {
-                          console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"));
-                        } else {
-                          console.log("Invalid time selected");
-                        }
-                        onChange(newValue);
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          error={!!errors.shiftStartTime}
-                          helperText={errors.shiftStartTime?.message}
-                          sx={{
-                            borderRadius: "10px !important",
-                            "&.MuiTextField-root": {
-                              borderRadius: "10px !important",
-                              border: "1px solid black !important",
-                              '& fieldset': { border: "1px solid black !important" },
-                              "&.Mui-focused svg path": {
-                                fill: "#0076bf"
-                              }
-                            }
-                          }}
-                        />
-                      )}
-                    />
-                  )}
-                />
 
-                <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
-                  {errors.shiftStartTime?.message}
-                </Typography>
-              </FormControl>
-            </Grid>
-
-            {/* Shift End Time */}
-            <Grid item xs={12} sm={2.8}>
-              <InputLabel
-                error={!!errors.shiftEndTime}
-                sx={{ textTransform: "capitalize", textAlign: "left", fontWeight: 700, color: Colors.gray }}
-              >
-                Shift End Time:*
-              </InputLabel>
-              <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
-                <Controller
-                  name="shiftEndTime"
-                  control={control}
-                  rules={{ required: "Shift End Time is required" }}
-                  render={({ field: { onChange, value } }) => (
-                    <TimePicker
-                      value={value}
-                      slotProps={{
-                        textField: {
-                          sx: {
-                            borderRadius: "10px !important",
-                            border: "2px solid black !important",
-                          }
-                        }
-                      }}
-                      onChange={(newValue) => {
-                        if (newValue && newValue.isValid && newValue.isValid()) {
-                          console.log("Selected Time (24-hour):", moment(newValue.toDate()).format("HH:mm"));
-                        } else {
-                          console.log("Invalid time selected");
-                        }
-                        onChange(newValue);
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          error={!!errors.shiftEndTime}
-                          helperText={errors.shiftEndTime?.message}
-                          sx={{
-                            borderRadius: "10px !important",
-                            ".MuiOutlinedInput-root": {
-                              borderRadius: "10px !important",
-                              '& fieldset': { border: "none !important" },
-                              "&.Mui-focused svg path": {
-                                fill: "#0076bf"
-                              }
-                            }
-                          }}
-                        />
-                      )}
-                    />
-                  )}
-                />
-                <Typography color="error" sx={{ fontSize: 12, textAlign: "left" }}>
-                  {errors.shiftEndTime?.message}
-                </Typography>
-              </FormControl>
-            </Grid>
-          </LocalizationProvider>
           <Grid item xs={12} sm={2.8}>
 
             <InputField
@@ -1196,7 +1112,7 @@ function CreateEmployee() {
               placeholder="Branch"
               error={errors?.branch?.message}
               register={register("branch", {
-                required: "Please enter branch.",
+                required: false,
               })}
             />
           </Grid>
@@ -1208,7 +1124,7 @@ function CreateEmployee() {
               placeholder="Visa"
               error={errors?.visa?.message}
               register={register("visa", {
-                required: "Please enter visa.",
+                required: false,
               })}
             />
           </Grid>
@@ -1220,7 +1136,7 @@ function CreateEmployee() {
               placeholder="Work Permit"
               error={errors?.work_permit?.message}
               register={register("work_permit", {
-                required: "Please enter work permit.",
+                required: false,
               })}
             />
           </Grid>
@@ -1232,7 +1148,7 @@ function CreateEmployee() {
               placeholder="IBAN"
               error={errors?.iban?.message}
               register={register("iban", {
-                required: "Please enter IBAN.",
+                required: false,
               })}
             />
           </Grid>
@@ -1256,7 +1172,7 @@ function CreateEmployee() {
               placeholder="Routing"
               error={errors?.routing?.message}
               register={register("routing", {
-                required: "Please enter routing.",
+                required: false,
               })}
             />
           </Grid>
@@ -1265,13 +1181,13 @@ function CreateEmployee() {
             <SelectField
 
               size={"small"}
-              label={"Shift Type "}
+              label={"Shift Type *:"}
               options={[{ id: 'Fixed', name: 'Fixed' }, { id: 'Roaster', name: 'Roaster' }]}
               selected={shiftType}
               onSelect={(value) => {
                 setShiftType(value);
               }}
-              register={register("shiftType")}
+              register={register("shiftType", { required: "Shift type is required" })}
             />
 
 
@@ -1563,72 +1479,66 @@ function CreateEmployee() {
 
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Basic Salary :*"}
-              size={'small'}
-              type={'number'}
+              size={"small"}
+              type={"number"}
               placeholder={"  Basic Salary "}
               error={errors?.basicSalary?.message}
               register={register("basicSalary", {
-                required:
-                  "Please enter basic salary."
-
+                required: "Please enter basic salary.",
               })}
             />
-
-
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
+          <Grid item xs={12} sm={2.8}>
             <InputField
               label={"Housing Allowance :*"}
-              size={'small'}
-              type={'number'}
+              size={"small"}
+              type={"number"}
               placeholder={"  Housing Allowance  "}
               error={errors?.housing_allowance?.message}
               register={register("housing_allowance", {
-                required:
-                  "Please enter housing allowance."
-
+                required: "Please enter housing allowance.",
               })}
             />
-
-
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
+          <Grid item xs={12} sm={2.8}>
             <InputField
-              label={" Transport Allowance :*"}
-              size={'small'}
-              type={'number'}
+              label={"Transport Allowance :*"}
+              size={"small"}
+              type={"number"}
               placeholder={"  Transport Allowance "}
               error={errors?.transport_allowance?.message}
               register={register("transport_allowance", {
-                required:
-                  "Please enter transport allowance."
-
+                required: "Please enter transport allowance.",
               })}
             />
-
-
           </Grid>
-          <Grid item xs={12} sm={2.8}>
 
+          <Grid item xs={12} sm={2.8}>
             <InputField
-              label={" Other Allowance :*"}
-              size={'small'}
-              type={'number'}
+              label={"Other Allowance :*"}
+              size={"small"}
+              type={"number"}
               placeholder={" Other Allowance "}
               error={errors?.other_allowance?.message}
               register={register("other_allowance", {
-                required:
-                  "Please enter other allowance."
-
+                required: "Please enter other allowance.",
               })}
             />
+          </Grid>
 
-
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Total Salary"}
+              size={"small"}
+              type={"number"}
+              placeholder={"Total Salary"}
+              disabled
+              value={totalSalary}
+            />
           </Grid>
 
           <Grid item xs={12} sm={2.8}>

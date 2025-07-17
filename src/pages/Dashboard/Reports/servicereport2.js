@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Box, TableCell, TableRow, Typography, tableCellClasses, Grid, Button, Input } from "@mui/material"
+import { Box, TableCell, TableRow, Typography, tableCellClasses, Grid, Button, Input, CircularProgress } from "@mui/material"
 import { FontFamily } from "assets"
 import styled from "@emotion/styled"
 import { useNavigate } from "react-router-dom"
@@ -124,7 +124,8 @@ function ServiceReport() {
   // *For Customer Queue
   const [customerQueue, setCustomerQueue] = useState([])
   const [Totals, setTotals] = useState(null)
-
+  const [customerQueue2, setCustomerQueue2] = useState([])
+  const [Totals2, setTotals2] = useState(null)
   const [totalCount, setTotalCount] = useState(0)
   const [pageLimit, setPageLimit] = useState(10) // Default to 10 items per page
   const [currentPage, setCurrentPage] = useState(1)
@@ -132,6 +133,7 @@ function ServiceReport() {
   const [sortOrder, setSortOrder] = useState(null)
   const [fromDate, setFromDate] = useState(new Date())
   const [toDate, setToDate] = useState(new Date())
+  const [loaderNew, setLoaderNew] = useState(false)
 
   // *For Filters
   const [filters, setFilters] = useState({})
@@ -142,6 +144,7 @@ function ServiceReport() {
   const [loading, setLoading] = useState(false)
   const [sort, setSort] = useState("desc")
   const [invoiceTotal, setInvoiceTotal] = useState(0)
+  const [invoiceTotal2, setInvoiceTotal2] = useState(0)
   // *For Get Customer Queue
   const getCustomerQueue = async (page = currentPage, limit = pageLimit, filter = {}) => {
     setLoader(true)
@@ -208,7 +211,71 @@ function ServiceReport() {
       setLoader(false)
     }
   }
+  const getCustomerQueue2 = async (page = currentPage, limit = pageLimit, filter = {}) => {
+    setLoaderNew(true)
 
+    try {
+      const params = {
+        page: 1,
+        limit: 999999,
+        from_date: fromDate ? moment(fromDate).format("MM-DD-YYYY") : "",
+        to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
+      }
+
+      // Add sorting parameters if available
+      if (sortField && sortOrder) {
+        params.sort_by = sortField
+        params.sort_order = sortOrder
+      }
+
+      const { data } = await CustomerServices.getServiceReport(params)
+      setCustomerQueue2(data?.rows || [])
+
+
+      // Calculate totals as before
+      const result = data?.rows?.reduce(
+        (acc, item) => {
+          acc.totalQuantity += item.quantity
+          acc.totalServiceCharges += item.center_fee * Number.parseInt(item.quantity)
+          acc.totalVat += item.center_fee * Number.parseInt(item.quantity || 0) * 0.05
+          acc.totalGovtFee +=
+            (Number.parseFloat(item.govt_fee || 0) + Number.parseFloat(item?.bank_charge || 0)) *
+            Number.parseInt(item.quantity || 0)
+          acc.invoiceTotal += (
+            Number.parseFloat(item?.total || 0) +
+            Number.parseFloat(item?.center_fee || 0) * Number.parseFloat(item?.quantity || 1) * 0.05
+          ).toFixed(2)
+          return acc
+        },
+        {
+          totalQuantity: 0,
+          totalServiceCharges: 0,
+          totalVat: 0,
+          totalGovtFee: 0,
+          invoiceTotal: 0,
+        },
+      )
+
+      setTotals2(result)
+
+      // Calculate invoice total
+      const totalLineTotal = data?.rows?.reduce((sum, item) => {
+        const centerFee = Number.parseFloat(item?.center_fee) || 0
+        const govtFee = Number.parseFloat(item?.govt_fee) || 0
+        const bankCharge = Number.parseFloat(item?.bank_charge) || 0
+        const quantity = Number.parseFloat(item?.quantity) || 0
+
+        const lineTotal = (centerFee + govtFee + bankCharge + centerFee * 0.05) * quantity
+        return sum + lineTotal
+      }, 0)
+
+      setInvoiceTotal2(totalLineTotal)
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      setLoaderNew(false)
+    }
+  }
   const handleSort = (key) => {
     const data = {
       sort_by: key,
@@ -658,7 +725,7 @@ function ServiceReport() {
     worksheet.mergeCells("A2:Z2")
 
     const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
+      `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
     ])
     dateRow.getCell(1).font = {
       name: "Arial",
@@ -671,7 +738,7 @@ function ServiceReport() {
 
     const periodRow = worksheet.addRow([
       toDate && fromDate
-        ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
+        ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
         : `Period: All`,
     ])
     periodRow.getCell(1).font = {
@@ -753,7 +820,7 @@ function ServiceReport() {
       const dataRow = worksheet.addRow([
         item.id || "",
         item?.receipt?.invoice_number || "",
-        item?.receipt?.invoice_date ? moment(item?.receipt?.invoice_date).format("DD/MM/YYYY") : "",
+        item?.receipt?.invoice_date ? new Date(moment(item.receipt.invoice_date).format("YYYY-MM-DD")) : null,
         agencyType?.[process.env.REACT_APP_TYPE]?.category || "",
         item?.service?.item_code || "",
         item?.service?.name || "",
@@ -984,7 +1051,10 @@ function ServiceReport() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
-      saveAs(blob, "Invoice_Report.xlsx")
+      saveAs(blob,
+        toDate && fromDate
+          ? `Service_Report : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
+          : `Service_Report: Present `);
     }
 
     download()
@@ -1011,7 +1081,10 @@ function ServiceReport() {
     setFromDate(new Date())
     setToDate(new Date())
     getCustomerQueue(currentPage, pageLimit)
+    getCustomerQueue2()
   }, [])
+
+
 
   return (
     <Box sx={{ p: 3 }}>
@@ -1070,21 +1143,29 @@ function ServiceReport() {
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
           {customerQueue?.length > 0 && (
             <Button
-              onClick={() => downloadInvoiceExcel(customerQueue)}
-              startIcon={<FileDownload />}
+              onClick={!loaderNew ? () => downloadInvoiceExcel(customerQueue2) : undefined}
+              startIcon={
+                loaderNew ? (
+                  <CircularProgress size={20} sx={{ color: "white" }} />
+                ) : (
+                  <FileDownload />
+                )
+              }
               variant="contained"
               color="primary"
+              disabled={loaderNew}
               sx={{
                 padding: "10px",
                 textTransform: "capitalize !important",
                 backgroundColor: "#001f3f !important",
+                color: "white !important",
                 fontSize: "12px",
                 ":hover": {
                   backgroundColor: "#001f3f !important",
                 },
               }}
             >
-              Export to Excel
+              {loaderNew ? "Loading Data..." : "Export to Excel"}
             </Button>
           )}
         </Box>
@@ -1120,7 +1201,7 @@ function ServiceReport() {
                 icon={<SearchIcon />}
                 title="Search"
                 sx={{ marginTop: "30px" }}
-                onClick={() => getCustomerQueue(null, null, null)}
+                onClick={() => { getCustomerQueue(null, null, null); getCustomerQueue2() }}
                 loading={loading}
               />
             </Grid>
@@ -1143,7 +1224,7 @@ function ServiceReport() {
             pageSize={pageLimit}
             onSortChange={handleSortChange}
             total={true}
-            csv={true}
+
           />
         }
 

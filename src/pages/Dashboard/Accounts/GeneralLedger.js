@@ -480,16 +480,16 @@ function GeneralLedger() {
       }
 
       const dataRow = worksheet.addRow([
-        item?.created_at ? moment(item?.created_at).format("DD/MM/YYYY") : "-",
+        item?.created_at ? new Date(moment(item.created_at).format("YYYY-MM-DD")) : "-",
         item?.journal_id ? item?.series_id + item?.journal_id : "-",
         item?.entry?.reference_no ?? "-",
         item?.type?.type_name ?? "-",
         item?.cost_center ?? "-",
         item?.description ?? "-",
         item?.comment ?? "-",
-        debit.toFixed(2),
-        credit.toFixed(2),
-        item?.account?.primary_account_id == 700328 ? (-1 * runningBalance).toFixed(2) : runningBalance.toFixed(2)
+        parseFloat(debit.toFixed(2)),
+        parseFloat(credit.toFixed(2)),
+        item?.account?.primary_account_id == 700328 ? parseFloat((-1 * runningBalance).toFixed(2)) : parseFloat(runningBalance.toFixed(2))
       ]);
 
       // Style data rows

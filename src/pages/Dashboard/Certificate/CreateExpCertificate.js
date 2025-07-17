@@ -305,14 +305,14 @@ function CreateExpCertificate() {
         setNewData(formData)
         navigate(
             `/exp-certificate-pdf`,
-            {
+           {
                 state: {
                     ...selectedItem,
                     ...formData,
                     fromDate: fromDate, 
                     toDate:toDate
                 },
-            }
+            } 
 
         )
 
