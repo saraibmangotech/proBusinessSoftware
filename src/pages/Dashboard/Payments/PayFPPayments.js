@@ -694,7 +694,7 @@ function PayFpPayments() {
             </SimpleDialog>
 
             <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
-                Create Payment Invoice
+                Add FP Payment
             </Typography>
 
             {/* Filters */}

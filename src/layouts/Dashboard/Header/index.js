@@ -1243,7 +1243,28 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-
+            {
+              id: 1502,
+              name: " Add FP Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/pay-fp-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "  FP Payment List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fp-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
             {
               id: 1502,
               name: "Prepaid Expenses",
@@ -1829,7 +1850,7 @@ function Header() {
               order_by: 13,
               childRoute: [],
             },
-             {
+            {
               id: 13,
               name: "Employee Leaves Record",
               icon: "customer",
@@ -2668,7 +2689,28 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-
+  {
+              id: 1502,
+              name: " Add FP Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/pay-fp-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "  FP Payment List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fp-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
             {
               id: 1502,
               name: "Prepaid Expenses",
@@ -3254,7 +3296,7 @@ function Header() {
               order_by: 13,
               childRoute: [],
             },
-             {
+            {
               id: 13,
               name: "Employee Leaves Record",
               icon: "customer",
