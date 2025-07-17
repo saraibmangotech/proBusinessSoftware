@@ -336,7 +336,7 @@ function InventoryLocations() {
             <SimpleDialog
                 open={statusDialog}
                 onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
+                title={"Add Location?"}
             >
                 <Box component="form" onSubmit={handleSubmit(CreateLocation)}>
                     <Grid container spacing={2}>
