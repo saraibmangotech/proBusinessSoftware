@@ -2214,6 +2214,46 @@ function Header() {
 
       ])
     }
+     else if (user?.role_id == 4) {
+      setNavigationData([
+
+        
+       {
+          id: 2,
+          name: "Leave Management",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/leave-management",
+          identifier: null,
+          navigation: true,
+
+        },
+         {
+          id: 2,
+          name: "Attendance Report",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/attendance-report",
+          identifier: null,
+          navigation: true,
+
+        },
+ {
+          id: 2,
+          name: "Document Expiry Report",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/doc-expiry-report",
+          identifier: null,
+          navigation: true,
+
+        },
+
+      ])
+    }
     else {
       setNavigationData([
 
