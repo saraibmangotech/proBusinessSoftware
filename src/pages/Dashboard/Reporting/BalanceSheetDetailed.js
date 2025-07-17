@@ -111,43 +111,47 @@ const formatAmount = (amount) => {
   }).format(amount)
 }
 
-// Recursive function to calculate account totals including children
+// Update the `calculateAccountTotals` function to correctly handle opening balance, debit, credit, period difference, and final balance, including recursive summation for child accounts.
 const calculateAccountTotals = (account) => {
   const opening = Number.parseFloat(account.opening_balance) || 0
   const debit = Number.parseFloat(account.total_debit) || 0
   const credit = Number.parseFloat(account.total_credit) || 0
 
-  // Adjust opening balance based on nature for calculation purposes
+  // Determine the effective opening balance based on account nature for summation
   let effectiveOpeningBalance = opening
   if (account.nature === "credit") {
-    effectiveOpeningBalance = -1 * opening
+    effectiveOpeningBalance = -opening
   }
 
-  let effectiveTotalDebit = debit
-  let effectiveTotalCredit = credit
+  let accumulatedTotalDebit = debit
+  let accumulatedTotalCredit = credit
+  let accumulatedOpeningBalance = 0
 
   if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
     account.childAccounts.forEach((child) => {
       const childTotals = calculateAccountTotals(child)
-      effectiveOpeningBalance += childTotals.effectiveOpeningBalance
-      effectiveTotalDebit += childTotals.effectiveTotalDebit
-      effectiveTotalCredit += childTotals.effectiveTotalCredit
+      accumulatedOpeningBalance += childTotals.effectiveOpeningBalance
+      accumulatedTotalDebit += childTotals.totalDebit
+      accumulatedTotalCredit += childTotals.totalCredit
     })
   }
 
-  const periodDifference = effectiveTotalDebit - effectiveTotalCredit
+  // Period difference is always (accumulated) Debit - (accumulated) Credit
+  const periodDifference = accumulatedTotalDebit - accumulatedTotalCredit
+
+  // Final balance is the effective opening balance + the period difference
   const balance = effectiveOpeningBalance + periodDifference
 
   return {
-    effectiveOpeningBalance: effectiveOpeningBalance,
-    effectiveTotalDebit: effectiveTotalDebit,
-    effectiveTotalCredit: effectiveTotalCredit,
-    periodDifference: periodDifference,
+    effectiveOpeningBalance: effectiveOpeningBalance, // This is the signed opening balance for display/accumulation
+    totalDebit: accumulatedTotalDebit,
+    totalCredit: accumulatedTotalCredit,
+    periodDifference: periodDifference, // This is the raw debit - credit difference
     balance: balance,
   }
 }
 
-// Helper function to transform data for display and Excel export
+// Update the `transformDataForDisplay` function to use the new `calculatedTotals` properties for accumulating totals for subcategories and major categories.
 const transformDataForDisplay = (data, searchTerm) => {
   const searchLower = searchTerm ? searchTerm.toLowerCase() : ""
 
@@ -178,7 +182,9 @@ const transformDataForDisplay = (data, searchTerm) => {
         })
       }
 
-      const accountTotals = calculateAccountTotals(account)
+      // Calculate totals for the current account (including its children)
+      const accountTotals = calculateAccountTotals(account) // This will recursively sum up from children
+
       // Only include parent account if it matches search or has matching children
       if (filterAccount(account) || childAccountsProcessed.length > 0) {
         processed.push({
@@ -204,24 +210,24 @@ const transformDataForDisplay = (data, searchTerm) => {
         const filteredAccounts = processAccountsRecursively(subItem.accounts)
 
         if (filteredAccounts.length > 0) {
-          const subcategoryName = filteredAccounts[0].account_subcategory || "Uncategorized" // Assuming all filtered accounts in this subItem share the same subcategory
-          if (!groupedSubcategories[subcategoryName]) {
-            groupedSubcategories[subcategoryName] = {
-              name: subcategoryName,
-              accounts: [],
-              openingTotal: 0,
-              debitTotal: 0,
-              creditTotal: 0,
-              periodDiffTotal: 0,
-              balanceTotal: 0,
-            }
-          }
-
+          // Group by subcategory type
           filteredAccounts.forEach((account) => {
+            const subcategoryName = account.account_subcategory || "Uncategorized"
+            if (!groupedSubcategories[subcategoryName]) {
+              groupedSubcategories[subcategoryName] = {
+                name: subcategoryName,
+                accounts: [],
+                openingTotal: 0,
+                debitTotal: 0,
+                creditTotal: 0,
+                periodDiffTotal: 0,
+                balanceTotal: 0,
+              }
+            }
             groupedSubcategories[subcategoryName].accounts.push(account)
             groupedSubcategories[subcategoryName].openingTotal += account.calculatedTotals.effectiveOpeningBalance
-            groupedSubcategories[subcategoryName].debitTotal += account.calculatedTotals.effectiveTotalDebit
-            groupedSubcategories[subcategoryName].creditTotal += account.calculatedTotals.effectiveTotalCredit
+            groupedSubcategories[subcategoryName].debitTotal += account.calculatedTotals.totalDebit
+            groupedSubcategories[subcategoryName].creditTotal += account.calculatedTotals.totalCredit
             groupedSubcategories[subcategoryName].periodDiffTotal += account.calculatedTotals.periodDifference
             groupedSubcategories[subcategoryName].balanceTotal += account.calculatedTotals.balance
           })
@@ -246,7 +252,7 @@ const transformDataForDisplay = (data, searchTerm) => {
         majorCategoryBalanceTotal,
       }
     })
-    .filter((majorCategory) => majorCategory.subcategories_grouped.length > 0) // Filter out major categories with no matching accounts
+    .filter((majorCategory) => majorCategory.subcategories_grouped.length > 0)
 }
 
 function BalanceSheetDetailed() {
@@ -468,8 +474,431 @@ function BalanceSheetDetailed() {
       ErrorToaster(error)
     }
   }
-
   const downloadExcel = async () => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet("Balance Sheet Summary")
+
+    // Set professional header and footer
+    worksheet.headerFooter.oddHeader =
+      '&C&"Arial,Bold"&18BALANCE SHEET SUMMARY\n' +
+      '&C&"Arial,Regular"&12Your Company Name\n' +
+      '&C&"Arial,Regular"&10Period: &D - &T\n' +
+      '&L&"Arial,Regular"&8Generated on: ' +
+      new Date().toLocaleDateString() +
+      "\n" +
+      '&R&"Arial,Regular"&8Page &P of &N'
+    worksheet.headerFooter.oddFooter =
+      '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+      '&C&"Arial,Regular"&8This report contains financial data as of ' +
+      new Date().toLocaleDateString() +
+      '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
+      '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+    // Set page setup for professional printing
+    worksheet.pageSetup = {
+      paperSize: 9, // A4
+      orientation: "landscape",
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 1.0,
+        bottom: 1.0,
+        header: 0.3,
+        footer: 0.5,
+      },
+    }
+
+    // Add title section at the top of the worksheet
+    const titleRow = worksheet.addRow(["BALANCE SHEET SUMMARY REPORT"])
+    titleRow.getCell(1).font = {
+      name: "Arial",
+      size: 16,
+      bold: true,
+      color: { argb: "2F4F4F" },
+    }
+    titleRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A1:G1")
+
+    const name =
+      agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+        ? "PREMIUM BUSINESSMEN SERVICES"
+        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+    const companyRow = worksheet.addRow([name])
+    companyRow.getCell(1).font = {
+      name: "Arial",
+      size: 14,
+      bold: true,
+      color: { argb: "4472C4" },
+    }
+    companyRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A2:G2")
+
+    const dateRow = worksheet.addRow([
+      `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
+    ])
+    dateRow.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    dateRow.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A3:G3")
+
+    const dateRow2 = worksheet.addRow([
+      toDate && fromDate
+        ? `Period:  ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
+        : `Period: All `,
+    ])
+    dateRow2.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    dateRow2.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A4:G4")
+
+    const costCenter = worksheet.addRow([`Cost Center: ${selectedCostCenter?.name}`])
+    costCenter.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    costCenter.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A5:G5")
+
+    const system = worksheet.addRow([
+      `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
+    ])
+    system.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    system.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells("A6:G6")
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    // Add headers with professional styling
+    const headers = [
+      "Account Code",
+      "Account Name",
+      "Opening Balance",
+      "Total Debit",
+      "Total Credit",
+      "Period Difference",
+      "Balance",
+    ]
+    worksheet.addRow(headers).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "808080" }, // Gray
+      }
+      cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+    })
+
+    // Grand totals initialization
+    let grandOpening = 0,
+      grandDebit = 0,
+      grandCredit = 0,
+      grandDiff = 0,
+      grandBalance = 0
+
+    const excelDisplayData = transformDataForDisplay(filteredBalanceSheet, searchTerm)
+
+    excelDisplayData.forEach((majorCategoryItem) => {
+      // Main section row (Assets/Liabilities/Equity)
+      const sectionRow = worksheet.addRow([majorCategoryItem.name])
+      sectionRow.getCell(1).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "4472C4" }, // Professional blue
+      }
+      sectionRow.getCell(1).font = {
+        name: "Arial",
+        bold: true,
+        color: { argb: "FFFFFF" },
+        size: 12,
+      }
+      sectionRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
+      worksheet.mergeCells(`A${sectionRow.number}:G${sectionRow.number}`)
+
+      majorCategoryItem?.subcategories_grouped?.forEach((groupedSubcategory) => {
+        // Subcategory Group Header (e.g., CWIP)
+        const subCategoryGroupRow = worksheet.addRow(["", groupedSubcategory.name])
+        subCategoryGroupRow.getCell(2).fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "D3D3D3" }, // Light gray
+        }
+        subCategoryGroupRow.getCell(2).font = { bold: true }
+        worksheet.mergeCells(`B${subCategoryGroupRow.number}:G${subCategoryGroupRow.number}`)
+
+        groupedSubcategory.accounts?.forEach((account) => {
+          const accountTotals = account.calculatedTotals
+          const row = worksheet.addRow([
+            account.account_code,
+            account.account_name,
+            accountTotals.effectiveOpeningBalance,
+            accountTotals.totalDebit,
+            accountTotals.totalCredit,
+            accountTotals.periodDifference,
+            accountTotals.balance,
+          ])
+
+          // Format numerical columns as numbers with 4 decimal places
+          for (let i = 3; i <= 7; i++) {
+            row.getCell(i).numFmt = "#,##0.0000"
+          }
+
+          // Style account rows
+          row.eachCell((cell, colNumber) => {
+            cell.font = { name: "Arial", size: 10 }
+            cell.alignment = {
+              horizontal: colNumber >= 3 && colNumber <= 7 ? "right" : "left",
+              vertical: "middle",
+            }
+            cell.border = {
+              top: { style: "hair", color: { argb: "CCCCCC" } },
+              left: { style: "hair", color: { argb: "CCCCCC" } },
+              bottom: { style: "hair", color: { argb: "CCCCCC" } },
+              right: { style: "hair", color: { argb: "CCCCCC" } },
+            }
+          })
+          // IMPORTANT: No child accounts are added here for the "short" report
+        })
+
+        // Subcategory type total row (orange)
+        if (groupedSubcategory?.accounts?.length > 0) {
+          const totalRow = worksheet.addRow([
+            "",
+            `${groupedSubcategory.name} Total`,
+            groupedSubcategory.openingTotal,
+            groupedSubcategory.debitTotal,
+            groupedSubcategory.creditTotal,
+            groupedSubcategory.periodDiffTotal,
+            groupedSubcategory.balanceTotal,
+          ])
+          // Format numerical columns
+          for (let i = 3; i <= 7; i++) {
+            totalRow.getCell(i).numFmt = "#,##0.0000"
+          }
+          totalRow.eachCell((cell) => {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFA500" }, // Orange
+            }
+            cell.font = { bold: true }
+          })
+        }
+      })
+
+      // Add category total row
+      if (majorCategoryItem?.subcategories_grouped?.length > 0) {
+        const catTotalRow = worksheet.addRow([
+          `${majorCategoryItem.name} Total`,
+          "",
+          majorCategoryItem.majorCategoryOpeningTotal,
+          majorCategoryItem.majorCategoryDebitTotal,
+          majorCategoryItem.majorCategoryCreditTotal,
+          majorCategoryItem.majorCategoryPeriodDiffTotal,
+          majorCategoryItem.majorCategoryBalanceTotal,
+        ])
+        // Format numerical columns
+        for (let i = 3; i <= 7; i++) {
+          catTotalRow.getCell(i).numFmt = "#,##0.0000"
+        }
+        catTotalRow.eachCell((cell) => {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "000080" }, // Navy
+          }
+          cell.font = { bold: true, color: { argb: "FFFFFF" } }
+        })
+
+        // Update grand totals
+        grandOpening += majorCategoryItem.majorCategoryOpeningTotal
+        grandDebit += majorCategoryItem.majorCategoryDebitTotal
+        grandCredit += majorCategoryItem.majorCategoryCreditTotal
+        grandDiff += majorCategoryItem.majorCategoryPeriodDiffTotal
+        grandBalance += majorCategoryItem.majorCategoryBalanceTotal
+      }
+    })
+
+    // Add Grand Total row at the end
+    const grandTotalRow = worksheet.addRow([
+      "Grand Total",
+      "",
+      grandOpening,
+      grandDebit,
+      grandCredit,
+      grandDiff,
+      grandBalance,
+    ])
+    // Format numerical columns
+    for (let i = 3; i <= 7; i++) {
+      grandTotalRow.getCell(i).numFmt = "#,##0.0000"
+    }
+    grandTotalRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" }, // Black
+      }
+      cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+    })
+
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Retain Profit and Owner Capital + Liabilities + Retain Profit rows (original logic)
+    const retainProfitRow = worksheet.addRow([
+      "Retain Profit",
+      "",
+      "",
+      "",
+      "",
+      "",
+      CommaSeparator(
+        (
+          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
+          Number.parseFloat(adminOpTotal)
+        ).toFixed(2),
+      ),
+    ])
+    retainProfitRow.eachCell((cell, colNumber) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" }, // Black
+      }
+      cell.font = {
+        name: "Arial",
+        bold: true,
+        color: { argb: "FFFFFF" },
+        size: 12,
+      }
+      cell.alignment = {
+        horizontal: colNumber === 7 ? "right" : "left",
+        vertical: "middle",
+      }
+      cell.border = {
+        top: { style: "thick", color: { argb: "FFFFFF" } },
+        left: { style: "thick", color: { argb: "FFFFFF" } },
+        bottom: { style: "thick", color: { argb: "FFFFFF" } },
+        right: { style: "thick", color: { argb: "FFFFFF" } },
+      }
+    })
+    worksheet.mergeCells(`A${retainProfitRow.number}:F${retainProfitRow.number}`)
+
+    const grandTotalFinalRow = worksheet.addRow([
+      "Owner Capital + Liabilities + Retain Profit",
+      "",
+      "",
+      "",
+      "",
+      "",
+      CommaSeparator(
+        Number.parseFloat(
+          Number.parseFloat(libalTotal) +
+            Number.parseFloat(capitalTotal) +
+            (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
+              Number.parseFloat(adminOpTotal)),
+        ).toFixed(2),
+      ),
+    ])
+    grandTotalFinalRow.eachCell((cell, colNumber) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" }, // Black
+      }
+      cell.font = {
+        name: "Arial",
+        bold: true,
+        color: { argb: "FFFFFF" },
+        size: 12,
+      }
+      cell.alignment = {
+        horizontal: colNumber === 7 ? "right" : "left",
+        vertical: "middle",
+      }
+      cell.border = {
+        top: { style: "thick", color: { argb: "FFFFFF" } },
+        left: { style: "thick", color: { argb: "FFFFFF" } },
+        bottom: { style: "thick", color: { argb: "FFFFFF" } },
+        right: { style: "thick", color: { argb: "FFFFFF" } },
+      }
+    })
+    worksheet.mergeCells(`A${grandTotalFinalRow.number}:F${grandTotalFinalRow.number}`)
+
+    // Add the electronic generated report text with black border as requested
+    worksheet.addRow([])
+    worksheet.addRow([])
+    const reportRow = worksheet.addRow(["This is electronically generated report"])
+    reportRow.getCell(1).font = {
+      name: "Arial",
+      size: 12,
+      bold: false,
+      color: { argb: "000000" },
+    }
+    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+    reportRow.getCell(1).border = {
+      top: { style: "medium", color: { argb: "000000" } },
+      left: { style: "medium", color: { argb: "000000" } },
+      bottom: { style: "medium", color: { argb: "000000" } },
+      right: { style: "medium", color: { argb: "000000" } },
+    }
+    worksheet.mergeCells(`A${reportRow.number}:G${reportRow.number}`)
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 15 },
+      { width: 30 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+    ]
+
+    const system2 = worksheet.addRow([`Powered By: MangotechDevs.ae`])
+    system2.getCell(1).font = {
+      name: "Arial",
+      size: 10,
+      italic: true,
+      color: { argb: "666666" },
+    }
+    system2.getCell(1).alignment = { horizontal: "center" }
+    worksheet.mergeCells(`A${system2.number}:G${system2.number}`)
+
+    // Add empty row for spacing
+    worksheet.addRow([])
+
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+    saveAs(
+      blob,
+      toDate && fromDate
+        ? `Balance Sheet Summary : ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
+        : `Balance Sheet Summary: Present `,
+    )
+  }
+
+  const downloadExcelDetailed = async () => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet("Balance Sheet")
 
@@ -1010,9 +1439,14 @@ function BalanceSheetDetailed() {
         >
           Balance Sheet
         </Typography>
-        {balanceSheet?.length > 0 && (
+          {balanceSheet?.length > 0 && (
           <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
             <PrimaryButton title={"Download Report"} onClick={() => downloadExcel()} />
+          </Box>
+        )}
+        {balanceSheet?.length > 0 && (
+          <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
+            <PrimaryButton title={"Download Detailed Report"} onClick={() => downloadExcelDetailed()} />
           </Box>
         )}
       </Box>
@@ -1122,19 +1556,19 @@ function BalanceSheetDetailed() {
                                                     <TableCell sx={{ pl: 3 }}>{account?.account_code ?? "-"}</TableCell>
                                                     <TableCell>{account?.account_name ?? "-"}</TableCell>
                                                     <TableCell className="text-right">
-                                                      {formatAmount(accountTotals.effectiveOpeningBalance)}
+                                                      {formatAmount(account.calculatedTotals.effectiveOpeningBalance)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                      {formatAmount(accountTotals.effectiveTotalDebit)}
+                                                      {formatAmount(account.calculatedTotals.totalDebit)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                      {formatAmount(accountTotals.effectiveTotalCredit)}
+                                                      {formatAmount(account.calculatedTotals.totalCredit)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                      {formatAmount(accountTotals.periodDifference)}
+                                                      {formatAmount(account.calculatedTotals.periodDifference)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                      {formatAmount(accountTotals.balance)}
+                                                      {formatAmount(account.calculatedTotals.balance)}
                                                     </TableCell>
                                                   </TableRow>
                                                   {expand.indexOf(account.id) !== -1 && ( // If account is expanded, show child accounts
@@ -1152,10 +1586,10 @@ function BalanceSheetDetailed() {
                                                                 {formatAmount(childTotals.effectiveOpeningBalance)}
                                                               </TableCell>
                                                               <TableCell className="text-right">
-                                                                {formatAmount(childTotals.effectiveTotalDebit)}
+                                                                {formatAmount(childTotals.totalDebit)}
                                                               </TableCell>
                                                               <TableCell className="text-right">
-                                                                {formatAmount(childTotals.effectiveTotalCredit)}
+                                                                {formatAmount(childTotals.totalCredit)}
                                                               </TableCell>
                                                               <TableCell className="text-right">
                                                                 {formatAmount(childTotals.periodDifference)}
