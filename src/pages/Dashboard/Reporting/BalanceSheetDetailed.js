@@ -18,25 +18,25 @@ import {
   Tab,
 } from "@mui/material"
 import styled from "@emotion/styled"
-import { FontFamily } from "assets"
-import Colors from "assets/Style/Colors"
-import { CircleLoading } from "components/Loaders"
-import { ErrorToaster } from "components/Toaster"
+import { FontFamily } from "assets" // Assuming FontFamily is defined here
+import Colors from "assets/Style/Colors" // Assuming Colors is defined here
+import { CircleLoading } from "components/Loaders" // Assuming this component exists
+import { ErrorToaster } from "components/Toaster" // Assuming this component exists
 import { makeStyles } from "@mui/styles"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { ExpandLess, ExpandMore } from "@mui/icons-material"
-import FinanceServices from "services/Finance"
-import { PrimaryButton } from "components/Buttons"
+import FinanceServices from "services/Finance" // Assuming this service exists
+import { PrimaryButton } from "components/Buttons" // Assuming this component exists
 import { saveAs } from "file-saver"
-import { agencyType, CommaSeparator } from "utils"
+import { agencyType, CommaSeparator } from "utils" // Assuming agencyType and CommaSeparator exist
 import { PDFExport } from "@progress/kendo-react-pdf"
 import SearchIcon from "@mui/icons-material/Search"
 import moment from "moment"
-import CustomerServices from "services/Customer"
-import { showErrorToast } from "components/NewToaster"
-import DatePicker from "components/DatePicker"
-import SelectField from "components/Select"
+import CustomerServices from "services/Customer" // Assuming this service exists
+import { showErrorToast } from "components/NewToaster" // Assuming this component exists
+import DatePicker from "components/DatePicker" // Assuming this component exists
+import InputField from "components/Input" // Assuming this component exists
+import SelectField from "components/Select" // Assuming this component exists
 import ExcelJS from "exceljs"
 
 // *For Table Style
@@ -48,13 +48,12 @@ const Cell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     fontSize: 14,
     fontFamily: "Public Sans",
-    border: "1px solid #EEEEEE",
+    border: 0,
     padding: "15px",
-    textAlign: "left",
+    textAlign: "center",
     whiteSpace: "nowrap",
-    color: "#434343",
-    paddingRight: "50px",
-    background: "transparent",
+    background: Colors.primary,
+    color: Colors.white,
     fontWeight: "bold",
   },
   [`&.${tableCellClasses.body}`]: {
@@ -62,7 +61,6 @@ const Cell = styled(TableCell)(({ theme }) => ({
     fontFamily: "Public Sans",
     textWrap: "nowrap",
     padding: "5px !important",
-    paddingLeft: "15px !important",
     ".MuiBox-root": {
       display: "flex",
       gap: "6px",
@@ -105,48 +103,150 @@ const useStyles = makeStyles({
   },
 })
 
-// Helper function to transform data for display and Excel export
-const transformDataForDisplay = (data) => {
-  return data.map((majorCategory) => {
-    const groupedSubcategories = {}
+// Helper function to format amount
+const formatAmount = (amount) => {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)
+}
 
-    majorCategory.sub.forEach((subItem) => {
-      subItem.accounts.forEach((account) => {
-        const subcategoryName = account.account_subcategory || "Uncategorized"
+// Recursive function to calculate account totals including children
+const calculateAccountTotals = (account) => {
+  const opening = Number.parseFloat(account.opening_balance) || 0
+  const debit = Number.parseFloat(account.total_debit) || 0
+  const credit = Number.parseFloat(account.total_credit) || 0
 
-        if (!groupedSubcategories[subcategoryName]) {
-          groupedSubcategories[subcategoryName] = {
-            name: subcategoryName,
-            accounts: [],
-            calculated_total: 0,
-          }
-        }
+  // Adjust opening balance based on nature for calculation purposes
+  let effectiveOpeningBalance = opening
+  if (account.nature === "credit") {
+    effectiveOpeningBalance = -1 * opening
+  }
 
-        let accountBalance = 0
-        const credit = Number.parseFloat(account.total_credit) || 0
-        const debit = Number.parseFloat(account.total_debit) || 0
+  let effectiveTotalDebit = debit
+  let effectiveTotalCredit = credit
 
-        if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
-          const childBalance = account.childAccounts.reduce((sum, child) => {
-            const cc = Number.parseFloat(child.total_credit) || 0
-            const cd = Number.parseFloat(child.total_debit) || 0
-            return sum + (child.nature === "debit" ? cd - cc : cc - cd)
-          }, 0)
-          accountBalance = childBalance
-        } else {
-          accountBalance = account.nature === "debit" ? debit - credit : credit - debit
-        }
-
-        groupedSubcategories[subcategoryName].accounts.push(account)
-        groupedSubcategories[subcategoryName].calculated_total += accountBalance
-      })
+  if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
+    account.childAccounts.forEach((child) => {
+      const childTotals = calculateAccountTotals(child)
+      effectiveOpeningBalance += childTotals.effectiveOpeningBalance
+      effectiveTotalDebit += childTotals.effectiveTotalDebit
+      effectiveTotalCredit += childTotals.effectiveTotalCredit
     })
+  }
 
-    return {
-      ...majorCategory,
-      subcategories_grouped: Object.values(groupedSubcategories),
-    }
-  })
+  const periodDifference = effectiveTotalDebit - effectiveTotalCredit
+  const balance = effectiveOpeningBalance + periodDifference
+
+  return {
+    effectiveOpeningBalance: effectiveOpeningBalance,
+    effectiveTotalDebit: effectiveTotalDebit,
+    effectiveTotalCredit: effectiveTotalCredit,
+    periodDifference: periodDifference,
+    balance: balance,
+  }
+}
+
+// Helper function to transform data for display and Excel export
+const transformDataForDisplay = (data, searchTerm) => {
+  const searchLower = searchTerm ? searchTerm.toLowerCase() : ""
+
+  const filterAccount = (account) => {
+    if (!searchTerm) return true
+    return (
+      account.account_code?.toLowerCase().includes(searchLower) ||
+      account.account_name?.toLowerCase().includes(searchLower) ||
+      account.account_category?.toLowerCase().includes(searchLower) ||
+      account.account_subcategory?.toLowerCase().includes(searchLower)
+    )
+  }
+
+  const processAccountsRecursively = (accounts) => {
+    const processed = []
+    accounts.forEach((account) => {
+      const childAccountsProcessed = []
+      if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
+        account.childAccounts.forEach((child) => {
+          const childTotals = calculateAccountTotals(child)
+          if (filterAccount(child)) {
+            childAccountsProcessed.push({
+              ...child,
+              calculatedTotals: childTotals,
+              isChild: true,
+            })
+          }
+        })
+      }
+
+      const accountTotals = calculateAccountTotals(account)
+      // Only include parent account if it matches search or has matching children
+      if (filterAccount(account) || childAccountsProcessed.length > 0) {
+        processed.push({
+          ...account,
+          calculatedTotals: accountTotals,
+          childAccounts: childAccountsProcessed, // Replace original children with filtered/processed ones
+        })
+      }
+    })
+    return processed
+  }
+
+  return data
+    .map((majorCategory) => {
+      const groupedSubcategories = {}
+      let majorCategoryOpeningTotal = 0
+      let majorCategoryDebitTotal = 0
+      let majorCategoryCreditTotal = 0
+      let majorCategoryPeriodDiffTotal = 0
+      let majorCategoryBalanceTotal = 0
+
+      majorCategory.sub.forEach((subItem) => {
+        const filteredAccounts = processAccountsRecursively(subItem.accounts)
+
+        if (filteredAccounts.length > 0) {
+          const subcategoryName = filteredAccounts[0].account_subcategory || "Uncategorized" // Assuming all filtered accounts in this subItem share the same subcategory
+          if (!groupedSubcategories[subcategoryName]) {
+            groupedSubcategories[subcategoryName] = {
+              name: subcategoryName,
+              accounts: [],
+              openingTotal: 0,
+              debitTotal: 0,
+              creditTotal: 0,
+              periodDiffTotal: 0,
+              balanceTotal: 0,
+            }
+          }
+
+          filteredAccounts.forEach((account) => {
+            groupedSubcategories[subcategoryName].accounts.push(account)
+            groupedSubcategories[subcategoryName].openingTotal += account.calculatedTotals.effectiveOpeningBalance
+            groupedSubcategories[subcategoryName].debitTotal += account.calculatedTotals.effectiveTotalDebit
+            groupedSubcategories[subcategoryName].creditTotal += account.calculatedTotals.effectiveTotalCredit
+            groupedSubcategories[subcategoryName].periodDiffTotal += account.calculatedTotals.periodDifference
+            groupedSubcategories[subcategoryName].balanceTotal += account.calculatedTotals.balance
+          })
+        }
+      })
+
+      Object.values(groupedSubcategories).forEach((group) => {
+        majorCategoryOpeningTotal += group.openingTotal
+        majorCategoryDebitTotal += group.debitTotal
+        majorCategoryCreditTotal += group.creditTotal
+        majorCategoryPeriodDiffTotal += group.periodDiffTotal
+        majorCategoryBalanceTotal += group.balanceTotal
+      })
+
+      return {
+        ...majorCategory,
+        subcategories_grouped: Object.values(groupedSubcategories),
+        majorCategoryOpeningTotal,
+        majorCategoryDebitTotal,
+        majorCategoryCreditTotal,
+        majorCategoryPeriodDiffTotal,
+        majorCategoryBalanceTotal,
+      }
+    })
+    .filter((majorCategory) => majorCategory.subcategories_grouped.length > 0) // Filter out major categories with no matching accounts
 }
 
 function BalanceSheetDetailed() {
@@ -154,11 +254,22 @@ function BalanceSheetDetailed() {
   const navigate = useNavigate()
   const contentRef = useRef(null)
   const { register } = useForm()
-  const tableHead = ["Code", "Name", "Major Category", "Sub Category", "Sub Total (AED)", "Final Total (AED)"]
+
+  const tableHead = [
+    "Code",
+    "Name",
+    "Opening Balance (AED)",
+    "Total Debit (AED)",
+    "Total Credit (AED)",
+    "Period Difference (AED)",
+    "Balance (AED)",
+  ]
+
   const [loader, setLoader] = useState(false)
   const [totalRevenue, setTotalRevenue] = useState(0)
   const [totalExpenses, setTotalExpenses] = useState(0)
   const [totalCost, setTotalCost] = useState(0)
+
   // *For Balance Sheet
   const [balanceSheet, setBalanceSheet] = useState([])
   const [filteredBalanceSheet, setFilteredBalanceSheet] = useState([])
@@ -168,15 +279,17 @@ function BalanceSheetDetailed() {
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const [capitalTotal, setCapitalTotal] = useState(0)
   const [libalTotal, setLibalTotal] = useState(0)
+
   // *For Filters
   const [filters, setFilters] = useState("all")
   const [filterData, setFilterData] = useState()
+
   // *For Collapse
   const [expand, setExpand] = useState([])
   const [fromDate, setFromDate] = useState()
   const [toDate, setToDate] = useState()
   const [adminOpTotal, setAdminOpTotal] = useState(0)
-  const TotalEquity = 0
+  const [searchTerm, setSearchTerm] = useState("")
 
   const getCostCenters = async () => {
     try {
@@ -218,7 +331,7 @@ function BalanceSheetDetailed() {
   }
 
   // *For Get Balance Sheet
-  const getBalanceSheet = async (filter) => {
+  const getBalanceSheet = async () => {
     try {
       setLoader(true) // Start loader
       const params = {
@@ -283,7 +396,6 @@ function BalanceSheetDetailed() {
             const credit = Number.parseFloat(account.total_credit) || 0
             const debit = Number.parseFloat(account.total_debit) || 0
             accountTotal = account.nature === "debit" ? debit - credit : credit - debit
-
             if (account.childAccounts && account.childAccounts.length > 0) {
               const childSum = account.childAccounts.reduce((sum, child) => {
                 const cc = Number.parseFloat(child.total_credit) || 0
@@ -301,12 +413,10 @@ function BalanceSheetDetailed() {
       const costData = myData.filter((item) => item?.name == "Expenses")
       const costSalesTotal = totalSales(costData[0]?.sub?.filter((item) => item?.type_number == 1))
       setTotalCost(costSalesTotal)
-
       const revenueTotal = calculateTotal(myData, "Revenue")
       const totalEnxpensesVal = calculateTotal(myData, "Expenses")
       setTotalRevenue(revenueTotal)
       setTotalExpenses(totalEnxpensesVal)
-
       const LiabilitiesTotal = calculateTotal(myData, "Liabilities")
       const OwnerCapitalTotal = calculateTotal(myData, "Owner Capital")
       setCapitalTotal(OwnerCapitalTotal)
@@ -318,10 +428,10 @@ function BalanceSheetDetailed() {
     }
   }
 
-  // Effect to transform data for display whenever filteredBalanceSheet changes
+  // Effect to transform data for display whenever filteredBalanceSheet or searchTerm changes
   useEffect(() => {
-    setDisplayData(transformDataForDisplay(filteredBalanceSheet))
-  }, [filteredBalanceSheet])
+    setDisplayData(transformDataForDisplay(filteredBalanceSheet, searchTerm))
+  }, [filteredBalanceSheet, searchTerm])
 
   // *For Handle Filter
   const handleFilter = (event, newValue, child) => {
@@ -359,40 +469,7 @@ function BalanceSheetDetailed() {
     }
   }
 
-  // *For Filter Chart of Account By Search (kept as is, but might not fully align with new display)
-  const filterBySearch = (search) => {
-    const result = []
-    for (const item of balanceSheet) {
-      if (item?.sub.length > 0) {
-        for (const sub of item?.sub) {
-          if (sub?.accounts?.length > 0) {
-            for (const acc of sub?.accounts) {
-              if (
-                acc.account_name?.toLowerCase().includes(search?.toLowerCase()) ||
-                acc.account_code?.toLowerCase().includes(search?.toLowerCase())
-              ) {
-                result.push(item)
-              } else {
-                if (acc?.childAccounts?.length > 0) {
-                  for (const subAcc of acc?.childAccounts) {
-                    if (
-                      subAcc.account_name?.toLowerCase().includes(search?.toLowerCase()) ||
-                      subAcc.account_code?.toLowerCase().includes(search?.toLowerCase())
-                    ) {
-                      result.push(item)
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    setFilteredBalanceSheet(result)
-  }
-
-  const downloadExcel = () => {
+  const downloadExcel = async () => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet("Balance Sheet")
 
@@ -411,7 +488,6 @@ function BalanceSheetDetailed() {
       new Date().toLocaleDateString() +
       '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
       '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
-    // Alternative simpler footer format
     worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
 
     // Set page setup for professional printing
@@ -432,7 +508,7 @@ function BalanceSheetDetailed() {
     }
 
     // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["BALANCE SHEET"])
+    const titleRow = worksheet.addRow(["BALANCE SHEET REPORT"])
     titleRow.getCell(1).font = {
       name: "Arial",
       size: 16,
@@ -440,7 +516,7 @@ function BalanceSheetDetailed() {
       color: { argb: "2F4F4F" },
     }
     titleRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A1:F1") // Merged to F as there are 6 columns
+    worksheet.mergeCells("A1:G1")
 
     const name =
       agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
@@ -454,7 +530,7 @@ function BalanceSheetDetailed() {
       color: { argb: "4472C4" },
     }
     companyRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A2:F2")
+    worksheet.mergeCells("A2:G2")
 
     const dateRow = worksheet.addRow([
       `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
@@ -466,11 +542,11 @@ function BalanceSheetDetailed() {
       color: { argb: "666666" },
     }
     dateRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A3:F3")
+    worksheet.mergeCells("A3:G3")
 
     const dateRow2 = worksheet.addRow([
       toDate && fromDate
-        ? `Period:  ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
+        ? `Period:  ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
         : `Period: All `,
     ])
     dateRow2.getCell(1).font = {
@@ -480,7 +556,7 @@ function BalanceSheetDetailed() {
       color: { argb: "666666" },
     }
     dateRow2.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A4:F4")
+    worksheet.mergeCells("A4:G4")
 
     const costCenter = worksheet.addRow([`Cost Center: ${selectedCostCenter?.name}`])
     costCenter.getCell(1).font = {
@@ -490,7 +566,7 @@ function BalanceSheetDetailed() {
       color: { argb: "666666" },
     }
     costCenter.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A5:F5")
+    worksheet.mergeCells("A5:G5")
 
     const system = worksheet.addRow([
       `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
@@ -502,45 +578,42 @@ function BalanceSheetDetailed() {
       color: { argb: "666666" },
     }
     system.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A6:F6")
+    worksheet.mergeCells("A6:G6")
 
     // Add empty row for spacing
     worksheet.addRow([])
 
     // Add headers with professional styling
-    const headerRow = worksheet.addRow(tableHead)
-    headerRow.eachCell((cell) => {
+    const headers = [
+      "Account Code",
+      "Account Name",
+      "Opening Balance",
+      "Total Debit",
+      "Total Credit",
+      "Period Difference",
+      "Balance",
+    ]
+    worksheet.addRow(headers).eachCell((cell) => {
       cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "2F4F4F" }, // Dark slate gray
+        fgColor: { argb: "808080" }, // Gray
       }
-      cell.font = {
-        name: "Arial",
-        bold: true,
-        color: { argb: "FFFFFF" },
-        size: 11,
-      }
-      cell.alignment = { horizontal: "center", vertical: "middle" }
-      cell.border = {
-        top: { style: "thin", color: { argb: "000000" } },
-        left: { style: "thin", color: { argb: "000000" } },
-        bottom: { style: "thin", color: { argb: "000000" } },
-        right: { style: "thin", color: { argb: "000000" } },
-      }
+      cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
     })
 
-    // Process data with exact same logic as displayData
-    let GrandTotal = 0
-    let TotalEquity = 0
+    // Grand totals initialization
+    let grandOpening = 0,
+      grandDebit = 0,
+      grandCredit = 0,
+      grandDiff = 0,
+      grandBalance = 0
 
-    const excelDisplayData = transformDataForDisplay(filteredBalanceSheet)
+    const excelDisplayData = transformDataForDisplay(filteredBalanceSheet, searchTerm)
 
-    excelDisplayData?.forEach((majorCategoryItem) => {
-      let majorCategoryTotal = 0
-
+    excelDisplayData.forEach((majorCategoryItem) => {
       // Main section row (Assets/Liabilities/Equity)
-      const sectionRow = worksheet.addRow([majorCategoryItem.name, "", "", "", "", ""])
+      const sectionRow = worksheet.addRow([majorCategoryItem.name])
       sectionRow.getCell(1).fill = {
         type: "pattern",
         pattern: "solid",
@@ -553,65 +626,41 @@ function BalanceSheetDetailed() {
         size: 12,
       }
       sectionRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
-      worksheet.mergeCells(`A${sectionRow.number}:F${sectionRow.number}`)
+      worksheet.mergeCells(`A${sectionRow.number}:G${sectionRow.number}`)
 
       majorCategoryItem?.subcategories_grouped?.forEach((groupedSubcategory) => {
-        let subcategoryCalculatedTotal = 0
-
         // Subcategory Group Header (e.g., CWIP)
-        const subCategoryGroupRow = worksheet.addRow([groupedSubcategory.name, "", "", "", "", ""])
-        subCategoryGroupRow.getCell(1).fill = {
+        const subCategoryGroupRow = worksheet.addRow(["", groupedSubcategory.name])
+        subCategoryGroupRow.getCell(2).fill = {
           type: "pattern",
           pattern: "solid",
-          fgColor: { argb: "E6E6FA" }, // Lavender
+          fgColor: { argb: "D3D3D3" }, // Light gray
         }
-        subCategoryGroupRow.getCell(1).font = {
-          name: "Arial",
-          bold: true,
-          size: 11,
-          color: { argb: "2F4F4F" },
-        }
-        subCategoryGroupRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
-        worksheet.mergeCells(`A${subCategoryGroupRow.number}:F${subCategoryGroupRow.number}`)
+        subCategoryGroupRow.getCell(2).font = { bold: true }
+        worksheet.mergeCells(`B${subCategoryGroupRow.number}:G${subCategoryGroupRow.number}`)
 
         groupedSubcategory.accounts?.forEach((account) => {
-          let accountDisplayTotal =
-            account?.nature === "debit"
-              ? Number.parseFloat(account?.total_debit || 0) - Number.parseFloat(account?.total_credit || 0)
-              : Number.parseFloat(account?.total_credit || 0) - Number.parseFloat(account?.total_debit || 0)
-          if (Array.isArray(account?.childAccounts) && account.childAccounts.length > 0) {
-            const childSum = account.childAccounts.reduce((sum, child) => {
-              const cc = Number.parseFloat(child?.total_credit) || 0
-              const cd = Number.parseFloat(child?.total_debit) || 0
-              return sum + (child?.nature === "debit" ? cd - cc : cc - cd)
-            }, 0)
-            accountDisplayTotal = childSum
-          }
-
-          subcategoryCalculatedTotal += accountDisplayTotal
-          majorCategoryTotal += accountDisplayTotal
-          GrandTotal += accountDisplayTotal
-          if (
-            majorCategoryItem?.name?.toLowerCase().includes("equity") ||
-            majorCategoryItem?.name?.toLowerCase().includes("liabilities")
-          ) {
-            TotalEquity += accountDisplayTotal
-          }
-
-          // Account row
-          const accountRow = worksheet.addRow([
-            account?.account_code ?? "-",
-            account?.account_name ?? "-",
-            account?.account_category ?? "-",
-            account?.account_subcategory ?? "-",
-            "", // Sub Total (AED) - empty for parent account
-            Number.parseFloat(accountDisplayTotal.toFixed(2)), // Final Total (AED)
+          const accountTotals = account.calculatedTotals
+          const row = worksheet.addRow([
+            account.account_code,
+            account.account_name,
+            accountTotals.effectiveOpeningBalance,
+            accountTotals.effectiveTotalDebit,
+            accountTotals.effectiveTotalCredit,
+            accountTotals.periodDifference,
+            accountTotals.balance,
           ])
+
+          // Format numerical columns as numbers with 4 decimal places
+          for (let i = 3; i <= 7; i++) {
+            row.getCell(i).numFmt = "#,##0.0000"
+          }
+
           // Style account rows
-          accountRow.eachCell((cell, colNumber) => {
+          row.eachCell((cell, colNumber) => {
             cell.font = { name: "Arial", size: 10 }
             cell.alignment = {
-              horizontal: colNumber === 6 ? "right" : "left", // Final Total column is 6th (index 5)
+              horizontal: colNumber >= 3 && colNumber <= 7 ? "right" : "left",
               vertical: "middle",
             }
             cell.border = {
@@ -625,23 +674,27 @@ function BalanceSheetDetailed() {
           // Child accounts
           if (Array.isArray(account?.childAccounts) && account.childAccounts.length > 0) {
             account.childAccounts.forEach((child) => {
-              const childCredit = isNaN(child?.total_credit) ? 0 : Number.parseFloat(child?.total_credit)
-              const childDebit = isNaN(child?.total_debit) ? 0 : Number.parseFloat(child?.total_debit)
-              const childSubTotal = child?.nature === "debit" ? childDebit - childCredit : childCredit - childDebit
-
+              const childTotals = child.calculatedTotals
               const childRow = worksheet.addRow([
-                child?.account_code ?? "-",
-                child?.account_name ?? "-",
-                child?.account_category ?? "-",
-                child?.account_subcategory ?? "-",
-                Number.parseFloat(childSubTotal).toFixed(2), // Sub Total (AED)
-                "", // Final Total (AED) - empty for child
+                child.account_code,
+                `-- ${child.account_name}`, // Indent child account name
+                childTotals.effectiveOpeningBalance,
+                childTotals.effectiveTotalDebit,
+                childTotals.effectiveTotalCredit,
+                childTotals.periodDifference,
+                childTotals.balance,
               ])
+
+              // Format numerical columns
+              for (let i = 3; i <= 7; i++) {
+                childRow.getCell(i).numFmt = "#,##0.0000"
+              }
+
               // Style child rows
               childRow.eachCell((cell, colNumber) => {
                 cell.font = { name: "Arial", size: 9, italic: true }
                 cell.alignment = {
-                  horizontal: colNumber === 5 ? "right" : "left", // Sub Total column is 5th (index 4)
+                  horizontal: colNumber >= 3 && colNumber <= 7 ? "right" : "left",
                   vertical: "middle",
                 }
                 cell.border = {
@@ -655,86 +708,96 @@ function BalanceSheetDetailed() {
           }
         })
 
-        // Subtotal for the grouped subcategory (e.g., Total - CWIP)
+        // Subcategory type total row (orange)
         if (groupedSubcategory?.accounts?.length > 0) {
-          const subtotalRow = worksheet.addRow([
-            `Total - ${groupedSubcategory.name}`,
+          const totalRow = worksheet.addRow([
             "",
-            "",
-            "",
-            "",
-            Number.parseFloat(subcategoryCalculatedTotal).toFixed(2),
+            `${groupedSubcategory.name} Total`,
+            groupedSubcategory.openingTotal,
+            groupedSubcategory.debitTotal,
+            groupedSubcategory.creditTotal,
+            groupedSubcategory.periodDiffTotal,
+            groupedSubcategory.balanceTotal,
           ])
-          subtotalRow.eachCell((cell, colNumber) => {
+          // Format numerical columns
+          for (let i = 3; i <= 7; i++) {
+            totalRow.getCell(i).numFmt = "#,##0.0000"
+          }
+          totalRow.eachCell((cell) => {
             cell.fill = {
               type: "pattern",
               pattern: "solid",
-              fgColor: { argb: "FFD700" }, // Gold
+              fgColor: { argb: "FFA500" }, // Orange
             }
-            cell.font = {
-              name: "Arial",
-              bold: true,
-              size: 10,
-              color: { argb: "2F4F4F" },
-            }
-            cell.alignment = {
-              horizontal: colNumber === 6 ? "right" : "left",
-              vertical: "middle",
-            }
-            cell.border = {
-              top: { style: "medium", color: { argb: "000000" } },
-              left: { style: "medium", color: { argb: "000000" } },
-              bottom: { style: "medium", color: { argb: "000000" } },
-              right: { style: "medium", color: { argb: "000000" } },
-            }
+            cell.font = { bold: true }
           })
-          worksheet.mergeCells(`A${subtotalRow.number}:E${subtotalRow.number}`)
         }
       })
 
-      // Section total (Assets / Liabilities / Equity)
+      // Add category total row
       if (majorCategoryItem?.subcategories_grouped?.length > 0) {
-        const sectionTotalRow = worksheet.addRow([
-          `Total ${majorCategoryItem?.name}`,
+        const catTotalRow = worksheet.addRow([
+          `${majorCategoryItem.name} Total`,
           "",
-          "",
-          "",
-          "",
-          Number.parseFloat(majorCategoryTotal).toFixed(2),
+          majorCategoryItem.majorCategoryOpeningTotal,
+          majorCategoryItem.majorCategoryDebitTotal,
+          majorCategoryItem.majorCategoryCreditTotal,
+          majorCategoryItem.majorCategoryPeriodDiffTotal,
+          majorCategoryItem.majorCategoryBalanceTotal,
         ])
-        sectionTotalRow.eachCell((cell, colNumber) => {
+        // Format numerical columns
+        for (let i = 3; i <= 7; i++) {
+          catTotalRow.getCell(i).numFmt = "#,##0.0000"
+        }
+        catTotalRow.eachCell((cell) => {
           cell.fill = {
             type: "pattern",
             pattern: "solid",
-            fgColor: { argb: "FFA500" }, // Orange
+            fgColor: { argb: "000080" }, // Navy
           }
-          cell.font = {
-            name: "Arial",
-            bold: true,
-            size: 11,
-            color: { argb: "FFFFFF" },
-          }
-          cell.alignment = {
-            horizontal: colNumber === 6 ? "right" : "left",
-            vertical: "middle",
-          }
-          cell.border = {
-            top: { style: "medium", color: { argb: "000000" } },
-            left: { style: "medium", color: { argb: "000000" } },
-            bottom: { style: "medium", color: { argb: "000000" } },
-            right: { style: "medium", color: { argb: "000000" } },
-          }
+          cell.font = { bold: true, color: { argb: "FFFFFF" } }
         })
-        worksheet.mergeCells(`A${sectionTotalRow.number}:E${sectionTotalRow.number}`)
+
+        // Update grand totals
+        grandOpening += majorCategoryItem.majorCategoryOpeningTotal
+        grandDebit += majorCategoryItem.majorCategoryDebitTotal
+        grandCredit += majorCategoryItem.majorCategoryCreditTotal
+        grandDiff += majorCategoryItem.majorCategoryPeriodDiffTotal
+        grandBalance += majorCategoryItem.majorCategoryBalanceTotal
       }
     })
 
-    // Grand Total row
-    worksheet.addRow([]) // Empty row for spacing
-    worksheet.addRow([]) // Empty row for spacing
+    // Add Grand Total row at the end
+    const grandTotalRow = worksheet.addRow([
+      "Grand Total",
+      "",
+      grandOpening,
+      grandDebit,
+      grandCredit,
+      grandDiff,
+      grandBalance,
+    ])
+    // Format numerical columns
+    for (let i = 3; i <= 7; i++) {
+      grandTotalRow.getCell(i).numFmt = "#,##0.0000"
+    }
+    grandTotalRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" }, // Black
+      }
+      cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+    })
 
+    // Add empty rows for spacing before footer
+    worksheet.addRow([])
+    worksheet.addRow([])
+
+    // Retain Profit and Owner Capital + Liabilities + Retain Profit rows (original logic)
     const retainProfitRow = worksheet.addRow([
       "Retain Profit",
+      "",
       "",
       "",
       "",
@@ -759,7 +822,7 @@ function BalanceSheetDetailed() {
         size: 12,
       }
       cell.alignment = {
-        horizontal: colNumber === 6 ? "right" : "left",
+        horizontal: colNumber === 7 ? "right" : "left",
         vertical: "middle",
       }
       cell.border = {
@@ -769,10 +832,11 @@ function BalanceSheetDetailed() {
         right: { style: "thick", color: { argb: "FFFFFF" } },
       }
     })
-    worksheet.mergeCells(`A${retainProfitRow.number}:E${retainProfitRow.number}`)
+    worksheet.mergeCells(`A${retainProfitRow.number}:F${retainProfitRow.number}`)
 
-    const grandTotalRow = worksheet.addRow([
+    const grandTotalFinalRow = worksheet.addRow([
       "Owner Capital + Liabilities + Retain Profit",
+      "",
       "",
       "",
       "",
@@ -786,7 +850,7 @@ function BalanceSheetDetailed() {
         ).toFixed(2),
       ),
     ])
-    grandTotalRow.eachCell((cell, colNumber) => {
+    grandTotalFinalRow.eachCell((cell, colNumber) => {
       cell.fill = {
         type: "pattern",
         pattern: "solid",
@@ -799,7 +863,7 @@ function BalanceSheetDetailed() {
         size: 12,
       }
       cell.alignment = {
-        horizontal: colNumber === 6 ? "right" : "left",
+        horizontal: colNumber === 7 ? "right" : "left",
         vertical: "middle",
       }
       cell.border = {
@@ -809,13 +873,12 @@ function BalanceSheetDetailed() {
         right: { style: "thick", color: { argb: "FFFFFF" } },
       }
     })
-    worksheet.mergeCells(`A${grandTotalRow.number}:E${grandTotalRow.number}`)
-
-    worksheet.addRow([])
-    worksheet.addRow([])
+    worksheet.mergeCells(`A${grandTotalFinalRow.number}:F${grandTotalFinalRow.number}`)
 
     // Add the electronic generated report text with black border as requested
-    const reportRow = worksheet.addRow(["This is electronicallyally generated report"])
+    worksheet.addRow([])
+    worksheet.addRow([])
+    const reportRow = worksheet.addRow(["This is electronically generated report"])
     reportRow.getCell(1).font = {
       name: "Arial",
       size: 12,
@@ -829,7 +892,18 @@ function BalanceSheetDetailed() {
       bottom: { style: "medium", color: { argb: "000000" } },
       right: { style: "medium", color: { argb: "000000" } },
     }
-    worksheet.mergeCells(`A${reportRow.number}:F${reportRow.number}`)
+    worksheet.mergeCells(`A${reportRow.number}:G${reportRow.number}`)
+
+    // Set column widths
+    worksheet.columns = [
+      { width: 15 },
+      { width: 30 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+    ]
 
     const system2 = worksheet.addRow([`Powered By: MangotechDevs.ae`])
     system2.getCell(1).font = {
@@ -839,82 +913,28 @@ function BalanceSheetDetailed() {
       color: { argb: "666666" },
     }
     system2.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells(`A${system2.number}:F${system2.number}`)
-
-    // Set column widths
-    worksheet.columns = [{ width: 15 }, { width: 35 }, { width: 20 }, { width: 20 }, { width: 15 }, { width: 18 }]
-
-    // Add workbook properties
-    workbook.creator = "Finance Department"
-    workbook.lastModifiedBy = "Finance System"
-    workbook.created = new Date()
-    workbook.modified = new Date()
-    workbook.lastPrinted = new Date()
-
-    // Set workbook properties
-    workbook.properties = {
-      title: "Balance Sheet",
-      subject: "Financial Report",
-      keywords: "balance sheet, financial, accounting",
-      category: "Financial Reports",
-      description: "Comprehensive balance sheet generated from accounting system",
-      company: "Your Company Name",
-    }
+    worksheet.mergeCells(`A${system2.number}:G${system2.number}`)
 
     // Add empty row for spacing
     worksheet.addRow([])
 
-    const download = async () => {
-      const buffer = await workbook.xlsx.writeBuffer()
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
-      saveAs(
-        blob,
-        toDate && fromDate
-          ? `Balance Sheet : ${fromDate ? moment(fromDate).format("MM/DD/YYYY") : "-"} To ${toDate ? moment(toDate).format("MM/DD/YYYY") : "Present"}`
-          : `Balance Sheet: Present `,
-      )
-    }
-    download()
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+    saveAs(
+      blob,
+      toDate && fromDate
+        ? `Balance Sheet Detailed : ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
+        : `Balance Sheet Detailed: Present `,
+    )
   }
 
   useEffect(() => {
-    getBalanceSheet()
     getCostCenters()
+    getBalanceSheet()
   }, [])
 
   return (
     <Box sx={{ m: 4, mb: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mr: 4,
-          my: 4,
-        }}
-      >
-        <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
-          Balance Sheet
-        </Typography>
-        {balanceSheet?.length > 0 && (
-          <Box
-            sx={{
-              textAlign: "right",
-              p: 4,
-              display: "flex",
-              gap: 2,
-            }}
-          >
-            {/* <PrimaryButton
-              title="Download PDF"
-              type="button"
-              style={{ backgroundColor: Colors.bluishCyan }}
-              onClick={() => handleExportWithComponent(contentRef)}
-            /> */}
-            <PrimaryButton title={"Export To Excel"} onClick={() => downloadExcel()} />
-          </Box>
-        )}
-      </Box>
       <Grid container spacing={2}>
         <Grid item xs={3}>
           <SelectField
@@ -925,6 +945,7 @@ function BalanceSheetDetailed() {
             onSelect={(value) => {
               setSelectedCostCenter(value)
             }}
+            register={register("costcenter", { required: "costcenter is required" })}
           />
         </Grid>
         <Grid item xs={3}>
@@ -951,23 +972,51 @@ function BalanceSheetDetailed() {
             icon={<SearchIcon />}
             title="Search"
             sx={{ marginTop: "30px" }}
-            onClick={() => getBalanceSheet(null, null, null)}
+            onClick={() => getBalanceSheet()}
           />
         </Grid>
       </Grid>
-      {/* Filters */}
-      {/* <Grid container spacing={1}>
-        <Grid item xs={12} sm={3}>
-          <InputField
-            size={'small'}
-            label={'Search'}
-            placeholder={'Search'}
-            register={register('search', {
-              onChange: (e) => filterBySearch(e.target.value)
-            })}
-          />
+      <Grid container spacing={1}>
+        <Grid item xs={3}>
+          <div className="container">
+            <div className="wrapper">
+              <InputField
+                size={"small"}
+                type="text"
+                id="text-to-search"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </Grid>
-      </Grid> */}
+      </Grid>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mr: 4,
+          my: 4,
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            color: Colors.charcoalGrey,
+            fontFamily: FontFamily.NunitoRegular,
+          }}
+        >
+          Balance Sheet
+        </Typography>
+        {balanceSheet?.length > 0 && (
+          <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
+            <PrimaryButton title={"Download Report"} onClick={() => downloadExcel()} />
+          </Box>
+        )}
+      </Box>
+      {/* Filters */}
       <Grid container spacing={1} sx={{ mb: 2 }}>
         <Grid item xs={12} sm={12}>
           <Tabs value={filters} onChange={(event, newValue) => handleFilter(event, newValue, false)}>
@@ -1021,186 +1070,99 @@ function BalanceSheetDetailed() {
                     displayData?.length > 0 ? (
                       <>
                         {displayData?.map((majorCategoryItem, majorIndex) => {
-                          let majorCategoryTotal = 0
                           return (
                             <Fragment key={majorIndex}>
                               {/* Major Category Row (e.g., Asset) */}
-                              <Row>
-                                <Cell className="pdf-table" colSpan={tableHead?.length}>
+                              <TableRow
+                                className="bg-primary/90 text-primary-foreground font-medium cursor-pointer hover:bg-primary/80"
+                                onClick={() => handleExpand(majorCategoryItem.id)}
+                              >
+                                <TableCell colSpan={tableHead?.length}>
                                   <Typography className="pdf-table" variant="subtitle1" sx={{ textAlign: "left" }}>
-                                    {expand.indexOf(majorCategoryItem.id) === -1 ? (
-                                      <ExpandMore
-                                        className="pdf-hide"
-                                        sx={{
-                                          verticalAlign: "sub",
-                                          cursor: "pointer",
-                                          opacity: majorCategoryItem?.subcategories_grouped?.length > 0 ? 1 : 0,
-                                        }}
-                                        onClick={() => handleExpand(majorCategoryItem.id)}
-                                      />
-                                    ) : (
-                                      <ExpandLess
-                                        className="pdf-hide"
-                                        sx={{
-                                          verticalAlign: "sub",
-                                          cursor: "pointer",
-                                          transform: "rotate(90deg)",
-                                          opacity: majorCategoryItem?.subcategories_grouped?.length > 0 ? 1 : 0,
-                                        }}
-                                        onClick={() => handleExpand(majorCategoryItem.id)}
-                                      />
-                                    )}
-                                    {majorCategoryItem?.name}
+                                    {expand.indexOf(majorCategoryItem.id) === -1 ? "▼" : "▶"} {majorCategoryItem?.name}
                                   </Typography>
-                                </Cell>
-                              </Row>
-
+                                </TableCell>
+                              </TableRow>
                               {expand.indexOf(majorCategoryItem.id) === -1 && ( // If major category is expanded
                                 <Fragment>
                                   {majorCategoryItem?.subcategories_grouped?.map((groupedSubcategory, subIndex) => {
-                                    majorCategoryTotal += groupedSubcategory.calculated_total // Accumulate to major category total
-
                                     return (
                                       <Fragment key={subIndex}>
                                         {/* Subcategory Group Header (e.g., CWIP) */}
-                                        <Row>
-                                          <Cell className="pdf-table" colSpan={tableHead?.length}>
+                                        <TableRow
+                                          className="bg-secondary text-secondary-foreground font-medium cursor-pointer hover:bg-secondary/90"
+                                          onClick={() => handleExpand(groupedSubcategory.name)}
+                                        >
+                                          <TableCell></TableCell>
+                                          <TableCell colSpan={tableHead?.length - 1}>
                                             <Typography
                                               className="pdf-table"
                                               variant="body1"
                                               sx={{ fontWeight: 700, textAlign: "left", ml: 1.5 }}
                                             >
-                                              {expand.indexOf(groupedSubcategory.name) === -1 ? ( // Use subcategory name as ID for expand
-                                                <ExpandMore
-                                                  className="pdf-hide"
-                                                  sx={{
-                                                    verticalAlign: "sub",
-                                                    cursor: "pointer",
-                                                    opacity: groupedSubcategory?.accounts?.length > 0 ? 1 : 0,
-                                                  }}
-                                                  onClick={() => handleExpand(groupedSubcategory.name)}
-                                                />
-                                              ) : (
-                                                <ExpandLess
-                                                  className="pdf-hide"
-                                                  sx={{
-                                                    verticalAlign: "sub",
-                                                    cursor: "pointer",
-                                                    transform: "rotate(90deg)",
-                                                    opacity: groupedSubcategory?.accounts?.length > 0 ? 1 : 0,
-                                                  }}
-                                                  onClick={() => handleExpand(groupedSubcategory.name)}
-                                                />
-                                              )}
+                                              {expand.indexOf(groupedSubcategory.name) === -1 ? "▼" : "▶"}{" "}
                                               {groupedSubcategory.name}
                                             </Typography>
-                                          </Cell>
-                                        </Row>
-
+                                          </TableCell>
+                                        </TableRow>
                                         {expand.indexOf(groupedSubcategory.name) === -1 && ( // If subcategory group is expanded
                                           <Fragment>
                                             {groupedSubcategory.accounts?.map((account, accIndex) => {
-                                              let accountDisplayTotal =
-                                                account?.nature === "debit"
-                                                  ? Number.parseFloat(account?.total_debit || 0) -
-                                                    Number.parseFloat(account?.total_credit || 0)
-                                                  : Number.parseFloat(account?.total_credit || 0) -
-                                                    Number.parseFloat(account?.total_debit || 0)
-                                              if (
-                                                Array.isArray(account?.childAccounts) &&
-                                                account.childAccounts.length > 0
-                                              ) {
-                                                const childSum = account.childAccounts.reduce((sum, child) => {
-                                                  const cc = Number.parseFloat(child?.total_credit) || 0
-                                                  const cd = Number.parseFloat(child?.total_debit) || 0
-                                                  return sum + (child?.nature === "debit" ? cd - cc : cc - cd)
-                                                }, 0)
-                                                accountDisplayTotal = childSum
-                                              }
-
+                                              const accountTotals = account.calculatedTotals
                                               return (
                                                 <Fragment key={accIndex}>
                                                   {/* Account Row */}
-                                                  <Row>
-                                                    <Cell
-                                                      className={
-                                                        account?.childAccounts
-                                                          ? classes.anchorLink + " " + "pdf-table"
-                                                          : "pdf-table"
-                                                      }
-                                                      onClick={() => handleExpand(account?.id)}
-                                                    >
-                                                      <Typography variant="body1" sx={{ ml: 3 }}>
-                                                        {account?.account_code ?? "-"}
-                                                      </Typography>
-                                                    </Cell>
-                                                    <Cell
-                                                      className={
-                                                        account?.childAccounts
-                                                          ? classes.anchorLink + " " + "pdf-table"
-                                                          : "pdf-table"
-                                                      }
-                                                      onClick={() => handleExpand(account?.id)}
-                                                    >
-                                                      {account?.account_name ?? "-"}
-                                                    </Cell>
-                                                    <Cell className="pdf-table">
-                                                      {account?.account_category ?? "-"}
-                                                    </Cell>
-                                                    <Cell className="pdf-table">
-                                                      {account?.account_subcategory ?? "-"}
-                                                    </Cell>
-                                                    <Cell className="pdf-table">
-                                                      {/* Sub Total (AED) - empty for parent account */}
-                                                    </Cell>
-                                                    <Cell className="pdf-table">
-                                                      {/* Final Total (AED) */}
-                                                      {CommaSeparator(
-                                                        Number.parseFloat(accountDisplayTotal.toFixed(2)),
-                                                      )}
-                                                    </Cell>
-                                                  </Row>
-
+                                                  <TableRow
+                                                    className={
+                                                      account.isChild
+                                                        ? "bg-muted/10 hover:bg-muted/30"
+                                                        : "hover:bg-muted/50"
+                                                    }
+                                                  >
+                                                    <TableCell sx={{ pl: 3 }}>{account?.account_code ?? "-"}</TableCell>
+                                                    <TableCell>{account?.account_name ?? "-"}</TableCell>
+                                                    <TableCell className="text-right">
+                                                      {formatAmount(accountTotals.effectiveOpeningBalance)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                      {formatAmount(accountTotals.effectiveTotalDebit)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                      {formatAmount(accountTotals.effectiveTotalCredit)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                      {formatAmount(accountTotals.periodDifference)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                      {formatAmount(accountTotals.balance)}
+                                                    </TableCell>
+                                                  </TableRow>
                                                   {expand.indexOf(account.id) !== -1 && ( // If account is expanded, show child accounts
                                                     <Fragment>
                                                       {account?.childAccounts?.map((child, childAccIndex) => {
-                                                        const childCredit = isNaN(child?.total_credit)
-                                                          ? 0
-                                                          : Number.parseFloat(child?.total_credit)
-                                                        const childDebit = isNaN(child?.total_debit)
-                                                          ? 0
-                                                          : Number.parseFloat(child?.total_debit)
-                                                        const childSubTotal =
-                                                          child?.nature === "debit"
-                                                            ? childDebit - childCredit
-                                                            : childCredit - childDebit
-
+                                                        const childTotals = child.calculatedTotals
                                                         return (
                                                           <Fragment key={childAccIndex}>
                                                             <Row sx={{ bgcolor: "#EEFBEE" }}>
-                                                              <Cell className="pdf-table">
-                                                                <Typography variant="body1" sx={{ ml: 4.5 }}>
-                                                                  {child?.account_code ?? "-"}
-                                                                </Typography>
-                                                              </Cell>
-                                                              <Cell className="pdf-table">
-                                                                {child?.account_name ?? "-"}
-                                                              </Cell>
-                                                              <Cell className="pdf-table">
-                                                                {child?.account_category ?? "-"}
-                                                              </Cell>
-                                                              <Cell className="pdf-table">
-                                                                {child?.account_subcategory ?? "-"}
-                                                              </Cell>
-                                                              <Cell className="pdf-table">
-                                                                {/* Sub Total (AED) */}
-                                                                {CommaSeparator(
-                                                                  Number.parseFloat(childSubTotal).toFixed(2),
-                                                                )}
-                                                              </Cell>
-                                                              <Cell className="pdf-table">
-                                                                {/* Final Total (AED) - empty for child account */}
-                                                              </Cell>
+                                                              <TableCell sx={{ pl: 4.5 }}>
+                                                                {child?.account_code ?? "-"}
+                                                              </TableCell>
+                                                              <TableCell>{child?.account_name ?? "-"}</TableCell>
+                                                              <TableCell className="text-right">
+                                                                {formatAmount(childTotals.effectiveOpeningBalance)}
+                                                              </TableCell>
+                                                              <TableCell className="text-right">
+                                                                {formatAmount(childTotals.effectiveTotalDebit)}
+                                                              </TableCell>
+                                                              <TableCell className="text-right">
+                                                                {formatAmount(childTotals.effectiveTotalCredit)}
+                                                              </TableCell>
+                                                              <TableCell className="text-right">
+                                                                {formatAmount(childTotals.periodDifference)}
+                                                              </TableCell>
+                                                              <TableCell className="text-right">
+                                                                {formatAmount(childTotals.balance)}
+                                                              </TableCell>
                                                             </Row>
                                                           </Fragment>
                                                         )
@@ -1210,28 +1172,30 @@ function BalanceSheetDetailed() {
                                                 </Fragment>
                                               )
                                             })}
-
                                             {/* Subtotal for the grouped subcategory (e.g., Total - CWIP) */}
                                             {groupedSubcategory?.accounts?.length > 0 && (
                                               <Row>
-                                                <Cell>
+                                                <TableCell>
                                                   <Typography variant="body1" sx={{ fontWeight: 700, ml: 4.5 }}>
                                                     Total of {groupedSubcategory.name}
                                                   </Typography>
-                                                </Cell>
-                                                <Cell colSpan={3}>
-                                                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                                    Total {groupedSubcategory.name}
-                                                  </Typography>
-                                                </Cell>
-                                                <Cell></Cell>
-                                                <Cell>
-                                                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                                    {CommaSeparator(
-                                                      Number.parseFloat(groupedSubcategory.calculated_total).toFixed(2),
-                                                    )}
-                                                  </Typography>
-                                                </Cell>
+                                                </TableCell>
+                                                <TableCell></TableCell>
+                                                <TableCell className="text-right">
+                                                  {formatAmount(groupedSubcategory.openingTotal)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                  {formatAmount(groupedSubcategory.debitTotal)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                  {formatAmount(groupedSubcategory.creditTotal)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                  {formatAmount(groupedSubcategory.periodDiffTotal)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                  {formatAmount(groupedSubcategory.balanceTotal)}
+                                                </TableCell>
                                               </Row>
                                             )}
                                           </Fragment>
@@ -1247,25 +1211,52 @@ function BalanceSheetDetailed() {
                                           majorCategoryItem?.name === "Asset" ? Colors.primary : Colors.bluishCyan,
                                       }}
                                     >
-                                      <Cell>
+                                      <TableCell>
                                         <Typography
                                           variant="body1"
                                           sx={{ fontWeight: 700, color: Colors.white, ml: 4.5 }}
                                         >
                                           Totals
                                         </Typography>
-                                      </Cell>
-                                      <Cell colSpan={3}>
+                                      </TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell className="text-right">
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
-                                          Total {majorCategoryItem?.name}
+                                          {CommaSeparator(
+                                            Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal).toFixed(4),
+                                          )}
                                         </Typography>
-                                      </Cell>
-                                      <Cell></Cell>
-                                      <Cell>
+                                      </TableCell>
+                                      <TableCell className="text-right">
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
-                                          {CommaSeparator(Number.parseFloat(majorCategoryTotal).toFixed(2))}
+                                          {CommaSeparator(
+                                            Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal).toFixed(4),
+                                          )}
                                         </Typography>
-                                      </Cell>
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
+                                          {CommaSeparator(
+                                            Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal).toFixed(4),
+                                          )}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
+                                          {CommaSeparator(
+                                            Number.parseFloat(majorCategoryItem.majorCategoryPeriodDiffTotal).toFixed(
+                                              4,
+                                            ),
+                                          )}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
+                                          {CommaSeparator(
+                                            Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal).toFixed(4),
+                                          )}
+                                        </Typography>
+                                      </TableCell>
                                     </Row>
                                   )}
                                 </Fragment>
@@ -1274,10 +1265,10 @@ function BalanceSheetDetailed() {
                           )
                         })}
                         <Row>
-                          <Cell colSpan={tableHead.length}></Cell>
+                          <TableCell colSpan={tableHead.length}></TableCell>
                         </Row>
                         <Row sx={{ bgcolor: Colors.primary }}>
-                          <Cell colSpan={5}>
+                          <TableCell colSpan={6}>
                             <Typography
                               className="pdf-table"
                               variant="body1"
@@ -1285,8 +1276,8 @@ function BalanceSheetDetailed() {
                             >
                               Retain Profit
                             </Typography>
-                          </Cell>
-                          <Cell>
+                          </TableCell>
+                          <TableCell>
                             <Typography
                               className="pdf-table"
                               variant="body2"
@@ -1299,25 +1290,19 @@ function BalanceSheetDetailed() {
                                 ).toFixed(2),
                               )}
                             </Typography>
-                          </Cell>
+                          </TableCell>
                         </Row>
                         <Row sx={{ bgcolor: Colors.primary }}>
-                          <Cell>
+                          <TableCell colSpan={6}>
                             <Typography
                               className="pdf-table"
                               variant="body1"
                               sx={{ fontWeight: 700, ml: 4.5, color: "white" }}
                             >
-                              Total
+                              Total Owner Capital + Liabilities + Retain Profit
                             </Typography>
-                          </Cell>
-                          <Cell colSpan={3}>
-                            <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, color: "white" }}>
-                              Owner Capital + Liabilities + Retain Profit
-                            </Typography>
-                          </Cell>
-                          <Cell></Cell>
-                          <Cell>
+                          </TableCell>
+                          <TableCell>
                             <Typography className="pdf-table" variant="body1" sx={{ fontWeight: 700, color: "white" }}>
                               {CommaSeparator(
                                 Number.parseFloat(
@@ -1328,7 +1313,7 @@ function BalanceSheetDetailed() {
                                 ).toFixed(2),
                               )}
                             </Typography>
-                          </Cell>
+                          </TableCell>
                         </Row>
                       </>
                     ) : (
