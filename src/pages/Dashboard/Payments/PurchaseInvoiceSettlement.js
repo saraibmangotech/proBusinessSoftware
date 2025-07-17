@@ -1318,7 +1318,7 @@ function PurchaseInvoiceSettlement() {
 
 
                                                     <Cell>
-                                                        {(item?.vat_enabled && item?.invoice_items.length > 0)
+                                                        {(item?.vat_enabled && item?.invoice_items?.length > 0)
                                                             ? parseFloat(
                                                                 item.invoice_items.reduce((sum, i) => sum + parseFloat(i?.tax || 0), 0)
                                                             ).toFixed(2)

@@ -1,7 +1,7 @@
 "use client"
 
 import { Fragment, useEffect, useState } from "react"
-import { Box, Card, CardContent, Grid, Typography, Paper } from "@mui/material"
+import { Box, Card, CardContent, Grid, Typography, Paper, Avatar, Chip, Button, Stack } from "@mui/material"
 import styled from "@emotion/styled"
 import { makeStyles } from "@mui/styles"
 import { useNavigate } from "react-router-dom"
@@ -9,6 +9,11 @@ import { BuyerRegistrationIcon, Images, ReceivedBuyerIdIcon, RequestBuyerIdIcon 
 import Colors from "assets/Style/Colors"
 import { useAuth } from "context/UseContext"
 import Storage from "utils/Storage"
+import EventIcon from "@mui/icons-material/Event"
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import CancelIcon from "@mui/icons-material/Cancel"
+import AccessTimeIcon from "@mui/icons-material/AccessTime"
+import HourglassTopIcon from "@mui/icons-material/HourglassTop"
 import {
   AreaChart,
   Area,
@@ -41,6 +46,27 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import NetworkWifiIcon from "@mui/icons-material/NetworkWifi";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import {
+  EmailOutlined,
+  PhoneOutlined,
+  CalendarTodayOutlined,
+  AttachMoneyOutlined,
+  CheckCircleOutline,
+  WarningAmberOutlined,
+  CancelOutlined,
+  DescriptionOutlined,
+  LocationOnOutlined,
+  PersonOutline,
+  CreditCardOutlined,
+  WorkOutline,
+  HourglassEmptyOutlined,
+  EventNoteOutlined,
+  ScheduleOutlined,
+} from "@mui/icons-material"
+
+import { VisibilityOutlined } from "@mui/icons-material"
+import CustomerServices from "services/Customer"
+import moment from "moment"
 // Navy blue theme colors
 const THEME = {
   primary: "#001f3f", // Dark navy blue (primary color)
@@ -214,7 +240,7 @@ function Dashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { getStorageItem } = Storage()
-
+  const [employeeDetail, setEmployeeDetail] = useState(null)
   const userJourney = getStorageItem("journey")
   const [renderState, setRenderState] = useState(false)
   const [stepperLabel, setStepperLabel] = useState([])
@@ -222,8 +248,9 @@ function Dashboard() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [catData, setCatData] = useState([])
   const [employeess, setEmployeess] = useState([])
-  const [currentState, setCurrentState] = useState((user?.role_id == 1000  || user?.role_id == 3) ? 'Admin' : user?.role_id == 1004 ? 'Cashier' : user?.role_id == 1003 ? 'Typist' : '')
-
+  const [currentState, setCurrentState] = useState((user?.role_id == 1000 || user?.role_id == 3) ? 'Admin' : user?.role_id == 1004 ? 'Cashier' : user?.role_id == 1003 ? 'Typist' : '')
+  const [shift, setShift] = useState(null)
+  const [employeeAttendance, setEmployeeAttendance] = useState(null)
   const pdfContent = Images?.guidelinePDF
 
   const statsData = [
@@ -252,7 +279,7 @@ function Dashboard() {
       color: THEME.accent2,
       bgColor: THEME.accent2,
       trend: "",
-       trendUp: true,
+      trendUp: true,
     },
     {
       title: "Total Collection",
@@ -264,7 +291,7 @@ function Dashboard() {
       trendUp: true,
     },
   ];
-  
+
   const statsData2 = [
     {
       title: "Total Sales",
@@ -312,8 +339,8 @@ function Dashboard() {
       trendUp: true,
     },
   ];
-  
-  
+
+
   const statsData3 = [
     {
       title: "Card Payments Collected",
@@ -352,7 +379,7 @@ function Dashboard() {
       trendUp: true,
     },
   ];
-  
+
 
   const handleDownload = () => {
     const a = document.createElement("a")
@@ -365,6 +392,32 @@ function Dashboard() {
     document.body.removeChild(a)
   }
 
+  const getIconAndColor = (key) => {
+    switch (key) {
+      case "passport":
+        return { icon: <DescriptionOutlined sx={{ mr: 1, color: "#4CAF50" }} />, color: "#e8f5e9", statusColor: "#4CAF50" };
+      case "emirates_id":
+        return { icon: <CreditCardOutlined sx={{ mr: 1, color: "#FF9800" }} />, color: "#fff3e0", statusColor: "#FF9800" };
+      case "visa_copy":
+        return { icon: <DescriptionOutlined sx={{ mr: 1, color: "#F44336" }} />, color: "#ffebee", statusColor: "#F44336" };
+      case "labor":
+        return { icon: <WorkOutline sx={{ mr: 1, color: "#4CAF50" }} />, color: "#e8f5e9", statusColor: "#4CAF50" };
+      default:
+        return { icon: <DescriptionOutlined sx={{ mr: 1 }} />, color: "#f0f0f0", statusColor: "#999" };
+    }
+  };
+
+  const getStatus = (expiryDate) => {
+    if (!expiryDate) return { label: "Not Set", color: "#999", icon: <WarningAmberOutlined sx={{ fontSize: 16 }} /> };
+
+    const today = moment();
+    const expiry = moment(expiryDate);
+    const diff = expiry.diff(today, "days");
+
+    if (diff >= 60) return { label: "Valid", color: "#4CAF50", icon: <CheckCircleOutline sx={{ fontSize: 16 }} /> };
+    if (diff >= 0) return { label: "Expiring Soon", color: "#FF9800", icon: <WarningAmberOutlined sx={{ fontSize: 16 }} /> };
+    return { label: "Expired", color: "#F44336", icon: <CancelOutlined sx={{ fontSize: 16 }} /> };
+  };
 
 
   useEffect(() => {
@@ -402,7 +455,7 @@ function Dashboard() {
       console.log(result);
       setEmployeess(result2)
       setCatData(result)
-      
+
       console.log(result);
       setStatsDetail(data)
 
@@ -411,8 +464,69 @@ function Dashboard() {
     }
   }
 
+  const getStatusCheck = (record) => {
+  if (record.isHoliday) return { label: "Holiday", color: "error" }
+  if (record.isWeekend) return { label: "Weekend", color: "default" }
+  if (record.present) return { label: "Present", color: "success" }
+  if (record.absent) return { label: "Absent", color: "error" }
+  if (record.onLeave) return { label: "On Leave", color: "info" }
+  return { label: "No Record", color: "default" }
+}
+
+  const getEmployeeAttendance = async (id) => {
+    try {
+      const params = {
+        user_id: id,
+        from_date: moment().subtract(6, 'days').format("MM-DD-YYYY"),
+        to_date: moment().format("MM-DD-YYYY"),
+      }
+      const { data } = await SystemServices.getEmployeeAttendance(params);
+      console.log(data);
+      setEmployeeAttendance(data?.daily)
+
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const getData = async () => {
+    try {
+      let params = { user_id: user?.id };
+      const { data } = await CustomerServices.getEmployeeDetail(params);
+      let data2 = data?.employee
+      setEmployeeDetail(data2)
+      getShiftDetail(data2?.shift_id)
+      getEmployeeAttendance(user?.id)
+
+
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
+  const getShiftDetail = async (id) => {
+
+
+    try {
+
+      let params = {
+        page: 1,
+        limit: 999999,
+
+        id: id
+
+      }
+
+      const { data } = await SystemServices.getShiftDetail(params)
+      setShift(data?.shifts)
+
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
   useEffect(() => {
     getStats()
+    getData()
   }, [])
 
   const onPieEnter = (_, index) => {
@@ -421,7 +535,7 @@ function Dashboard() {
 
   return (
     <Fragment>
-      <Box
+      {user?.role_id != 4 ? <Box
         sx={{
           m: 2,
           position: "relative",
@@ -678,201 +792,201 @@ function Dashboard() {
         </Grid>
 
         {/* Charts Section */}
-        {currentState == 'Admin' && 
-        
-        <Grid container spacing={3} mt={2}>
-          {/* Sales Trend Chart */}
-          <Grid item xs={12} md={8}>
-            <Card
-              sx={{
-                p: 2,
-                borderRadius: "16px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                border: `1px solid ${THEME.primary}`,
-                "& .recharts-default-tooltip": {
-                  backgroundColor: THEME.light,
+        {currentState == 'Admin' &&
+
+          <Grid container spacing={3} mt={2}>
+            {/* Sales Trend Chart */}
+            <Grid item xs={12} md={8}>
+              <Card
+                sx={{
+                  p: 2,
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                   border: `1px solid ${THEME.primary}`,
-                },
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Monthly Sales Graph
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={statsDetail?.salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={THEME.secondary} stopOpacity={0.8} />
-                      <stop offset="95%" stopColor={THEME.secondary} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <RechartsTooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke={THEME.secondary}
-                    fillOpacity={1}
-                    fill="url(#colorValue)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </Card>
-          </Grid>
+                  "& .recharts-default-tooltip": {
+                    backgroundColor: THEME.light,
+                    border: `1px solid ${THEME.primary}`,
+                  },
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
+                  Monthly Sales Graph
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={statsDetail?.salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={THEME.secondary} stopOpacity={0.8} />
+                        <stop offset="95%" stopColor={THEME.secondary} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <RechartsTooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke={THEME.secondary}
+                      fillOpacity={1}
+                      fill="url(#colorValue)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Card>
+            </Grid>
 
-          {/* Category Distribution */}
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                p: 2,
-                borderRadius: "16px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                border: `1px solid ${THEME.primary}`,
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Category Wise Service Sales
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    activeIndex={activeIndex}
-                    activeShape={(props) => {
-                      const RADIAN = Math.PI / 180
-                      const {
-                        cx,
-                        cy,
-                        midAngle,
-                        innerRadius,
-                        outerRadius,
-                        startAngle,
-                        endAngle,
-                        fill,
-                        payload,
-                        percent,
-                        value,
-                      } = props
-                      const sin = Math.sin(-RADIAN * midAngle)
-                      const cos = Math.cos(-RADIAN * midAngle)
-                      const sx = cx + (outerRadius + 10) * cos
-                      const sy = cy + (outerRadius + 10) * sin
-                      const mx = cx + (outerRadius + 30) * cos
-                      const my = cy + (outerRadius + 30) * sin
-                      const ex = mx + (cos >= 0 ? 1 : -1) * 22
-                      const ey = my
-                      const textAnchor = cos >= 0 ? "start" : "end"
+            {/* Category Distribution */}
+            <Grid item xs={12} md={4}>
+              <Card
+                sx={{
+                  p: 2,
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  border: `1px solid ${THEME.primary}`,
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
+                  Category Wise Service Sales
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      activeIndex={activeIndex}
+                      activeShape={(props) => {
+                        const RADIAN = Math.PI / 180
+                        const {
+                          cx,
+                          cy,
+                          midAngle,
+                          innerRadius,
+                          outerRadius,
+                          startAngle,
+                          endAngle,
+                          fill,
+                          payload,
+                          percent,
+                          value,
+                        } = props
+                        const sin = Math.sin(-RADIAN * midAngle)
+                        const cos = Math.cos(-RADIAN * midAngle)
+                        const sx = cx + (outerRadius + 10) * cos
+                        const sy = cy + (outerRadius + 10) * sin
+                        const mx = cx + (outerRadius + 30) * cos
+                        const my = cy + (outerRadius + 30) * sin
+                        const ex = mx + (cos >= 0 ? 1 : -1) * 22
+                        const ey = my
+                        const textAnchor = cos >= 0 ? "start" : "end"
 
-                      return (
-                        <g>
-                          <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-                            {payload.name}
-                          </text>
-                          <Sector
-                            cx={cx}
-                            cy={cy}
-                            innerRadius={innerRadius}
-                            outerRadius={outerRadius}
-                            startAngle={startAngle}
-                            endAngle={endAngle}
-                            fill={fill}
-                          />
-                          <Sector
-                            cx={cx}
-                            cy={cy}
-                            startAngle={startAngle}
-                            endAngle={endAngle}
-                            innerRadius={outerRadius + 6}
-                            outerRadius={outerRadius + 10}
-                            fill={fill}
-                          />
-                          <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-                          <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-                          <text
-                            x={ex + (cos >= 0 ? 1 : -1) * 12}
-                            y={ey}
-                            textAnchor={textAnchor}
-                            fill="#333"
-                          >{`${value}`}</text>
-                          <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-                            {`(${(percent * 100).toFixed(2)}%)`}
-                          </text>
-                        </g>
-                      )
-                    }}
-                    data={catData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    onMouseEnter={onPieEnter}
-                  >
-                    {catData?.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={THEME.chartColors[index % THEME.chartColors.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </Card>
-          </Grid>
+                        return (
+                          <g>
+                            <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
+                              {payload.name}
+                            </text>
+                            <Sector
+                              cx={cx}
+                              cy={cy}
+                              innerRadius={innerRadius}
+                              outerRadius={outerRadius}
+                              startAngle={startAngle}
+                              endAngle={endAngle}
+                              fill={fill}
+                            />
+                            <Sector
+                              cx={cx}
+                              cy={cy}
+                              startAngle={startAngle}
+                              endAngle={endAngle}
+                              innerRadius={outerRadius + 6}
+                              outerRadius={outerRadius + 10}
+                              fill={fill}
+                            />
+                            <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
+                            <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+                            <text
+                              x={ex + (cos >= 0 ? 1 : -1) * 12}
+                              y={ey}
+                              textAnchor={textAnchor}
+                              fill="#333"
+                            >{`${value}`}</text>
+                            <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
+                              {`(${(percent * 100).toFixed(2)}%)`}
+                            </text>
+                          </g>
+                        )
+                      }}
+                      data={catData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      onMouseEnter={onPieEnter}
+                    >
+                      {catData?.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={THEME.chartColors[index % THEME.chartColors.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </Card>
+            </Grid>
 
-          {/* Employee Service Distribution */}
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                p: 2,
-                borderRadius: "16px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                border: `1px solid ${THEME.primary}`,
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Typist Wise Service Sales
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={employeess} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={false} />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Bar dataKey="value" fill={THEME.accent1} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            {/* Employee Service Distribution */}
+            <Grid item xs={12} md={4}>
+              <Card
+                sx={{
+                  p: 2,
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  border: `1px solid ${THEME.primary}`,
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
+                  Typist Wise Service Sales
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={employeess} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" tick={false} />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Bar dataKey="value" fill={THEME.accent1} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
 
-            </Card>
-          </Grid>
+              </Card>
+            </Grid>
 
-          {/* Revenue vs Expenses */}
-          <Grid item xs={12} md={8}>
-          <Card
-              sx={{
-                p: 2,
-                borderRadius: "16px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                border: `1px solid ${THEME.primary}`,
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                Credit Invoices vs Paid Invoices
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={statsDetail?.paidCreditGraph} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="credit" stroke={THEME.accent1} activeDot={{ r: 8 }} strokeWidth={2} />
-                  <Line type="monotone" dataKey="paid" stroke={THEME.accent2} strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </Card>
-          </Grid>
+            {/* Revenue vs Expenses */}
+            <Grid item xs={12} md={8}>
+              <Card
+                sx={{
+                  p: 2,
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  border: `1px solid ${THEME.primary}`,
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
+                  Credit Invoices vs Paid Invoices
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={statsDetail?.paidCreditGraph} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="credit" stroke={THEME.accent1} activeDot={{ r: 8 }} strokeWidth={2} />
+                    <Line type="monotone" dataKey="paid" stroke={THEME.accent2} strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Card>
+            </Grid>
 
-        </Grid>}
+          </Grid>}
         <Grid container spacing={3} mt={2}>
           {currentState == 'Cashier' && <Grid item xs={12} md={12}>
             <Card
@@ -901,47 +1015,435 @@ function Dashboard() {
           </Grid>}
           {console.log(statsDetail?.salesData)}
           {currentState == 'Typist' &&
-                <Grid item xs={12} md={12}>
-                <Card
-                  sx={{
-                    p: 2,
-                    borderRadius: "16px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            <Grid item xs={12} md={12}>
+              <Card
+                sx={{
+                  p: 2,
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  border: `1px solid ${THEME.primary}`,
+                  "& .recharts-default-tooltip": {
+                    backgroundColor: THEME.light,
                     border: `1px solid ${THEME.primary}`,
-                    "& .recharts-default-tooltip": {
-                      backgroundColor: THEME.light,
-                      border: `1px solid ${THEME.primary}`,
-                    },
-                  }}
-                >
-                  <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
-                    Monthly Sales Graph
-                  </Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={statsDetail?.salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={THEME.secondary} stopOpacity={0.8} />
-                          <stop offset="95%" stopColor={THEME.secondary} stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <RechartsTooltip />
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke={THEME.secondary}
-                        fillOpacity={1}
-                        fill="url(#colorValue)"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </Card>
-              </Grid>}
+                  },
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: THEME.primary }}>
+                  Monthly Sales Graph
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={statsDetail?.salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={THEME.secondary} stopOpacity={0.8} />
+                        <stop offset="95%" stopColor={THEME.secondary} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <RechartsTooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke={THEME.secondary}
+                      fillOpacity={1}
+                      fill="url(#colorValue)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Card>
+            </Grid>}
         </Grid>
-      </Box>
+      </Box> :
+        <Box sx={{ p: 4, bgcolor: "#f0f2f5", minHeight: "100vh" }}>
+          {/* Header Section */}
+          <Card
+            sx={{
+              mb: 4,
+              borderRadius: 3,
+              background: "linear-gradient(to right, #6A0DAD, #4169E1)", // Purple to Royal Blue gradient
+              color: "white",
+              p: 4,
+              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Grid container spacing={4} alignItems="center">
+              {/* Profile Info */}
+              <Grid item xs={12} md={8}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Avatar sx={{ width: 80, height: 80, mr: 3, bgcolor: "rgba(255,255,255,0.2)" }}>
+                    <PersonOutline sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                      Welcome back, {employeeDetail?.user?.name}! 👋
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                      {employeeDetail?.designation}
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                      Employee ID: {employeeDetail?.employee_code}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                      <EmailOutlined sx={{ mr: 1, fontSize: 18 }} />
+                      <Box>
+                        <Typography variant="caption" display="block">
+                          Email
+                        </Typography>
+                        <Typography variant="body2">{employeeDetail?.user?.email}</Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                      <PhoneOutlined sx={{ mr: 1, fontSize: 18 }} />
+                      <Box>
+                        <Typography variant="caption" display="block">
+                          Mobile
+                        </Typography>
+                        <Typography variant="body2">{employeeDetail?.user?.phone}</Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                      <CalendarTodayOutlined sx={{ mr: 1, fontSize: 18 }} />
+                      <Box>
+                        <Typography variant="caption" display="block">
+                          Joined
+                        </Typography>
+                        <Typography variant="body2">{moment(employeeDetail?.date_of_joining).format('DD-MM-YYYY')}</Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+                  {/* <Grid item xs={12} sm={6} md={3}>
+                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                      <AttachMoneyOutlined sx={{ mr: 1, fontSize: 18 }} />
+                      <Box>
+                        <Typography variant="caption" display="block">
+                          Salary
+                        </Typography>
+                        <Typography variant="body2">AED 4,500</Typography>
+                      </Box>
+                    </Box>
+                  </Grid> */}
+                </Grid>
+              </Grid>
+
+              {/* Quick Stats */}
+              <Grid item xs={12} md={4}>
+                <Box sx={{ borderLeft: { md: "1px solid rgba(255,255,255,0.3)" }, pl: { md: 4 }, pt: { xs: 3, md: 0 } }}>
+                  <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+                    Quick Stats
+                  </Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Total Hours
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} sx={{ textAlign: "right" }}>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        N/A
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Completed Shifts
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} sx={{ textAlign: "right" }}>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                           N/A
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Bank Account
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} sx={{ textAlign: "right" }}>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {employeeDetail?.iban}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Grid>
+            </Grid>
+          </Card>
+
+          {/* Document Status & Expiry Tracking */}
+          <Card sx={{ mb: 4, borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <DescriptionOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+                Document Status & Expiry Tracking
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Monitor your important document expiry dates
+            </Typography>
+
+            <Grid container spacing={2}>
+              {employeeDetail?.documents?.map((doc, index) => {
+                const { icon, color: bgColor, statusColor } = getIconAndColor(doc.key);
+                const { label, color: chipColor, icon: chipIcon } = getStatus(doc.expiry_date);
+                const daysLeft = doc.expiry_date
+                  ? moment(doc.expiry_date).diff(moment(), "days")
+                  : null;
+
+                return (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Card sx={{ borderRadius: 2, p: 2, bgcolor: bgColor, boxShadow: "none" }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          {icon}
+                          <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#333" }}>
+                            {doc.name}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={label}
+                          icon={chipIcon}
+                          sx={{
+                            bgcolor: chipColor,
+                            color: "white",
+                            height: 24,
+                            "& .MuiChip-icon": { color: "white" },
+                          }}
+                        />
+                      </Box>
+
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Expires:
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: "medium", mb: 1 }}>
+                        {doc.expiry_date ? moment(doc.expiry_date).format("YYYY-MM-DD") : "N/A"}
+                      </Typography>
+
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Days left:
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: "bold",
+                          color: chipColor,
+                          mb: 2,
+                        }}
+                      >
+                        {doc.expiry_date
+                          ? daysLeft >= 0
+                            ? `${daysLeft} days`
+                            : `${Math.abs(daysLeft)} days ago`
+                          : "N/A"}
+                      </Typography>
+
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<VisibilityOutlined />}
+                        sx={{
+                          borderColor: chipColor,
+                          color: chipColor,
+                          "&:hover": { borderColor: chipColor, bgcolor: bgColor },
+                          width: "100%",
+                        }}
+                        onClick={() => {
+                          if (doc.path) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${doc.path}`, "_blank");
+                        }}
+                        disabled={!doc.path}
+                      >
+                        View Document
+                      </Button>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+
+          </Card>
+
+          {/* Current Shift Status */}
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <Card sx={{ borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <HourglassEmptyOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
+                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+                    Current Shift Status
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Your active shift details and progress
+                </Typography>
+
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} md={12}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <EventNoteOutlined sx={{ mr: 1, color: "#666" }} />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Date
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                              {moment(shift?.created_at).format('DD-MM-YYYY')}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <ScheduleOutlined sx={{ mr: 1, color: "#666" }} />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Time
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                              {moment().startOf("day").add(shift?.start_time, "minutes").format("hh:mm A")} - {moment().startOf("day").add(shift?.end_time, "minutes").format("hh:mm A")}
+
+
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                    </Grid>
+                  </Grid>
+
+
+                </Grid>
+              </Card>
+            </Grid>
+            <Grid item xs={6}>
+              <Card sx={{ borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <HourglassEmptyOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
+                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+                    Today Shift Status
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Your today shift details and progress
+                </Typography>
+
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} md={12}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <EventNoteOutlined sx={{ mr: 1, color: "#666" }} />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Date
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                              {moment(shift?.created_at).format('DD-MM-YYYY')}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <ScheduleOutlined sx={{ mr: 1, color: "#666" }} />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Time
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                              {moment().startOf("day").add(shift?.start_time, "minutes").format("hh:mm A")} - {moment().startOf("day").add(shift?.end_time, "minutes").format("hh:mm A")}
+
+
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                    </Grid>
+                  </Grid>
+
+
+                </Grid>
+              </Card>
+            </Grid>
+          </Grid>
+       <Box px={2} py={4}>
+      <Typography variant="h6" fontWeight="bold" gutterBottom>
+        Attendance Record
+      </Typography>
+      <Typography variant="body2" color="textSecondary" gutterBottom>
+        Your recent attendance and working hours
+      </Typography>
+
+      <Stack spacing={2}>
+        {employeeAttendance?.map((record, index) => (
+          <Paper
+            key={index}
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: "1px solid #E0E0E0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+            }}
+          >
+            <Box display="flex" alignItems="center" gap={2}>
+              <CalendarTodayIcon color="primary" />
+              <Box>
+                <Typography variant="subtitle1" fontWeight="medium">
+                  {record.date}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {record.check_in && record.check_out
+                    ? `${record.check_in} - ${record.check_out}`
+                    : "No attendance"}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box textAlign="right">
+              <Typography variant="subtitle2">
+                {record.worked_hours}h
+              </Typography>
+              {record.excess_hours > 0 && (
+                <Typography variant="caption" color="orange">
+                  +{record.excess_hours.toFixed(2)}h OT
+                </Typography>
+              )}
+              {record.status === "Present" ? (
+                <Chip
+                  label="Present"
+                  size="small"
+                  color="success"
+                  icon={<CheckCircleIcon />}
+                  sx={{ ml: 1 }}
+                />
+              ) : (
+                <Chip
+                  label="Absent"
+                  size="small"
+                  color="error"
+                  icon={<CancelIcon />}
+                  sx={{ ml: 1 }}
+                />
+              )}
+            </Box>
+          </Paper>
+        ))}
+      </Stack>
+    </Box>
+        </Box>}
     </Fragment>
   )
 }
