@@ -480,7 +480,7 @@ const prepareExcelData = (data) => {
                     if (nature === "debit") {
                         accountRunningBalance += debit - credit;
                     } else {
-                        accountRunningBalance += credit - debit;
+                        accountRunningBalance += debit - debit;
                     }
 
                     processedData.push({
