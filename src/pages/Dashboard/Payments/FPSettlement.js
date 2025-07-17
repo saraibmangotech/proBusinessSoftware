@@ -868,7 +868,7 @@ function FPSettlement() {
             </SimpleDialog>
 
             <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 4 }}>
-                Purchase Invoice Settlement
+                FP  Settlement
             </Typography>
 
             {/* Filters */}

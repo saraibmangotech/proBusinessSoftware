@@ -441,11 +441,11 @@ function FPSettlementList() {
 
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Purchase Settlement List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>FP Settlement List</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#001f3f'}
                     title="Settle"
-                    onClick={() => { navigate('/purchase-invoice-settlement'); localStorage.setItem("currentUrl", '/create-customer') }}
+                    onClick={() => { navigate('/fp-settlement'); localStorage.setItem("currentUrl", '/create-customer') }}
                     loading={loading}
                 />}
 
