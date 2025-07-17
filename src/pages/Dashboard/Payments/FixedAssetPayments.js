@@ -259,6 +259,18 @@ function FixedAssetPayments() {
 
 
         },
+         {
+            header: "Paid Amount",
+            accessorKey: "paid_amount",
+
+
+        },
+        {
+            header: "Payment Status",
+            accessorKey: "payment_status",
+
+
+        },
         {
             header: "Payment Mode",
             accessorKey: "payment_mode",
@@ -274,6 +286,7 @@ function FixedAssetPayments() {
 
 
         },
+        
          {
                   header: "Date",
                   accessorKey: 'date', // optional, used for column ID purposes

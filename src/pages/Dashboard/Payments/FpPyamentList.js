@@ -8,7 +8,6 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
-    Button,
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -30,11 +29,11 @@ import { addPermission } from 'redux/slices/navigationDataSlice';
 import SimpleDialog from 'components/Dialog/SimpleDialog';
 import { PrimaryButton } from 'components/Buttons';
 import SelectField from 'components/Select';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong"; // for invoice
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
@@ -43,8 +42,6 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import DatePicker from 'components/DatePicker';
-import FPInvoiceServices from 'services/FPInvoice';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -111,7 +108,7 @@ const useStyles = makeStyles({
     }
 })
 
-function PrepaidExpenses() {
+function FpPaymentList() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -138,7 +135,7 @@ function PrepaidExpenses() {
     const [confirmationDialog, setConfirmationDialog] = useState(false)
 
     // *For Customer Queue
-    const [tableData, setTableData] = useState([]);
+    const [customerQueue, setCustomerQueue] = useState([]);
 
 
 
@@ -156,62 +153,24 @@ function PrepaidExpenses() {
 
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('desc')
-    const [fromDate, setFromDate] = useState(new Date());
-    const [toDate, setToDate] = useState(new Date());
 
-    const handleFromDate = (newDate) => {
-        try {
-            // eslint-disable-next-line eqeqeq
-            if (newDate == 'Invalid Date') {
-                setFromDate('invalid')
-                return
-            }
-            console.log(newDate, "newDate")
-            setFromDate(new Date(newDate))
-        } catch (error) {
-            ErrorToaster(error)
-        }
-    }
-
-    const handleToDate = (newDate) => {
-        try {
-            // eslint-disable-next-line eqeqeq
-            if (newDate == 'Invalid Date') {
-                setToDate('invalid')
-                return
-            }
-            setToDate(new Date(newDate))
-        } catch (error) {
-            ErrorToaster(error)
-        }
-    }
-
-
-    const getData = async (page, limit, filter) => {
+    // *For Get Customer Queue
+    const getCustomerQueue = async (page, limit, filter) => {
         setLoader(true)
 
         try {
-            const Page = page ? page : currentPage
-            const Limit = limit ? limit : pageLimit
-            const Filter = filter ? { ...filters, ...filter } : null;
-            setCurrentPage(Page)
-            setPageLimit(Limit)
-            setFilters(Filter)
+            
             let params = {
                 page: 1,
                 limit: 999999,
-                type: "Prepaid Expense",
-                from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
-                to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
+               
 
 
             }
-
-            const { data } = await FPInvoiceServices.getFPInvoiceList(params)
-            console.log(data);
-
-            setTableData(data?.rows)
-
+           
+            const { data } = await CustomerServices.getFPPayments(params)
+            setCustomerQueue(data?.rows)
+            
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -230,154 +189,146 @@ function PrepaidExpenses() {
             sort_by: key,
             sort_order: sort
         }
-        Debounce(() => getData(1, '', data));
+        Debounce(() => getCustomerQueue(1, '', data));
     }
 
 
 
+    // *For Handle Filter
 
+    const handleFilter = () => {
+        let data = {
+            search: getValues('search')
+        }
+        Debounce(() => getCustomerQueue(1, '', data));
+    }
+    const handleDelete = async (item) => {
+
+
+        try {
+            let params = {
+                id: selectedData?.id,
+                type: 'payment_voucher'
+            }
+
+
+            const { message } = await CustomerServices.DeleteVoucher(params)
+
+            SuccessToaster(message);
+            getCustomerQueue()
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            // setLoader(false)
+        }
+    }
+    const UpdateStatus = async () => {
+        try {
+            let obj = {
+                customer_id: selectedData?.id,
+                is_active: status?.id,
+            };
+
+            const promise = CustomerServices.CustomerStatus(obj);
+            console.log(promise);
+
+            showPromiseToast(
+                promise,
+                "Saving...",
+                "Added Successfully",
+                "Something Went Wrong"
+            );
+
+            // Await the promise and then check its response
+            const response = await promise;
+            if (response?.responseCode === 200) {
+                setStatusDialog(false);
+                setStatus(null)
+                getCustomerQueue();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
     const columns = [
         {
-            header: "System #",
-            accessorKey: "invoice_number",
+            header: "Receipt No.",
+            accessorKey: "id",
 
-
-        },
-        {
-            header: "Amortization Months",
-            accessorKey: "total_months",
 
 
         },
         {
-            header: "Months Recorded",
-            accessorKey: "months_recorded",
+            header: "Amount",
+            accessorKey: "total_paid_amount",
 
 
         },
-
         {
-            header: " Date",
-
-
-            accessorFn: (row) => row?.purchase_date ? moment(row?.purchase_date).format("DD/MM/YYYY") : '',
-            cell: ({ row }) => (
-                <Box
-                    variant="contained"
-                    color="primary"
-                    sx={{ cursor: "pointer", display: "flex", gap: 2 }}
-                >
-                    {row?.original?.purchase_date ? moment(row?.original?.purchase_date).format("DD/MM/YYYY") : ''}
-                </Box>
-            ),
-            total: false,
-        },
-        {
-            header: "Vendor Name",
-            accessorKey: "name",
+            header: "Payment Mode",
+            accessorKey: "payment_mode",
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {row?.original?.vendor?.name}
+
+
+                    {row?.original?.payment_mode}
 
                 </Box>
             ),
 
 
         },
+         {
+                  header: "Date",
+                  accessorKey: 'date', // optional, used for column ID purposes
+                  accessorFn: (row) => {
+                    const dateValue = row?.date || row?.created_at;
+                    return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
+                  },
+                  cell: ({ row }) => {
+                    const dateValue = row?.original?.date || row?.original?.created_at;
+                    return (
+                      <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                      >
+                        {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
+                      </Box>
+                    );
+                  },
+                },
+
         {
-            header: "Total Charges",
-            accessorKey: "total_charges",
+            header: "Creator",
+            accessorKey: "address",
             cell: ({ row }) => (
-                <Box>{parseFloat(row?.original?.total_charges || 0).toFixed(2)}</Box>
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    {row?.original?.creator?.name}
+
+                </Box>
             ),
-        },
-        {
-            header: "Tax",
-            accessorKey: "tax",
-            cell: ({ row }) => (
-                <Box>{row?.original?.vat_enabled ? parseFloat(row?.original?.tax || 0).toFixed(2) : parseFloat(0).toFixed(2)}</Box>
-            ),
-        },
-        {
-            header: "Paid Amount",
-            accessorKey: "paid_amount",
-
-
-        },
-        {
-            header: "Payment Status",
-            accessorKey: "payment_status",
 
 
         },
 
-        // {
-        //     header: "Paid",
-        //     accessorKey: "paid_amount",
-        //     cell: ({ row }) => (
-        //         <Box>{parseFloat(row?.original?.paid_amount || 0).toFixed(2)}</Box>
-        //     ),
-        // },
-
-
-        // {
-        //     header: "Balance",
-        //     accessorKey: "total_amount",
-        //     cell: ({ row }) => (
-
-        //         <Box sx={{ display: 'flex', gap: 1 }}>
-        //             {(parseFloat(row?.original?.total_amount) - parseFloat(row?.original?.paid_amount)).toFixed(2)}
-
-        //         </Box>
-        //     ),
-
-
-        // },
-        // {
-        //     header: "Payment Status",
-        //     accessorKey: "total_amount",
-        //     cell: ({ row }) => (
-
-        //         <Box sx={{ display: 'flex', gap: 1 }}>
-        //             {parseFloat(row?.original?.total_amount) == parseFloat(row?.original?.paid_amount) ? 'Paid' : parseFloat(row?.original?.paid_amount) > 0 ? "Partial Paid" : 'Unpaid'}
-
-        //         </Box>
-        //     ),
-
-
-        // },
 
 
         {
             header: "Actions",
             cell: ({ row }) => (
 
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
-                    {/* <Box>
-                        {row?.original?.paid_amount == 0 && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-purchase-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                    </Box> */}
+                <Box sx={{ display: 'flex', gap: 1 }}>
 
-
-                    {/* <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="View Receipts"
-                        onClick={() => {
-                            localStorage.setItem("currentUrl", '/create-customer');
-                            navigate('/fp-payment-history', {
-                                state: { id: row?.original?.id }, // Replace 123 with your actual ID
-                            });
-                        }}
-                        loading={loading}
-                    /> */}
-
-
-
-                    <Tooltip title="Invoice">
+                    <Tooltip title="PDF">
                         <IconButton
                             onClick={() => {
                                 window.open(
-                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-fp-invoice?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-receipt?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
                                     '_blank'
                                 );
                             }}
@@ -389,9 +340,10 @@ function PrepaidExpenses() {
                                 height: 35,
                             }}
                         >
-                            <ReceiptIcon color="black" fontSize="10px" />
+                            <ReceiptLongIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
+               
 
                 </Box>
             ),
@@ -402,7 +354,7 @@ function PrepaidExpenses() {
 
 
     useEffect(() => {
-        getData()
+        getCustomerQueue()
     }, []);
 
     return (
@@ -414,6 +366,7 @@ function PrepaidExpenses() {
                 message={"Are You Sure?"}
                 action={() => {
                     setConfirmationDialog(false);
+                    handleDelete()
 
                 }}
             />
@@ -422,7 +375,7 @@ function PrepaidExpenses() {
                 onClose={() => setStatusDialog(false)}
                 title={"Change Status?"}
             >
-                <Box component="form" >
+                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={12}>
                             <SelectField
@@ -472,71 +425,23 @@ function PrepaidExpenses() {
                     </Grid>
                 </Box>
             </SimpleDialog>
+
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Prepaid Expenses</Typography>
-
-
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>FP Payment List</Typography>
+              
 
             </Box>
-            <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                <Grid item xs={8}>
-                    <Grid container spacing={1}>
-                        <Grid item xs={5}>
-                            <DatePicker
-                                label={"From Date"}
-                                disableFuture={true}
-                                size="small"
-                                value={fromDate}
-                                onChange={(date) => handleFromDate(date)}
-                            />
-                        </Grid>
-                        <Grid item xs={5}>
-                            <DatePicker
-                                label={"To Date"}
-
-                                disableFuture={true}
-                                size="small"
-                                value={toDate}
-                                onChange={(date) => handleToDate(date)}
-                            />
-                        </Grid>
-
-                        <Grid item xs={2} sx={{ marginTop: "30px" }}>
-                            <PrimaryButton
-                                bgcolor={"#001f3f"}
-                                icon={<SearchIcon />}
-                                title="Search"
-                                sx={{ marginTop: "30px" }}
-                                onClick={() => getData(null, null, null)}
-                                loading={loading}
-                            />
-                        </Grid>
-                    </Grid>
-                </Grid>
-                <Grid item xs={4} display={'flex'} mt={2.7} justifyContent={'flex-end'}>
-                    <PrimaryButton
-                        bgcolor={'#001f3f'}
-                        title="Create"
-
-                        onClick={() => {
-                            navigate("/create-prepaid-expense");
-                            localStorage.setItem("currentUrl", "/create-prepaid-expense");
-                        }}
-                        loading={loading}
-                    />
-                </Grid>
-            </Grid>
-
 
             {/* Filters */}
             <Box >
 
 
-                {<DataTable loading={loader} data={tableData} columns={columns} />}
+                {<DataTable loading={loader} data={customerQueue} columns={columns} />}
             </Box>
 
         </Box>
     );
 }
 
-export default PrepaidExpenses;
+export default FpPaymentList;

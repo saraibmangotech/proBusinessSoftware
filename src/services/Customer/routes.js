@@ -182,7 +182,9 @@ const routes = {
   SalesInvoiceSettlement:'/sales/invoice/adjust',
   getSalesSettlement:'sales/invoice/adjustments',
   getPurchaseSettlement:'purchases/invoice/adjustments',
-  getLeaveDetail:'/hrms/employees/leaves/details'
+  getLeaveDetail:'/hrms/employees/leaves/details',
+  getFP:"/purchases/FPinvoice",
+  getFPPayments:'/purchases/FPinvoice/payments'
 
 
 };
