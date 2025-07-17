@@ -1439,6 +1439,7 @@ function BalanceSheetDetailed() {
         >
           Balance Sheet
         </Typography>
+        <Box sx={{display:'flex',gap:2}}>
           {balanceSheet?.length > 0 && (
           <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
             <PrimaryButton title={"Download Report"} onClick={() => downloadExcel()} />
@@ -1449,6 +1450,7 @@ function BalanceSheetDetailed() {
             <PrimaryButton title={"Download Detailed Report"} onClick={() => downloadExcelDetailed()} />
           </Box>
         )}
+        </Box>
       </Box>
       {/* Filters */}
       <Grid container spacing={1} sx={{ mb: 2 }}>
