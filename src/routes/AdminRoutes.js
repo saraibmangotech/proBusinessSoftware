@@ -259,6 +259,9 @@ const PurchaseSettlementList = lazy(() =>
 const EmployeeLeaves = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/EmployeeLeaves")
 );
+const EmployeeDashboard = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/EmployeeDashboard")
+);
 const InventoryLocations = lazy(() =>
   import("pages/Dashboard/Settings/InventoryLocations")
 );
@@ -1310,6 +1313,10 @@ const AdminRoutes = [
   {
     path: "/balance-sheet-old",
     component: <BalanceSheet />,
+  },
+  {
+    path: "/employee-dashboard",
+    component: <EmployeeDashboard />,
   },
    {
     path: "/balance-sheet",
