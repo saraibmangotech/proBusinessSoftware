@@ -26,6 +26,14 @@ const CustomerServices = {
     const data = await get(routes.getLeaveDetail, params);
     return data;
   },
+  getFPPayments: async (params) => {
+    const data = await get(routes.getFPPayments, params);
+    return data;
+  },
+  getFP: async (params) => {
+    const data = await get(routes.getFP, params);
+    return data;
+  },
    SalesInvoiceSettlement: async (obj) => {
     const data = await post(routes.SalesInvoiceSettlement, obj);
     return data;

@@ -22,6 +22,10 @@ const VehiclePaymentServices = {
     const data = await post(routes.createVehiclePayment, obj);
     return data;
   },
+  PayFpPayments: async (obj) => {
+    const data = await post(routes.PayFpPayments, obj);
+    return data;
+  },
   CreatePaymentInvoice: async (obj) => {
     const data = await post(routes.CreatePaymentInvoice, obj);
     return data;

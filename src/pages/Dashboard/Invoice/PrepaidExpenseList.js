@@ -235,7 +235,7 @@ function PrepaidExpenses() {
 
 
 
-   
+
     const columns = [
         {
             header: "System #",
@@ -255,6 +255,7 @@ function PrepaidExpenses() {
 
 
         },
+
         {
             header: " Date",
 
@@ -298,6 +299,19 @@ function PrepaidExpenses() {
                 <Box>{row?.original?.vat_enabled ? parseFloat(row?.original?.tax || 0).toFixed(2) : parseFloat(0).toFixed(2)}</Box>
             ),
         },
+        {
+            header: "Paid Amount",
+            accessorKey: "paid_amount",
+
+
+        },
+        {
+            header: "Payment Status",
+            accessorKey: "payment_status",
+
+
+        },
+
         // {
         //     header: "Paid",
         //     accessorKey: "paid_amount",
@@ -460,7 +474,7 @@ function PrepaidExpenses() {
             </SimpleDialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Prepaid Expenses</Typography>
-              
+
 
 
             </Box>
@@ -512,7 +526,7 @@ function PrepaidExpenses() {
                     />
                 </Grid>
             </Grid>
-          
+
 
             {/* Filters */}
             <Box >

@@ -449,6 +449,9 @@ const UpdatePurchaseInvoice = lazy(() =>
 const CreatePaymentInvoice = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentInvoice")
 );
+const PayFpPayments = lazy(() =>
+  import("pages/Dashboard/Payments/PayFPPayments")
+);
 const SalesInvoiceSettlement = lazy(() =>
   import("pages/Dashboard/Payments/SalesInvoiceSettlement")
 );
@@ -463,6 +466,9 @@ const CreateSaleInvoicePayment = lazy(() =>
 );
 const PaymentInvoices = lazy(() =>
   import("pages/Dashboard/Payments/PaymentInvoices")
+);
+const FpPaymentList = lazy(() =>
+  import("pages/Dashboard/Payments/FpPyamentList")
 );
 const SupplierPaymentReceipts = lazy(() =>
   import("pages/Dashboard/Payments/SupplierPaymentReceipts")
@@ -800,6 +806,10 @@ const AdminRoutes = [
     component: <PaymentInvoices />,
   },
   {
+    path: "/fp-payment-list",
+    component: <FpPaymentList />,
+  },
+  {
     path: "/supplier-payment-receipt-list",
     component: <SupplierPaymentReceipts />,
   },
@@ -838,6 +848,10 @@ const AdminRoutes = [
   {
     path: "/create-payment-invoice",
     component: <CreatePaymentInvoice />,
+  },
+  {
+    path: "/pay-fp-payment",
+    component: <PayFpPayments />,
   },
   {
     path: "/notifications",

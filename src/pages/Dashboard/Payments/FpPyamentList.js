@@ -32,6 +32,8 @@ import SelectField from 'components/Select';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as XLSX from "xlsx";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong"; // for invoice
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { saveAs } from "file-saver";
 import { PDFExport } from '@progress/kendo-react-pdf';
 import moment from 'moment';
@@ -40,7 +42,6 @@ import { showErrorToast, showPromiseToast } from 'components/NewToaster';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import { useAuth } from 'context/UseContext';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -107,7 +108,7 @@ const useStyles = makeStyles({
     }
 })
 
-function InventoryLocations() {
+function FpPaymentList() {
 
     const navigate = useNavigate();
     const classes = useStyles();
@@ -115,10 +116,8 @@ function InventoryLocations() {
     const contentRef = useRef(null);
     const [status, setStatus] = useState(null)
     const [statusDialog, setStatusDialog] = useState(false)
-        const [statusDialog2, setStatusDialog2] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
-    const { user } = useAuth()
     const {
         register,
         handleSubmit,
@@ -128,7 +127,7 @@ function InventoryLocations() {
         reset,
     } = useForm();
 
-    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
+    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
     const [loader, setLoader] = useState(false);
@@ -156,30 +155,29 @@ function InventoryLocations() {
     const [sort, setSort] = useState('desc')
 
     // *For Get Customer Queue
-
-
-
     const getCustomerQueue = async (page, limit, filter) => {
         setLoader(true)
 
         try {
-
+            
             let params = {
                 page: 1,
                 limit: 999999,
+               
 
 
             }
-
-            const { data } = await CustomerServices.getInventoryLocations(params)
+           
+            const { data } = await CustomerServices.getFPPayments(params)
             setCustomerQueue(data?.rows)
-
+            
         } catch (error) {
             showErrorToast(error)
         } finally {
             setLoader(false)
         }
     }
+
 
 
 
@@ -208,10 +206,13 @@ function InventoryLocations() {
 
 
         try {
-            let params = { reception_id: selectedData?.id }
+            let params = {
+                id: selectedData?.id,
+                type: 'payment_voucher'
+            }
 
 
-            const { message } = await CustomerServices.deleteReception(params)
+            const { message } = await CustomerServices.DeleteVoucher(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -221,14 +222,14 @@ function InventoryLocations() {
             // setLoader(false)
         }
     }
-    const CreateLocation = async (formData) => {
+    const UpdateStatus = async () => {
         try {
             let obj = {
-                name: formData.name,
-               
+                customer_id: selectedData?.id,
+                is_active: status?.id,
             };
 
-            const promise = CustomerServices.CreateLocation(obj);
+            const promise = CustomerServices.CustomerStatus(obj);
             console.log(promise);
 
             showPromiseToast(
@@ -249,51 +250,71 @@ function InventoryLocations() {
             console.log(error);
         }
     };
-  const UpdateLocation = async (formData) => {
-        try {
-            let obj = {
-                id:selectedData?.id,
-                name: formData.name,
-               
-            };
-
-            const promise = CustomerServices.UpdateLocation(obj);
-            console.log(promise);
-
-            showPromiseToast(
-                promise,
-                "Saving...",
-                "Added Successfully",
-                "Something Went Wrong"
-            );
-
-            // Await the promise and then check its response
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                setStatusDialog2(false);
-                setStatus(null)
-                getCustomerQueue();
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     const columns = [
         {
-            header: "SR No.",
+            header: "Receipt No.",
             accessorKey: "id",
 
 
+
         },
         {
-            header: "Name",
-            accessorKey: "name",
+            header: "Amount",
+            accessorKey: "total_paid_amount",
 
 
         },
+        {
+            header: "Payment Mode",
+            accessorKey: "payment_mode",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
 
 
+                    {row?.original?.payment_mode}
+
+                </Box>
+            ),
+
+
+        },
+         {
+                  header: "Date",
+                  accessorKey: 'date', // optional, used for column ID purposes
+                  accessorFn: (row) => {
+                    const dateValue = row?.date || row?.created_at;
+                    return dateValue ? moment(dateValue).format("DD/MM/YYYY") : "";
+                  },
+                  cell: ({ row }) => {
+                    const dateValue = row?.original?.date || row?.original?.created_at;
+                    return (
+                      <Box
+                        variant="contained"
+                        color="primary"
+                        sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+                      >
+                        {dateValue ? moment(dateValue).format("DD/MM/YYYY") : "N/A"}
+                      </Box>
+                    );
+                  },
+                },
+
+        {
+            header: "Creator",
+            accessorKey: "address",
+            cell: ({ row }) => (
+
+                <Box sx={{ display: 'flex', gap: 1 }}>
+
+
+                    {row?.original?.creator?.name}
+
+                </Box>
+            ),
+
+
+        },
 
 
 
@@ -303,10 +324,26 @@ function InventoryLocations() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                    {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { setSelectedData(row?.original);setStatusDialog2(true); setValue('name',row?.original?.name) }} src={Images.editIcon} width={'35px'}></Box>}
-                    <Box>
-
-                    </Box>
+                    <Tooltip title="PDF">
+                        <IconButton
+                            onClick={() => {
+                                window.open(
+                                    `${process.env.REACT_APP_INVOICE_GENERATOR}generate-purchase-receipt?id=${row?.original?.id}&instance=${process.env.REACT_APP_TYPE}`,
+                                    '_blank'
+                                );
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 35,
+                                height: 35,
+                            }}
+                        >
+                            <ReceiptLongIcon color="black" fontSize="10px" />
+                        </IconButton>
+                    </Tooltip>
+               
 
                 </Box>
             ),
@@ -336,18 +373,28 @@ function InventoryLocations() {
             <SimpleDialog
                 open={statusDialog}
                 onClose={() => setStatusDialog(false)}
-                title={"Add Location?"}
+                title={"Change Status?"}
             >
-                <Box component="form" onSubmit={handleSubmit(CreateLocation)}>
+                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <InputField
-                                label={"Name *:"}
+                        <Grid item xs={12} sm={12}>
+                            <SelectField
                                 size={"small"}
-                                placeholder={" Name"}
-                                error={errors?.name?.message}
-                                register={register("name", {
-                                    required: "Please enter  name.",
+                                label={"Select Status :"}
+                                options={
+
+                                    [
+                                        { id: false, name: "Disabled" },
+                                        { id: true, name: "Enabled" },
+
+                                    ]}
+                                selected={status}
+                                onSelect={(value) => {
+                                    setStatus(value);
+                                }}
+                                error={errors?.status?.message}
+                                register={register("status", {
+                                    required: "Please select status.",
                                 })}
                             />
                         </Grid>
@@ -379,60 +426,10 @@ function InventoryLocations() {
                 </Box>
             </SimpleDialog>
 
- <SimpleDialog
-                open={statusDialog2}
-                onClose={() => setStatusDialog2(false)}
-                title={"Update Location?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateLocation)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <InputField
-                                label={"Name *:"}
-                                size={"small"}
-                                placeholder={" Name"}
-                                error={errors?.name?.message}
-                                register={register("name", {
-                                    required: "Please enter  name.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
-                            >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog2(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </SimpleDialog>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Inventory Locations</Typography>
-                {user?.role_id != 1003 && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create "
-                    onClick={() => setStatusDialog(true)}
-                    loading={loading}
-                />}
 
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>FP Payment List</Typography>
+              
 
             </Box>
 
@@ -447,4 +444,4 @@ function InventoryLocations() {
     );
 }
 
-export default InventoryLocations;
+export default FpPaymentList;
