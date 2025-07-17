@@ -199,6 +199,9 @@ const BalanceSheet = lazy(() =>
   import("pages/Dashboard/Reporting/BalanceSheet")
 );
 
+const BalanceSheetDetailed = lazy(() =>
+  import("pages/Dashboard/Reporting/BalanceSheetDetailed")
+);
 const ProfitLossStatement = lazy(() =>
   import("pages/Dashboard/Reporting/ProfitLossStatement")
 );
@@ -1305,8 +1308,12 @@ const AdminRoutes = [
     component: <ProfitLossCustomerReport />,
   },
   {
-    path: "/balance-sheet",
+    path: "/balance-sheet-old",
     component: <BalanceSheet />,
+  },
+   {
+    path: "/balance-sheet",
+    component: <BalanceSheetDetailed />,
   },
   {
     path: "/export-customers",
