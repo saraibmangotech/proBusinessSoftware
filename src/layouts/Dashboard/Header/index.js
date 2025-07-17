@@ -2214,226 +2214,43 @@ function Header() {
 
       ])
     }
-    else if(user?.role_id == 6){
+     else if (user?.role_id == 4) {
       setNavigationData([
-       
-        {
-          id: 22,
-          name: "HRMS",
+
+        
+       {
+          id: 2,
+          name: "Leave Management",
           icon: "customer",
           parent_id: null,
-          api: "/api/customers",
-          route: "",
+          api: "/api/roles",
+          route: "/leave-management",
           identifier: null,
           navigation: true,
-          order_by: 2,
-          children: [
-            {
-              id: 13,
-              name: "Employee management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/users",
-              route: "/employee-list",
-              identifier: null,
-              navigation: true,
-              order_by: 13,
-              childRoute: [],
-            },
-              {
-              id: 13,
-              name: "Leave management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/users",
-              route: "/leave-list",
-              identifier: null,
-              navigation: true,
-              order_by: 13,
-              childRoute: [],
-            },
-              {
-              id: 55,
-              name: "Holidays Management",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/holidays",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-             {
-              id: 55,
-              name: "Salary Management",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/salary-list",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Attendance Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/attendance-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
 
-
-
-
-          ],
         },
-        {
-          id: 13,
-          name: "Settings",
-          icon: "settings",
-          parent_id: null,
-          api: "/api/users",
-          route: "/user-list",
-          identifier: null,
-          navigation: true,
-          order_by: 13,
-          childRoute: [
-            {
-              id: 33,
-              name: "Customer Management",
-              icon: "customer",
-              parent_id: 12,
-              api: null,
-              route: "/customer-list",
-              identifier: null,
-              navigation: true,
-              order_by: 33,
-            },
-
-            {
-              id: 13,
-              name: "User management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/users",
-              route: "/user-list",
-              identifier: null,
-              navigation: true,
-              order_by: 13,
-              childRoute: [],
-            },
-            {
-              id: 14,
-              name: "Role management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/roles",
-              route: "/role-list",
-              identifier: null,
-              navigation: true,
-              order_by: 14,
-              children: [],
-              childRoute: [],
-            },],
-          children: [
-            {
-              id: 33,
-              name: "Customer Management",
-              icon: "customer",
-              parent_id: 12,
-              api: null,
-              route: "/customer-list",
-              identifier: null,
-              navigation: true,
-              order_by: 33,
-            },
-
-            
-            {
-              id: 13,
-              name: "User management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/users",
-              route: "/user-list",
-              identifier: null,
-              navigation: true,
-              order_by: 13,
-              childRoute: [],
-            },
-            {
-              id: 14,
-              name: "Role management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/roles",
-              route: "/role-list",
-              identifier: null,
-              navigation: true,
-              order_by: 14,
-              children: [],
-              childRoute: [],
-            }
-           
-
-          ],
-        },
-
-
-      ])
-    }
-    else if(user?.role_id == 4){
-      setNavigationData([
-       
-        {
-          id: 22,
-          name: "HRMS",
+         {
+          id: 2,
+          name: "Attendance Report",
           icon: "customer",
           parent_id: null,
-          api: "/api/customers",
-          route: "",
+          api: "/api/roles",
+          route: "/attendance-report",
           identifier: null,
           navigation: true,
-          order_by: 2,
-          children: [
-            
-              {
-              id: 13,
-              name: "Leave management",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/users",
-              route: "/leave-list",
-              identifier: null,
-              navigation: true,
-              order_by: 13,
-              childRoute: [],
-            },
-              
-            
-            {
-              id: 55,
-              name: "Attendance Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/attendance-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
 
-
-
-
-          ],
         },
-       
+ {
+          id: 2,
+          name: "Document Expiry Report",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/doc-expiry-report",
+          identifier: null,
+          navigation: true,
 
+        },
 
       ])
     }

@@ -20,6 +20,7 @@ import SystemServices from "services/System"
 import CustomerServices from "services/Customer"
 import SelectField from "components/Select"
 import ExcelJS from "exceljs";
+import { useAuth } from "context/UseContext"
 
 // Dummy data for Document Expiry Report
 const documentExpiryData = [
@@ -210,6 +211,7 @@ const documentExpiryData = [
 function DocumentExpiryReport() {
     const [loader, setLoader] = useState(false)
     const [filteredData, setFilteredData] = useState(documentExpiryData)
+    const { user } = useAuth();
     const [filters, setFilters] = useState({
         department: "",
         document_type: "",
@@ -225,7 +227,7 @@ function DocumentExpiryReport() {
         // setLoader(true)
         try {
             let params = {
-                employee_id: id ? id : '',
+                employee_id: id ? id :user?.role_id == 4 ? user?.id :'',
             }
 
             const { data } = await SystemServices.getDocExpiryReport(params);
@@ -798,7 +800,7 @@ function DocumentExpiryReport() {
             )}
 
             {/* Filters */}
-            <Box
+            {user?.role_id != 4 && <Box
                 sx={{
                     p: 2,
                     bgcolor: "#f8f9fa",
@@ -825,7 +827,7 @@ function DocumentExpiryReport() {
                     </Grid>
 
                 </Grid>
-            </Box>
+            </Box>}
 
             {/* Data Table */}
             <Box>

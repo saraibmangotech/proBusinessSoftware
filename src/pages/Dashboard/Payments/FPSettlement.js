@@ -391,6 +391,7 @@ function FPSettlement() {
                     invoice_number: data?.invoice_number,
                     invoice_date: data?.invoice_date,
                     total_amount: data?.total_amount,
+                    paid_amount: data?.paid_amount,
                     tax: data?.tax,
                     final_amount: data?.final_total,
                     created_by: data?.creator?.id
@@ -743,7 +744,7 @@ function FPSettlement() {
         if (selectedInvoice2.length > 0) {
 
             console.log(selectedInvoice2, 'selectedInvoice2');
-            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + parseFloat(invoice.total_amount || 0), 0);
+            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + (parseFloat(invoice.total_amount || 0)-parseFloat(invoice.paid_amount || 0)), 0);
 
             console.log(totalAmountUnpaid);
 
@@ -1334,7 +1335,7 @@ function FPSettlement() {
                                                         {parseFloat(item?.paid_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {parseFloat(item?.balance || 0) ?? '-'}
+                                                        {parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0) ?? '-'}
                                                     </Cell>
                                                     <Cell>
                                                         <Box
@@ -1371,7 +1372,7 @@ function FPSettlement() {
                                                                 disabled={true}
                                                                 size="small"
                                                                 type="number"
-                                                                value={item?.total_amount || 0}
+                                                                value={parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0) || 0}
                                                                 placeholder="Receiving"
                                                                 InputProps={{ inputProps: { min: 0 } }}
 
