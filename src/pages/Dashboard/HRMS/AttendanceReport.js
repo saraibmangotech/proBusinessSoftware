@@ -627,7 +627,35 @@ export default function AttendanceTable() {
             console.log(error)
         }
     }
-
+  const MarkAsHoliday = async () => {
+        console.log(shifts)
+        const convertedShifts = shifts.map((shift) => ({
+            ...shift,
+            check_in: moment(shift.check_in, "HH:mm").hours() * 60 + moment(shift.check_in, "HH:mm").minutes(),
+            check_out: shift?.check_out
+                ? moment(shift.check_out, "HH:mm").hours() * 60 + moment(shift.check_out, "HH:mm").minutes()
+                : null,
+        }))
+        console.log(convertedShifts)
+        try {
+            const obj = {
+                is_holiday:true,
+                user_id: selectedData?.id,
+                date: tableDate,
+                shifts: [],
+            }
+            const promise = CustomerServices.markAttendance(obj)
+            showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
+            const response = await promise
+            if (response?.responseCode === 200) {
+                setDialog(false)
+                setShifts([])
+                getAttendance(moment(selectedDate).format("MMMM"), moment().format("YYYY"))
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const handleTimeChange = (shiftId, field, newValue) => {
         console.log(newValue, "newValue")
         const updatedShifts = shifts.map((shift) => {
@@ -852,15 +880,17 @@ export default function AttendanceTable() {
                         </LocalizationProvider>
                         <Grid
                             item
-                            xs={6}
-                            sm={6}
+                            xs={12}
+                            sm={12}
                             sx={{
                                 mt: 2,
                                 display: "flex",
                                 justifyContent: "space-between",
+                                alignItems:'center',
                                 gap: "25px",
                             }}
                         >
+                            <PrimaryButton bgcolor={Colors.primary} onClick={() => MarkAsHoliday()} title="Mark As Holiday" />
                             <PrimaryButton bgcolor={Colors.primary} onClick={() => UpdateHours()} title="Yes,Confirm" />
                             <PrimaryButton onClick={() => setDialog(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
                         </Grid>

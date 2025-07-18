@@ -361,16 +361,16 @@ const downloadExcel = async () => {
       employee.designation,
       employee.nationality,
  
-      new Date(employee.joining_date).toLocaleDateString("en-GB", {
+      employee.joining_date ? new Date(employee.joining_date).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
-      }),
-      new Date(employee.leaving_date).toLocaleDateString("en-GB", {
+      }) : '-',
+      employee.leaving_date ? new Date(employee.leaving_date).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
-      }),
+      }) : '-',
       employee.years_of_service,
    
       employee.last_basic_salary,
@@ -599,12 +599,12 @@ const downloadExcel = async () => {
     {
       header: "Joining Date",
       accessorKey: "joining_date",
-      cell: ({ row }) => <Box>{moment(row.original.joining_date).format("DD/MM/YYYY")}</Box>,
+      cell: ({ row }) => <Box>{row.original.joining_date  ? moment(row.original.joining_date).format("DD/MM/YYYY") : "-"}</Box>,
     },
     {
       header: "Leaving Date",
       accessorKey: "leaving_date",
-      cell: ({ row }) => <Box>{moment(row.original.leaving_date).format("DD/MM/YYYY")}</Box>,
+      cell: ({ row }) => <Box>{row.original.leaving_date ? moment(row.original.leaving_date).format("DD/MM/YYYY") : '-'}</Box>,
     },
     {
       header: "Years of Service",
@@ -707,7 +707,7 @@ const downloadExcel = async () => {
               Total Gratuity Amount
             </Typography>
             <Typography sx={{ fontSize: "20px", fontWeight: "bold", color: "#1b5e20" }}>
-              AED {statsData?.totalGratuity}
+               {statsData?.totalGratuity}
             </Typography>
           </Box>
         </Grid>

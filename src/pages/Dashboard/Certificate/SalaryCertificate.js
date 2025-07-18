@@ -140,7 +140,7 @@ function SalaryCertificate() {
     const [selectedVisa, setSelectedVisa] = useState()
 
 
-    const tableHead = [{ name: 'Date', key: 'created_at' },{ name: ' Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }, { name: 'Signed Date', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Date', key: 'created_at' },{ name: ' Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }]
 
 
     const allowFilesType = [
@@ -500,22 +500,26 @@ function SalaryCertificate() {
                                                                         lg={4}
                                                                         sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
                                                                         component={'div'}
-                                                                        onClick={() =>{
-                                                                            if(item?.certificate?.split('_').pop().includes('doc') || item?.certificate?.split('_').pop().includes('xls') ){
+                                                                          onClick={() => {
+                                                                            console.log(item, 'item');
+                                                                            navigate(
+                                                                                `/certificate-pdf`,
+                                                                                {
+                                                                                    state: {
+                                                                                        ...item,
+                                                                                    
+                                                                                      
+                                                                                    },
+                                                                                }
 
-                                                                                handleDownload(item?.certificate, item?.certificate?.split('_').pop());
-                                                                              }
-                                                                              else{
-                                                                                
-                                                                                window.open(process.env.REACT_APP_IMAGE_BASE_URL+item?.certificate, '_blank');
-                                                                              }
+                                                                            )
                                                                         }}
                                                                         // onClick={() =>  handleDownload(item?.certificate, item?.certificate?.split('_').pop())}
                                                                         key={index}
                                                                     >
 
                                                                         <Box>
-                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} />
+                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} /> View
                                                                         </Box>
                                                                         <p style={{ textAlign: 'center', lineHeight: '20px', color: '#0F2772', fontWeight: 'bold', fontSize: '12px' }}>
                                                                             {item?.certificate?.split('_').pop()}
@@ -523,10 +527,8 @@ function SalaryCertificate() {
                                                                     </Grid>
                                                                 </Cell>
                                                              
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.signed_at && moment(item?.created_at).format('MM-DD-YYYY')}
-                                                                </Cell>
-
+                                  
+                                
 
 
 

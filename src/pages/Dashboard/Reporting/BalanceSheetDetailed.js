@@ -128,7 +128,7 @@ const calculateAccountTotals = (account) => {
   let accumulatedOpeningBalance = 0
 
   if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
-    account.childAccounts.forEach((child) => {
+    account?.childAccounts?.forEach((child) => {
       const childTotals = calculateAccountTotals(child)
       accumulatedOpeningBalance += childTotals.effectiveOpeningBalance
       accumulatedTotalDebit += childTotals.totalDebit
@@ -167,10 +167,10 @@ const transformDataForDisplay = (data, searchTerm) => {
 
   const processAccountsRecursively = (accounts) => {
     const processed = []
-    accounts.forEach((account) => {
+    accounts?.forEach((account) => {
       const childAccountsProcessed = []
       if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
-        account.childAccounts.forEach((child) => {
+        account?.childAccounts?.forEach((child) => {
           const childTotals = calculateAccountTotals(child)
           if (filterAccount(child)) {
             childAccountsProcessed.push({
@@ -206,12 +206,12 @@ const transformDataForDisplay = (data, searchTerm) => {
       let majorCategoryPeriodDiffTotal = 0
       let majorCategoryBalanceTotal = 0
 
-      majorCategory.sub.forEach((subItem) => {
-        const filteredAccounts = processAccountsRecursively(subItem.accounts)
+      majorCategory?.sub?.forEach((subItem) => {
+        const filteredAccounts = processAccountsRecursively(subItem?.accounts)
 
         if (filteredAccounts.length > 0) {
           // Group by subcategory type
-          filteredAccounts.forEach((account) => {
+          filteredAccounts?.forEach((account) => {
             const subcategoryName = account.account_subcategory || "Uncategorized"
             if (!groupedSubcategories[subcategoryName]) {
               groupedSubcategories[subcategoryName] = {
@@ -382,7 +382,7 @@ function BalanceSheetDetailed() {
               const debit = Number.parseFloat(account.total_debit) || 0
               total += account.nature === "debit" ? debit - credit : credit - debit
               if (account.childAccounts) {
-                account.childAccounts.forEach((child) => {
+                account?.childAccounts?.forEach((child) => {
                   const childCredit = Number.parseFloat(child.total_credit) || 0
                   const childDebit = Number.parseFloat(child.total_debit) || 0
                   total += child.nature === "debit" ? childDebit - childCredit : childCredit - childDebit
@@ -1102,7 +1102,7 @@ function BalanceSheetDetailed() {
 
           // Child accounts
           if (Array.isArray(account?.childAccounts) && account.childAccounts.length > 0) {
-            account.childAccounts.forEach((child) => {
+            account?.childAccounts?.forEach((child) => {
               const childTotals = child.calculatedTotals
               const childRow = worksheet.addRow([
                 child.account_code,
