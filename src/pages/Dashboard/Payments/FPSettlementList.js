@@ -172,7 +172,7 @@ function FPSettlementList() {
             let params = {
                 page: 1,
                 limit: 999999,
-                type: 'purchase',
+                  type: 'fp',
                 from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                 vendor_id: selectedUser?.id,
