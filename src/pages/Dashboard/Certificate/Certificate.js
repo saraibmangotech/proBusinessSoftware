@@ -145,7 +145,7 @@ const Certificate = () => {
     const exportDOCWithMethod = async () => {
         const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`
         const currentDate = moment().format("D MMM YYYY")
-        const fileName = `${moment().unix()}_${state?.name}-SalaryCertificate.docx`
+        const fileName = `${moment().unix()}_${state?.user?.name}-SalaryCertificate.docx`
 
         // Convert logo to base64
         let logoBase64 = ""
@@ -271,7 +271,7 @@ const Certificate = () => {
                     <div class="certificate-title">SALARY CERTIFICATE</div>
 
                     <div class="content">
-                        <p>This is to certify that <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.department}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}/span> inclusive.</p>
+                        <p>This is to certify that <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.designation}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}/span> inclusive.</p>
 
                     <p>This certificate has been issued at the request of the employee, for whatever purpose it may serve him without any legal obligation to the company.</p>
                     </div>
@@ -292,9 +292,7 @@ const Certificate = () => {
                                     www.premiumservices.ae
                                 </td>
                                 <td style="width: 34%; text-align: center; vertical-align: top; font-size: 9pt;">
-                                    ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-                ? "Premium Businessmen Services"
-                : 'For Premium Professional Government Services L.L.C.'}<br/>
+                                    ${state?.for}<br/>
                                    P.O. Box 334338, United Arab   Emirates<br/>
                                 
                                     Telephone: +971 4 520 4444
@@ -416,7 +414,7 @@ const Certificate = () => {
                         <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || "Employee Name"}</span> •{" "}
                         <strong>{state?.designation}</strong>, Passport no: <strong>{state?.passport_number || "-"}</strong> is
                         currently employed by our company since <strong>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</strong> till now, in the capacity of{" "}
-                        <strong>{state?.department}</strong>. His monthly Gross salary is{" "}
+                        <strong>{state?.designation}</strong>. His monthly Gross salary is{" "}
                         <strong>AED {parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}</strong> inclusive.
                     </Typography>
 
@@ -428,7 +426,7 @@ const Certificate = () => {
 
                 <Typography paragraph sx={{ fontWeight: "bold", mt: 3 }}>
 
-                    {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "Premium Businessmen Services" : 'For Premium Professional Government Services L.L.C.'}
+                    {state?.for}
 
                 </Typography>
 

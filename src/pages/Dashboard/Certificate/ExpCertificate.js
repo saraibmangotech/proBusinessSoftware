@@ -145,7 +145,7 @@ const ExpCertificate = () => {
     const exportDOCWithMethod = async () => {
         const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`
         const currentDate = moment().format("D MMM YYYY")
-        const fileName = `${state?.name}-ExperienceCertificate.docx`
+        const fileName = `${state?.user?.name}-ExperienceCertificate.docx`
 
         // Convert logo to base64
         let logoBase64 = ""
@@ -435,7 +435,7 @@ const ExpCertificate = () => {
 
                 <Typography paragraph sx={{ fontWeight: "bold", mt: 3 }}>
 
-                    {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "Premium Businessmen Services" : 'For Premium Professional Government Services L.L.C.'}
+                    {state?.for}
 
                 </Typography>
 
@@ -463,7 +463,7 @@ const ExpCertificate = () => {
                         </Box>
                         <Box sx={{ flex: 1, textAlign: "center" }}>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>
-                                {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "Premium Businessmen Services" : 'For Premium Professional Government Services L.L.C.'}
+                                {state?.for}
 
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>
