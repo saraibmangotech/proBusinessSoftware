@@ -6,6 +6,7 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+  
   CreateLocation: async (obj) => {
     const data = await post(routes.CreateLocation, obj);
     return data;
