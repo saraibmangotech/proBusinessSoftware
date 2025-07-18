@@ -253,6 +253,9 @@ const ReceptionList = lazy(() =>
 const SalesSettlementList = lazy(() =>
   import("pages/Dashboard/Payments/SalesSetttlementList")
 );
+const EmployeePaySlips = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/EmployeePaySlips")
+);
 const PurchaseSettlementList = lazy(() =>
   import("pages/Dashboard/Payments/PurchaseSettlementList")
 );
@@ -1167,6 +1170,10 @@ const AdminRoutes = [
   {
     path: "/sales-settlement-list",
     component: <SalesSettlementList />,
+  },
+   {
+    path: "/employee-pay-slips",
+    component: <EmployeePaySlips />,
   },
   {
     path: "/purchase-settlement-list",

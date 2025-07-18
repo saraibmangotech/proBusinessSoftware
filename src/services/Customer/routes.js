@@ -184,7 +184,8 @@ const routes = {
   getPurchaseSettlement:'purchases/invoice/adjustments',
   getLeaveDetail:'/hrms/employees/leaves/details',
   getFP:"/purchases/FPinvoice",
-  getFPPayments:'/purchases/FPinvoice/payments'
+  getFPPayments:'/purchases/FPinvoice/payments',
+  getPaySlips:'/hrms/payslips'
 
 
 };
