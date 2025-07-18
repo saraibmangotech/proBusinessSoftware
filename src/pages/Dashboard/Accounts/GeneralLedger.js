@@ -275,7 +275,13 @@ function GeneralLedger() {
       setTotalCount(data?.statement?.count);
       setOpeningBal(data?.statement?.opening_balance_aed)
       setClosingBal(data?.statement?.closing_balance_aed)
-      setTotalBalance(data?.statement?.opening_balance_aed);
+      // If the first row's primary_account_id is 700328, multiply opening balance by -1
+      let openingBalance = data?.statement?.opening_balance_aed;
+      console.log("Opening Balance:", data?.statement.rows[0]?.account?.primary_account_id);
+      if (data?.statement.rows[0]?.account?.primary_account_id=== 700328) {
+        openingBalance = openingBalance * -1;
+      }
+      setTotalBalance(openingBalance);
     } catch (error) {
       showErrorToast(error);
     } finally {
@@ -808,7 +814,7 @@ function GeneralLedger() {
                           {accountLedgers.map((item, index) => {
                             let page = LedgerLinking(item?.entry?.reference_module)
                             const balance =
-                              selectedAccount?.nature === "debit" ||  item?.account?.primary_account_id == 700328 
+                              selectedAccount?.nature === "debit" 
                                 ? (
                                   parseFloat(item?.debit) -
                                   parseFloat(item?.credit)

@@ -716,7 +716,7 @@ function CreateFixedAssetInvoice() {
                 limit: 10000,
                 name: search,
                 is_disabled: false,
-                sub_category: 15
+                sub_head: 15
 
             }
             const { data } = await FinanceServices.getAccountsDropDown(params)
