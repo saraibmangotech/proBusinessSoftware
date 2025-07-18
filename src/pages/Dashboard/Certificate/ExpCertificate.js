@@ -271,7 +271,7 @@ const ExpCertificate = () => {
                     <div class="certificate-title">EXPERIENCE CERTIFICATE</div>
 
                   <div class="content">
-                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}/span> to <span class="employee-details">${moment(state?.toDate).isSame(moment(), 'day')
+                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to <span class="employee-details">${moment(state?.toDate).isSame(moment(), 'day')
                 ? 'Present'
                 : moment(state?.toDate).format('DD-MMMM-YYYY')}
 </span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
