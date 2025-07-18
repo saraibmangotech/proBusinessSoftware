@@ -4,7 +4,7 @@ import { Fragment } from "react"
 import { Autocomplete, Box, InputLabel, TextField, Typography, createFilterOptions } from "@mui/material"
 
 function SelectField(props) {
-  const { label, size, disabled, onSearch, addNew, multiple, selected, onSelect, register, error, options } = props
+  const { label, size, disabled, onSearch, addNew, multiple, selected, onSelect, register, error, options ,sx} = props
 
   const filter = createFilterOptions({
     matchFrom: "any",
@@ -140,6 +140,7 @@ function SelectField(props) {
           <TextField
             {...params}
             sx={{
+              ...sx,
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
                   border: "2px solid black !important",

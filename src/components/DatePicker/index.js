@@ -20,7 +20,9 @@ function DatePicker({
   register, 
   onChange, 
   minDate, 
-  maxDate 
+  height,
+  maxDate ,
+  sx
 }) {
   const isValidDate = (date) => date instanceof Date && !isNaN(date);
 
@@ -44,8 +46,10 @@ function DatePicker({
               maxDate={maxDate}
               format="dd/MM/yyyy"
               sx={{
+                ...sx,
                 width: 1,
                 '& .MuiOutlinedInput-root': {
+                  height:height,
                   '& fieldset': {
                     border: `2px solid ${Colors.DarkBlue} !important`,
                     borderRadius: '10px'

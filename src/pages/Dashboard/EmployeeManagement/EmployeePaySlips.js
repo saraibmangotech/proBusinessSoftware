@@ -523,7 +523,17 @@ function EmployeePaySlips() {
                                 size={"small"}
                                 label={"Select Employee "}
                                 options={users}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        height: '100px !important',
+                                        "& fieldset": {
+                                            border: "2px solid black !important",
+                                            borderRadius: "12px",
+                                            height: '100px !important',
 
+                                        }
+                                    }
+                                }}
                                 selected={selectedUser}
                                 onSelect={(value) => {
                                     setSelectedUser(value);
@@ -540,7 +550,7 @@ function EmployeePaySlips() {
                                 label={'Select Month'}
                                 openTo="month"
                                 views={['month', 'year']}
-
+                                height={'20px'}
                                 value={selectMonth}
                                 onChange={(date) => handleSelectMonth(date)}
                             />
