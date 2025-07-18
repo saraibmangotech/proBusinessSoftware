@@ -550,7 +550,7 @@ function EmployeePaySlips() {
                                 label={'Select Month'}
                                 openTo="month"
                                 views={['month', 'year']}
-                                height={'20px'}
+                                height={'40px'}
                                 value={selectMonth}
                                 onChange={(date) => handleSelectMonth(date)}
                             />
