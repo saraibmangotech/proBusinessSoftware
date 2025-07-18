@@ -259,6 +259,33 @@ function FpPaymentList() {
 
         },
         {
+            header: "Vendor",
+            accessorKey: "name",
+            accessorFn: (row) => {
+                // assuming row.invoice is an array of invoice objects with a "number" or "invoice_number" key
+                return row?.payment_items?.map(inv => inv?.invoice?.vendor?.name).join(", ") || "-";
+            },
+            cell: ({ row }) => (
+                <Box>
+                    {row?.original?.payment_items?.map(inv => inv?.invoice?.vendor?.name).join(", ") || "-"}
+                </Box>
+            ),
+
+        },
+        {
+            header: "Invoice Number",
+            accessorKey: "name", // still required by some libraries for internal handling
+            accessorFn: (row) => {
+                // assuming row.invoice is an array of invoice objects with a "number" or "invoice_number" key
+                return row?.payment_items?.map(inv => inv?.invoice?.invoice_number).join(", ") || "-";
+            },
+            cell: ({ row }) => (
+                <Box>
+                    {row?.original?.payment_items?.map(inv => inv?.invoice?.invoice_number).join(", ") || "-"}
+                </Box>
+            ),
+        },
+        {
             header: "Amount",
             accessorKey: "total_paid_amount",
 
