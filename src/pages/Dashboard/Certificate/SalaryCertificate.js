@@ -500,15 +500,19 @@ function SalaryCertificate() {
                                                                         lg={4}
                                                                         sx={{ cursor: 'pointer', display: 'flex', gap: '5px' }}
                                                                         component={'div'}
-                                                                        onClick={() =>{
-                                                                            if(item?.certificate?.split('_').pop().includes('doc') || item?.certificate?.split('_').pop().includes('xls') ){
+                                                                          onClick={() => {
+                                                                            console.log(item, 'item');
+                                                                            navigate(
+                                                                                `/certificate-pdf`,
+                                                                                {
+                                                                                    state: {
+                                                                                        ...item,
+                                                                                    
+                                                                                      
+                                                                                    },
+                                                                                }
 
-                                                                                handleDownload(item?.certificate, item?.certificate?.split('_').pop());
-                                                                              }
-                                                                              else{
-                                                                                
-                                                                                window.open(process.env.REACT_APP_IMAGE_BASE_URL+item?.certificate, '_blank');
-                                                                              }
+                                                                            )
                                                                         }}
                                                                         // onClick={() =>  handleDownload(item?.certificate, item?.certificate?.split('_').pop())}
                                                                         key={index}

@@ -12,7 +12,7 @@ import instance from "config/axios"
 import CustomerServices from "services/Customer"
 import routes from "services/System/routes"
 import { agencyType, CleanTypes, getFileSize } from "utils"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Images } from "assets"
 
@@ -24,6 +24,7 @@ const Certificate = () => {
     const [progress, setProgress] = useState(0)
     const [uploadedSize, setUploadedSize] = useState(0)
     const [loading, setLoading] = useState(false)
+    const [employeeDetail, setEmployeeDetail] = useState(null)
 
     // Function to convert image to base64
     const getImageAsBase64 = (url) => {
@@ -43,7 +44,19 @@ const Certificate = () => {
             img.src = url
         })
     }
+  const getData = async () => {
+    try {
+      let params = { user_id: state?.employee?.id };
+      const { data } = await CustomerServices.getEmployeeDetail(params);
+      let data2 = data?.employee
+      setEmployeeDetail(data2)
 
+
+
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
     console.log(state)
 
     const allowFilesType = ["application/pdf"]
@@ -145,7 +158,7 @@ const Certificate = () => {
     const exportDOCWithMethod = async () => {
         const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`
         const currentDate = moment().format("D MMM YYYY")
-        const fileName = `${moment().unix()}_${state?.user?.name}-SalaryCertificate.docx`
+        const fileName = `${moment().unix()}_${state?.user?.name || state?.employee?.name}-SalaryCertificate.docx`
 
         // Convert logo to base64
         let logoBase64 = ""
@@ -271,7 +284,7 @@ const Certificate = () => {
                     <div class="certificate-title">SALARY CERTIFICATE</div>
 
                     <div class="content">
-                        <p>This is to certify that <span class="employee-details underline">${state?.user?.name || "Employee Name"}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.designation}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}/span> inclusive.</p>
+                        <p>This is to certify that <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.designation}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || employeeDetail?.basic_salary || 0) + parseFloat(state?.housing_allowance || employeeDetail?.housing_allowance || 0) + parseFloat(state?.transport_allowance || employeeDetail?.transport_allowance || 0) + parseFloat(state?.other_allowance ||employeeDetail?.other_allowance ||  0)}/span> inclusive.</p>
 
                     <p>This certificate has been issued at the request of the employee, for whatever purpose it may serve him without any legal obligation to the company.</p>
                     </div>
@@ -320,10 +333,13 @@ const Certificate = () => {
         const reader = new FileReader()
         reader.onload = () => {
             const base64 = reader.result.split(",")[1]
-            sendBlobPreview(base64, `${state?.user?.name}_Salary_Certificate`)
+            sendBlobPreview(base64, `${state?.user?.name || state?.employee?.name}_Salary_Certificate`)
         }
         reader.readAsDataURL(converted)
     }
+useEffect(() => {
+  getData()
+}, [])
 
     return (
         <>
@@ -411,11 +427,11 @@ const Certificate = () => {
                 <Box sx={{ textAlign: "justify", mb: 3 }}>
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
                         This is to certify that{" "}
-                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || "Employee Name"}</span> •{" "}
+                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || state?.employee?.name }</span> •{" "}
                         <strong>{state?.designation}</strong>, Passport no: <strong>{state?.passport_number || "-"}</strong> is
                         currently employed by our company since <strong>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</strong> till now, in the capacity of{" "}
                         <strong>{state?.designation}</strong>. His monthly Gross salary is{" "}
-                        <strong>AED {parseFloat(state?.basic_salary || 0) + parseFloat(state?.housing_allowance || 0) + parseFloat(state?.transport_allowance || 0) + parseFloat(state?.other_allowance || 0)}</strong> inclusive.
+                        <strong>AED {parseFloat(state?.basic_salary || employeeDetail?.basic_salary ||  0) + parseFloat(state?.housing_allowance || employeeDetail?.housing_allowance ||  0) + parseFloat(state?.transport_allowance || employeeDetail?.transport_allowance || 0) + parseFloat(state?.other_allowance || employeeDetail?.other_allowance || 0)}</strong> inclusive.
                     </Typography>
 
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>

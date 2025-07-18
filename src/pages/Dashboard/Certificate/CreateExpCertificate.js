@@ -310,7 +310,7 @@ function CreateExpCertificate() {
                     ...selectedItem,
                     ...formData,
                     fromDate: fromDate, 
-                    toDate:toDate
+                    valid_till_date:toDate
                 },
             } 
 
@@ -346,10 +346,10 @@ function CreateExpCertificate() {
                      
                         <Grid item xs={12} sm={12}>
                             <DatePicker
-                                disabled={fromDate ? false : true}
+                              
                                 disableFuture={true}
                                 size='small'
-                                minDate={fromDate}
+                             
                                 label={'To Date'}
                                 value={toDate}
                                 onChange={(date) => setToDate(new Date(date))}

@@ -271,9 +271,9 @@ const ExpCertificate = () => {
                     <div class="certificate-title">EXPERIENCE CERTIFICATE</div>
 
                   <div class="content">
-                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to <span class="employee-details">${moment(state?.toDate).isSame(moment(), 'day')
+                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to <span class="employee-details">${moment(state?.valid_till_date).isSame(moment(), 'day')
                 ? 'Present'
-                : moment(state?.toDate).format('DD-MMMM-YYYY')}
+                : moment(state?.valid_till_date).format('DD-MMMM-YYYY')}
 </span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
 
                         <p>We found him/her to be honest, hardworking and of good conduct. We wish him/her all the best in his/her future endeavors.</p>
@@ -420,9 +420,9 @@ const ExpCertificate = () => {
                         passport no. <span style={{ fontWeight: "bold" }}>{state?.passport_number || "-"}</span>, was working in the
                         capacity of <span style={{ fontWeight: "bold" }}>{state?.designation}</span> in our esteemed organization from{" "}
                         <span style={{ fontWeight: "bold" }}>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to{" "}
-                        <span style={{ fontWeight: "bold" }}>{moment(state?.toDate).isSame(moment(), 'day')
+                        <span style={{ fontWeight: "bold" }}>{moment(state?.valid_till_date).isSame(moment(), 'day')
                             ? 'Present'
-                            : moment(state?.toDate).format('DD-MMMM-YYYY')}
+                            : moment(state?.valid_till_date).format('DD-MMMM-YYYY')}
                         </span>. During his/her tenure, he/she has shown dedication,
                         professionalism and commitment to his/her duties.
                     </Typography>
