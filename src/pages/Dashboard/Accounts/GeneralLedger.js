@@ -808,7 +808,7 @@ function GeneralLedger() {
                           {accountLedgers.map((item, index) => {
                             let page = LedgerLinking(item?.entry?.reference_module)
                             const balance =
-                              selectedAccount?.nature === "debit"
+                              selectedAccount?.nature === "debit" ||  item?.account?.primary_account_id == 700328 
                                 ? (
                                   parseFloat(item?.debit) -
                                   parseFloat(item?.credit)

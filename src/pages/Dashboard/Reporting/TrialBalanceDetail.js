@@ -1613,7 +1613,7 @@ const downloadExcel2 = async () => {
 
                                                                                                                 <TableCell className="text-right">
                                                                                                                     {parseFloat(
-                                                                                                                        parseFloat(parseFloat(account.opening_balance) || 0.0) +
+                                                                                                                        parseFloat(parseFloat(account.nature === "debit" ? account.opening_balance : -1 * account.opening_balance ) || 0.0) +
                                                                                                                         (account.nature === "debit"
                                                                                                                             ? parseFloat(account.total_debit) - parseFloat(account.total_credit)
                                                                                                                             : -1 * (parseFloat(account.total_credit) - parseFloat(account.total_debit)))
