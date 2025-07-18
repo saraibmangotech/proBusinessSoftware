@@ -140,7 +140,7 @@ function SalaryCertificate() {
     const [selectedVisa, setSelectedVisa] = useState()
 
 
-    const tableHead = [{ name: 'Date', key: 'created_at' },{ name: ' Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }, { name: 'Signed Date', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Date', key: 'created_at' },{ name: ' Name', key: 'name' }, { name: 'Salary Certificate', key: 'created_at' }]
 
 
     const allowFilesType = [
@@ -519,7 +519,7 @@ function SalaryCertificate() {
                                                                     >
 
                                                                         <Box>
-                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} />
+                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} /> View
                                                                         </Box>
                                                                         <p style={{ textAlign: 'center', lineHeight: '20px', color: '#0F2772', fontWeight: 'bold', fontSize: '12px' }}>
                                                                             {item?.certificate?.split('_').pop()}
@@ -527,10 +527,8 @@ function SalaryCertificate() {
                                                                     </Grid>
                                                                 </Cell>
                                                              
-                                                                <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.signed_at && moment(item?.created_at).format('MM-DD-YYYY')}
-                                                                </Cell>
-
+                                  
+                                
 
 
 

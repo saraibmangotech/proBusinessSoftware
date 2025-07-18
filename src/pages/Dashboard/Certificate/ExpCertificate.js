@@ -143,192 +143,169 @@ const ExpCertificate = () => {
     }
 
     const exportDOCWithMethod = async () => {
-        const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`
-        const currentDate = moment().format("D MMM YYYY")
-        const fileName = `${state?.user?.name}-ExperienceCertificate.docx`
+    const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`;
+    const currentDate = moment().format("D MMM YYYY");
+    const fileName = `${state?.user?.name}-ExperienceCertificate.docx`;
 
-        // Convert logo to base64
-        let logoBase64 = ""
-        try {
-            logoBase64 = await getImageAsBase64(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed)
-        } catch (error) {
-            console.error("Error converting logo to base64:", error)
-            // Fallback to placeholder if logo conversion fails
-            logoBase64 =
-                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-        }
-
-        // Get the HTML content matching the professional format
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <meta charset="utf-8">
-                    <title>Experience Certificate</title>
-                    <style>
-                        body { 
-                            font-family: 'Times New Roman', serif; 
-                            line-height: 1.4; 
-                            max-width: 800px; 
-                            margin: 0 auto; 
-                            padding: 40px 60px;
-                            font-size: 12pt;
-                        }
-                        .header { 
-                            text-align: center; 
-                            margin-bottom: 40px;
-                            border-bottom: 2px solid #000;
-                            padding-bottom: 20px;
-                        }
-                        .logo {
-                            width: 80px;
-                            height: 80px;
-                            margin: 0 auto 20px;
-                        }
-                        .company-name {
-                            font-size: 16pt;
-                            font-weight: bold;
-                            margin-bottom: 5px;
-                        }
-                        .company-details {
-                            font-size: 10pt;
-                            color: #666;
-                        }
-                        .ref-section {
-                            margin: 30px 0;
-                            font-size: 11pt;
-                        }
-                        .ref-number {
-                            margin-bottom: 10px;
-                        }
-                        .date {
-                            margin-bottom: 20px;
-                        }
-                        .to-section {
-                            margin-bottom: 30px;
-                            font-size: 11pt;
-                        }
-                        .certificate-title {
-                            text-align: center;
-                            font-size: 14pt;
-                            font-weight: bold;
-                            text-decoration: underline;
-                            margin: 40px 0 30px 0;
-                        }
-                        .content {
-                            text-align: justify;
-                            margin: 20px 0;
-                            font-size: 11pt;
-                            line-height: 1.6;
-                        }
-                        .employee-details {
-                            font-weight: bold;
-                        }
-                        .signature-section {
-                            margin-top: 80px;
-                            font-size: 11pt;
-                        }
-                        .signature-line {
-                            margin-top: 60px;
-                            border-bottom: 1px solid #000;
-                            width: 200px;
-                        }
-                        .footer {
-                            margin-top: 60px;
-                            border-top: 2px solid #000;
-                            padding-top: 20px;
-                            font-size: 9pt;
-                            text-align: center;
-                            color: #666;
-                        }
-                        .underline {
-                            text-decoration: underline;
-                            font-weight: bold;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="${logoBase64}" 
-                                 alt="Company Logo" 
-                                 style="width: 80px; height: 80px; margin: 0 auto; display: block;" />
-                        </div>
-                      
-                    </div>
-
-                    <div class="ref-section">
-                        <div class="ref-number">Ref: ${state?.reference || state?.reference_number}</div>
-                        <div class="date">Date: ${currentDate}</div>
-                    </div>
-
-                    <div class="to-section">
-                        <div><strong>To,</strong></div>
-                        <div>${state?.to}</div>
-                        <div>UAE</div>
-                    </div>
-
-                    <div class="certificate-title">EXPERIENCE CERTIFICATE</div>
-
-                  <div class="content">
-                        <p>This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>, passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of <span class="employee-details">${state?.designation}</span> in our esteemed organization from <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to <span class="employee-details">${moment(state?.valid_till_date).isSame(moment(), 'day')
-                ? 'Present'
-                : moment(state?.valid_till_date).format('DD-MMMM-YYYY')}
-</span>. During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.</p>
-
-                        <p>We found him/her to be honest, hardworking and of good conduct. We wish him/her all the best in his/her future endeavors.</p>
-                    </div>
-
-                  
-
-                    <div class="signature-section">
-                        <p><strong>Authorized Signatory</strong></p>
-                        <p><strong>Human Resources Department</strong></p>
-                        <div class="signature-line"></div>
-                        <p style="margin-top: 10px;">Date: ${currentDate}</p>
-                    </div>
-
-                    <div class="footer">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="width: 33%; text-align: left; vertical-align: top; font-size: 9pt;">
-                                    www.premiumservices.ae
-                                </td>
-                                <td style="width: 34%; text-align: center; vertical-align: top; font-size: 9pt;">
-                                    ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-                ? "Premium Businessmen Services"
-                : 'For Premium Professional Government Services L.L.C.'}<br/>
-                                   P.O. Box 334338, United Arab   Emirates<br/>
-                                
-                                    Telephone: +971 4 520 4444
-                                </td>
-                                <td style="width: 33%; text-align: right; vertical-align: top; font-size: 9pt; direction: rtl;">
-                                    بريميم بروفيشنال الخدمات الحكومية<br/>
-                                    ش.ذ.م.م ص.ب 334338<br/>
-                                    في الإمارات العربية المتحدة<br/>
-                                    هاتف: 4444 520 4 971+
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </body>
-            </html>
-        `
-
-        // Convert HTML to DOC
-        const converted = htmlDocx.asBlob(htmlContent)
-
-        // Save the file
-        saveAs(converted, fileName)
-
-        // Convert to base64 for upload (if needed)
-        const reader = new FileReader()
-        reader.onload = () => {
-            const base64 = reader.result.split(",")[1]
-            sendBlobPreview(base64, `${state?.user?.name}_Experience_Certificate`)
-        }
-        reader.readAsDataURL(converted)
+    // Convert logo to base64
+    let logoBase64 = "";
+    try {
+        logoBase64 = await getImageAsBase64(
+            agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                ? Images.tasheel
+                : Images.aldeed
+        );
+    } catch (error) {
+        console.error("Error converting logo to base64:", error);
+        logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
     }
+
+    // Optimized HTML
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Experience Certificate</title>
+        <style>
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+            body {
+                font-family: 'Times New Roman', serif;
+                line-height: 1.4;
+                font-size: 11pt;
+                margin: 0 auto;
+                padding: 0;
+                max-width: 800px;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #000;
+                padding-bottom: 10px;
+            }
+            .logo {
+                width: 70px;
+                height: 70px;
+                margin: 0 auto 15px;
+            }
+            .ref-section, .to-section, .content {
+                margin: 15px 0;
+            }
+            .certificate-title {
+                text-align: center;
+                font-size: 13pt;
+                font-weight: bold;
+                text-decoration: underline;
+                margin: 25px 0;
+            }
+            .content {
+                text-align: justify;
+                font-size: 11pt;
+            }
+            .employee-details {
+                font-weight: bold;
+            }
+            .underline {
+                text-decoration: underline;
+            }
+            .signature-section {
+                margin-top: 40px;
+                font-size: 11pt;
+            }
+            .signature-line {
+                margin-top: 30px;
+                border-bottom: 1px solid #000;
+                width: 200px;
+            }
+            .footer {
+                margin-top: 30px;
+                padding-top: 10px;
+                border-top: 1px solid #000;
+                font-size: 9pt;
+                text-align: center;
+                color: #666;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <img src="${logoBase64}" alt="Company Logo" class="logo" />
+        </div>
+
+        <div class="ref-section">
+            <div>Ref: ${state?.reference || state?.reference_number}</div>
+            <div>Date: ${currentDate}</div>
+        </div>
+
+        <div class="to-section">
+            <strong>To,</strong><br/>
+            ${state?.to}<br/>
+            UAE
+        </div>
+
+        <div class="certificate-title">EXPERIENCE CERTIFICATE</div>
+
+        <div class="content">
+            <p>
+                This is to certify that, <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span>,
+                passport no. <span class="employee-details">${state?.passport_number || "-"}</span>, was working in the capacity of
+                <span class="employee-details">${state?.designation}</span> in our esteemed organization from
+                <span class="employee-details">${moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to
+                <span class="employee-details">${moment(state?.valid_till).isSame(moment(), 'day') ? 'Present' : moment(state?.valid_till).format('DD-MMMM-YYYY')}</span>.
+                During his/her tenure, he/she has shown dedication, professionalism and commitment to his/her duties.
+            </p>
+            <p>
+                We found him/her to be honest, hardworking and of good conduct. We wish him/her all the best in his/her future endeavors.
+            </p>
+        </div>
+
+        <div><strong>${state?.for || ''}</strong></div>
+
+        <div class="signature-section">
+            <p><strong>Authorized Signatory</strong></p>
+            <p><strong>Human Resources Department</strong></p>
+            <div class="signature-line"></div>
+            <p style="margin-top: 10px;">Date: ${currentDate}</p>
+        </div>
+
+        <div class="footer">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 33%; text-align: left;">www.premiumservices.ae</td>
+                    <td style="width: 34%; text-align: center;">
+                        ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                            ? "Premium Businessmen Services"
+                            : "For Premium Professional Government Services L.L.C."}<br/>
+                        P.O. Box 334338, UAE<br/>
+                        Telephone: +971 4 520 4444
+                    </td>
+                    <td style="width: 33%; text-align: right; direction: rtl;">
+                        بريميم بروفيشنال الخدمات الحكومية<br/>
+                        ش.ذ.م.م ص.ب 334338<br/>
+                        الإمارات العربية المتحدة<br/>
+                        هاتف: 4444 520 4 971+
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+    </html>
+    `;
+
+    const converted = htmlDocx.asBlob(htmlContent);
+    saveAs(converted, fileName);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        const base64 = reader.result.split(",")[1];
+        sendBlobPreview(base64, `${state?.user?.name}_Experience_Certificate`);
+    };
+    reader.readAsDataURL(converted);
+};
+
 
     return (
         <>
@@ -420,9 +397,9 @@ const ExpCertificate = () => {
                         passport no. <span style={{ fontWeight: "bold" }}>{state?.passport_number || "-"}</span>, was working in the
                         capacity of <span style={{ fontWeight: "bold" }}>{state?.designation}</span> in our esteemed organization from{" "}
                         <span style={{ fontWeight: "bold" }}>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</span> to{" "}
-                        <span style={{ fontWeight: "bold" }}>{moment(state?.valid_till_date).isSame(moment(), 'day')
+                        <span style={{ fontWeight: "bold" }}>{moment(state?.valid_till).isSame(moment(), 'day')
                             ? 'Present'
-                            : moment(state?.valid_till_date).format('DD-MMMM-YYYY')}
+                            : moment(state?.valid_till).format('DD-MMMM-YYYY')}
                         </span>. During his/her tenure, he/she has shown dedication,
                         professionalism and commitment to his/her duties.
                     </Typography>
@@ -463,7 +440,9 @@ const ExpCertificate = () => {
                         </Box>
                         <Box sx={{ flex: 1, textAlign: "center" }}>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>
-                                {state?.for}
+                                {agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                                    ? "Premium Businessmen Services"
+                                    : 'For Premium Professional Government Services L.L.C.'}
 
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>

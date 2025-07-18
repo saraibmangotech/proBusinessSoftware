@@ -44,19 +44,19 @@ const Certificate = () => {
             img.src = url
         })
     }
-  const getData = async () => {
-    try {
-      let params = { user_id: state?.employee?.id };
-      const { data } = await CustomerServices.getEmployeeDetail(params);
-      let data2 = data?.employee
-      setEmployeeDetail(data2)
+    const getData = async () => {
+        try {
+            let params = { user_id: state?.employee?.id };
+            const { data } = await CustomerServices.getEmployeeDetail(params);
+            let data2 = data?.employee
+            setEmployeeDetail(data2)
 
 
 
-    } catch (error) {
-      console.error("Error fetching employee data:", error);
-    }
-  };
+        } catch (error) {
+            console.error("Error fetching employee data:", error);
+        }
+    };
     console.log(state)
 
     const allowFilesType = ["application/pdf"]
@@ -125,7 +125,7 @@ const Certificate = () => {
                 to: state?.to,
                 forField: state?.for,
                 employee_id: state?.user_id,
-                content:'12'
+                content: '12'
             }
             console.log(obj)
             const promise = CustomerServices.CreateCertificate(obj)
@@ -156,190 +156,174 @@ const Certificate = () => {
     }
 
     const exportDOCWithMethod = async () => {
-        const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`
-        const currentDate = moment().format("D MMM YYYY")
-        const fileName = `${moment().unix()}_${state?.user?.name || state?.employee?.name}-SalaryCertificate.docx`
+        const refNumber = `HR-01-SC-${moment().format("DDMM")}-${moment().format("MM-YYYY")}`;
+        const currentDate = moment().format("D MMM YYYY");
+        const fileName = `${moment().unix()}_${state?.user?.name || state?.employee?.name}-SalaryCertificate.docx`;
 
         // Convert logo to base64
-        let logoBase64 = ""
+        let logoBase64 = "";
         try {
-            logoBase64 = await getImageAsBase64(agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed )
+            logoBase64 = await getImageAsBase64(
+                agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                    ? Images.tasheel
+                    : Images.aldeed
+            );
         } catch (error) {
-            console.error("Error converting logo to base64:", error)
-            // Fallback to placeholder if logo conversion fails
+            console.error("Error converting logo to base64:", error);
             logoBase64 =
-                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
         }
 
-        // Get the HTML content matching the professional format
+        // HTML Content
         const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <meta charset="utf-8">
-                    <title>Salary Certificate</title>
-                    <style>
-                        body { 
-                            font-family: 'Times New Roman', serif; 
-                            line-height: 1.4; 
-                            max-width: 800px; 
-                            margin: 0 auto; 
-                            padding: 40px 60px;
-                            font-size: 12pt;
-                        }
-                        .header { 
-                            text-align: center; 
-                            margin-bottom: 40px;
-                            border-bottom: 2px solid #000;
-                            padding-bottom: 20px;
-                        }
-                        .logo {
-                            width: 80px;
-                            height: 80px;
-                            margin: 0 auto 20px;
-                        }
-                        .company-name {
-                            font-size: 16pt;
-                            font-weight: bold;
-                            margin-bottom: 5px;
-                        }
-                        .company-details {
-                            font-size: 10pt;
-                            color: #666;
-                        }
-                        .ref-section {
-                            margin: 30px 0;
-                            font-size: 11pt;
-                        }
-                        .ref-number {
-                            margin-bottom: 10px;
-                        }
-                        .date {
-                            margin-bottom: 20px;
-                        }
-                        .to-section {
-                            margin-bottom: 30px;
-                            font-size: 11pt;
-                        }
-                        .certificate-title {
-                            text-align: center;
-                            font-size: 14pt;
-                            font-weight: bold;
-                            text-decoration: underline;
-                            margin: 40px 0 30px 0;
-                        }
-                        .content {
-                            text-align: justify;
-                            margin: 20px 0;
-                            font-size: 11pt;
-                            line-height: 1.6;
-                        }
-                        .employee-details {
-                            font-weight: bold;
-                        }
-                        .signature-section {
-                            margin-top: 80px;
-                            font-size: 11pt;
-                        }
-                        .signature-line {
-                            margin-top: 60px;
-                            border-bottom: 1px solid #000;
-                            width: 200px;
-                        }
-                        .footer {
-                            margin-top: 60px;
-                            border-top: 2px solid #000;
-                            padding-top: 20px;
-                            font-size: 9pt;
-                            text-align: center;
-                            color: #666;
-                        }
-                        .underline {
-                            text-decoration: underline;
-                            font-weight: bold;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="${logoBase64}" 
-                                 alt="Company Logo" 
-                                 style="width: 80px; height: 80px; margin: 0 auto; display: block;" />
-                        </div>
-                      
-                    </div>
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Salary Certificate</title>
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 2cm;
+                    }
+                    body { 
+                        font-family: 'Times New Roman', serif; 
+                        line-height: 1.4; 
+                        font-size: 11pt;
+                        max-width: 800px; 
+                        margin: 0 auto; 
+                        padding: 20px 30px;
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #000;
+                        padding-bottom: 10px;
+                    }
+                    .logo {
+                        width: 80px;
+                        height: 80px;
+                        margin: 0 auto 10px;
+                    }
+                    .ref-section {
+                        margin: 20px 0;
+                        font-size: 11pt;
+                    }
+                    .to-section {
+                        margin-bottom: 20px;
+                        font-size: 11pt;
+                    }
+                    .certificate-title {
+                        text-align: center;
+                        font-size: 14pt;
+                        font-weight: bold;
+                        text-decoration: underline;
+                        margin: 20px 0;
+                    }
+                    .content {
+                        text-align: justify;
+                        font-size: 11pt;
+                        line-height: 1.6;
+                    }
+                    .employee-details {
+                        font-weight: bold;
+                    }
+                    .signature-section {
+                        margin-top: 40px;
+                        font-size: 11pt;
+                    }
+                    .signature-line {
+                        margin-top: 30px;
+                        border-bottom: 1px solid #000;
+                        width: 200px;
+                    }
+                    .footer {
+                        margin-top: 30px;
+                        border-top: 2px solid #000;
+                        padding-top: 10px;
+                        font-size: 9pt;
+                        text-align: center;
+                        color: #666;
+                    }
+                    .underline {
+                        text-decoration: underline;
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <img src="${logoBase64}" alt="Company Logo" class="logo" />
+                </div>
 
-                    <div class="ref-section">
-                        <div class="ref-number">Ref: ${state?.reference}</div>
-                        <div class="date">Date: ${currentDate}</div>
-                    </div>
+                <div class="ref-section">
+                    <div class="ref-number">Ref: ${state?.reference}</div>
+                    <div class="date">Date: ${currentDate}</div>
+                </div>
 
-                    <div class="to-section">
-                        <div><strong>To,</strong></div>
-                        <div>${state?.to}</div>
-                        <div>UAE</div>
-                    </div>
+                <div class="to-section">
+                    <div><strong>To,</strong></div>
+                    <div>${state?.to}</div>
+                    <div>UAE</div>
+                </div>
 
-                    <div class="certificate-title">SALARY CERTIFICATE</div>
+                <div class="certificate-title">SALARY CERTIFICATE</div>
 
-                    <div class="content">
-                        <p>This is to certify that <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.designation}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || employeeDetail?.basic_salary || 0) + parseFloat(state?.housing_allowance || employeeDetail?.housing_allowance || 0) + parseFloat(state?.transport_allowance || employeeDetail?.transport_allowance || 0) + parseFloat(state?.other_allowance ||employeeDetail?.other_allowance ||  0)}/span> inclusive.</p>
+                <div class="content">
+                    <p>This is to certify that <span class="employee-details underline">${state?.user?.name || state?.employee?.name}</span> • <span class="employee-details">${state?.designation}</span>, Passport no: <span class="employee-details">${state?.passport_number || "-"}</span> is currently employed by our company since <span class="employee-details">1st September 2022</span> till now, in the capacity of <span class="employee-details">${state?.designation}</span>. His monthly Gross salary is <span class="employee-details">AED ${parseFloat(state?.basic_salary || employeeDetail?.basic_salary || 0) + parseFloat(state?.housing_allowance || employeeDetail?.housing_allowance || 0) + parseFloat(state?.transport_allowance || employeeDetail?.transport_allowance || 0) + parseFloat(state?.other_allowance || employeeDetail?.other_allowance || 0)}</span> inclusive.</p>
 
                     <p>This certificate has been issued at the request of the employee, for whatever purpose it may serve him without any legal obligation to the company.</p>
-                    </div>
+                </div>
+<div><strong>${state?.for}</strong></div>
+                <div class="signature-section">
+                    <p><strong>Authorized Signatory</strong></p>
+                    <p><strong>Human Resources Department</strong></p>
+                    <div class="signature-line"></div>
+                    <p style="margin-top: 10px;">Date: ${currentDate}</p>
+                </div>
 
-                  
+                <div class="footer">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 33%; text-align: left;">www.premiumservices.ae</td>
+                            <td style="width: 34%; text-align: center;">
+                                ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+                ? "Premium Businessmen Services"
+                : 'For Premium Professional Government Services L.L.C.'}<br/>
+                                P.O. Box 334338, United Arab Emirates<br/>
+                                Telephone: +971 4 520 4444
+                            </td>
+                            <td style="width: 33%; text-align: right; direction: rtl;">
+                                بريميم بروفيشنال الخدمات الحكومية<br/>
+                                ش.ذ.م.م ص.ب 334338<br/>
+                                في الإمارات العربية المتحدة<br/>
+                                هاتف: 4444 520 4 971+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </body>
+        </html>
+    `;
 
-                    <div class="signature-section">
-                        <p><strong>Authorized Signatory</strong></p>
-                        <p><strong>Human Resources Department</strong></p>
-                        <div class="signature-line"></div>
-                        <p style="margin-top: 10px;">Date: ${currentDate}</p>
-                    </div>
-
-                    <div class="footer">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="width: 33%; text-align: left; vertical-align: top; font-size: 9pt;">
-                                    www.premiumservices.ae
-                                </td>
-                                <td style="width: 34%; text-align: center; vertical-align: top; font-size: 9pt;">
-                                    ${state?.for}<br/>
-                                   P.O. Box 334338, United Arab   Emirates<br/>
-                                
-                                    Telephone: +971 4 520 4444
-                                </td>
-                                <td style="width: 33%; text-align: right; vertical-align: top; font-size: 9pt; direction: rtl;">
-                                    بريميم بروفيشنال الخدمات الحكومية<br/>
-                                    ش.ذ.م.م ص.ب 334338<br/>
-                                    في الإمارات العربية المتحدة<br/>
-                                    هاتف: 4444 520 4 971+
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </body>
-            </html>
-        `
-
-        // Convert HTML to DOC
-        const converted = htmlDocx.asBlob(htmlContent)
+        // Convert HTML to DOCX Blob
+        const converted = htmlDocx.asBlob(htmlContent);
 
         // Save the file
-        saveAs(converted, fileName)
+        saveAs(converted, fileName);
 
-        // Convert to base64 for upload (if needed)
-        const reader = new FileReader()
+        // Upload or preview as base64 (optional)
+        const reader = new FileReader();
         reader.onload = () => {
-            const base64 = reader.result.split(",")[1]
-            sendBlobPreview(base64, `${state?.user?.name || state?.employee?.name}_Salary_Certificate`)
-        }
-        reader.readAsDataURL(converted)
-    }
-useEffect(() => {
-  getData()
-}, [])
+            const base64 = reader.result.split(",")[1];
+            sendBlobPreview(base64, `${state?.user?.name || state?.employee?.name}_Salary_Certificate`);
+        };
+        reader.readAsDataURL(converted);
+    };
+
+    useEffect(() => {
+        getData()
+    }, [])
 
     return (
         <>
@@ -376,7 +360,7 @@ useEffect(() => {
                 <Box sx={{ textAlign: "center", mb: 4, pb: 2 }}>
                     <Box sx={{ mb: 2 }}>
                         <img
-                            src={agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed  }
+                            src={agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? Images.tasheel : Images.aldeed}
                             alt="Company Logo"
                             style={{
                                 width: "150px",
@@ -427,11 +411,11 @@ useEffect(() => {
                 <Box sx={{ textAlign: "justify", mb: 3 }}>
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
                         This is to certify that{" "}
-                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || state?.employee?.name }</span> •{" "}
+                        <span style={{ textDecoration: "underline", fontWeight: "bold" }}>{state?.user?.name || state?.employee?.name}</span> •{" "}
                         <strong>{state?.designation}</strong>, Passport no: <strong>{state?.passport_number || "-"}</strong> is
                         currently employed by our company since <strong>{moment(state?.date_of_joining).format('DD-MMMM-YYYY')}</strong> till now, in the capacity of{" "}
                         <strong>{state?.designation}</strong>. His monthly Gross salary is{" "}
-                        <strong>AED {parseFloat(state?.basic_salary || employeeDetail?.basic_salary ||  0) + parseFloat(state?.housing_allowance || employeeDetail?.housing_allowance ||  0) + parseFloat(state?.transport_allowance || employeeDetail?.transport_allowance || 0) + parseFloat(state?.other_allowance || employeeDetail?.other_allowance || 0)}</strong> inclusive.
+                        <strong>AED {parseFloat(state?.basic_salary || employeeDetail?.basic_salary || 0) + parseFloat(state?.housing_allowance || employeeDetail?.housing_allowance || 0) + parseFloat(state?.transport_allowance || employeeDetail?.transport_allowance || 0) + parseFloat(state?.other_allowance || employeeDetail?.other_allowance || 0)}</strong> inclusive.
                     </Typography>
 
                     <Typography paragraph sx={{ fontSize: "0.95rem", lineHeight: 1.6 }}>

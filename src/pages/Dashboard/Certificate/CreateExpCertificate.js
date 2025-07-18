@@ -310,7 +310,7 @@ function CreateExpCertificate() {
                     ...selectedItem,
                     ...formData,
                     fromDate: fromDate, 
-                    valid_till_date:toDate
+                    valid_till:toDate
                 },
             } 
 

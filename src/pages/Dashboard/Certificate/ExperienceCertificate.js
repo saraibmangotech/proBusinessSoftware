@@ -519,7 +519,7 @@ function ExperienceCertificate() {
                                                                     >
 
                                                                         <Box>
-                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} />
+                                                                            <Box component={'img'} src={Images.docIcon} width={'25px'} /> View
                                                                         </Box>
                                                                         <p style={{ textAlign: 'center', lineHeight: '20px', color: '#0F2772', fontWeight: 'bold', fontSize: '12px' }}>
                                                                             {item?.certificate?.split('_').pop()}
