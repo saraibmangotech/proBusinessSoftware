@@ -142,7 +142,7 @@ function CreateSalaryCertificate() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [newData, setNewData] = useState(null)
 
-    const tableHead = [{ name: 'Select', key: 'created_at' }, { name: ' Name', key: 'commission_monthly' }, { name: 'Basic Salary', key: 'commission_monthly' }, { name: 'Housing Allowance', key: 'commission_monthly' }, { name: 'Transport Allowance', key: 'created_at' }, { name: 'Other Allowance', key: 'created_at' }, { name: 'Total Salary', key: 'commission_monthly' }, { name: 'Visa Status', key: 'commission_monthly' }]
+    const tableHead = [{ name: 'Select', key: 'created_at' }, { name: ' Name', key: 'commission_monthly' }, { name: 'Basic Salary', key: 'commission_monthly' }, { name: 'Housing Allowance', key: 'commission_monthly' }, { name: 'Transport Allowance', key: 'created_at' }, { name: 'Other Allowance', key: 'created_at' }, { name: 'Total Salary', key: 'commission_monthly' }]
 
 
     const allowFilesType = [
@@ -520,12 +520,7 @@ function CreateSalaryCertificate() {
                                                             <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                                                 {parseFloat(item?.basic_salary || 0) + parseFloat(item?.housing_allowance || 0) + parseFloat(item?.transport_allowance || 0) + parseFloat(item?.other_allowance || 0)}
                                                             </Cell>
-                                                            <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                <Box component={'div'} sx={{ cursor: 'pointer', display: 'flex  !important', justifyContent: 'flex-start  !important' }} onClick={() => { setPaymentDialog(true); setSelectedVisa(item) }}>
-                                                                    <Box component={'img'} src={item?.visa_status == 'active' ? Images.successIcon : Images.errorIcon} width={'13px'}></Box>
-                                                                    {item?.visa_status == 'active' ? 'Active' : 'Inactive'}
-                                                                </Box>
-                                                            </Cell>
+                                                         
                                                         </Row>
                                                     ))}
                                                 </TableBody>

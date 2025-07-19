@@ -127,7 +127,7 @@ function UpdateEmployee() {
             key: "emirates_id",
             path: "",
             expiry_date: null,
-            is_required: true
+            is_required: false
 
 
         },
@@ -136,7 +136,7 @@ function UpdateEmployee() {
             key: "passport",
             path: "",
             expiry_date: null,
-            is_required: true
+            is_required: false
         },
 
         {
@@ -286,6 +286,7 @@ function UpdateEmployee() {
                     shift_end: moment(formData?.shiftEndTime).format('HH:mm'),
 
                     grace_period_minutes: formData?.graceMonths,
+                    passport_number: formData?.passportnumber,
                     minimum_required_minutes: formData?.minHours,
                     short_time_deduction_type: selectedTimeDetection?.id,
                     personal_time_minutes_per_month: formData?.personalMintPerMonth,
@@ -927,7 +928,7 @@ function UpdateEmployee() {
                     <Grid item xs={12} sm={2.8}>
 
                         <InputField
-                            label={"Emergency Contact :*"}
+                            label={"Emergency Contact :"}
                             size={'small'}
                             placeholder={"Emergency Contact "}
                             type={'number'}
@@ -1070,7 +1071,7 @@ function UpdateEmployee() {
                                 <DatePicker
                                     disablePast={true}
                                     size="small"
-                                    label={`${item?.name} Expiry Date :*`}
+                                    label={`${item?.name} Expiry Date :`}
                                     value={item?.expiry_date ? new Date(item.expiry_date) : null}
                                     error={errors[`${item?.key}_expiry`]?.message}
                                     register={register(`${item?.key}_expiry`, {
@@ -1224,7 +1225,7 @@ function UpdateEmployee() {
                     </Grid>
                     <Grid item xs={12} sm={2.8}>
                         <InputField
-                            label={"Branch:*"}
+                            label={"Branch:"}
                             size="small"
                             placeholder="Branch"
                             error={errors?.branch?.message}
@@ -1236,7 +1237,7 @@ function UpdateEmployee() {
 
                     <Grid item xs={12} sm={2.8}>
                         <InputField
-                            label={"Visa:*"}
+                            label={"Visa:"}
                             size="small"
                             placeholder="Visa"
                             error={errors?.visa?.message}
@@ -1248,7 +1249,7 @@ function UpdateEmployee() {
 
                     <Grid item xs={12} sm={2.8}>
                         <InputField
-                            label={"Work Permit:*"}
+                            label={"Work Permit:"}
                             size="small"
                             placeholder="Work Permit"
                             error={errors?.work_permit?.message}
@@ -1260,7 +1261,7 @@ function UpdateEmployee() {
 
                     <Grid item xs={12} sm={2.8}>
                         <InputField
-                            label={"IBAN:*"}
+                            label={"IBAN:"}
                             size="small"
                             placeholder="IBAN"
                             error={errors?.iban?.message}
@@ -1284,7 +1285,7 @@ function UpdateEmployee() {
                     </Grid>
                     <Grid item xs={12} sm={2.8}>
                         <InputField
-                            label={"Routing:*"}
+                            label={"Routing:"}
                             size="small"
                             placeholder="Routing"
                             error={errors?.routing?.message}
@@ -1530,6 +1531,7 @@ function UpdateEmployee() {
                         <InputField
                             label={" Pension Percentage :"}
                             size={'small'}
+                            step={'any'}
                             type={'number'}
                             disabled={isApplicable == 'no'}
                             placeholder={"  Pension Percentage "}
@@ -1548,6 +1550,7 @@ function UpdateEmployee() {
                         <InputField
                             label={" Pension Percentage Employer :"}
                             size={'small'}
+                            step={'any'}
                             type={'number'}
                             disabled={isApplicable == 'no'}
                             placeholder={"  Pension Percentage Employer "}
@@ -1699,7 +1702,7 @@ function UpdateEmployee() {
 
                     <Grid item xs={12} sm={2.8}>
                         <DatePicker
-                            label={"Leaving Date:*"}
+                            label={"Leaving Date:"}
                             value={leavingDate}
                             size={"small"}
                             error={errors?.leavingDate?.message}
@@ -1716,7 +1719,7 @@ function UpdateEmployee() {
                     <Grid item xs={12} sm={2.8}>
 
                         <InputField
-                            label={" Leaving Reason :*"}
+                            label={" Leaving Reason :"}
                             size={'small'}
 
                             placeholder={"  Leaving Reason "}

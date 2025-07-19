@@ -372,6 +372,7 @@ function CreateEmployee() {
           has_left_job: leftJob == 'yes' ? true : false,
           date_of_leaving: leavingDate,
           leaving_reason: formData?.reason,
+          passport_number: formData?.passportnumber,
           branch: formData?.branch,
           transport_allowance: formData?.transport_allowance,
           housing_allowance: formData?.housing_allowance,
@@ -1107,7 +1108,7 @@ function CreateEmployee() {
 
           <Grid item xs={12} sm={2.8}>
             <InputField
-              label={"Branch:*"}
+              label={"Branch:"}
               size="small"
               placeholder="Branch"
               error={errors?.branch?.message}
@@ -1143,7 +1144,7 @@ function CreateEmployee() {
 
           <Grid item xs={12} sm={2.8}>
             <InputField
-              label={"IBAN:*"}
+              label={"IBAN:"}
               size="small"
               placeholder="IBAN"
               error={errors?.iban?.message}
@@ -1167,7 +1168,7 @@ function CreateEmployee() {
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <InputField
-              label={"Routing:*"}
+              label={"Routing:"}
               size="small"
               placeholder="Routing"
               error={errors?.routing?.message}
@@ -1411,6 +1412,7 @@ function CreateEmployee() {
               label={" Pension Percentage :"}
               size={'small'}
               type={'number'}
+              step={'any'}
               disabled={isApplicable == 'no'}
               placeholder={"  Pension Percentage "}
               error={errors?.pensionPercentage?.message}
@@ -1429,6 +1431,7 @@ function CreateEmployee() {
               label={" Pension Percentage Employer :"}
               size={'small'}
               type={'number'}
+              step={'any'}
               disabled={isApplicable == 'no'}
               placeholder={"  Pension Percentage Employer "}
               error={errors?.pensionPercentageEmp?.message}

@@ -454,7 +454,8 @@ function LeaveList() {
             header: "Document",
             accessorKey: "document",
             cell: ({ row }) => {
-                const { document: file, name } = row.original;
+                let { document: file, name } = row.original;
+                if (file && file.startsWith('/')) file = file.trimStart('/');
                 const extension = file?.split('.').pop().toLowerCase();
 
                 const getIcon = () => {
@@ -474,7 +475,7 @@ function LeaveList() {
                             sx={{ cursor: 'pointer' }}
                             onClick={() =>
                                 window.open(
-                                    `${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${file}`,
+                                    `${process.env.REACT_APP_IMAGE_BASE_URL}${file}`,
                                     '_blank'
                                 )
                             }
@@ -482,7 +483,7 @@ function LeaveList() {
                         <p
                             onClick={() =>
                                 window.open(
-                                    `${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${file}`,
+                                    `${process.env.REACT_APP_IMAGE_BASE_URL}${file}`,
                                     '_blank'
                                 )
                             }
@@ -518,7 +519,7 @@ function LeaveList() {
                             const status = row?.original?.status?.toLowerCase();
                             const type = row?.original?.type?.toLowerCase();
 
-                            if (status === 'pending' && (row?.original?.user_id != user?.id) ) {
+                            if ((status === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id) ) {
                                 setStatusDialog(true);
                             } 
                         }}
