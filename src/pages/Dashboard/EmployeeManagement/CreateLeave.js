@@ -184,7 +184,16 @@ function CreateLeave() {
                 name: item?.user?.name,
             }));
 
+            if (user?.role_id === 4) {
 
+                const findElement =  formattedData?.find((item) => item?.user_id == user?.id);
+                console.log('Found Element:', findElement);
+
+
+                setSelectedUser(findElement)
+                setValue('user', findElement)
+
+            }
             setUsers(formattedData);
 
 
@@ -198,19 +207,7 @@ function CreateLeave() {
         getUsers()
     }, [])
 
-    useEffect(() => {
-        if (user?.role_id === 4) {
-            
-            const findElement = users?.find((item) => item?.user_id === user?.id);
-            console.log('Found Element:', findElement);
-
-
-            setSelectedUser(findElement)
-            setValue('user', findElement)
-
-        }
-
-    }, [user])
+ 
 
     return (
         <Box sx={{ p: 3, borderRadius: 3 }}>

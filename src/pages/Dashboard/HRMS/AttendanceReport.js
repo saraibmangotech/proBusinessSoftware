@@ -73,7 +73,7 @@ const getStatusStyles = (status) => {
                 border: "1px solid #66bb6a",
                 color: "#2e7d32",
             };
-        case "absent":
+        case "Absent":
             return {
                 bg: "#e3f2fd",
                 border: "1px solid #ef5350",
@@ -470,17 +470,22 @@ export default function AttendanceTable() {
     }, [transformedData, nameFilter])
 
     const daysInMonth = useMemo(() => {
-        const start = moment(startDate)
-        const end = moment(endDate)
-        const days = []
-        const current = start.clone()
+        if (!startDate || !endDate) return [];
+
+        const start = moment(startDate);
+        const end = moment(endDate);
+        const days = [];
+
+        const current = start.clone();
         while (current.isSameOrBefore(end, "day")) {
-            days.push(current.clone()) // 👈 important: push a copy, not reference
-            current.add(1, "day")
+            days.push(current.clone()); // Push a clone to avoid mutation
+            current.add(1, "day");
         }
-        return days
-    }, [startDate, endDate])
-    console.log(daysInMonth, "daysInMonthdaysInMonth")
+
+        return days;
+    }, [startDate, endDate]);
+
+    console.log(daysInMonth.map(day => day.format("YYYY-MM-DD")), "daysInMonth");
 
     // Memoize summary statistics
     const summaryStats = useMemo(() => {
@@ -627,7 +632,7 @@ export default function AttendanceTable() {
             console.log(error)
         }
     }
-  const MarkAsHoliday = async () => {
+    const MarkAsHoliday = async () => {
         console.log(shifts)
         const convertedShifts = shifts.map((shift) => ({
             ...shift,
@@ -639,7 +644,7 @@ export default function AttendanceTable() {
         console.log(convertedShifts)
         try {
             const obj = {
-                is_holiday:true,
+                is_holiday: true,
                 user_id: selectedData?.id,
                 date: tableDate,
                 shifts: [],
@@ -886,7 +891,7 @@ export default function AttendanceTable() {
                                 mt: 2,
                                 display: "flex",
                                 justifyContent: "space-between",
-                                alignItems:'center',
+                                alignItems: 'center',
                                 gap: "25px",
                             }}
                         >
@@ -1003,7 +1008,7 @@ export default function AttendanceTable() {
                 </CardContent>
             </Card>
             {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
                     <Card
                         elevation={0}
@@ -1135,7 +1140,7 @@ export default function AttendanceTable() {
                         </CardContent>
                     </Card>
                 </Grid>
-            </Grid>
+            </Grid> */}
             {/* Attendance Progress */}
             {/* <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
@@ -1188,7 +1193,7 @@ export default function AttendanceTable() {
                                 </TableCell>
                                 {daysInMonth.map((day) => (
                                     <TableCell
-                                        key={day.format("D")}
+                                        key={day.format("YYYY-MM-DD")} X
                                         align="center"
                                         sx={{
                                             fontWeight: 600,
@@ -1204,10 +1209,13 @@ export default function AttendanceTable() {
                                             background: "rgb(243 248 253)",
                                         }}
                                     >
+                                        {/* Optional: Debugging */}
+                                        {/* console.log(day.toISOString()) */}
                                         {day.format("D")} <br />
                                         {day.format("ddd")}
                                     </TableCell>
                                 ))}
+
                             </TableRow>
                         </TableHead>
                         <TableBody>

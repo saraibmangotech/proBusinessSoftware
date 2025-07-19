@@ -202,44 +202,47 @@ function SalaryList() {
       alDay: parseFloat(salary?.approvedLeaveDays || 0),
     }
   }
-  const generateDefaultEmployeeData2 = (salary) => {
-    console.log(salary, 'employeeemployee')
-    return {
-      user_id: salary?.employee?.user_id,
-      id: salary?.employee?.id,
-      employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
-      employeeId: salary.employee?.employee_code,
-      salaryPaid: parseFloat(salary.basicSalary) || 0,
-      commission: parseFloat(salary?.commission),
-      housing_allowance: parseFloat(salary?.employee?.housing_allowance || 0),
-      transport_allowance: parseFloat(salary?.employee?.transport_allowance || 0),
-      other_allowance: parseFloat(salary?.employee?.other_allowance || 0),
-      salaryPackage: parseFloat(salary?.salaryPackage || 0),
-      otherAdd: 0,
-      al: 0,
-      sl: 0,
-      arrear: 0,
-      gpssaEmp: parseFloat(salary?.pension || 0),
+const generateDefaultEmployeeData2 = (salary) => {
+  console.log(salary, 'employeeemployee');
+  const toFixed3 = (val) => parseFloat((parseFloat(val || 0)).toFixed(3));
 
-      staffAdvance: 0,
-      lateComm: parseFloat(salary?.lateDeduction),
-      additional: 0,
-      salaryDeduction: 0,
-      unpaidLeave: parseFloat(salary?.absentDeduction || 0),
-      totalPay: parseFloat(salary?.netSalary) || 0,
-      commissionFinal: 0,
-      netSalary: parseFloat(salary.netSalary) || 0,
-      // Default administrative data
-      routingCode: salary?.employee?.routing,
-      salaryIban: salary?.employee?.iban,
-      workPermit: salary?.employee?.work_permit,
-      visa: salary?.employee?.visa,
-      branch: salary?.employee?.branch,
-      remark: "New Employee",
-      minutesLate: parseFloat(salary?.totalShortMinutes || 0),
-      alDay: parseFloat(salary?.approvedLeaveDays || 0),
-    }
-  }
+  return {
+    user_id: salary?.employee?.user_id,
+    id: salary?.employee?.id,
+    employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
+    employeeId: salary.employee?.employee_code,
+    salaryPaid: toFixed3(salary.basicSalary),
+    commission: toFixed3(salary?.commission),
+    housing_allowance: toFixed3(salary?.employee?.housing_allowance),
+    transport_allowance: toFixed3(salary?.employee?.transport_allowance),
+    other_allowance: toFixed3(salary?.employee?.other_allowance),
+    salaryPackage: toFixed3(salary?.salaryPackage),
+    otherAdd: 0,
+    al: 0,
+    sl: 0,
+    arrear: 0,
+    gpssaEmp: toFixed3(salary?.pension),
+
+    staffAdvance: 0,
+    lateComm: toFixed3(salary?.lateDeduction),
+    additional: 0,
+    salaryDeduction: 0,
+    unpaidLeave: toFixed3(salary?.absentDeduction),
+    totalPay: toFixed3(salary?.netSalary),
+    commissionFinal: 0,
+    netSalary: toFixed3(salary?.netSalary),
+
+    routingCode: salary?.employee?.routing,
+    salaryIban: salary?.employee?.iban,
+    workPermit: salary?.employee?.work_permit,
+    visa: salary?.employee?.visa,
+    branch: salary?.employee?.branch,
+    remark: "New Employee",
+    minutesLate: toFixed3(salary?.totalShortMinutes),
+    alDay: toFixed3(salary?.approvedLeaveDays),
+  };
+};
+
 
   // Handle employee selection change
   // const handleEmployeeSelectionChange = (event) => {

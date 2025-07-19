@@ -14,6 +14,7 @@ import ExcelJS from "exceljs"
 import SystemServices from "services/System"
 import CustomerServices from "services/Customer"
 import DatePicker from "components/DatePicker"
+import { useAuth } from "context/UseContext"
 
 // Mock data based on your API structure
 const mockData = {
@@ -155,7 +156,7 @@ function EmployeeAttendanceReport() {
     const [selectedEmployee, setSelectedEmployee] = useState(null)
     const [fromDate, setFromDate] = useState();
     const [toDate, setToDate] = useState();
-
+    const { user } = useAuth();
     const getData = async (id) => {
         try {
             const params = {
@@ -185,6 +186,16 @@ function EmployeeAttendanceReport() {
                 name: item?.user?.name,
             }))
             setEmployees(formattedData)
+            if (user?.role_id === 4) {
+
+                const findElement = formattedData?.find((item) => item?.user_id == user?.id);
+                console.log('Found Element:', findElement);
+
+
+                setSelectedEmployee(findElement)
+
+
+            }
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -597,15 +608,22 @@ function EmployeeAttendanceReport() {
         getEmployees()
 
     }, [])
-    useEffect(() => {
-        if (selectedEmployee) {
-            getData()
+  useEffect(() => {
+    if (selectedEmployee && fromDate && toDate) {
+        getData();
+    } else {
+        if (!selectedEmployee) {
+            showErrorToast('Please select an employee');
         }
-        else {
-            showErrorToast('Please Select Employee')
+        if (!fromDate) {
+            showErrorToast('Please select a "From" date');
         }
+        if (!toDate) {
+            showErrorToast('Please select a "To" date');
+        }
+    }
+}, [fromDate, toDate]);
 
-    }, [fromDate, toDate])
 
 
     return (
