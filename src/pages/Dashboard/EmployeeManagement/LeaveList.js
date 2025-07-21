@@ -455,7 +455,7 @@ function LeaveList() {
             accessorKey: "document",
             cell: ({ row }) => {
                 let { document: file, name } = row.original;
-                if (file && file.startsWith('/')) file = file.trimStart('/');
+                if (file) file = file.substring(1);
                 const extension = file?.split('.').pop().toLowerCase();
 
                 const getIcon = () => {

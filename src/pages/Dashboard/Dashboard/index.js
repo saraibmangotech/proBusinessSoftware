@@ -1197,7 +1197,10 @@ function Dashboard() {
                 const daysLeft = doc.expiry_date
                   ? moment(doc.expiry_date).diff(moment(), "days")
                   : null;
-
+              let docPath = doc.path;
+                if (docPath && docPath.startsWith("/")) {
+                  docPath = docPath.substring(1);
+                }
                 return (
                   <Grid item xs={12} sm={6} md={3} key={index}>
                     <Card sx={{ borderRadius: 2, p: 2, bgcolor: bgColor, boxShadow: "none" }}>
@@ -1256,7 +1259,7 @@ function Dashboard() {
                           width: "100%",
                         }}
                         onClick={() => {
-                          if (doc.path) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL}${doc.path}`, "_blank");
+                          if (docPath) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL}${docPath}`, "_blank");
                         }}
                         disabled={!doc.path}
                       >
