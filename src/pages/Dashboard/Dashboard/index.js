@@ -248,7 +248,7 @@ function Dashboard() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [catData, setCatData] = useState([])
   const [employeess, setEmployeess] = useState([])
-  const [currentState, setCurrentState] = useState((user?.role_id == 1000 || user?.role_id == 3) ? 'Admin' : user?.role_id == 1004 ? 'Cashier' : user?.role_id == 1003 ? 'Typist' : '')
+  const [currentState, setCurrentState] = useState((user?.role_id == 1000 || user?.role_id == 3 || user?.role_id == 1001) ? 'Admin' : user?.role_id == 1004 ? 'Cashier' : user?.role_id == 1003 ? 'Typist' : '')
   const [shift, setShift] = useState(null)
   const [employeeAttendance, setEmployeeAttendance] = useState(null)
   const pdfContent = Images?.guidelinePDF
