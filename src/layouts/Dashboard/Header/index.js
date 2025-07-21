@@ -321,22 +321,67 @@ function Header() {
             identifier: null,
             navigation: true,
             order_by: 33,
-          },
-          {
-            id: 33,
-            name: " Sale Settlement List",
-            icon: "customer",
-            parent_id: 12,
-            api: null,
-            route: "/sales-settlement-list",
-            identifier: null,
-            navigation: true,
-            order_by: 33,
-          },
+          }
+        
 
 
         ],
-      },])
+      },
+      {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+          
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+           
+          ],
+        },
+    
+    ])
     }
     else if (user?.role_id == 1003) {
       setNavigationData([
@@ -454,6 +499,59 @@ function Header() {
 
 
 
+          ],
+        },
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+          
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+           
           ],
         },
 
@@ -646,6 +744,59 @@ function Header() {
 
 
 
+          ],
+        },
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+          
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+           
           ],
         },
 
@@ -964,6 +1115,59 @@ function Header() {
 
 
 
+          ],
+        },
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+          
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+           
           ],
         },
       ]);
@@ -1860,30 +2064,20 @@ function Header() {
           navigation: true,
           order_by: 2,
           children: [
+            
             {
               id: 13,
-              name: "Employee management",
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
               api: "/api/users",
-              route: "/employee-list",
+              route: "/dashboard",
               identifier: null,
               navigation: true,
               order_by: 13,
               childRoute: [],
             },
-            {
-              id: 13,
-              name: "Employee Leaves Record",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/users",
-              route: "/employee-leaves",
-              identifier: null,
-              navigation: true,
-              order_by: 13,
-              childRoute: [],
-            },
+            
             {
               id: 13,
               name: "Leave management",
@@ -1896,39 +2090,8 @@ function Header() {
               order_by: 13,
               childRoute: [],
             },
-            {
-              id: 55,
-              name: "Holidays Management",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/holidays",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Salary Management",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/salary-list",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-             {
-              id: 55,
-              name: "Pay Slips",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/employee-pay-slips",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
+            
+          
             {
               id: 55,
               name: "Attendance Report",
@@ -1940,105 +2103,7 @@ function Header() {
               navigation: true,
               order_by: 55,
             },
-            {
-              id: 55,
-              name: "Shift Management",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/shift-management",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            }, {
-              id: 55,
-              name: "Shift Allocations",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/shift-allocations",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Salary Certificate",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/salary-certificate",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-
-            {
-              id: 55,
-              name: "Experience Certificate",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/experience-certificate",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Eos  Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/eos-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Leave  Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/leave-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Employee Status  Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/employee-status-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Document Expiry  Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/doc-expiry-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
-            {
-              id: 55,
-              name: "Employee Attendance  Report",
-              icon: "customer",
-              parent_id: 22,
-              api: null,
-              route: "/employee-attendance-report",
-              identifier: null,
-              navigation: true,
-              order_by: 55,
-            },
+           
           ],
         },
         {
@@ -3511,6 +3576,59 @@ function Header() {
               children: [],
               childRoute: [],
             },
+            {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            
+          
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+           
+          ],
+        },
 
 
           ],
