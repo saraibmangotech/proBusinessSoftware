@@ -79,6 +79,13 @@ const getStatusStyles = (status) => {
                 border: "1px solid #ef5350",
                 color: "#c62828",
             };
+        case "Pending":
+            return {
+                bg: "#fffde7",               // Light yellow background
+                border: "1px solid #ffeb3b", // Bright yellow border
+                color: "#fbc02d",            // Darker yellow text for better contrast
+            };
+
         default: {
             return {
                 bg: "rgba(158, 126, 255, 0.15)", // light purple background
@@ -130,12 +137,16 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
             {daysInMonth.map((day) => {
                 const dateStr = day.format("YYYY-MM-DD");
                 const isSunday = day.day() === 0;
+                console.log(employee.attendance[0], 'asdasd');
 
                 const dayAttendance = employee.attendance.find((att) => att.date === dateStr);
                 const status = dayAttendance?.status || "A";
                 const duration = dayAttendance?.duration || "0h 0m";
                 const logs = dayAttendance?.logs?.[0] || {};
-                const { bg, border, color } = getStatusStyles(status);
+                const shift = dayAttendance?.shift_time
+                console.log(dayAttendance, 'shiftshift');
+
+                const { bg, border, color } = (logs.check_in && !logs.check_out) ? getStatusStyles('Pending') : getStatusStyles(status);
 
                 return (
                     <TableCell
@@ -150,8 +161,8 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                         <Tooltip title={`Duration: ${duration}`} arrow placement="top">
                             <Box
                                 sx={{
-                                    width: 120,
-                                    height: 100,
+                                    width: 140,
+                                    height: 140,
                                     py: 1,
                                     px: 1.5,
                                     borderRadius: "5px",
@@ -185,6 +196,15 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                                         <Box sx={{ fontSize: "0.7rem" }}>
                                             Out: {logs.check_out ? formatMinutesToTime(logs.check_out) : "--:--"}
                                         </Box>
+
+                                    </>
+                                )}
+                                {status === "Present" && (
+                                    <>
+                                        <Box sx={{ fontSize: "0.7rem" }}>
+                                            Shift: {shift}
+                                        </Box>
+
 
                                     </>
                                 )}
@@ -341,10 +361,24 @@ export default function AttendanceTable() {
                 const dateStr = day.format("YYYY-MM-DD")
                 const att = employee.attendance.find((a) => a.date === dateStr)
                 if (att) {
-                    rowData.push(att.status === "Present" ? att.duration || "Present" : att.status)
-                    if (att.status === "Present") totalPresentDays++
-                    else totalAbsentDays++
-                } else {
+                    if (att.status === "Present") {
+                        console.log(att, 'att');
+
+                        const checkIn = att?.logs[0]?.check_in ? formatMinutesToTime(att?.logs[0]?.check_in) : "N/A";
+                        const checkOut = att?.logs[att?.logs?.length - 1]?.check_out ? formatMinutesToTime(att?.logs[att?.logs?.length - 1]?.check_out) : "N/A";
+
+                        const shiftTime = (att?.shift_time);
+
+
+
+                        rowData.push(`✔ ${att.duration || "Present"} | In: ${checkIn} | Out: ${checkOut} | Shift: ${shiftTime}`);
+                        totalPresentDays++;
+                    } else {
+                        rowData.push(att.status); // e.g., "Absent", "Leave"
+                        totalAbsentDays++;
+                    }
+                }
+                else {
                     rowData.push("A")
                     totalAbsentDays++
                 }
@@ -454,6 +488,7 @@ export default function AttendanceTable() {
                         date: day.date,
                         status: day.logs ? "Present" : day.status,
                         logs: day?.logs,
+                        shift_time: day.shift_time,
                         duration: day.totalDuration,
                     })) || [],
             }))

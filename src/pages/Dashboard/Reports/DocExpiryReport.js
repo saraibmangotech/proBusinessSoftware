@@ -24,188 +24,7 @@ import { useAuth } from "context/UseContext"
 
 // Dummy data for Document Expiry Report
 const documentExpiryData = [
-    {
-        id: 1,
-        employee_id: "EMP001",
-        employee_name: "Ahmed Hassan",
-        department: "Engineering",
-        designation: "Senior Developer",
-        document_type: "Passport",
-        document_number: "A1234567",
-        issue_date: "2019-05-15",
-        expiry_date: "2025-05-15",
-        days_until_expiry: 153,
-        status: "Active",
-        nationality: "UAE",
-    },
-    {
-        id: 2,
-        employee_id: "EMP001",
-        employee_name: "Ahmed Hassan",
-        department: "Engineering",
-        designation: "Senior Developer",
-        document_type: "Visa",
-        document_number: "V7891234",
-        issue_date: "2024-01-10",
-        expiry_date: "2025-01-10",
-        days_until_expiry: 13,
-        status: "Expiring Soon",
-        nationality: "UAE",
-    },
-    {
-        id: 3,
-        employee_id: "EMP002",
-        employee_name: "Sarah Johnson",
-        department: "Marketing",
-        designation: "Marketing Manager",
-        document_type: "Emirates ID",
-        document_number: "784-1985-1234567-8",
-        issue_date: "2020-03-20",
-        expiry_date: "2024-12-15",
-        days_until_expiry: -13,
-        status: "Expired",
-        nationality: "USA",
-    },
-    {
-        id: 4,
-        employee_id: "EMP002",
-        employee_name: "Sarah Johnson",
-        department: "Marketing",
-        designation: "Marketing Manager",
-        document_type: "Driving License",
-        document_number: "DL789456123",
-        issue_date: "2022-06-10",
-        expiry_date: "2025-06-10",
-        days_until_expiry: 183,
-        status: "Active",
-        nationality: "USA",
-    },
-    {
-        id: 5,
-        employee_id: "EMP003",
-        employee_name: "Mohammed Ali",
-        department: "Finance",
-        designation: "Finance Executive",
-        document_type: "Passport",
-        document_number: "B9876543",
-        issue_date: "2020-08-12",
-        expiry_date: "2025-08-12",
-        days_until_expiry: 237,
-        status: "Active",
-        nationality: "Egypt",
-    },
-    {
-        id: 6,
-        employee_id: "EMP003",
-        employee_name: "Mohammed Ali",
-        department: "Finance",
-        designation: "Finance Executive",
-        document_type: "Work Permit",
-        document_number: "WP456789123",
-        issue_date: "2023-11-01",
-        expiry_date: "2025-01-15",
-        days_until_expiry: 18,
-        status: "Expiring Soon",
-        nationality: "Egypt",
-    },
-    {
-        id: 7,
-        employee_id: "EMP004",
-        employee_name: "Lisa Chen",
-        department: "HR",
-        designation: "HR Specialist",
-        document_type: "Visa",
-        document_number: "V1122334",
-        issue_date: "2023-09-05",
-        expiry_date: "2024-12-20",
-        days_until_expiry: -8,
-        status: "Expired",
-        nationality: "China",
-    },
-    {
-        id: 8,
-        employee_id: "EMP004",
-        employee_name: "Lisa Chen",
-        department: "HR",
-        designation: "HR Specialist",
-        document_type: "Emirates ID",
-        document_number: "784-1990-9876543-2",
-        issue_date: "2021-04-15",
-        expiry_date: "2025-04-15",
-        days_until_expiry: 138,
-        status: "Active",
-        nationality: "China",
-    },
-    {
-        id: 9,
-        employee_id: "EMP005",
-        employee_name: "Omar Abdullah",
-        department: "Operations",
-        designation: "Operations Manager",
-        document_type: "Passport",
-        document_number: "C5544332",
-        issue_date: "2019-12-01",
-        expiry_date: "2025-12-01",
-        days_until_expiry: 348,
-        status: "Active",
-        nationality: "Jordan",
-    },
-    {
-        id: 10,
-        employee_id: "EMP005",
-        employee_name: "Omar Abdullah",
-        department: "Operations",
-        designation: "Operations Manager",
-        document_type: "Medical Certificate",
-        document_number: "MC789123456",
-        issue_date: "2024-06-15",
-        expiry_date: "2025-01-05",
-        days_until_expiry: 8,
-        status: "Expiring Soon",
-        nationality: "Jordan",
-    },
-    {
-        id: 11,
-        employee_id: "EMP006",
-        employee_name: "Jennifer Smith",
-        department: "Sales",
-        designation: "Sales Executive",
-        document_type: "Driving License",
-        document_number: "DL456123789",
-        issue_date: "2021-02-14",
-        expiry_date: "2024-11-30",
-        days_until_expiry: -28,
-        status: "Expired",
-        nationality: "UK",
-    },
-    {
-        id: 12,
-        employee_id: "EMP007",
-        employee_name: "Rajesh Kumar",
-        department: "IT",
-        designation: "System Administrator",
-        document_type: "Visa",
-        document_number: "V9988776",
-        issue_date: "2024-08-12",
-        expiry_date: "2025-02-12",
-        days_until_expiry: 56,
-        status: "Active",
-        nationality: "India",
-    },
-    {
-        id: 13,
-        employee_id: "EMP008",
-        employee_name: "Fatima Al-Zahra",
-        department: "Legal",
-        designation: "Legal Advisor",
-        document_type: "Professional License",
-        document_number: "PL123456789",
-        issue_date: "2023-11-30",
-        expiry_date: "2025-01-20",
-        days_until_expiry: 23,
-        status: "Expiring Soon",
-        nationality: "Lebanon",
-    },
+   
 ]
 
 function DocumentExpiryReport() {
@@ -227,7 +46,7 @@ function DocumentExpiryReport() {
         // setLoader(true)
         try {
             let params = {
-                employee_id: id ? id :user?.role_id == 4 ? user?.id :'',
+                employee_id: id ? id : selectedEmployee?.user_id ,
             }
 
             const { data } = await SystemServices.getDocExpiryReport(params);
@@ -262,7 +81,19 @@ function DocumentExpiryReport() {
                 name: item?.user?.name,
             }));
 
+            if (user?.role_id != 6) {
+                console.log(formattedData);
+                console.log(user?.id);
 
+
+                const findElement = formattedData?.find((item) => item?.user_id == user?.id);
+                console.log('Found Element:', findElement);
+
+
+                setSelectedEmployee(findElement)
+
+
+            }
             setEmployees(formattedData);
 
         } catch (error) {
@@ -315,267 +146,268 @@ function DocumentExpiryReport() {
 
     // Handle Excel Export
     // Handle Excel Export - matching table columns exactly
- const handleExcelExport = async () => {
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet("Document Expiry Report")
+    const handleExcelExport = async () => {
+        const workbook = new ExcelJS.Workbook()
+        const worksheet = workbook.addWorksheet("Document Expiry Report")
 
-    // Set professional header and footer
-    worksheet.headerFooter.oddHeader =
-      '&C&"Arial,Bold"&18DOCUMENT EXPIRY REPORT\n' +
-      '&C&"Arial,Regular"&12Your Company Name\n' +
-      '&C&"Arial,Regular"&10Period: &D - &T\n' +
-      '&L&"Arial,Regular"&8Generated on: ' +
-      new Date().toLocaleDateString() +
-      "\n" +
-      '&R&"Arial,Regular"&8Page &P of &N'
+        // Set professional header and footer
+        worksheet.headerFooter.oddHeader =
+            '&C&"Arial,Bold"&18DOCUMENT EXPIRY REPORT\n' +
+            '&C&"Arial,Regular"&12Your Company Name\n' +
+            '&C&"Arial,Regular"&10Period: &D - &T\n' +
+            '&L&"Arial,Regular"&8Generated on: ' +
+            new Date().toLocaleDateString() +
+            "\n" +
+            '&R&"Arial,Regular"&8Page &P of &N'
 
-    worksheet.headerFooter.oddFooter =
-      '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
-      '&C&"Arial,Regular"&8This report contains employee data as of ' +
-      new Date().toLocaleDateString() +
-      '&R&"Arial,Regular"&8Generated by: HR Department\n' +
-      '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+        worksheet.headerFooter.oddFooter =
+            '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+            '&C&"Arial,Regular"&8This report contains employee data as of ' +
+            new Date().toLocaleDateString() +
+            '&R&"Arial,Regular"&8Generated by: HR Department\n' +
+            '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
 
-    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
 
-    // Set page setup for professional printing
-    worksheet.pageSetup = {
-      paperSize: 9, // A4
-      orientation: "landscape",
-      fitToPage: true,
-      fitToWidth: 1,
-      fitToHeight: 0,
-      margins: {
-        left: 0.7,
-        right: 0.7,
-        top: 1.0,
-        bottom: 1.0,
-        header: 0.3,
-        footer: 0.3,
-      },
-    }
-
-    // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["DOCUMENT EXPIRY REPORT"])
-    titleRow.getCell(1).font = {
-      name: "Arial",
-      size: 16,
-      bold: true,
-      color: { argb: "2F4F4F" },
-    }
-    titleRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A1:H1")
-
-    // Dynamic company name based on environment
-    const name =
-      process.env.NEXT_PUBLIC_TYPE === "TASHEEL"
-        ? "PREMIUM BUSINESSMEN SERVICES"
-        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-
-    const companyRow = worksheet.addRow([name])
-    companyRow.getCell(1).font = {
-      name: "Arial",
-      size: 14,
-      bold: true,
-      color: { argb: "4472C4" },
-    }
-    companyRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A2:H2")
-
-    const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })} at ${new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      })}`,
-    ])
-    dateRow.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    dateRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A3:H3")
-
-    // Add empty row for spacing
-    worksheet.addRow([])
-
-    // Headers matching the table columns exactly
-    const headers = [
-      "Employee ID",
-      "Employee Name",
-      "Department",
-      "Document Type",
-      "Document Number",
-      "Issue Date",
-      "Expiry Date",
-      "Days Until Expiry",
-    ]
-
-    const headerRow = worksheet.addRow(headers)
-    headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "808080" }, // Gray
-      }
-      cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
-      cell.alignment = { horizontal: "center", vertical: "middle" }
-      cell.border = {
-        top: { style: "thin", color: { argb: "000000" } },
-        left: { style: "thin", color: { argb: "000000" } },
-        bottom: { style: "thin", color: { argb: "000000" } },
-        right: { style: "thin", color: { argb: "000000" } },
-      }
-    })
-
-    // Add all documents with data matching table columns
-    filteredData?.forEach((doc) => {
-      const daysUntilExpiry = Math.floor((new Date(doc.expiry_date) - new Date()) / (1000 * 60 * 60 * 24))
-
-      const row = worksheet.addRow([
-        doc.employee?.employee_code,
-        doc.employee?.first_name,
-        doc.employee?.department,
-        doc.name,
-        doc.reference_id,
-        new Date(doc.updatedAt).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }),
-        new Date(doc.expiry_date).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }),
-        daysUntilExpiry < 0 ? `${Math.abs(daysUntilExpiry)} days ago` : `${daysUntilExpiry} days`,
-      ])
-
-      // Add borders to all cells
-      row.eachCell((cell) => {
-        cell.border = {
-          top: { style: "thin", color: { argb: "000000" } },
-          left: { style: "thin", color: { argb: "000000" } },
-          bottom: { style: "thin", color: { argb: "000000" } },
-          right: { style: "thin", color: { argb: "000000" } },
+        // Set page setup for professional printing
+        worksheet.pageSetup = {
+            paperSize: 9, // A4
+            orientation: "landscape",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: {
+                left: 0.7,
+                right: 0.7,
+                top: 1.0,
+                bottom: 1.0,
+                header: 0.3,
+                footer: 0.3,
+            },
         }
-        cell.alignment = { horizontal: "center", vertical: "middle" }
-      })
 
-      // Color code expiry date based on days until expiry
-      const expiryDateCell = row.getCell(7)
-      const daysCell = row.getCell(8)
-
-      if (daysUntilExpiry < 0) {
-        // Expired - Red
-        expiryDateCell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "F44336" },
+        // Add title section at the top of the worksheet
+        const titleRow = worksheet.addRow(["DOCUMENT EXPIRY REPORT"])
+        titleRow.getCell(1).font = {
+            name: "Arial",
+            size: 16,
+            bold: true,
+            color: { argb: "2F4F4F" },
         }
-        expiryDateCell.font = { color: { argb: "FFFFFF" }, bold: true }
-        daysCell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "F44336" },
+        titleRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A1:H1")
+
+        // Dynamic company name based on environment
+        const name =
+            process.env.NEXT_PUBLIC_TYPE === "TASHEEL"
+                ? "PREMIUM BUSINESSMEN SERVICES"
+                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+
+        const companyRow = worksheet.addRow([name])
+        companyRow.getCell(1).font = {
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "4472C4" },
         }
-        daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
-      } else if (daysUntilExpiry <= 30) {
-        // Expiring Soon - Orange
-        expiryDateCell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FF9800" },
+        companyRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A2:H2")
+
+        const dateRow = worksheet.addRow([
+            `Report Generated: ${new Date().toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            })} at ${new Date().toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            })}`,
+        ])
+        dateRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
         }
-        expiryDateCell.font = { color: { argb: "FFFFFF" }, bold: true }
-        daysCell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FF9800" },
-        }
-        daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
-      } else {
-        // Active - Green
-        daysCell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "4CAF50" },
-        }
-        daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
-      }
-    })
+        dateRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A3:H3")
 
-    // Set column widths
-    worksheet.columns = [
-      { width: 12 }, // Employee ID
-      { width: 25 }, // Employee Name
-      { width: 15 }, // Department
-      { width: 20 }, // Document Type
-      { width: 20 }, // Document Number
-      { width: 15 }, // Issue Date
-      { width: 15 }, // Expiry Date
-      { width: 18 }, // Days Until Expiry
-    ]
+        // Add empty row for spacing
+        worksheet.addRow([])
 
-    // Add empty rows for spacing before footer
-    worksheet.addRow([])
-    worksheet.addRow([])
+        // Headers matching the table columns exactly
+        const headers = [
+            "Employee ID",
+            "Employee Name",
+            "Department",
+            "Document Type",
+            "Document Number",
+            "Issue Date",
+            "Expiry Date",
+            "Days Until Expiry",
+        ]
 
-    // Add the electronic generated report text with black border
-    const reportRow = worksheet.addRow(["This is electronically generated report"])
-    reportRow.getCell(1).font = {
-      name: "Arial",
-      size: 12,
-      bold: false,
-      color: { argb: "000000" },
-    }
-    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
-    reportRow.getCell(1).border = {
-      top: { style: "medium", color: { argb: "000000" } },
-      left: { style: "medium", color: { argb: "000000" } },
-      bottom: { style: "medium", color: { argb: "000000" } },
-      right: { style: "medium", color: { argb: "000000" } },
-    }
-    worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
-
-    // Add empty row for spacing
-    worksheet.addRow([])
-
-    const system2 = worksheet.addRow(["Powered By: MangotechDevs.ae"])
-    system2.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    system2.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells(`A${system2.number}:H${system2.number}`)
-
-    // Add empty row for spacing
-    worksheet.addRow([])
-
-    const buffer = await workbook.xlsx.writeBuffer()
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    })
-    saveAs(
-      blob,
-      `Document_Expiry_Report_${new Date()
-        .toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
+        const headerRow = worksheet.addRow(headers)
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "808080" }, // Gray
+            }
+            cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+            cell.alignment = { horizontal: "center", vertical: "middle" }
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
         })
-        .replace(/\//g, "-")}.xlsx`,
-    )
-  }
+
+        // Add all documents with data matching table columns
+        filteredData?.forEach((doc) => {
+            const daysUntilExpiry = Math.floor((new Date(doc.expiry_date) - new Date()) / (1000 * 60 * 60 * 24))
+
+            const row = worksheet.addRow([
+                doc.employee?.employee_code,
+                doc.employee?.first_name,
+                doc.employee?.department,
+                doc.name,
+                doc.reference_id,
+                new Date(doc.updatedAt).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                }),
+                new Date(doc.expiry_date).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                }),
+                daysUntilExpiry < 0 ? `${Math.abs(daysUntilExpiry)} days ago` : `${daysUntilExpiry} days`,
+            ])
+
+            // Add borders to all cells
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: { style: "thin", color: { argb: "000000" } },
+                    left: { style: "thin", color: { argb: "000000" } },
+                    bottom: { style: "thin", color: { argb: "000000" } },
+                    right: { style: "thin", color: { argb: "000000" } },
+                }
+                cell.alignment = { horizontal: "center", vertical: "middle" }
+            })
+
+            // Color code expiry date based on days until expiry
+            const expiryDateCell = row.getCell(7)
+            const daysCell = row.getCell(8)
+
+            if (daysUntilExpiry < 0) {
+                // Expired - Red
+                expiryDateCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "F44336" },
+                }
+                expiryDateCell.font = { color: { argb: "FFFFFF" }, bold: true }
+                daysCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "F44336" },
+                }
+                daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
+            } else if (daysUntilExpiry <= 30) {
+                // Expiring Soon - Orange
+                expiryDateCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FF9800" },
+                }
+                expiryDateCell.font = { color: { argb: "FFFFFF" }, bold: true }
+                daysCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FF9800" },
+                }
+                daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
+            } else {
+                // Active - Green
+                daysCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "4CAF50" },
+                }
+                daysCell.font = { color: { argb: "FFFFFF" }, bold: true }
+            }
+        })
+
+        // Set column widths
+        worksheet.columns = [
+            { width: 12 }, // Employee ID
+            { width: 25 }, // Employee Name
+            { width: 15 }, // Department
+            { width: 20 }, // Document Type
+            { width: 20 }, // Document Number
+            { width: 15 }, // Issue Date
+            { width: 15 }, // Expiry Date
+            { width: 18 }, // Days Until Expiry
+        ]
+
+        // Add empty rows for spacing before footer
+        worksheet.addRow([])
+        worksheet.addRow([])
+
+        // Add the electronic generated report text with black border
+        const reportRow = worksheet.addRow(["This is electronically generated report"])
+        reportRow.getCell(1).font = {
+            name: "Arial",
+            size: 12,
+            bold: false,
+            color: { argb: "000000" },
+        }
+        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+        reportRow.getCell(1).border = {
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+        }
+        worksheet.mergeCells(`A${reportRow.number}:H${reportRow.number}`)
+
+        // Add empty row for spacing
+        worksheet.addRow([])
+
+        const system2 = worksheet.addRow(["Powered By: MangotechDevs.ae"])
+        system2.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        }
+        system2.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells(`A${system2.number}:H${system2.number}`)
+
+        // Add empty row for spacing
+        worksheet.addRow([])
+
+        const buffer = await workbook.xlsx.writeBuffer()
+        const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        })
+        saveAs(
+            blob,
+            `Document_Expiry_Report_${new Date()
+                .toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                })
+                .replace(/\//g, "-")}.xlsx`,
+        )
+    }
+
 
 
     // Get status chip color and icon
@@ -689,7 +521,13 @@ function DocumentExpiryReport() {
 
     useEffect(() => {
         getEmployees()
-        getData()
+        if (user?.role_id != 6) {
+           getData(user?.id)
+        }
+        else{
+             getData()
+        }
+
     }, [])
 
 
@@ -800,7 +638,7 @@ function DocumentExpiryReport() {
             )}
 
             {/* Filters */}
-            {user?.role_id != 4 && <Box
+            {user?.role_id == 6 && <Box
                 sx={{
                     p: 2,
                     bgcolor: "#f8f9fa",
@@ -815,11 +653,11 @@ function DocumentExpiryReport() {
                         <SelectField size="small"
                             label="Select Employee "
                             options={employees}
-
+                            disabled={user?.role_id != 6}
                             selected={selectedEmployee}
                             onSelect={(value) => {
                                 console.log(value);
-                                getData(value?.id)
+                                getData(value?.user_id)
                                 setSelectedEmployee(value)
                             }}
 

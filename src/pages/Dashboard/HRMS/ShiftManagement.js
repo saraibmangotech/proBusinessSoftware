@@ -397,7 +397,7 @@ const ShiftManagement = () => {
                                     >
                                         Assign
                                     </Button>
-                                    <Button
+                                    {/* <Button
                                         variant="outlined"
                                         size="small"
                                         sx={{
@@ -407,7 +407,7 @@ const ShiftManagement = () => {
                                         }}
                                     >
                                         <EditIcon sx={{ fontSize: 16 }} />
-                                    </Button>
+                                    </Button> */}
                                 </Box>
                             </CardContent>
                         </Card>
@@ -594,7 +594,7 @@ const ShiftManagement = () => {
                             <Box mt={2}>
                                 <DatePicker
                                     label={"From Date"}
-                                    disableFuture={true}
+                                 
                                     size="small"
                                     value={fromDate}
                                     onChange={(date) => setFromDate(new Date(date))}
@@ -604,7 +604,7 @@ const ShiftManagement = () => {
                                 <DatePicker
                                     label={"To Date"}
 
-                                    disableFuture={true}
+                                    
                                     size="small"
                                     value={toDate}
                                     onChange={(date) => setToDate(new Date(date))}

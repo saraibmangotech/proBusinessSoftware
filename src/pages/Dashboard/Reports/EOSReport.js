@@ -327,7 +327,7 @@ const downloadExcel = async () => {
     "Last Basic Salary (AED)",
     "Total Salary (AED)",
     "Gratuity Amount (AED)",
-    "Status",
+   
   ]
 
   const headerRow = worksheet.addRow(headers)
@@ -376,7 +376,7 @@ const downloadExcel = async () => {
       employee.last_basic_salary,
       employee.total_salary,
       employee.gratuity_amount,
-      employee.status,
+   
     ])
 
     // Format numerical columns
@@ -628,21 +628,7 @@ const downloadExcel = async () => {
         <Box sx={{ fontWeight: "bold", color: "#2e7d32" }}>AED {row.original.gratuity_amount.toLocaleString()}</Box>
       ),
     },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: ({ row }) => (
-        <Chip
-          label={row.original.status}
-          size="small"
-          sx={{
-            backgroundColor: getStatusColor(row.original.status),
-            color: "white",
-            fontWeight: "bold",
-          }}
-        />
-      ),
-    },
+
   ]
 
   // Calculate totals

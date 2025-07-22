@@ -8,6 +8,7 @@ import {
     Tooltip,
     Checkbox,
     InputAdornment,
+    TextField,
 } from '@mui/material';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
@@ -42,7 +43,10 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import { useAuth } from 'context/UseContext';
-import DatePicker from 'components/DatePicker';
+
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -181,8 +185,10 @@ function EmployeePaySlips() {
 
     const getCustomerQueue = async (page, limit, filter) => {
         setLoader(true)
-        const month = moment(selectMonth).format("MM"); // e.g., "May"
-        const year = moment(selectMonth).format("YYYY");  // e.g., "2017"
+        console.log(selectMonth,'selectMonth');
+        
+        const month = selectMonth ?  moment(new Date(selectMonth)).format("MM") : null; // e.g., "May"
+        const year = selectMonth ? moment(new Date(selectMonth)).format("YYYY") : null;  // e.g., "2017"
         console.log(month, year);
 
 
@@ -435,7 +441,7 @@ function EmployeePaySlips() {
 
     useEffect(() => {
         getUsers()
-        getCustomerQueue()
+     
     }, []);
 
     return (
@@ -516,7 +522,7 @@ function EmployeePaySlips() {
             </Box>
             <Grid container spacing={1} justifyContent={"space-between"} alignItems={"center"}>
                 <Grid item xs={12}>
-                    <Grid container spacing={1}>
+                    <Grid container spacing={1} display={'flex'} alignItems={'center'}>
 
                         <Grid item xs={2.5}>
                             <SelectField
@@ -546,18 +552,49 @@ function EmployeePaySlips() {
                             />
                         </Grid>
                         <Grid item xs={2.5}>
-                            <DatePicker
-                                label={'Select Month'}
-                                openTo="month"
-                                views={['month', 'year']}
-                                height={'40px'}
-                                value={selectMonth}
-                                onChange={(date) => handleSelectMonth(date)}
-                            />
+                            <Box>
+                                <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Select Month & Year </InputLabel>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+
+                                        views={['year', 'month']}
+                                        slotProps={{ textField: { size: "small", fullWidth: true, sx:{"& fieldset":{border:"1px solid black", borderRadius:"12px"}} } }}
+                                        minDate={dayjs('2000-01-01')}
+                                        maxDate={dayjs('2100-12-31')}
+                                        value={selectMonth}
+                                        onChange={(newValue) => {
+                                            setSelectMonth(newValue);
+                                            console.log(newValue, 'newValuenewValue');
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                fullWidth
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: 'black',
+                                                        },
+                                                        '&:hover fieldset': {
+                                                            borderColor: 'black',
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: 'black',
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </LocalizationProvider>
+                                <Box sx={{ height: "16px" }} />
+                            </Box>
+
                         </Grid>
 
 
-                        <Grid item xs={1} sx={{ marginTop: "30px" }}>
+                        <Grid item xs={1} sx={{ marginTop: "10px" }}>
                             <PrimaryButton
                                 bgcolor={"#001f3f"}
                                 icon={<SearchIcon />}

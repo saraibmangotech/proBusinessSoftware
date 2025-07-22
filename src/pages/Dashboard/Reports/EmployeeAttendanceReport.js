@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Box, Typography, Grid, Chip } from "@mui/material"
 import { Download as DownloadIcon } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
@@ -326,6 +326,7 @@ function EmployeeAttendanceReport() {
             "Check In",
             "Check Out",
             "Worked Hours",
+            "Shift",
             "Short Hours",
             "Excess Hours",
             "Worked Time",
@@ -361,6 +362,7 @@ function EmployeeAttendanceReport() {
                 day.check_in || "N/A",
                 day.check_out || "N/A",
                 day.worked_hours || 0,
+                formatMinutesToTime(day?.shift?.start_time) +' - ' +  formatMinutesToTime(day?.shift?.end_time),
                 day.short_hours || 0,
                 day.excess_hours || 0,
                 day.worked_time || "N/A",
@@ -499,6 +501,15 @@ function EmployeeAttendanceReport() {
         if (day.onLeave) return "#ff9800"
         return "#9e9e9e"
     }
+    const formatMinutesToTime = (minutesStr) => {
+        console.log(minutesStr, 'minutesStrminutesStr');
+
+        const totalMinutes = parseInt(parseFloat(minutesStr), 10);
+        console.log(totalMinutes,'totalMinutestotalMinutes');
+        
+        return moment().startOf("day").add(totalMinutes, "minutes").format("hh:mm A");
+    };
+
 
     const getDayTypeColor = (day) => {
         if (day.isWeekend) return "#9e9e9e"
@@ -575,6 +586,21 @@ function EmployeeAttendanceReport() {
             ),
         },
         {
+            header: "Shift",
+            accessorKey: "shift",
+            cell: ({ row }) => {
+                const startTime = moment().startOf("day").add(row?.original?.shift?.start_time || 0, "minutes");
+                const endTime = moment().startOf("day").add(row?.original?.shift?.end_time || 0, "minutes");
+                console.log(row?.original?.shift, 'shift');
+
+                return (
+                    <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
+                        {formatMinutesToTime(row?.original?.shift?.start_time) +' - ' +  formatMinutesToTime(row?.original?.shift?.end_time)}
+                    </Box>
+                );
+            }
+        },
+        {
             header: "Worked Hours",
             accessorKey: "worked_hours",
             cell: ({ row }) => <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>{row.original.worked_hours || 0}h</Box>,
@@ -608,22 +634,28 @@ function EmployeeAttendanceReport() {
         getEmployees()
 
     }, [])
-  useEffect(() => {
-    if (selectedEmployee && fromDate && toDate) {
-        getData();
-    } else {
-        if (!selectedEmployee) {
-            showErrorToast('Please select an employee');
-        }
-        if (!fromDate) {
-            showErrorToast('Please select a "From" date');
-        }
-        if (!toDate) {
-            showErrorToast('Please select a "To" date');
-        }
-    }
-}, [fromDate, toDate]);
+    const isFirstRun = useRef(true);
 
+    useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            return; // Skip the first run
+        }
+
+        if (selectedEmployee && fromDate && toDate) {
+            getData();
+        } else {
+            if (!selectedEmployee) {
+                showErrorToast('Please select an employee');
+            }
+            if (!fromDate) {
+                showErrorToast('Please select a "From" date');
+            }
+            if (!toDate) {
+                showErrorToast('Please select a "To" date');
+            }
+        }
+    }, [fromDate, toDate]);
 
 
     return (

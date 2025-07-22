@@ -127,7 +127,7 @@ function SalariesList() {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [inputError, setInputError] = useState(false)
-    const [selectedMonth, setSelectedMonth] = useState(dayjs());
+    const [selectedMonth, setSelectedMonth] = useState(dayjs().subtract(1, "month"));
 
 
     const { user } = useAuth()
@@ -216,13 +216,13 @@ function SalariesList() {
 
     const getCustomerQueue = async (date) => {
         setLoader(true)
-        console.log(date, 'selectedMonth');
+        console.log(selectedMonth, 'selectedMonth');
 
 
         try {
 
             let params = {
-                month: date ? moment(date).month() + 1 : moment().month() + 1,
+                month: date ? moment(date).month() + 1 :  moment(selectedMonth).month() ,
                 year: date ? moment(date).year() : moment().year(),
                 limit: 999999,
 
@@ -253,10 +253,12 @@ function SalariesList() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
-    useEffect(() => {
-        getCustomerQueue()
-    }, [])
+  useEffect(() => {
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
+  getCustomerQueue(oneMonthAgo);
+}, []);
 
     // *For Handle Filter
 
@@ -585,7 +587,7 @@ function SalariesList() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Salary List</Typography>
-                {user?.role_id != 1003 && <PrimaryButton
+                {user?.role_id == 6 && <PrimaryButton
                     bgcolor={'#001f3f'}
                     title="Create "
                     onClick={() => { navigate('/create-payroll'); localStorage.setItem("currentUrl", '/create-customer') }}

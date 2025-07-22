@@ -911,7 +911,7 @@ function LeaveList() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Leave List</Typography>
-                {user?.role_id != 1003 && <PrimaryButton
+                {true && <PrimaryButton
                     bgcolor={'#001f3f'}
                     title="Create "
                     onClick={() => { navigate('/create-leave'); localStorage.setItem("currentUrl", '/create-customer') }}
