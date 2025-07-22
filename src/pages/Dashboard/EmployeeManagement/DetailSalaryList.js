@@ -39,7 +39,8 @@ import dayjs from "dayjs"
 import moment from "moment"
 import { PrimaryButton } from "components/Buttons"
 import UserServices from "services/User"
-
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 // *For Table Style
 const Cell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -119,40 +120,40 @@ function DetailSalaryList() {
 
 
     // Updated column configuration with action column
-  const columnConfig = [
-    { key: "employeeName", header: "Employee Name", type: "auto" },
-    { key: "employeeId", header: "Employee ID", type: "auto" },
-    { key: "salaryPaid", header: "Salary Basic", type: "auto" },
-    { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
-    { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
-    { key: "other_allowance", header: "Others", type: "auto" },
-    { key: "salaryPackage", header: "Salary Package", type: "auto" },
-    { key: "commission", header: "Commission", type: "auto" },
-    { key: "otherAdd", header: "Other Add", type: "auto" },
-    { key: "al", header: "AL/SL", type: "auto" },
+    const columnConfig = [
+        { key: "employeeName", header: "Employee Name", type: "auto" },
+        { key: "employeeId", header: "Employee ID", type: "auto" },
+        { key: "salaryPaid", header: "Salary Basic", type: "auto" },
+        { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
+        { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
+        { key: "other_allowance", header: "Others", type: "auto" },
+        { key: "salaryPackage", header: "Salary Package", type: "auto" },
+        { key: "commission", header: "Commission", type: "auto" },
+        { key: "otherAdd", header: "Other Add", type: "auto" },
+        { key: "al", header: "AL/SL", type: "auto" },
 
-    { key: "arrear", header: "Airfare", type: "auto" },
-    { key: "gpssaEmp", header: "GPSSA", type: "auto", isGpssa: true },
+        { key: "arrear", header: "Airfare", type: "auto" },
+        { key: "gpssaEmp", header: "GPSSA", type: "auto", isGpssa: true },
 
-    { key: "staffAdvance", header: "Staff Advance", type: "auto" },
-    { key: "lateComm", header: "Late Coming", type: "auto" },
-    { key: "additional", header: "Additional", type: "auto" },
-    { key: "salaryDeduction", header: "Salary Deduction", type: "auto" },
-    { key: "unpaidLeave", header: "Unpaid Deduction", type: "auto" },
-    { key: "totalPay", header: "Total pay", type: "auto" },
-    { key: "commissionFinal", header: "Commission Return", type: "auto" },
-    { key: "netSalary", header: "Net Salary", type: "auto" },
-    // New administrative columns - all auto
-    { key: "routingCode", header: "ROUTING CODE", type: "auto" },
-    { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
-    { key: "workPermit", header: "WORK PERMIT", type: "auto" },
-    { key: "visa", header: "Visa", type: "auto" },
-    { key: "branch", header: "BRANCH", type: "auto" },
+        { key: "staffAdvance", header: "Staff Advance", type: "auto" },
+        { key: "lateComm", header: "Late Coming", type: "auto" },
+        { key: "additional", header: "Additional", type: "auto" },
+        { key: "salaryDeduction", header: "Salary Deduction", type: "auto" },
+        { key: "unpaidLeave", header: "Unpaid Deduction", type: "auto" },
+        { key: "totalPay", header: "Total pay", type: "auto" },
+        { key: "commissionFinal", header: "Commission Return", type: "auto" },
+        { key: "netSalary", header: "Net Salary", type: "auto" },
+        // New administrative columns - all auto
+        { key: "routingCode", header: "ROUTING CODE", type: "auto" },
+        { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
+        { key: "workPermit", header: "WORK PERMIT", type: "auto" },
+        { key: "visa", header: "Visa", type: "auto" },
+        { key: "branch", header: "BRANCH", type: "auto" },
 
-    { key: "minutesLate", header: "Minutes Late", type: "auto" },
-    { key: "alDay", header: "AL Day", type: "auto" },
-    // { key: "actions", header: "Actions", type: "action" },
-  ]
+        { key: "minutesLate", header: "Minutes Late", type: "auto" },
+        { key: "alDay", header: "AL Day", type: "auto" },
+        // { key: "actions", header: "Actions", type: "action" },
+    ]
 
     // Start with empty table
     const [data, setData] = useState([])
@@ -324,6 +325,316 @@ function DetailSalaryList() {
             console.log(error);
 
         }
+    };
+
+    // You will need to import these libraries:
+
+
+    const downloadExcel = async () => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Salary Details Report");
+
+        // Set professional header and footer
+        worksheet.headerFooter.oddHeader =
+            '&C&"Arial,Bold"&18SALARY DETAILS REPORT\n' +
+            '&C&"Arial,Regular"&12Your Company Name\n' +
+            '&C&"Arial,Regular"&10Period: &D - &T\n' +
+            '&L&"Arial,Regular"&8Generated on: ' +
+            new Date().toLocaleDateString() +
+            "\n" +
+            '&R&"Arial,Regular"&8Page &P of &N';
+        worksheet.headerFooter.oddFooter =
+            '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+            '&C&"Arial,Regular"&8This report contains employee salary data as of ' +
+            new Date().toLocaleDateString() +
+            '&R&"Arial,Regular"&8Generated by: HR Department\n' +
+            '&C&"Arial,Regular"&8Powered by Premium Business Solutions';
+        worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter;
+
+        // Set page setup for professional printing
+        worksheet.pageSetup = {
+            paperSize: 9, // A4
+            orientation: "landscape",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: {
+                left: 0.7,
+                right: 0.7,
+                top: 1.0,
+                bottom: 1.0,
+                header: 0.3,
+                footer: 0.3,
+            },
+        };
+
+        // Add title section at the top of the worksheet
+        const titleRow = worksheet.addRow(["SALARY DETAILS REPORT - EMPLOYEE WISE SALARY CALCULATION"]);
+        titleRow.getCell(1).font = {
+            name: "Arial",
+            size: 16,
+            bold: true,
+            color: { argb: "2F4F4F" },
+        };
+        titleRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A1:AA1"); // Merged across 27 columns
+
+        const companyName = "PREMIUM BUSINESSMEN SERVICES"; // Hardcoded company name
+        const companyRow = worksheet.addRow([companyName]);
+        companyRow.getCell(1).font = {
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "4472C4" },
+        };
+        companyRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A2:AA2"); // Merged across 27 columns
+
+        const dateRow = worksheet.addRow([
+            `Report Generated: ${new Date().toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            })} at ${new Date().toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            })}`,
+        ]);
+        dateRow.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        };
+        dateRow.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells("A3:AA3"); // Merged across 27 columns
+
+        // Add empty row for spacing
+        worksheet.addRow([]);
+
+        // Define headers based on columnConfig from your component
+        const headers = [
+            "Employee Name", "Employee ID", "Salary Basic", "Housing Allowance", "Transport Allowance",
+            "Others", "Salary Package", "Commission", "Other Add", "AL/SL", "Airfare", "GPSSA",
+            "Staff Advance", "Late Coming", "Additional", "Salary Deduction", "Unpaid Deduction",
+            "Total pay", "Commission Return", "Net Salary", "ROUTING CODE", "SALARY IBAN",
+            "WORK PERMIT", "Visa", "BRANCH", "Minutes Late", "AL Day"
+        ];
+
+        const headerRow = worksheet.addRow(headers);
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "808080" }, // Gray
+            };
+            cell.font = { bold: true, color: { argb: "FFFFFF" } }; // White bold
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            };
+        });
+
+        // Grand totals initialization
+        let grandTotalBasicSalary = 0;
+        let grandTotalNetSalary = 0;
+        let grandTotalTotalPay = 0;
+
+        // Add all employees data
+        data?.forEach((row) => {
+            const rowData = [
+                row.employeeName,
+                row.employeeId,
+                row.salaryPaid,
+                row.housing_allowance || 0,
+                row.transport_allowance || 0,
+                row.other_allowance || 0,
+                row.salaryPackage || 0,
+                row.commission,
+                row.otherAdd,
+                row.al,
+                row.arrear,
+                row.gpssaEmp,
+                row.staffAdvance,
+                row.lateComm,
+                row.additional,
+                row.salaryDeduction,
+                row.unpaidLeave,
+                row.totalPay,
+                row.commissionFinal,
+                row.netSalary,
+                row.routingCode,
+                row.salaryIban,
+                row.workPermit,
+                row.visa,
+                row.branch,
+                row.minutesLate,
+                row.alDay,
+            ];
+            const excelRow = worksheet.addRow(rowData);
+
+            // Format numerical columns (from 'Salary Basic' to 'Net Salary')
+            // These correspond to columns 3 to 20 (Excel 1-indexed)
+            for (let i = 2; i <= 19; i++) {
+                excelRow.getCell(i + 1).numFmt = "#,##0.00";
+            }
+
+            // Add borders to all cells
+            excelRow.eachCell((cell) => {
+                cell.border = {
+                    top: { style: "thin", color: { argb: "000000" } },
+                    left: { style: "thin", color: { argb: "000000" } },
+                    bottom: { style: "thin", color: { argb: "000000" } },
+                    right: { style: "thin", color: { argb: "000000" } },
+                };
+                cell.alignment = { horizontal: "center", vertical: "middle" };
+            });
+
+            // Update grand totals
+            grandTotalBasicSalary += Number.parseFloat(row.salaryPaid) || 0;
+            grandTotalNetSalary += Number.parseFloat(row.netSalary) || 0;
+            grandTotalTotalPay += Number.parseFloat(row.totalPay) || 0;
+        });
+
+        // Add Grand Total row at the end
+        const grandTotalRow = worksheet.addRow([
+            "GRAND TOTAL",
+            `${data?.length} Total Employees`,
+            grandTotalBasicSalary, // Salary Basic
+            "", // Housing Allowance (empty)
+            "", // Transport Allowance (empty)
+            "", // Others (empty)
+            "", // Salary Package (empty)
+            "", // Commission (empty)
+            "", // Other Add (empty)
+            "", // AL/SL (empty)
+            "", // Airfare (empty)
+            "", // GPSSA (empty)
+            "", // Staff Advance (empty)
+            "", // Late Coming (empty)
+            "", // Additional (empty)
+            "", // Salary Deduction (empty)
+            "", // Unpaid Deduction (empty)
+            grandTotalTotalPay, // Total Pay
+            "", // Commission Return (empty)
+            grandTotalNetSalary, // Net Salary
+            "", // ROUTING CODE (empty)
+            "", // SALARY IBAN (empty)
+            "", // WORK PERMIT (empty)
+            "", // Visa (empty)
+            "", // BRANCH (empty)
+            "", // Minutes Late (empty)
+            "", // AL Day (empty)
+        ]);
+
+        // Format grand total row
+        grandTotalRow.eachCell((cell, colNumber) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "000000" }, // Black
+            };
+            cell.font = { bold: true, color: { argb: "FFFFFF" } }; // White bold
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.border = {
+                top: { style: "thick", color: { argb: "000000" } },
+                left: { style: "thick", color: { argb: "000000" } },
+                bottom: { style: "thick", color: { argb: "000000" } },
+                right: { style: "thick", color: { argb: "000000" } },
+            };
+            // Format numerical columns for totals: Salary Basic (col 3), Total Pay (col 18), Net Salary (col 20)
+            if (colNumber === 3 || colNumber === 18 || colNumber === 20) {
+                cell.numFmt = "#,##0.00";
+            }
+        });
+
+        // Set column widths based on the new headers
+        worksheet.columns = [
+            { width: 25 }, // Employee Name
+            { width: 15 }, // Employee ID
+            { width: 15 }, // Salary Basic
+            { width: 18 }, // Housing Allowance
+            { width: 18 }, // Transport Allowance
+            { width: 12 }, // Others
+            { width: 18 }, // Salary Package
+            { width: 15 }, // Commission
+            { width: 12 }, // Other Add
+            { width: 10 }, // AL/SL
+            { width: 10 }, // Airfare
+            { width: 10 }, // GPSSA
+            { width: 15 }, // Staff Advance
+            { width: 15 }, // Late Coming
+            { width: 12 }, // Additional
+            { width: 18 }, // Salary Deduction
+            { width: 18 }, // Unpaid Deduction
+            { width: 15 }, // Total pay
+            { width: 18 }, // Commission Return
+            { width: 15 }, // Net Salary
+            { width: 18 }, // ROUTING CODE
+            { width: 18 }, // SALARY IBAN
+            { width: 18 }, // WORK PERMIT
+            { width: 10 }, // Visa
+            { width: 12 }, // BRANCH
+            { width: 15 }, // Minutes Late
+            { width: 10 }, // AL Day
+        ];
+
+        // Add empty rows for spacing before footer
+        worksheet.addRow([]);
+        worksheet.addRow([]);
+
+        // Add the electronic generated report text with black border as requested
+        const reportRow = worksheet.addRow(["This is electronically generated report"]);
+        reportRow.getCell(1).font = {
+            name: "Arial",
+            size: 12,
+            bold: false,
+            color: { argb: "000000" },
+        };
+        reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" };
+        reportRow.getCell(1).border = {
+            top: { style: "medium", color: { argb: "000000" } },
+            left: { style: "medium", color: { argb: "000000" } },
+            bottom: { style: "medium", color: { argb: "000000" } },
+            right: { style: "medium", color: { argb: "000000" } },
+        };
+        worksheet.mergeCells(`A${reportRow.number}:AA${reportRow.number}`);
+
+        // Add empty row for spacing
+        worksheet.addRow([]);
+
+        const system2 = worksheet.addRow(["Powered By: MangotechDevs.ae"]);
+        system2.getCell(1).font = {
+            name: "Arial",
+            size: 10,
+            italic: true,
+            color: { argb: "666666" },
+        };
+        system2.getCell(1).alignment = { horizontal: "center" };
+        worksheet.mergeCells(`A${system2.number}:AA${system2.number}`);
+
+        // Add empty row for spacing
+        worksheet.addRow([]);
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        saveAs(
+            blob,
+            `Salary_Details_Report_${new Date()
+                .toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                })
+                .replace(/\//g, "-")}.xlsx`,
+        );
     };
 
 
@@ -515,7 +826,12 @@ function DetailSalaryList() {
     return (
         <Box sx={{ p: 3 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, alignItems: "center" }}>
-                <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Update Payroll</Typography>
+                <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}> Salary Details</Typography>
+
+                <PrimaryButton
+                    title={"Download Excel"}
+                    onClick={() => downloadExcel()}
+                />
             </Box>
 
             <Box sx={{ width: "100%" }}>

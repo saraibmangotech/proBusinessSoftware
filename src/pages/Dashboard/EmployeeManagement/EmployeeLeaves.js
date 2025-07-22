@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useRef, useState } from "react"
 import {
     Box,
@@ -17,28 +16,34 @@ import {
     Button,
 } from "@mui/material"
 import styled from "@emotion/styled"
-import { useNavigate } from "react-router-dom"
-import Colors from "assets/Style/Colors"
-import { CircleLoading } from "components/Loaders"
-import { SuccessToaster } from "components/Toaster"
-import CustomerServices from "services/Customer"
+import Colors from "assets/Style/Colors" // Assuming this is not a standard import in Next.js
+import { CircleLoading } from "components/Loaders" // Assuming this is not a standard import in Next.js
+import { SuccessToaster } from "components/Toaster" // Assuming this is not a standard import in Next.js
+import CustomerServices from "services/Customer" // Assuming this is a placeholder for an actual service
 import { makeStyles } from "@mui/styles"
-import { Debounce } from "utils"
+
 import { useForm } from "react-hook-form"
-import { useDispatch } from "react-redux"
-import SimpleDialog from "components/Dialog/SimpleDialog"
-import { PrimaryButton } from "components/Buttons"
-import SelectField from "components/Select"
-import { showErrorToast, showPromiseToast } from "components/NewToaster"
-import ConfirmationDialog from "components/Dialog/ConfirmationDialog"
+
+import { PrimaryButton } from "components/Buttons" // Assuming this is not a standard import in Next.js
+import SelectField from "components/Select" // Assuming this is not a standard import in Next.js
+import { showErrorToast, showPromiseToast } from "components/NewToaster" // Assuming this is not a standard import in Next.js
+import ConfirmationDialog from "components/Dialog/ConfirmationDialog" // Assuming this is not a standard import in Next.js
 import { useAuth } from "context/UseContext"
+import { Debounce } from "utils"
 import SystemServices from "services/System"
+import SimpleDialog from "components/Dialog/SimpleDialog"
+
+
+
+
+
+
+
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
 }))
-
 const Cell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         fontSize: 12,
@@ -82,7 +87,6 @@ const Cell = styled(TableCell)(({ theme }) => ({
         },
     },
 }))
-
 const useStyles = makeStyles({
     loaderWrap: {
         display: "flex",
@@ -93,11 +97,10 @@ const useStyles = makeStyles({
         },
     },
 })
-
 function EmployeeLeaves() {
-    const navigate = useNavigate()
+    const navigate = () => { } // Mock useNavigate
     const classes = useStyles()
-    const dispatch = useDispatch()
+
     const contentRef = useRef(null)
     const [status, setStatus] = useState(null)
     const [statusDialog, setStatusDialog] = useState(false)
@@ -106,7 +109,6 @@ function EmployeeLeaves() {
     const { user } = useAuth()
     const [editingRow, setEditingRow] = useState(null)
     const [editedData, setEditedData] = useState({})
-
     const {
         register,
         handleSubmit,
@@ -115,155 +117,41 @@ function EmployeeLeaves() {
         getValues,
         reset,
     } = useForm()
-
     const [loader, setLoader] = useState(false)
     const [confirmationDialog, setConfirmationDialog] = useState(false)
-
     // *For Employee Leaves
     const [employeeLeaves, setEmployeeLeaves] = useState([])
     const [totalCount, setTotalCount] = useState(0)
     const [pageLimit, setPageLimit] = useState(50)
     const [currentPage, setCurrentPage] = useState(1)
-
     // *For Filters
     const [filters, setFilters] = useState({})
-
     // *For Permissions
     const [permissions, setPermissions] = useState()
     const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState("desc")
-
-    // Sample data with gender and annual fees
-    const sampleData = [
-        {
-            id: 65,
-            user_id: 30002,
-            annual_fees: 5000,
-            sick_leave_full: 15,
-            sick_leave_full_balance: 15,
-            sick_leave_half: 30,
-            sick_leave_half_balance: 30,
-            sick_leave_unpaid: 45,
-            sick_leave_unpaid_balance: 45,
-            maternity_leave_full: 0,
-            maternity_leave_full_balance: 0,
-            maternity_leave_half: 0,
-            maternity_leave_half_balance: 0,
-            maternity_leave_unpaid: 0,
-            maternity_leave_unpaid_balance: 0,
-            bereavement_leave_spouse: 5,
-            bereavement_leave_other: 3,
-            parental_leave: 5,
-            annual_leave: 24,
-            annual_leave_balance: "0.0",
-            created_at: "2025-07-08T06:46:28.266Z",
-            updated_at: "2025-07-08T06:46:28.266Z",
-            user: {
-                id: 30002,
-                name: "Staff",
-                ref_id: "S-30002",
-                phone: "132456780",
-                email: "staff@pro.com",
-                employee_id: null,
-                role_id: 1001,
-                is_active: true,
-                gender: "male", // Added gender field
-            },
-        },
-        {
-            id: 64,
-            user_id: 105,
-            annual_fees: 4500,
-            sick_leave_full: 15,
-            sick_leave_full_balance: 15,
-            sick_leave_half: 30,
-            sick_leave_half_balance: 30,
-            sick_leave_unpaid: 45,
-            sick_leave_unpaid_balance: 45,
-            maternity_leave_full: 90,
-            maternity_leave_full_balance: 90,
-            maternity_leave_half: 60,
-            maternity_leave_half_balance: 60,
-            maternity_leave_unpaid: 30,
-            maternity_leave_unpaid_balance: 30,
-            bereavement_leave_spouse: 5,
-            bereavement_leave_other: 3,
-            parental_leave: 5,
-            annual_leave: 24,
-            annual_leave_balance: "0.0",
-            created_at: "2025-07-08T06:46:27.977Z",
-            updated_at: "2025-07-08T06:46:27.977Z",
-            user: {
-                id: 105,
-                name: "Aaisha Ahmed Mohammed Albalushi",
-                ref_id: "S-105",
-                phone: "0540144024",
-                email: "aaisha@gmail.com",
-                employee_id: "4014",
-                role_id: 4,
-                is_active: true,
-                gender: "female", // Added gender field
-            },
-        },
-        {
-            id: 63,
-            user_id: 107,
-            annual_fees: 5500,
-            sick_leave_full: 15,
-            sick_leave_full_balance: 15,
-            sick_leave_half: 30,
-            sick_leave_half_balance: 30,
-            sick_leave_unpaid: 45,
-            sick_leave_unpaid_balance: 45,
-            maternity_leave_full: 0,
-            maternity_leave_full_balance: 0,
-            maternity_leave_half: 0,
-            maternity_leave_half_balance: 0,
-            maternity_leave_unpaid: 0,
-            maternity_leave_unpaid_balance: 0,
-            bereavement_leave_spouse: 5,
-            bereavement_leave_other: 3,
-            parental_leave: 5,
-            annual_leave: 24,
-            annual_leave_balance: "0.0",
-            created_at: "2025-07-08T06:46:27.687Z",
-            updated_at: "2025-07-08T06:46:27.687Z",
-            user: {
-                id: 107,
-                name: "Jassem Mohammad Aziz Nasab",
-                ref_id: "S-107",
-                phone: "0540164016",
-                email: "jassem@gmail.com",
-                employee_id: "4016",
-                role_id: 4,
-                is_active: true,
-                gender: "male", // Added gender field
-            },
-        },
-    ]
+    const [originalData, setOriginalData] = useState([])
 
     // *For Get Employee Leaves
     const getEmployeeLeaves = async (page, limit, filter) => {
         setLoader(true)
         try {
             const params = {
-                page: 1,
-                limit: 999999,
+                page: page || 1,
+                limit: limit || 999999,
+                ...filter, // Spread the filter object here
             }
-
-            // Replace with actual API call
-            const { data } = await CustomerServices.getEmployeeLeaves(params);
-            console.log(data?.leaves?.rows, 'data');
-            setEmployeeLeaves(data?.leaves?.rows);
-
-            //   // Using sample data for now
-            //   setEmployeeLeaves(sampleData)
+            const { data } = await CustomerServices.getEmployeeLeaves(params)
+            console.log(data?.leaves?.rows, "data")
+            setOriginalData(data?.leaves?.rows)
+            setEmployeeLeaves(data?.leaves?.rows)
         } catch (error) {
             showErrorToast(error)
         } finally {
             setLoader(false)
         }
     }
+    console.log(employeeLeaves, 'employeeLeaves');
 
     const handleSort = (key) => {
         const data = {
@@ -272,14 +160,24 @@ function EmployeeLeaves() {
         }
         Debounce(() => getEmployeeLeaves(1, "", data))
     }
-
     // *For Handle Filter
     const handleFilter = () => {
-        const data = {
-            search: getValues("search"),
+        const searchTerm = getValues("search")?.toLowerCase() || "";
+        if (searchTerm) {
+
+            const filteredData = originalData.filter((item) => {
+                const nameMatch = item?.user?.name?.toLowerCase().includes(searchTerm);
+                const idMatch = item?.user?.employee_id?.toLowerCase().includes(searchTerm);
+                return nameMatch || idMatch;
+            });
+
+            console.log("Filtered Data:", filteredData);
+            setEmployeeLeaves(filteredData)
         }
-        Debounce(() => getEmployeeLeaves(1, "", data))
-    }
+        else {
+            setEmployeeLeaves(originalData)
+        }
+    };
 
     const handleDelete = async (item) => {
         try {
@@ -293,7 +191,6 @@ function EmployeeLeaves() {
             // setLoader(false)
         }
     }
-
     const UpdateStatus = async () => {
         try {
             const obj = {
@@ -314,23 +211,19 @@ function EmployeeLeaves() {
             console.log(error)
         }
     }
-
     // Check if field is a balance field (should be locked)
     const isBalanceField = (fieldName) => {
         return fieldName.includes("balance")
     }
-
     // Check if field is maternity related and user is male
     const isMaternityFieldDisabledForMale = (row, fieldName) => {
         return fieldName.includes("maternity") && row.user?.gender === "male"
     }
-
     // Handle edit mode
     const handleEdit = (row) => {
         setEditingRow(row.id)
         setEditedData({ ...row })
     }
-
     // Handle field change
     const handleFieldChange = (fieldName, value) => {
         setEditedData((prev) => ({
@@ -338,13 +231,11 @@ function EmployeeLeaves() {
             [fieldName]: value,
         }))
     }
-
     // Handle update
     const handleUpdate = async (row) => {
         console.log("Updated row data:", editedData)
         // Update the employeeLeaves state with edited data
         setEmployeeLeaves((prev) => prev.map((item) => (item.id === editedData.id ? editedData : item)))
-
         setEditingRow(null)
         setEditedData({})
         const promise = SystemServices.updateEmployeeLeaves(editedData)
@@ -353,26 +244,20 @@ function EmployeeLeaves() {
         if (response?.responseCode === 200) {
             getEmployeeLeaves()
         }
-
-
-
         // Here you would typically make an API call to update the data
         // await CustomerServices.updateEmployeeLeave(editedData);
     }
-
     // Handle cancel edit
     const handleCancelEdit = () => {
         setEditingRow(null)
         setEditedData({})
     }
-
     // Render editable field
     const renderEditableField = (row, fieldName, value) => {
         const isEditing = editingRow === row.id
         const isLocked = isBalanceField(fieldName)
         const isMaternityDisabled = isMaternityFieldDisabledForMale(row, fieldName)
-
-        if (isLocked || isMaternityDisabled) {
+        if (isMaternityDisabled) {
             return (
                 <TextField
                     value={value || 0}
@@ -388,7 +273,6 @@ function EmployeeLeaves() {
                 />
             )
         }
-
         if (isEditing) {
             return (
                 <TextField
@@ -400,14 +284,11 @@ function EmployeeLeaves() {
                 />
             )
         }
-
         return <Typography variant="body2">{value || 0}</Typography>
     }
-
     useEffect(() => {
         getEmployeeLeaves()
     }, [])
-
     return (
         <Box sx={{ p: 3 }}>
             <ConfirmationDialog
@@ -419,7 +300,6 @@ function EmployeeLeaves() {
                     handleDelete()
                 }}
             />
-
             <SimpleDialog open={statusDialog} onClose={() => setStatusDialog(false)} title={"Change Status?"}>
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
@@ -453,24 +333,39 @@ function EmployeeLeaves() {
                                     gap: "25px",
                                 }}
                             >
-                                <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
+                                <PrimaryButton bgcolor={"#1976d2"} title="Yes,Confirm" type="submit" />
                                 <PrimaryButton onClick={() => setStatusDialog(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
                             </Grid>
                         </Grid>
                     </Grid>
                 </Box>
             </SimpleDialog>
-
             <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
                 <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Employee Leaves Management</Typography>
             </Box>
+            {/* Search Filter */}
+            <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                    <TextField
+                        {...register("search")}
+                        label="Search by Name or Employee ID"
+                        variant="outlined"
+                        size="small"
+                        fullWidth
 
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={2}>
+                    <Button variant="contained" onClick={() => handleFilter()}>
+                        Search
+                    </Button>
+                </Grid>
+            </Grid>
             {/* Employee Leaves Table */}
             <TableContainer component={Paper} sx={{ mt: 2, maxHeight: "80vh", overflow: "auto" }}>
                 <Table stickyHeader>
                     <TableHead>
                         <Row>
-
                             <Cell sx={{ minWidth: 150, position: "sticky", left: 0, backgroundColor: "white", zIndex: 10 }}>
                                 Employee Info
                             </Cell>
@@ -491,7 +386,6 @@ function EmployeeLeaves() {
                             <Cell sx={{ minWidth: 80 }}>Bereavement Leave Spouse</Cell>
                             <Cell sx={{ minWidth: 80 }}>Bereavement Leave Other</Cell>
                             <Cell sx={{ minWidth: 80 }}>Parental Leave</Cell>
-
                             <Cell sx={{ minWidth: 120 }}>Actions</Cell>
                         </Row>
                     </TableHead>
@@ -507,7 +401,6 @@ function EmployeeLeaves() {
                         ) : employeeLeaves.length > 0 ? (
                             employeeLeaves.map((row) => (
                                 <Row key={row.id}>
-
                                     <Cell sx={{ position: "sticky", left: 0, backgroundColor: "white", zIndex: 5 }}>
                                         <Box>
                                             <Typography variant="body2" fontWeight="bold">
@@ -516,7 +409,6 @@ function EmployeeLeaves() {
                                             <Typography variant="caption" color="textSecondary">
                                                 {row.user?.employee_id}
                                             </Typography>
-
                                             <Typography
                                                 variant="caption"
                                                 display="block"
@@ -550,7 +442,6 @@ function EmployeeLeaves() {
                                     <Cell>{renderEditableField(row, "bereavement_leave_spouse", row.bereavement_leave_spouse)}</Cell>
                                     <Cell>{renderEditableField(row, "bereavement_leave_other", row.bereavement_leave_other)}</Cell>
                                     <Cell>{renderEditableField(row, "parental_leave", row.parental_leave)}</Cell>
-
                                     <Cell>
                                         <Box sx={{ display: "flex", gap: 1, flexDirection: "column" }}>
                                             {editingRow === row.id ? (
@@ -583,10 +474,7 @@ function EmployeeLeaves() {
                     </TableBody>
                 </Table>
             </TableContainer>
-
-
         </Box>
     )
 }
-
 export default EmployeeLeaves

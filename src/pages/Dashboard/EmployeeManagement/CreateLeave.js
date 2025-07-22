@@ -184,9 +184,9 @@ function CreateLeave() {
                 name: item?.user?.name,
             }));
 
-            if (user?.role_id === 4) {
+            if (user?.role_id != 6) {
 
-                const findElement =  formattedData?.find((item) => item?.user_id == user?.id);
+                const findElement = formattedData?.find((item) => item?.user_id == user?.id);
                 console.log('Found Element:', findElement);
 
 
@@ -207,7 +207,7 @@ function CreateLeave() {
         getUsers()
     }, [])
 
- 
+
 
     return (
         <Box sx={{ p: 3, borderRadius: 3 }}>
@@ -260,7 +260,7 @@ function CreateLeave() {
                         <SelectField size="small"
                             label="Select User :*"
                             options={users}
-                            disabled={user?.role_id == 4}
+                            disabled={user?.role_id != 6}
                             selected={selectedUser}
                             onSelect={(value) => setSelectedUser(value)}
                             error={errors?.user?.message}
@@ -276,7 +276,8 @@ function CreateLeave() {
                             { id: 'Sick', name: 'Sick' },
                             { id: 'Maternity', name: 'Maternity (Only for females)' },
                             { id: 'Paternal', name: 'Paternal (Only for males)' },
-                            { id: 'Bereavement', name: 'Bereavement' }]}
+                            { id: 'Bereavement', name: 'Bereavement' },
+                            { id: 'Military', name: 'Military' }]}
 
                             selected={selectedType}
                             onSelect={(value) => setSelectedType(value)}
@@ -302,7 +303,7 @@ function CreateLeave() {
                         />
                     </Grid>}
                     <Grid item xs={12} md={2.8}>
-                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>Upload Document :</Typography>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', color: Colors.gray }}>{selectedType?.id == 'Sick' ? "Upload Document :*" : "Upload Document :"}</Typography>
                         <UploadFileSingle
                             Memo={true}
                             accept={allowFilesType}
@@ -310,7 +311,7 @@ function CreateLeave() {
 
                             file={doc}
                             register={register("doc", {
-                                required: false,
+                                required: selectedType?.id == 'Sick' ? 'document is required' : false,
                                 onChange: async (e) => {
                                     const path = await handleUploadDocument(e);
                                     if (path) {

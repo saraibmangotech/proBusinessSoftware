@@ -520,6 +520,7 @@ function UpdateEmployee() {
             const details = data2 || {};
             console.log(details, 'details');
             setNewDetails(details)
+            getShifts(details?.shift_id)
             setValue('name', employee?.user?.name || '');
             setValue('id', employee?.user?.employee_id || '');
             setValue('email', employee?.user?.email || '');
@@ -580,7 +581,7 @@ function UpdateEmployee() {
             setValue('iban', details?.iban || '');
             setValue('branch', details?.branch || '');
             setValue('visa', details?.visa || '');
-            setValue('work_permit', details?.iban || '');
+            setValue('work_permit', details?.work_permit || '');
             setValue('routing', details?.routing || '');
             setisLocal(details?.is_local ? "yes" : "no")
             setSelectedCostCenter({ id: details?.cost_center, name: details?.cost_center })
@@ -641,7 +642,7 @@ function UpdateEmployee() {
             showErrorToast(error);
         }
     };
-    const getShifts = async () => {
+    const getShifts = async (id) => {
         try {
             let params = {
                 page: 1,
@@ -651,7 +652,7 @@ function UpdateEmployee() {
             const { data } = await CustomerServices.getShifts(params);
             setShifts(data?.shifts?.rows);
 
-            let selected = data?.shifts?.rows?.find(item => item?.id == newDetails?.shift_id)
+            let selected = data?.shifts?.rows?.find(item => item?.id == id)
             setSelectedShift({ id: selected?.id, name: selected?.name })
             setValue('shift', { id: selected?.id, name: selected?.name } || '');
         } catch (error) {
@@ -712,7 +713,7 @@ function UpdateEmployee() {
         getNationalities()
         getCategoryList()
         getRoles()
-        getShifts()
+    
     }, [])
 
     // useEffect(() => {
