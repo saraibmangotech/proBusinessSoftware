@@ -113,15 +113,15 @@ const formatAmount = (amount) => {
 
 // Update the `calculateAccountTotals` function to correctly handle opening balance, debit, credit, period difference, and final balance, including recursive summation for child accounts.
 const calculateAccountTotals = (account) => {
-  const opening = Number.parseFloat(account.opening_balance) || 0
+  const opening = account?.nature == "credit"
+            ? -1 * (Number.parseFloat(account.opening_balance) || 0)
+            : Number.parseFloat(account.opening_balance) || 0
   const debit = Number.parseFloat(account.total_debit) || 0
   const credit = Number.parseFloat(account.total_credit) || 0
 
   // Determine the effective opening balance based on account nature for summation
   let effectiveOpeningBalance = opening
-  if (account.nature === "credit") {
-    effectiveOpeningBalance = -opening
-  }
+  
 
   let accumulatedTotalDebit = debit
   let accumulatedTotalCredit = credit
@@ -345,7 +345,7 @@ function BalanceSheetDetailed() {
         to_date: toDate ? moment(toDate).format("MM-DD-YYYY") : "",
         from_date: fromDate ? moment(fromDate).format("MM-DD-YYYY") : "",
       }
-      const { data } = await FinanceServices.getAccountReports(params)
+      const { data } = await FinanceServices.getAccountReportsDetail(params)
       const myData = data?.detail
       setBalanceSheet(myData?.slice(0, -2)) // Keep original for tabs
       setFilteredBalanceSheet(myData?.slice(0, -2)) // Keep original for tabs and initial display data source
