@@ -166,7 +166,7 @@ function ProfitLossStatement() {
         from_date: fromDate ? moment(fromDate).format('MM-DD-YYYY') : '',
         ...Filter
       }
-      const { data } = await FinanceServices.getAccountReports(params)
+      const { data } = await FinanceServices.getAccountReportsDetail(params)
       setProfitLossStatement(data?.detail.slice(3))
       setFilteredProfitLossStatement(data?.detail.slice(3))
       let myData = data?.detail.slice(3)
