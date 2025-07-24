@@ -133,7 +133,7 @@ function ConsolidatedSupplierPayables() {
       if (!row.isVendorHeader && !row.isTotal && !row.isOpeningBalance) {
         grandTotalAmount += Number.parseFloat(row.total_amount || 0)
         grandTotalPaid += Number.parseFloat(row.paid_amount || 0)
-        grandTotalUnpaid += Number.parseFloat(row.unpaid_amount || 0)
+        grandTotalUnpaid += Number.parseFloat(row.unpaid_amount || 0)+Number.parseFloat(row.runningBalance || 0)
       }
     })
 
@@ -170,7 +170,7 @@ function ConsolidatedSupplierPayables() {
   const [loading, setLoading] = useState(false)
   const [sort, setSort] = useState("desc")
 
- const prepareExcelData = (data) => {
+  const prepareExcelData = (data) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet(" Consolidated Supplier  Payable")
 
@@ -280,10 +280,10 @@ function ConsolidatedSupplierPayables() {
           "",
         ])
         dataRow.getCell(4).font = { name: "Arial", size: 10, bold: true }
-        ;[5, 6, 7].forEach((i) => {
-          dataRow.getCell(i).numFmt = "#,##0.00"
-          dataRow.getCell(i).alignment = { horizontal: "right" }
-        })
+          ;[5, 6, 7].forEach((i) => {
+            dataRow.getCell(i).numFmt = "#,##0.00"
+            dataRow.getCell(i).alignment = { horizontal: "right" }
+          })
         return
       }
 
@@ -295,7 +295,7 @@ function ConsolidatedSupplierPayables() {
           "",
           Number(row.totalAmount || 0),
           Number(row.totalPaid || 0),
-          Number(row.totalUnpaid || 0),
+          Number(row.totalUnpaid || 0)+Number.parseFloat(row.runningBalance || 0),
           "",
         ])
         dataRow.eachCell((cell, i) => {
@@ -553,7 +553,7 @@ function ConsolidatedSupplierPayables() {
   }
 
   // *For Get Customer Queue
-   const getCustomerQueue = async (page, limit, filter) => {
+  const getCustomerQueue = async (page, limit, filter) => {
     if (true) {
       setLoader(true)
       try {
@@ -567,7 +567,7 @@ function ConsolidatedSupplierPayables() {
           type: "supplier",
         }
 
-          const { data } = await FinanceServices.getConsolidatedSupplierPayables(params)
+        const { data } = await FinanceServices.getConsolidatedSupplierPayables(params)
 
         // Process the data to create the table rows
         const processedData = processStatementsData(data?.vendors || [])
@@ -610,7 +610,7 @@ function ConsolidatedSupplierPayables() {
           debit: 0.0,
           credit: 0.0,
           allocated: 0.0,
-          runningBalance: overallRunningBalance.toFixed(2),
+          runningBalance: parseFloat(vendor?.opening_balance).toFixed(2),
         })
 
         // Add invoice entries if available
@@ -619,7 +619,7 @@ function ConsolidatedSupplierPayables() {
         let totalUnpaid = 0
         let totalDebit = 0
         let totalCredit = 0
-        let runningBalance = overallRunningBalance
+        let runningBalance = parseFloat(vendor?.opening_balance).toFixed(2)
 
         if (vendor.invoices && vendor.invoices.length > 0) {
           vendor.invoices.forEach((invoice) => {
@@ -649,7 +649,7 @@ function ConsolidatedSupplierPayables() {
               debit: debit,
               credit: credit,
               allocated: debit.toFixed(2),
-              runningBalance: runningBalance.toFixed(2),
+              runningBalance: parseFloat(vendor?.opening_balance).toFixed(2),
             })
           })
         }
@@ -664,7 +664,7 @@ function ConsolidatedSupplierPayables() {
           debit: totalDebit,
           credit: totalCredit,
           allocated: "0.00",
-          runningBalance: runningBalance.toFixed(2),
+          runningBalance: parseFloat(vendor?.opening_balance).toFixed(2),
         })
 
         overallRunningBalance = runningBalance
@@ -979,6 +979,8 @@ function ConsolidatedSupplierPayables() {
                 </tr>
               ) : customerQueue?.length > 0 ? (
                 customerQueue.map((row, index) => {
+                  console.log(row, 'rowrowrow');
+
                   // Vendor Header Row
                   if (row.isVendorHeader) {
                     return (
@@ -994,7 +996,7 @@ function ConsolidatedSupplierPayables() {
                   if (row.isOpeningBalance) {
                     return (
                       <tr key={row.id} className="opening-balance-row">
-                        <td></td>
+                        <td>OpeningBalance</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -1016,7 +1018,7 @@ function ConsolidatedSupplierPayables() {
                         <td></td>
                         <td className="number-cell bold">{Number.parseFloat(row.totalAmount || 0).toFixed(2)}</td>
                         <td className="number-cell bold">{Number.parseFloat(row.totalPaid || 0).toFixed(2)}</td>
-                        <td className="number-cell bold">{Number.parseFloat(row.totalUnpaid || 0).toFixed(2)}</td>
+                        <td className="number-cell bold">{(Number.parseFloat(row.totalUnpaid || 0)+Number.parseFloat(row.runningBalance || 0)).toFixed(2)}</td>
                         <td></td>
                       </tr>
                     )
@@ -1024,7 +1026,7 @@ function ConsolidatedSupplierPayables() {
 
                   // Regular Transaction Row
                   return (
-                    <tr key={row.id || index} className="transaction-row">
+                    row.type && (<tr key={row.id || index} className="transaction-row">
                       <td>{row.type || "Invoice"}</td>
                       <td>{row.invoice_number || "-"}</td>
                       <td>{row.purchase_date ? moment(row.purchase_date).format("YYYY-MM-DD") : ""}</td>
@@ -1037,7 +1039,7 @@ function ConsolidatedSupplierPayables() {
                           {row.status || "Unpaid"}
                         </span>
                       </td>
-                    </tr>
+                    </tr>)
                   )
                 })
               ) : (
