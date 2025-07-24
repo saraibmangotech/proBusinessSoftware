@@ -810,7 +810,7 @@ function PayReceipts() {
                         </Tooltip>
                     )}
 
-                    {[1000, 3, 2].includes(user?.role_id) && (
+                    {[1000, 3, 2,1001].includes(user?.role_id) && (
                         <Tooltip title="Void Invoice">
                             <IconButton
                                 onClick={() => {

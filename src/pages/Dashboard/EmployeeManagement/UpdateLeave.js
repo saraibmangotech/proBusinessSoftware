@@ -9,6 +9,9 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 
@@ -39,6 +42,8 @@ function UpdateLeave() {
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const [startDate, setStartDate] = useState(null)
     const [endDate, setEndDate] = useState(null)
+    const [selectedTime, setSelectedTime] = useState(null)
+    const [isHalfDay, setIsHalfDay] = useState(false)
     const [users, setUsers] = useState([])
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
@@ -286,16 +291,69 @@ function UpdateLeave() {
                             { id: 'Maternity', name: 'Maternity (Only for females)' },
                             { id: 'Paternal', name: 'Paternal (Only for males)' },
                             { id: 'Bereavement', name: 'Bereavement' },
-                                                    { id: 'Military', name: 'Military' }]}
+                            { id: 'Military', name: 'Military' },
+                            { id: 'Personal Time', name: 'Personal Time' },]}
 
                             selected={selectedType}
-                            onSelect={(value) => setSelectedType(value)}
+                            onSelect={(value) => {
+                                setSelectedType(value)
+                                if (value?.id != 'Annual') {
+                                    setIsHalfDay(false)
+                                }
+
+                            }}
                             error={errors?.type?.message}
                             register={register("type", {
                                 required: "Please select  type"
                             })}
                         />
                     </Grid>
+                    {selectedType?.id == 'Annual' && <Grid item xs={2.8} sm={2.8}>
+                        <Typography sx={{ fontSize: '15px', color: Colors.black, mb: 2, fontWeight: 'bold' }}>Type : </Typography>
+                        <FormControl>
+                            <RadioGroup
+                                row
+                                defaultValue={isHalfDay}
+                                onChange={(e) => {
+                                    console.log(e.target.value);
+                                    setIsHalfDay(JSON.parse(e.target.value));
+
+                                }}
+                            >
+                                <FormControlLabel
+                                    sx={{ color: "#000" }}
+
+                                    value={true}
+                                    control={<Radio />}
+                                    label="Half Day"
+                                />
+                                <FormControlLabel
+                                    sx={{ color: "#000" }}
+
+                                    value={false}
+                                    control={<Radio />}
+                                    label="Full Day"
+                                />
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>}
+                    {selectedType?.id == 'Personal Time' && <Grid item xs={12} md={2.8}>
+                        <SelectField size="small"
+                            label="Select Time :"
+                            options={[{ id: '30', name: '30' },
+                            { id: '60', name: '60' },
+                            { id: '120', name: '120' },
+
+                            ]}
+
+                            selected={selectedTime}
+                            onSelect={(value) => setSelectedTime(value)}
+                            error={errors?.time?.message}
+                            register={register("time", {
+                                required: "Please select  time"
+                            })}
+                        />
+                    </Grid>}
                     {selectedType?.id == 'Bereavement' && <Grid item xs={12} md={2.8}>
                         <SelectField size="small"
                             label="Select Additional Type :"
@@ -320,7 +378,7 @@ function UpdateLeave() {
 
                             file={doc}
                             register={register("doc", {
-                               required: selectedType?.id == 'Sick' ? 'document is required' : false,
+                                required: selectedType?.id == 'Sick' ? 'document is required' : false,
                                 onChange: async (e) => {
                                     const path = await handleUploadDocument(e);
                                     if (path) {
