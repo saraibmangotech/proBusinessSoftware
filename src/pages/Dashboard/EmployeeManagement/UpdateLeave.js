@@ -150,6 +150,8 @@ function UpdateLeave() {
                 document: doc,
                 first_approver_id: selectedUser?.leave_approver_1,
                 second_approver_id: selectedUser?.leave_approver_2,
+                requested_minutes: selectedTime?.id,
+                is_halfday: isHalfDay
             };
             const promise = CustomerServices.UpdateLeave(obj);
 
@@ -215,7 +217,11 @@ function UpdateLeave() {
             setValue('user', state?.employee)
             setSelectedUser(state?.employee)
             setDoc(state?.document)
+            setIsHalfDay(state?.is_halfday)
+            setSelectedTime({ id: state?.request_minutes, name: state?.request_minutes })
+                setValue('type',{ id: state?.request_minutes, name: state?.request_minutes })
             setSelectedType({ id: state?.type, name: state?.type })
+            setValue('type',{ id: state?.type, name: state?.type })
             setSelectedAdditionalType({ id: state?.additional_type, name: state?.additional_type })
             setValue('reason', state?.request_reason)
         }
@@ -258,6 +264,7 @@ function UpdateLeave() {
                         <DatePicker
                             label={"End Date:*"}
                             value={endDate}
+                            disabled={isHalfDay || selectedType?.id == 'Personal Time'}
                             size={"small"}
                             error={errors?.endDate?.message}
                             register={register("endDate", {
