@@ -441,12 +441,22 @@ function LeaveList() {
         {
             header: "Total Days",
             accessorKey: "total_days",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.type =='Personal Time' ? row?.original?.requested_minutes + ' '+'(Minutes)' : row?.original?.total_days }
+                </Box>
+            ),
 
 
         },
         {
             header: "Type",
             accessorKey: "type",
+            cell: ({ row }) => (
+                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.is_halfday ? row?.original?.type + ' ' + '(HalfDay)' : row?.original?.type}
+                </Box>
+            ),
 
 
         },
@@ -519,9 +529,13 @@ function LeaveList() {
                             const status = row?.original?.status?.toLowerCase();
                             const type = row?.original?.type?.toLowerCase();
 
+<<<<<<< HEAD
                             if ((status === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id) ) {
+=======
+                            if (status === 'pending' && (row?.original?.user_id != user?.id)) {
+>>>>>>> c76d22d99db9062359def40447e3749beaf14c82
                                 setStatusDialog(true);
-                            } 
+                            }
                         }}
 
 

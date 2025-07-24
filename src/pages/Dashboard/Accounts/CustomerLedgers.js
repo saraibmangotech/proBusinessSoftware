@@ -905,7 +905,7 @@ function CustomerLedgers() {
         getCostCenters()
     }, []);
     useEffect(() => {
-        if (user?.role_id != 1000) {
+        if (user?.role_id != 1000 && user?.role_id != 1001) {
             setFieldDisabled(true)
             setSelectedUser(user)
 

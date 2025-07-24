@@ -9,6 +9,9 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 
@@ -42,6 +45,7 @@ function CreateLeave() {
     const [users, setUsers] = useState([])
     const { user } = useAuth();
     const [selectedType, setSelectedType] = useState(null)
+    const [isHalfDay, setIsHalfDay] = useState(false)
     const [selectedAdditionalType, setSelectedAdditionalType] = useState(null)
     const [selectedUser, setSelectedUser] = useState(null)
     const [progress, setProgress] = useState(0);
@@ -49,6 +53,7 @@ function CreateLeave() {
     const [slipDetail, setSlipDetail] = useState([]);
     const [slipLink, setSlipLink] = useState("");
     const [doc, setDoc] = useState(null)
+    const [selectedTime, setSelectedTime] = useState(null)
     const {
         control,
         handleSubmit,
@@ -142,6 +147,8 @@ function CreateLeave() {
                 document: doc,
                 first_approver_id: selectedUser?.leave_approver_1,
                 second_approver_id: selectedUser?.leave_approver_2,
+                requested_minutes:selectedTime?.id,
+                is_halfday:isHalfDay
 
             };
             console.log(obj, 'objobj');
@@ -236,6 +243,10 @@ function CreateLeave() {
                             onChange={(date) => {
                                 setValue("startDate", date)
                                 setStartDate(new Date(date))
+                                if (isHalfDay || selectedType?.id == 'Personal Time') {
+                                    setStartDate(new Date(date))
+                                    setEndDate(new Date(date))
+                                }
 
                             }}
                         />
@@ -244,6 +255,7 @@ function CreateLeave() {
                         <DatePicker
                             label={"End Date:*"}
                             value={endDate}
+                            disabled={isHalfDay || selectedType?.id == 'Personal Time'}
                             size={"small"}
                             error={errors?.endDate?.message}
                             register={register("endDate", {
@@ -277,16 +289,69 @@ function CreateLeave() {
                             { id: 'Maternity', name: 'Maternity (Only for females)' },
                             { id: 'Paternal', name: 'Paternal (Only for males)' },
                             { id: 'Bereavement', name: 'Bereavement' },
-                            { id: 'Military', name: 'Military' }]}
+                            { id: 'Military', name: 'Military' },
+                            { id: 'Personal Time', name: 'Personal Time' },]}
 
                             selected={selectedType}
-                            onSelect={(value) => setSelectedType(value)}
+                            onSelect={(value) => {
+                                setSelectedType(value)
+                                if (value?.id != 'Annual') {
+                                    setIsHalfDay(false)
+                                }
+
+                            }}
                             error={errors?.type?.message}
                             register={register("type", {
                                 required: "Please select  type"
                             })}
                         />
                     </Grid>
+                    {selectedType?.id == 'Annual' && <Grid item xs={2.8} sm={2.8}>
+                        <Typography sx={{ fontSize: '15px', color: Colors.black, mb: 2, fontWeight: 'bold' }}>Type : </Typography>
+                        <FormControl>
+                            <RadioGroup
+                                row
+                                defaultValue={isHalfDay}
+                                onChange={(e) => {
+                                    console.log(e.target.value);
+                                    setIsHalfDay(JSON.parse(e.target.value));
+
+                                }}
+                            >
+                                <FormControlLabel
+                                    sx={{ color: "#000" }}
+
+                                    value={true}
+                                    control={<Radio />}
+                                    label="Half Day"
+                                />
+                                <FormControlLabel
+                                    sx={{ color: "#000" }}
+
+                                    value={false}
+                                    control={<Radio />}
+                                    label="Full Day"
+                                />
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>}
+                    {selectedType?.id == 'Personal Time' && <Grid item xs={12} md={2.8}>
+                        <SelectField size="small"
+                            label="Select Time :"
+                            options={[{ id: '30', name: '30' },
+                            { id: '60', name: '60' },
+                            { id: '120', name: '120' },
+
+                            ]}
+
+                            selected={selectedTime}
+                            onSelect={(value) => setSelectedTime(value)}
+                            error={errors?.time?.message}
+                            register={register("time", {
+                                required: "Please select  time"
+                            })}
+                        />
+                    </Grid>}
                     {selectedType?.id == 'Bereavement' && <Grid item xs={12} md={2.8}>
                         <SelectField size="small"
                             label="Select Additional Type :"
