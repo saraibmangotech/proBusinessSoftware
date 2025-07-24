@@ -789,7 +789,7 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
-                    {[1000, 3, 2].includes(user?.role_id) && (
+                    {[1000, 3, 2,1001].includes(user?.role_id) && (
                         <Tooltip title="Change Invoice Date">
                             <IconButton
                                 onClick={() => {
@@ -833,7 +833,7 @@ function PayReceipts() {
                     )}
 
 
-                    {[1000, 3, 2].includes(user?.role_id) && (!row?.original?.invoice_number?.includes('TSL')) && (row?.original?.is_paid) && (
+                    {[1000, 3, 2,1001].includes(user?.role_id) && (!row?.original?.invoice_number?.includes('TSL')) && (row?.original?.is_paid) && (
                         <Tooltip title="Update Payment">
                             <IconButton
                                 onClick={() => {
