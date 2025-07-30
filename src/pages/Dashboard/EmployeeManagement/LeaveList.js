@@ -231,14 +231,20 @@ function LeaveList() {
 
 
             const { data } = await CustomerServices.getLeaveDetail(params)
+            const status = newData?.status?.toLowerCase();
+            const type = newData?.type?.toLowerCase();
+
+            if (status === 'pending' && (newData?.user_id != user?.id)) {
+                setStatusDialog(true);
+            }
 
             console.log(data, 'datadatadata');
             let leaves = data?.leaves
             setEmployeeData(data?.employee)
-            if (selectedData?.type == 'Bereavement') {
-                if (selectedData?.additional_type == 'Spouse') {
+            if (newData?.type == 'Bereavement') {
+                if (newData?.additional_type == 'Spouse') {
                     let leaveBalance = Math.floor(leaves?.bereavement_leave_spouse)
-                    let appliedDays = parseFloat(selectedData?.total_days)
+                    let appliedDays = parseFloat(newData?.total_days)
                     let approvedDays = appliedDays > leaveBalance ?
                         leaveBalance :
                         appliedDays
@@ -254,7 +260,7 @@ function LeaveList() {
                 }
                 else {
                     let leaveBalance = Math.floor(leaves?.bereavement_leave_other)
-                    let appliedDays = parseFloat(selectedData?.total_days)
+                    let appliedDays = parseFloat(newData?.total_days)
                     let approvedDays = appliedDays > leaveBalance ?
                         leaveBalance :
                         appliedDays
@@ -270,11 +276,11 @@ function LeaveList() {
                 }
 
             }
-            else if (selectedData?.type == 'Annual') {
+            else if (newData?.type == 'Annual') {
                 console.log(data, 'leavesleaves');
 
                 let leaveBalance = parseFloat(leaves?.annual_leave_balance)
-                let appliedDays = parseFloat(selectedData?.total_days)
+                let appliedDays = parseFloat(newData?.total_days)
                 let approvedDays = appliedDays > leaveBalance ?
                     leaveBalance :
                     appliedDays
@@ -289,11 +295,11 @@ function LeaveList() {
                     appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
             }
 
-            else if (selectedData?.type == 'Sick') {
+            else if (newData?.type == 'Sick') {
                 console.log(data, 'leavesleaves');
 
                 let leaveBalance = parseFloat(leaves?.sick_leave_full_balance || 0) || parseFloat(leaves?.sick_leave_half_balance || 0) || parseFloat(leaves?.sick_leave_unpaid_balance || 0)
-                let appliedDays = parseFloat(selectedData?.total_days)
+                let appliedDays = parseFloat(newData?.total_days)
                 let approvedDays = appliedDays > leaveBalance ?
                     leaveBalance :
                     appliedDays
@@ -307,11 +313,11 @@ function LeaveList() {
                 setValue('absent',
                     appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
             }
-            else if (selectedData?.type == 'Maternity') {
+            else if (newData?.type == 'Maternity') {
                 console.log(data, 'leavesleaves');
 
                 let leaveBalance = parseFloat(leaves?.maternity_leave_full_balance || 0) || parseFloat(leaves?.maternity_leave_half_balance || 0) || parseFloat(leaves?.maternity_leave_unpaid_balance || 0)
-                let appliedDays = parseFloat(selectedData?.total_days)
+                let appliedDays = parseFloat(newData?.total_days)
                 let approvedDays = appliedDays > leaveBalance ?
                     leaveBalance :
                     appliedDays
@@ -325,11 +331,11 @@ function LeaveList() {
                 setValue('absent',
                     appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
             }
-            else if (selectedData?.type == 'Paternal') {
+            else if (newData?.type == 'Paternal') {
                 console.log(data, 'leavesleaves');
 
                 let leaveBalance = parseFloat(leaves?.parental_leave || 0)
-                let appliedDays = parseFloat(selectedData?.total_days)
+                let appliedDays = parseFloat(newData?.total_days)
                 let approvedDays = appliedDays > leaveBalance ?
                     leaveBalance :
                     appliedDays
@@ -343,6 +349,7 @@ function LeaveList() {
                 setValue('absent',
                     appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
             }
+
         } catch (error) {
             showErrorToast(error)
         } finally {
@@ -443,7 +450,7 @@ function LeaveList() {
             accessorKey: "total_days",
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.type =='Personal Time' ? row?.original?.requested_minutes + ' '+'(Minutes)' : row?.original?.total_days }
+                    {row?.original?.type == 'Personal Time' ? row?.original?.requested_minutes + ' ' + '(Minutes)' : row?.original?.total_days}
                 </Box>
             ),
 
@@ -526,8 +533,6 @@ function LeaveList() {
                             setSelectedData(row?.original);
                             await getEmployeeDetail(row?.original?.user_id, row?.original);
 
-                            const status = row?.original?.status?.toLowerCase();
-                            const type = row?.original?.type?.toLowerCase();
 
                             if ((status === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id)) {
                                 setStatusDialog(true);
