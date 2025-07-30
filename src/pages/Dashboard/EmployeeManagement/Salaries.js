@@ -352,6 +352,15 @@ function SalariesList() {
             accessorKey: "id",
 
         },
+         {
+            header: "Created Date",
+            accessorKey: "created_at",
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.created_at ? moment(row.original.created_at).format("DD-MM-YYYY") : ""}
+                </Box>
+            ),
+        },
         {
             header: "Employee Count",
             accessorKey: "employee_count",

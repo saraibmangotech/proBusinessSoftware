@@ -529,11 +529,7 @@ function LeaveList() {
                             const status = row?.original?.status?.toLowerCase();
                             const type = row?.original?.type?.toLowerCase();
 
-<<<<<<< HEAD
-                            if ((status === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id) ) {
-=======
-                            if (status === 'pending' && (row?.original?.user_id != user?.id)) {
->>>>>>> c76d22d99db9062359def40447e3749beaf14c82
+                            if ((status === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id)) {
                                 setStatusDialog(true);
                             }
                         }}

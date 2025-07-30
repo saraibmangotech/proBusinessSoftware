@@ -899,7 +899,7 @@ function EmployeeDashboard() {
                   +{record.excess_hours.toFixed(2)}h OT
                 </Typography>
               )}
-              {record.status === "Present" ? (
+              {record.present ? (
                 <Chip
                   label="Present"
                   size="small"
