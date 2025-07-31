@@ -48,6 +48,7 @@ import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import dayjs from "dayjs"
 import { agencyType } from "utils"
+import { useAuth } from "context/UseContext"
 const formatTime = (timeString) => {
     return timeString ? moment(timeString, "HH:mm").format("hh:mm A") : "--:--"
 }
@@ -219,6 +220,7 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
 EmployeeRow.displayName = "EmployeeRow"
 
 export default function AttendanceTable() {
+    const { user } = useAuth();
     const theme = useTheme()
     const [nameFilter, setNameFilter] = useState("")
     const [selectedDate, setSelectedDate] = useState(moment())
@@ -732,7 +734,10 @@ export default function AttendanceTable() {
         console.log(dateStr, "dateStr")
         setTableDate(dateStr)
         setSelectedData(employee)
-        setDialog(true)
+        if (user?.role_id == 6) {
+            setDialog(true)
+        }
+
     }, [])
 
     useEffect(() => {
