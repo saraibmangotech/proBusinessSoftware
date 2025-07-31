@@ -544,17 +544,17 @@ function ReceptionList() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <PrimaryButton
+         {user?.role_id == 1001 && <PrimaryButton
             title={"Download PDF"}
             onClick={() => window.open(
               `${process.env.REACT_APP_INVOICE_GENERATOR}generate-reception-report?from_date=${moment(fromDate).format('MM-DD-YYYY')}&to_date=${moment(toDate).format('MM-DD-YYYY')}&instance=${process.env.REACT_APP_TYPE}`,
               '_blank'
             )}
-        />
-          <PrimaryButton
+        />}
+           {user?.role_id == 1001 && <PrimaryButton
             title={"Download Excel"}
             onClick={() => downloadExcel()}
-          />
+          />}
           {user?.role_id != 1003 && <PrimaryButton
             bgcolor={'#001f3f'}
             title="Create "

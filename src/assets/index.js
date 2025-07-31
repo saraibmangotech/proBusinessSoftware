@@ -101,6 +101,8 @@ export const Images = {
 	Footer2: require("./Images/footer2.jpeg"),
 	headerCenterLogoTasheel: require("./Images/headercenterlogo.jpeg"),
 	headerCenterLogoAdheed: require("./Images/headercenterlogoadheed.png"),
+	headerCenterLogoPCSS: require("./Images/headercenterlogopcss.png"),
+	headerCenterLogoPGS: require("./Images/headercenterlogopgs.png"),
 	mainLogo: require("./Images/mainLogo.jpeg"),
 	loginSide: require("./Images/Login-amico.png"),
 

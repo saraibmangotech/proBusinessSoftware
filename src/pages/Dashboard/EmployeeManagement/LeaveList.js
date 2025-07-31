@@ -534,7 +534,7 @@ function LeaveList() {
                             await getEmployeeDetail(row?.original?.user_id, row?.original);
 
 
-                            if ((status === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id)) {
+                            if ((status.toLowerCase() === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id)) {
                                 setStatusDialog(true);
                             }
                         }}
