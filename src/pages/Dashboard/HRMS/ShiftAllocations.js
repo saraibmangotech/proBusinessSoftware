@@ -1,125 +1,90 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+"use client"
+
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
-    Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, tableCellClasses, IconButton, CircularProgress, Chip, Grid, InputLabel,
+    Box,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    tableCellClasses,
+    Grid,
+    TextField,
     FormControl,
+    InputLabel,
     Select,
     MenuItem,
-    ListItemText,
-    Tooltip,
-    Checkbox,
+    Chip,
+    OutlinedInput,
+    IconButton,
+    ListSubheader,
     InputAdornment,
-} from '@mui/material';
-import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
-import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
-import Colors from 'assets/Style/Colors';
-import { CircleLoading } from 'components/Loaders';
-import { ErrorToaster, SuccessToaster } from 'components/Toaster';
-import FinanceStatusDialog from 'components/Dialog/FinanceStatusDialog';
-import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
-import AllocateDialog from 'components/Dialog/AllocateDialog';
-import CustomerServices from 'services/Customer';
-import { makeStyles } from '@mui/styles';
-import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
-import InputField from 'components/Input';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { addPermission } from 'redux/slices/navigationDataSlice';
-import SimpleDialog from 'components/Dialog/SimpleDialog';
-import { PrimaryButton } from 'components/Buttons';
-import SelectField from 'components/Select';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import SearchIcon from '@mui/icons-material/Search';
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { PDFExport } from '@progress/kendo-react-pdf';
-import moment from 'moment';
-import LabelCustomInput from 'components/Input/LabelCustomInput';
-import { showErrorToast, showPromiseToast } from 'components/NewToaster';
-import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
-import DataTable from 'components/DataTable';
-import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
-import { useAuth } from 'context/UseContext';
-import SystemServices from 'services/System';
-import { setSelectedState } from '@progress/kendo-react-grid';
+    Checkbox,
+} from "@mui/material"
+
+import styled from "@emotion/styled"
+import { useNavigate } from "react-router-dom"
+import { makeStyles } from "@mui/styles"
+import { useForm } from "react-hook-form"
+import DeleteIcon from "@mui/icons-material/Delete"
+import SearchIcon from "@mui/icons-material/Search"
+import { showErrorToast, showPromiseToast } from "components/NewToaster"
+import CustomerServices from "services/Customer"
+
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs from "dayjs"
+import moment from "moment"
+import { PrimaryButton } from "components/Buttons"
+import UserServices from "services/User"
+import { ErrorToaster } from "components/Toaster"
+import DatePicker from "components/DatePicker"
+import SelectField from "components/Select"
 
 // *For Table Style
-const Row = styled(TableRow)(({ theme }) => ({
-    border: 0,
-
-}));
-
 const Cell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-        border: '1px solid #EEEEEE',
-        padding: '15px',
-        textAlign: 'left',
-        whiteSpace: 'nowrap',
-        color: '#434343',
-        paddingRight: '50px',
-        background: 'transparent',
-        fontWeight: 'bold'
-
+        fontSize: 11,
+        fontFamily: "Public Sans",
+        padding: "6px",
+        textAlign: "center",
+        whiteSpace: "nowrap",
+        color: "#ffffff",
+        backgroundColor: "#1e3a8a",
+        fontWeight: "bold",
+        minWidth: "70px",
     },
     [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        fontFamily: 'Public Sans',
-
-        textWrap: 'nowrap',
-        padding: '5px !important',
-        paddingLeft: '15px !important',
-
-        '.MuiBox-root': {
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '.MuiBox-root': {
-                cursor: 'pointer'
-            }
-        },
-        'svg': {
-            width: 'auto',
-            height: '24px',
-        },
-        '.MuiTypography-root': {
-            textTransform: 'capitalize',
-            fontFamily: FontFamily.NunitoRegular,
-            textWrap: 'nowrap',
-        },
-        '.MuiButtonBase-root': {
-            padding: '8px',
-            width: '28px',
-            height: '28px',
-        }
+        fontSize: 11,
+        fontFamily: "Public Sans",
+        textWrap: "nowrap",
+        padding: "3px !important",
+        textAlign: "center",
+        border: "1px solid #EEEEEE",
+        backgroundColor: "#ffffff",
     },
-}));
+}))
 
 const useStyles = makeStyles({
-    loaderWrap: {
-        display: 'flex',
-        height: 100,
-        '& svg': {
-            width: '40px !important',
-            height: '40px !important'
-        }
-    }
+    autoColumn: {
+        backgroundColor: "#e3f2fd !important",
+    },
+    manualColumn: {
+        backgroundColor: "#fff3e0 !important",
+    },
+    gpssaColumn: {
+        backgroundColor: "#ffff00 !important",
+    },
 })
 
 function ShiftAllocations() {
+    const navigate = useNavigate()
+    const classes = useStyles()
+    const contentRef = useRef(null)
 
-    const navigate = useNavigate();
-    const classes = useStyles();
-    const dispatch = useDispatch();
-    const contentRef = useRef(null);
-    const [status, setStatus] = useState(null)
-    const [statusDialog, setStatusDialog] = useState(false)
-    const [selectedData, setSelectedData] = useState(null)
-    const [tableLoader, setTableLoader] = useState(false)
-    const { user } = useAuth()
     const {
         register,
         handleSubmit,
@@ -127,230 +92,482 @@ function ShiftAllocations() {
         setValue,
         getValues,
         reset,
-    } = useForm();
+    } = useForm()
 
-    const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
-
-
-    const [loader, setLoader] = useState(false);
-
-    const [confirmationDialog, setConfirmationDialog] = useState(false)
-
-    // *For Customer Queue
-    const [customerQueue, setCustomerQueue] = useState([]);
-    const [shifts, setShifts] = useState([])
-    const [employees, setEmployees] = useState([])
-    const [selectedEmployee, setSelectedEmployee] = useState(null)
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([])
+    const [searchText, setSearchText] = useState("")
+    const [employess, setEmployess] = useState([])
+    const [selectedMonth, setSelectedMonth] = useState(dayjs());
+    const [selectedCostCenter, setSelectedCostCenter] = useState(null)
+    const [costCenters, setCostCenters] = useState([])
+    const [filtertedCostCenters, setFiltertedCostCenters] = useState([])
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
+    const [fromDate2, setFromDate2] = useState();
+    const [toDate2, setToDate2] = useState();
     const [selectedShift, setSelectedShift] = useState(null)
 
-
-    const [totalCount, setTotalCount] = useState(0);
-    const [pageLimit, setPageLimit] = useState(50);
-    const [currentPage, setCurrentPage] = useState(1);
-
-
-
-    // *For Filters
-    const [filters, setFilters] = useState({});
-
-    // *For Permissions
-    const [permissions, setPermissions] = useState();
-
-    const [loading, setLoading] = useState(false)
-    const [sort, setSort] = useState('desc')
-
-    // *For Get Customer Queue
-
-
-
+    const handleToDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setToDate('invalid')
+                return
+            }
+            setToDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
+    const handleFromDate = (newDate) => {
+        try {
+            // eslint-disable-next-line eqeqeq
+            if (newDate == 'Invalid Date') {
+                setFromDate('invalid')
+                return
+            }
+            console.log(newDate, "newDate")
+            setFromDate(new Date(newDate))
+        } catch (error) {
+            ErrorToaster(error)
+        }
+    }
     const getCustomerQueue = async (page, limit, filter) => {
-        setLoader(true)
+
 
         try {
 
             let params = {
                 page: 1,
                 limit: 999999,
-                employee_id:selectedEmployee?.user_id,
-                shift_id:selectedShift?.id
+
 
             }
 
-            const { data } = await SystemServices.getAllocations(params)
-            setCustomerQueue(data?.allocations?.rows)
+            const { data } = await CustomerServices.getEmployees(params)
+            setEmployess(data?.employees?.rows)
 
         } catch (error) {
             showErrorToast(error)
-        } finally {
-            setLoader(false)
         }
     }
 
-
-
-
-
-
-    const handleSort = (key) => {
-        let data = {
-            sort_by: key,
-            sort_order: sort
-        }
-        Debounce(() => getCustomerQueue(1, '', data));
-    }
-
-
-
-    // *For Handle Filter
-
-    const handleFilter = () => {
-        let data = {
-            search: getValues('search')
-        }
-        Debounce(() => getCustomerQueue(1, '', data));
-    }
-    const handleDelete = async (item) => {
+    const getShifts = async (page, limit, filter) => {
+        console.log(selectedEmployeeIds, 'selectedEmployeeIds');
 
 
         try {
-            let params = { reception_id: selectedData?.id }
+
+            let params = {
+                page: 1,
+                limit: 999999,
+                user_ids: selectedEmployeeIds?.join(','),
+                from_date: fromDate ? moment(fromDate).format("YYYY-MM-DD") : "",
+                to_date: toDate ? moment(toDate).format("YYYY-MM-DD") : "",
 
 
-            const { message } = await CustomerServices.deleteReception(params)
+            }
 
-            SuccessToaster(message);
-            getCustomerQueue()
+            const { data } = await CustomerServices.getRoutedShifts(params)
+            console.log(data);
+            setData(data?.allocations)
+
+
         } catch (error) {
             showErrorToast(error)
-        } finally {
-            // setLoader(false)
         }
     }
-    const UpdateStatus = async () => {
+    // Updated column configuration with action column
+    const columnConfig = [
+        { key: "employeeName", header: "Employee Name", type: "auto" },
+        { key: "employeeId", header: "Employee ID", type: "auto" },
+        { key: "salaryPaid", header: "Salary Basic", type: "auto" },
+        { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
+        { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
+        { key: "other_allowance", header: "Others", type: "auto" },
+        { key: "salaryPackage", header: "Salary Package", type: "auto" },
+        { key: "commission", header: "Commission", type: "manual" },
+        { key: "otherAdd", header: "Other Add", type: "manual" },
+        { key: "al", header: "AL/SL", type: "manual" },
+
+        { key: "arrear", header: "Airfare", type: "manual" },
+        { key: "gpssaEmp", header: "GPSSA", type: "manual", isGpssa: true },
+
+        { key: "staffAdvance", header: "Staff Advance", type: "manual" },
+        { key: "lateComm", header: "Late Coming", type: "manual" },
+        { key: "additional", header: "Additional", type: "manual" },
+        { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
+        { key: "unpaidLeave", header: "Unpaid Deduction", type: "manual" },
+        { key: "totalPay", header: "Total pay", type: "auto" },
+        { key: "commissionFinal", header: "Commission Return", type: "manual" },
+        { key: "netSalary", header: "Net Salary", type: "auto" },
+        // New administrative columns - all auto
+        { key: "routingCode", header: "ROUTING CODE", type: "auto" },
+        { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
+        { key: "workPermit", header: "WORK PERMIT", type: "auto" },
+        { key: "visa", header: "Visa", type: "auto" },
+        { key: "branch", header: "BRANCH", type: "auto" },
+
+        { key: "minutesLate", header: "Minutes Late", type: "auto" },
+        { key: "alDay", header: "AL Day", type: "auto" },
+        { key: "actions", header: "Actions", type: "action" },
+    ]
+
+    // Start with empty table
+    const [data, setData] = useState([])
+
+    // Filter employees based on search text
+    const filteredEmployees = employess.filter((employee) => {
+        const searchLower = searchText?.toLowerCase()
+        return (
+            employee?.user?.name?.toLowerCase().includes(searchLower)
+
+        )
+    })
+
+    // Generate default employee data
+    const generateDefaultEmployeeData = (employee, salary) => {
+        console.log(salary, 'employeeemployee')
+        return {
+            user_id: employee?.user_id,
+            id: employee.id,
+            employeeName: employee.first_name + employee.last_name,
+            employeeId: salary.employee?.employee_code,
+            salaryPaid: parseFloat(salary.basicSalary) || 0,
+            commission: parseFloat(salary?.commission),
+            otherAdd: 0,
+            al: 0,
+            sl: 0,
+            arrear: 0,
+            gpssaEmp: parseFloat(salary?.pension || 0),
+
+            staffAdvance: 0,
+            lateComm: parseFloat(salary?.lateDeduction),
+            additional: 0,
+            salaryDeduction: 0,
+            unpaidLeave: parseFloat(salary?.absentDeduction || 0),
+            totalPay: parseFloat(salary?.netSalary) || 0,
+            commissionFinal: 0,
+            netSalary: parseFloat(salary.netSalary) || 0,
+            // Default administrative data
+            routingCode: salary?.employee?.routing,
+            salaryIban: salary?.employee?.iban,
+            workPermit: salary?.employee?.work_permit,
+            visa: salary?.employee?.visa,
+            branch: salary?.employee?.branch,
+            remark: "New Employee",
+            minutesLate: parseFloat(salary?.totalShortMinutes || 0),
+            alDay: parseFloat(salary?.approvedLeaveDays || 0),
+        }
+    }
+    const generateDefaultEmployeeData2 = (salary) => {
+        console.log(salary, 'employeeemployee');
+        const toFixed3 = (val) => parseFloat((parseFloat(val || 0)).toFixed(3));
+
+        return {
+            user_id: salary?.employee?.user_id,
+            id: salary?.employee?.id,
+            employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
+            employeeId: salary.employee?.employee_code,
+            salaryPaid: toFixed3(salary.basicSalary),
+            commission: toFixed3(salary?.commission),
+            housing_allowance: toFixed3(salary?.employee?.housing_allowance),
+            transport_allowance: toFixed3(salary?.employee?.transport_allowance),
+            other_allowance: toFixed3(salary?.employee?.other_allowance),
+            salaryPackage: toFixed3(salary?.salaryPackage),
+            otherAdd: 0,
+            al: 0,
+            sl: 0,
+            arrear: 0,
+            gpssaEmp: toFixed3(salary?.pension),
+
+            staffAdvance: 0,
+            lateComm: toFixed3(salary?.lateDeduction),
+            additional: 0,
+            salaryDeduction: 0,
+            unpaidLeave: toFixed3(salary?.absentDeduction),
+            totalPay: toFixed3(salary?.netSalary),
+            commissionFinal: 0,
+            netSalary: toFixed3(salary?.netSalary),
+
+            routingCode: salary?.employee?.routing,
+            salaryIban: salary?.employee?.iban,
+            workPermit: salary?.employee?.work_permit,
+            visa: salary?.employee?.visa,
+            branch: salary?.employee?.branch,
+            remark: "New Employee",
+            minutesLate: toFixed3(salary?.totalShortMinutes),
+            alDay: toFixed3(salary?.approvedLeaveDays),
+        };
+    };
+
+
+    // Handle employee selection change
+    // const handleEmployeeSelectionChange = (event) => {
+    //   const selectedIds = event.target.value
+    //   console.log(selectedIds,'selectedIds');
+
+    //   setSelectedEmployeeIds(selectedIds)
+
+    //   // Add new employees to table
+    //   const currentEmployeeIds = new Set(data.map((row) => row.id))
+    //   const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id))
+
+    //   if (newEmployeeIds.length > 0) {
+    //     const newEmployees = newEmployeeIds.map((id) => {
+    //       const employee = employess.find((emp) => emp.id === id)
+    //       return generateDefaultEmployeeData(employee)
+    //     })
+    //     setData((prevData) => [...prevData, ...newEmployees])
+    //   }
+
+    //   // Remove employees that are no longer selected
+    //   const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id))
+    //   if (removedEmployeeIds.length > 0) {
+    //     setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
+    //   }
+    // }
+    const handleEmployeeSelectionChange2 = async (event) => {
+        const selectedIds = event.target.value; // contains user_ids
+        setSelectedEmployeeIds(selectedIds); // keep state name
+
+        const currentEmployeeIds = new Set(data.map((row) => row.user_id)); // compare with user_id
+        const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id));
+
+        if (newEmployeeIds.length > 0) {
+            await Promise.all(
+                newEmployeeIds.map(async (user_id) => {
+                    const employee = employess.find((emp) => emp.user_id === user_id);
+                    let salary = 0;
+
+                    try {
+                        const { data } = await CustomerServices.employeeSalaryDetail({
+                            user_id,
+                            month: moment(selectedMonth).month() + 1,
+                            year: moment(selectedMonth).year(),
+                        });
+
+                        const salaries = data?.results;
+                        const newEmployeeDataArray = salaries.map((salary) =>
+                            generateDefaultEmployeeData2(salary)
+                        );
+
+
+
+                    } catch (error) {
+                        console.error(`Failed to fetch salary for ${user_id}`, error);
+                    }
+
+                    return generateDefaultEmployeeData2(salary);
+                })
+            );
+        }
+
+        const removedEmployeeIds = Array.from(currentEmployeeIds).filter(
+            (id) => !selectedIds.includes(id)
+        );
+
+
+    };
+
+
+    const AllocateShifts = async (formData) => {
         try {
-            let obj = {
-                customer_id: selectedData?.id,
-                is_active: status?.id,
+            const transformedData = data.map((item) => ({
+                user_id: item.user_id,
+
+                shift_id: item?.shift_id,
+                date: item?.log_date,
+                start_time: item?.shift?.start_time,
+                end_time: item?.shift?.end_time
+
+            }));
+
+            console.log(transformedData);
+
+            console.log(data);
+
+
+            const obj = {
+
+
+                shifts: transformedData,
+                user_ids: selectedEmployeeIds,
+                from_date: moment(fromDate).format('YYYY-MM-DD'),
+                to_date: moment(toDate).format('YYYY-MM-DD')
             };
 
-            const promise = CustomerServices.CustomerStatus(obj);
-            console.log(promise);
+            const promise = CustomerServices.AllocateNewShift(obj);
 
             showPromiseToast(
                 promise,
-                "Saving...",
-                "Added Successfully",
-                "Something Went Wrong"
+                'Saving ...',
+                'Success',
+                'Something Went Wrong'
             );
 
-            // Await the promise and then check its response
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                setStatusDialog(false);
-                setStatus(null)
-                getCustomerQueue();
-            }
+            // const response = await promise;
+
+            // if (response?.responseCode === 200) {
+            //     navigate('/salary-list');
+            // }
         } catch (error) {
+
             console.log(error);
+
         }
     };
 
 
-    const columns = [
-        {
-            header: "SR No.",
-            accessorKey: "id",
+    // Handle remove employee
+    const handleRemoveEmployee = (employeeId) => {
+
+        setSelectedEmployeeIds((prevIds) => prevIds.filter((id) => id !== employeeId))
+    }
+
+    // Handle search input change
+    const handleSearchChange = (event) => {
+        event.stopPropagation() // Prevent event bubbling
+        setSearchText(event.target.value)
+    }
+    const getCostCenters = async () => {
+        try {
+            let params = {
+                page: 1,
+                limit: 999999,
+            };
+
+            const { data } = await CustomerServices.getCostCenters(params);
+            setCostCenters(data?.cost_centers);
+            setFiltertedCostCenters(data?.cost_centers)
+            setSelectedCostCenter(null)
+
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+    useEffect(() => {
+        getCostCenters()
+        getCustomerQueue()
+    }, [])
 
 
-        },
-        {
-            header: "Name",
-            accessorKey: "name",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.employee?.name}
-                </Box>
-            ),
-
-
-        },
-        {
-            header: "Employee Id",
-            accessorKey: "employee_id",
-             cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.employee?.employee_id}
-                </Box>
-            ),
+    // Handle input changes for manual fields
+    const handleInputChange = useCallback((id, field, value) => {
+        const numericValue = Number.parseFloat(value) || 0
 
 
 
-        },
-        {
-            header: "Shift",
-            accessorKey: "shift",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.shift?.name}
-                </Box>
-            ),
+    }, [])
+
+    const renderCell = (row, column) => {
+        const value = row[column.key]
 
 
-        },
-        {
-            header: "Shift Timings",
-            accessorKey: "shift",
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment().startOf('day').add(row?.original?.shift?.start_time, 'minutes').format('hh:mm A') + '-' + moment().startOf('day').add(row?.original?.shift?.end_time, 'minutes').format('hh:mm A')}
-                </Box>
-            ),
+        // Handle action column
+        if (column.key === "actions") {
+            return (
+                <IconButton
+                    size="small"
+                    onClick={() => handleRemoveEmployee(row.id)}
+                    sx={{ color: "#ff1744" }}
+                    title="Remove Employee"
+                >
+                    <DeleteIcon fontSize="small" />
+                </IconButton>
+            )
+        }
 
-        },
-        {
-            id: "fromDate",
-            header: "From Date",
-            // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.from_date).format("DD/MM/YYYY"),
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.from_date).format("DD/MM/YYYY")}
-                </Box>
-            ),
-        },
-        {
-            id: "toDate",
-            header: "To Date",
-            // Remove accessorKey and fix accessorFn to use row directly
-            accessorFn: (row) => moment(row.to_date).format("DD/MM/YYYY"),
-            cell: ({ row }) => (
-                <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {moment(row.original.to_date).format("DD/MM/YYYY")}
-                </Box>
-            ),
-        },
+        // Handle text fields (name, ID, and administrative text fields)
+        if (
+            column.key === "employeeName" ||
+            column.key === "employeeId" ||
+            column.key === "routingCode" ||
+            column.key === "salaryIban" ||
+            column.key === "workPermit" ||
+            column.key === "visa" ||
+            column.key === "branch" ||
+            column.key === "remark"
+        ) {
+            if (column.type === "manual") {
+                return (
+                    <TextField
+                        variant="standard"
+                        value={value || ""}
+                        onChange={(e) => handleInputChange(row.id, column.key, e.target.value)}
+                        InputProps={{
+                            disableUnderline: false,
+                            style: { fontSize: "11px" },
+                        }}
+                        sx={{ width: "100%" }}
+                        inputProps={{ style: { textAlign: "center" } }}
+                    />
+                )
+            }
+            return (
+                <Typography
+                    variant="body2"
+                    sx={{ fontSize: "11px", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis" }}
+                >
+                    {value}
+                </Typography>
+            )
+        }
 
-        // {
-        //     header: "Actions",
-        //     cell: ({ row }) => (
+        // Handle numeric fields
+        if (column.type === "manual") {
+            return (
+                <TextField
+                    type="number"
+                    variant="standard"
+                    value={value || 0}
+                    onChange={(e) => handleInputChange(row.id, column.key, e.target.value)}
+                    InputProps={{
+                        disableUnderline: false,
+                        style: { fontSize: "11px" },
+                    }}
+                    sx={{ width: "100%" }}
+                    inputProps={{ step: "0.01", style: { textAlign: "center" } }}
+                />
+            )
+        }
 
-        //         <Box sx={{ display: 'flex', gap: 1 }}>
-        //             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/reception-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
-        //             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-reception/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-        //             <Box>
-        //                 {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => { setSelectedData(row?.original); setConfirmationDialog(true) }} width={'35px'}></Box>}
-
-        //                 {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
-        //             </Box>
-
-        //         </Box>
-        //     ),
-        // },
-
+        return (
+            <Typography variant="body2" sx={{ fontSize: "11px" }}>
+                {typeof value === "number" ? (value === 0 ? "-" : value?.toLocaleString()) : value || "-"}
+            </Typography>
+        )
+    }
+    const [shiftData, setShiftData] = useState(data) // original data passed in
+    const shiftOptions = [
+        { id: 1, name: "Morning Patrol" },
+        { id: 2, name: "Evening Patrol" },
+        { id: 3, name: "Night Patrol" },
     ]
+    const groupedData = {};
+    data.forEach(item => {
+        const userId = item.user_id;
+
+        if (!groupedData[userId]) {
+            groupedData[userId] = {
+                user: item.user,
+                shiftsByDate: {}
+            };
+        }
+
+        groupedData[userId].shiftsByDate[item.log_date] = item;
+    });
 
 
-    const getShifts = async () => {
+    // Get all unique dates
+    const uniqueDates = [...new Set(data.map(item => item.log_date))].sort((a, b) => new Date(a) - new Date(b));
+    const [shifts, setShifts] = useState([])
+    const getShiftsList = async () => {
+        setFromDate2(null)
+        setToDate2(null)
+        setSelectedShift(null)
+        setSelectedRows([])
+        setSelectedUserIds([])
         try {
             let params = {
                 page: 1,
@@ -364,156 +581,399 @@ function ShiftAllocations() {
             showErrorToast(error);
         }
     };
+    // Get all unique users
+    const uniqueUsers = [...new Map(data.map(item => [item.user.id, item.user])).values()];
 
-    const getEmployees = async () => {
+    const updateShiftForUser = async (recordId, shiftId) => {
         try {
-            let params = {
-                page: 1,
-                limit: 999999,
-                shift_type: 'Roaster'
-            };
 
-            const { data } = await CustomerServices.getEmployees(params);
-
-            const formattedData = data?.employees?.rows?.map((item, index) => ({
-                ...item,
-                id: item?.id,
-                name: item?.user?.name,
-            }));
-
-            console.log(formattedData, 'formattedData');
-
-            setEmployees(formattedData);
-
-
-
+            console.log("Shift updated:", recordId)
         } catch (error) {
-            showErrorToast(error);
+            console.error("Failed to update shift", error)
         }
+    }
+
+    const getShiftNameById = (id) => {
+        return shiftOptions.find((shift) => shift.id === id)?.name || "Unknown Shift"
+    }
+    const handleShiftChange = (userId, date, newShiftId, newShiftObj) => {
+        if (!userId || !date) return;
+
+        setData((prev) =>
+            prev.map((item) =>
+                item.user_id === userId && item.log_date === date
+                    ? { ...item, shift_id: newShiftId, shift: newShiftObj }
+                    : item
+            )
+        );
     };
+    const bulkAllocate = () => {
+
+        const stripTime = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+        const from = stripTime(new Date(fromDate2));
+        const to = stripTime(new Date(toDate2));
+
+        const updatedData = data.map(item => {
+            // Convert item.log_date safely to Date and strip time
+            const itemDate = stripTime(new Date(item.log_date));
+
+            // Check if this item is in selected rows
+            const isSelected = selectedRows.some(row => row.id === item.id);
+
+            // Check if this item's date is within range
+            const isInRange = isSelected && itemDate >= from && itemDate <= to;
+
+            // Debug log
+            console.log({
+                isSelected,
+                itemDate: itemDate.toISOString().split("T")[0],
+                from: from.toISOString().split("T")[0],
+                to: to.toISOString().split("T")[0],
+                isInRange,
+            });
+
+            // Update only if selected and in date range
+            if (isInRange) {
+                return {
+                    ...item,
+                    shift_id: selectedShift.id,
+                    shift: { ...selectedShift },
+                    start_time: String(selectedShift.start_time),
+                    end_time: String(selectedShift.end_time),
+                };
+            }
+
+            // Return item unchanged if not matching
+            return item;
+        });
+        setData(updatedData)
+        console.log(updatedData, 'updated full data with selected rows updated');
+        return updatedData;
+    };
+
+
+    const [selectedRows, setSelectedRows] = useState([])
+    console.log(data, 'asdasd');
+    const [selectedUserIds, setSelectedUserIds] = useState([]);
+
+    const handleRowSelect = (userId) => {
+        setSelectedUserIds((prev) => {
+            const newSelected = prev.includes(userId)
+                ? prev.filter(id => id !== userId)
+                : [...prev, userId];
+
+            // Filter data based on updated selected user IDs
+            const selectedRowsNew = data.filter(item => newSelected.includes(item.user_id));
+            setSelectedRows(selectedRowsNew); // <-- Update state with correct filtered data
+
+            return newSelected; // <-- Set the updated selected user IDs
+        });
+    };
+
+
+
+    const employees = {};
+    data.forEach(item => {
+        if (!employees[item.user_id]) {
+            employees[item.user_id] = {
+                user: item.user,
+                shiftsByDate: {},
+            };
+        }
+        employees[item.user_id].shiftsByDate[item.log_date] = item;
+    });
+
     useEffect(() => {
-        getEmployees()
-        getShifts()
+        getShiftsList()
     }, [])
-    useEffect(() => {
-        getCustomerQueue()
-    }, []);
+
 
     return (
         <Box sx={{ p: 3 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, alignItems: "center" }}>
+                <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>Shift Allocations</Typography>
+            </Box>
 
-            <ConfirmationDialog
-                open={confirmationDialog}
-                onClose={() => setConfirmationDialog(false)}
-                message={"Are You Sure?"}
-                action={() => {
-                    setConfirmationDialog(false);
-                    handleDelete()
+            {/* Employee Multi-Select Dropdown with Search */}
+            <Grid container xs={12} spacing={2}>
+                <Grid item xs={3}>
+                    <Box sx={{ mb: 3 }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="employee-select-label">Select Employees</InputLabel>
+                            <Select
+                                labelId="employee-select-label"
+                                multiple
 
-                }}
-            />
-            <SimpleDialog
-                open={statusDialog}
-                onClose={() => setStatusDialog(false)}
-                title={"Change Status?"}
-            >
-                <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12}>
-                            <SelectField
-                                size={"small"}
-                                label={"Select Status :"}
-                                options={
+                                value={selectedEmployeeIds}
+                                onChange={handleEmployeeSelectionChange2}
+                                input={<OutlinedInput label="Select Employees" />}
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                        {selected.map((userId) => {
+                                            const employee = employess.find((emp) => emp.user_id === userId);
+                                            return (
+                                                <Box
+                                                    key={userId}
+                                                    onMouseDown={(e) => e.stopPropagation()} // ✅ This prevents the Select from opening
+                                                >
+                                                    <Chip
+                                                        label={employee?.user?.name}
+                                                        size="small"
+                                                        onDelete={() => {
+                                                            const updated = selectedEmployeeIds.filter(id => id !== userId);
+                                                            handleEmployeeSelectionChange2({ target: { value: updated } });
+                                                        }}
+                                                    />
+                                                </Box>
+                                            );
+                                        })}
+                                    </Box>
+                                )}
 
-                                    [
-                                        { id: false, name: "Disabled" },
-                                        { id: true, name: "Enabled" },
 
-                                    ]}
-                                selected={status}
-                                onSelect={(value) => {
-                                    setStatus(value);
+
+                                MenuProps={{
+                                    PaperProps: {
+                                        style: {
+                                            maxHeight: 400,
+                                        },
+                                    },
+                                    // Prevent menu from closing when clicking on search input
+                                    autoFocus: false,
                                 }}
-                                error={errors?.status?.message}
-                                register={register("status", {
-                                    required: "Please select status.",
-                                })}
-                            />
-                        </Grid>
-                        <Grid container sx={{ justifyContent: "center" }}>
-                            <Grid
-                                item
-                                xs={6}
-                                sm={6}
-                                sx={{
-                                    mt: 2,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "25px",
-                                }}
+                                onClose={() => setSearchText("")} // Clear search when dropdown closes
                             >
-                                <PrimaryButton
-                                    bgcolor={Colors.primary}
-                                    title="Yes,Confirm"
-                                    type="submit"
-                                />
-                                <PrimaryButton
-                                    onClick={() => setStatusDialog(false)}
-                                    bgcolor={"#FF1F25"}
-                                    title="No,Cancel"
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </SimpleDialog>
+                                {/* Search Input */}
+                                <ListSubheader
+                                    sx={{
+                                        backgroundColor: "white",
+                                        zIndex: 1,
+                                        position: "sticky",
+                                        top: 0,
+                                    }}
+                                >
+                                    <TextField
+                                        size="small"
+                                        placeholder="Search employees..."
+                                        fullWidth
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchIcon />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        value={searchText}
+                                        onChange={handleSearchChange}
+                                        onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
+                                        onKeyDown={(e) => {
+                                            // Prevent dropdown from closing on any key except Escape
+                                            if (e.key !== "Escape") {
+                                                e.stopPropagation()
+                                            }
+                                            // Clear search on Escape
+                                            if (e.key === "Escape") {
+                                                setSearchText("")
+                                            }
+                                        }}
+                                        sx={{
+                                            "& .MuiOutlinedInput-root": {
+                                                "& fieldset": {
+                                                    borderColor: "#e0e0e0",
+                                                },
+                                                "&:hover fieldset": {
+                                                    borderColor: "#1976d2",
+                                                },
+                                                "&.Mui-focused fieldset": {
+                                                    borderColor: "#1976d2",
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </ListSubheader>
 
+                                {/* Employee Options */}
+                                {filteredEmployees.map((employee) => (
+                                    <MenuItem
+                                        key={employee.user_id}
+                                        value={employee.user_id} // using user_id instead of id
+                                        sx={{
+                                            whiteSpace: "normal",
+                                            wordWrap: "break-word",
+                                            minHeight: "auto",
+                                            py: 1,
+                                        }}
+                                    >
+                                        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                                            <Box sx={{ flexGrow: 1 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                                                    {employee?.user?.name}
+                                                </Typography>
+                                                <Typography variant="caption" color="textSecondary">
+                                                    Salary: {parseFloat(employee?.basic_salary || 0) +
+                                                        parseFloat(employee?.housing_allowance || 0) +
+                                                        parseFloat(employee?.other_allowance || 0) +
+                                                        parseFloat(employee?.transport_allowance || 0)}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    </MenuItem>
+                                ))}
 
-            <Box sx={{ mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Shift Allocations</Typography>
-                <Grid container mt={2} spacing={2} display={'flex'} alignItems={'center'}>
-                    <Grid item xs={12} sm={3}>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </Grid>
+
+                <Grid item xs={12} sm={3}>
+                    <DatePicker
+                        disableFuture={true}
+                        size="small"
+                        label={"From Date"}
+                        value={fromDate}
+                        onChange={(date) => handleFromDate(date)}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3} >
+                    <DatePicker
+                        disableFuture={true}
+                        size="small"
+                        minDate={fromDate}
+                        label={"To Date"}
+                        value={toDate}
+                        onChange={(date) => handleToDate(date)}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3} mt={4}>
+                    <PrimaryButton
+                        title={"Get Shifts"}
+                        onClick={() =>
+                            getShifts()}
+                    />
+                </Grid>
+
+            </Grid>
+            <Box sx={{ width: "100%" }}>
+                <Grid container mt={2} mb={2} spacing={2}>
+                    <Grid item xs={3}>
                         <SelectField
-                            size={'small'}
-                            label={'Select Employee'}
-                            options={employees}
-                            selected={selectedEmployee}
-                            onSelect={(value) => { setSelectedEmployee(value) }}
-                            register={register("employee")}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                        <SelectField
-                            size={'small'}
-                            label={'Select Shift'}
+                            size={"small"}
+                            label={"Select Shift "}
                             options={shifts}
+
                             selected={selectedShift}
-                            onSelect={(value) => { setSelectedShift(value); }}
-                            register={register("shift")}
+                            onSelect={(value) => {
+                                setSelectedShift(value);
+
+                            }}
+
                         />
                     </Grid>
                     <Grid item xs={12} sm={3}>
-                        {user?.role_id != 1003 && <PrimaryButton
-                            bgcolor={'#001f3f'}
-                            title="Search "
-                            buttonStyle={{ mt: 2 }}
-                            onClick={() => { getCustomerQueue() }}
-                            loading={loading}
-                        />}
+                        <DatePicker
+                            disableFuture={true}
+                            size="small"
+                            label={"From Date"}
+                            value={fromDate2}
+                            onChange={(date) => setFromDate2(date)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={3} >
+                        <DatePicker
+                            disableFuture={true}
+                            size="small"
+                            minDate={fromDate}
+                            label={"To Date"}
+                            value={toDate2}
+                            onChange={(date) => setToDate2(date)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={3} mt={4}>
+                        <PrimaryButton
+                            title={"Bulk Allocate"}
+                            onClick={() =>
+                                bulkAllocate()}
+                        />
                     </Grid>
 
                 </Grid>
+                <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
+                    <Table stickyHeader size="small" >
+                        <TableHead>
+                            <TableRow>
+                                <TableCell />
+                                <TableCell sx={{ width: '200px', minWidth: '200px', maxWidth: '200px' }}>
+                                    Employee Name
+                                </TableCell>
+                                {uniqueDates.map(date => (
+                                    <TableCell key={date}>
+                                        {new Date(date).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "2-digit",
+                                            weekday: "short",
+                                        })}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {uniqueUsers.map(user => (
+                                <TableRow key={user.id} hover selected={selectedUserIds.includes(user.id)}>
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            checked={selectedUserIds.includes(user.id)}
+                                            onChange={() => handleRowSelect(user.id)}
+                                        />
+                                    </TableCell>
+                                    <TableCell>{user.name}</TableCell>
+                                    {uniqueDates.map(date => {
+                                        const row = data.find(item => item.user_id === user.id && item.log_date === date);
+                                        const currentShiftId = row?.shift_id || "";
+
+                                        return (
+                                            <TableCell key={`${user.id}-${date}`}>
+                                                <Select
+                                                    size="small"
+                                                    value={currentShiftId}
+
+                                                    onChange={(e) => {
+                                                        const newShiftId = e.target.value;
+                                                        const newShift = shifts.find((shift) => shift.id === newShiftId);
+                                                        handleShiftChange(user.id, date, newShiftId, newShift);
+                                                    }}
+                                                    fullWidth
+                                                >
+                                                    {shifts.map((shift) => (
+                                                        <MenuItem key={shift.id} value={shift.id}>
+                                                            {shift.name}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </TableCell>
+                                        );
+                                    })}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Box>
 
-            {/* Filters */}
-            <Box >
 
+            <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', mt: 2 }}>
+                <PrimaryButton
+                    bgcolor={'#001f3f'}
+                    title="Save"
+                    onClick={() => AllocateShifts()}
 
-                {<DataTable loading={loader} data={customerQueue} columns={columns} />}
+                    disabled={data?.length == 0}
+
+                />
+
             </Box>
-
         </Box>
-    );
+    )
 }
 
-export default ShiftAllocations;
+export default ShiftAllocations
