@@ -234,7 +234,7 @@ function LeaveList() {
             const status = newData?.status?.toLowerCase();
             const type = newData?.type?.toLowerCase();
 
-            if (status === 'pending' && (newData?.user_id != user?.id)) {
+            if ((status.toLowerCase() === 'pending' || status.toLowerCase()=='partial')  && (newData?.user_id != user?.id)) {
                 setStatusDialog(true);
             }
 

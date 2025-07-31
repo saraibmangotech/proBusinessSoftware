@@ -185,7 +185,9 @@ const routes = {
   getLeaveDetail:'/hrms/employees/leaves/details',
   getFP:"/purchases/FPinvoice",
   getFPPayments:'/purchases/FPinvoice/payments',
-  getPaySlips:'/hrms/payslips'
+  getPaySlips:'/hrms/payslips',
+  getRoutedShifts:'/hrms/shifts/roasterallocations',
+  AllocateNewShift:'/hrms/shifts/allocate'
 
 
 };

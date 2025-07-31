@@ -1,4 +1,4 @@
-import { post, get, patch,deleted } from 'services';
+import { post, get, patch, deleted } from 'services';
 import routes from './routes';
 
 const CustomerServices = {
@@ -6,7 +6,11 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
-  
+  AllocateNewShift: async (obj) => {
+    const data = await post(routes.AllocateNewShift, obj);
+    return data;
+  },
+
   CreateLocation: async (obj) => {
     const data = await post(routes.CreateLocation, obj);
     return data;
@@ -15,7 +19,7 @@ const CustomerServices = {
     const data = await patch(routes.UpdateLocation, obj);
     return data;
   },
-    getSalaries: async (params) => {
+  getSalaries: async (params) => {
     const data = await get(routes.getSalaries, params);
     return data;
   },
@@ -39,7 +43,7 @@ const CustomerServices = {
     const data = await get(routes.getPaySlips, params);
     return data;
   },
-   SalesInvoiceSettlement: async (obj) => {
+  SalesInvoiceSettlement: async (obj) => {
     const data = await post(routes.SalesInvoiceSettlement, obj);
     return data;
   },
@@ -47,15 +51,20 @@ const CustomerServices = {
     const data = await get(routes.getAgingReportPayable, params);
     return data;
   },
-   getPurchaseSettlement: async (params) => {
+  getPurchaseSettlement: async (params) => {
     const data = await get(routes.getPurchaseSettlement, params);
     return data;
   },
-     getInventoryLocations: async (params) => {
+  getInventoryLocations: async (params) => {
     const data = await get(routes.getInventoryLocations, params);
     return data;
   },
-    getSalesSettlement: async (params) => {
+
+  getRoutedShifts: async (params) => {
+    const data = await get(routes.getRoutedShifts, params);
+    return data;
+  },
+  getSalesSettlement: async (params) => {
     const data = await get(routes.getSalesSettlement, params);
     return data;
   },
@@ -63,27 +72,27 @@ const CustomerServices = {
     const data = await get(routes.getEmployeeLeaves, params);
     return data;
   },
-   getShifts: async (params) => {
+  getShifts: async (params) => {
     const data = await get(routes.getShifts, params);
     return data;
   },
-   getAgingReportReceivable: async (params) => {
+  getAgingReportReceivable: async (params) => {
     const data = await get(routes.getAgingReportReceivable, params);
     return data;
   },
-    getSalaryDetail: async (params) => {
+  getSalaryDetail: async (params) => {
     const data = await get(routes.getSalaryDetail, params);
     return data;
   },
-    addHoliday: async (obj) => {
+  addHoliday: async (obj) => {
     const data = await post(routes.addHoliday, obj);
     return data;
   },
-    markAttendance: async (obj) => {
+  markAttendance: async (obj) => {
     const data = await post(routes.markAttendance, obj);
     return data;
   },
-    updateEmployeePassword: async (obj) => {
+  updateEmployeePassword: async (obj) => {
     const data = await post(routes.updateEmployeePassword, obj);
     return data;
   },
@@ -199,7 +208,7 @@ const CustomerServices = {
     const data = await deleted(routes.DeleteProduct, obj);
     return data;
   },
-    deleteHoliday: async (obj) => {
+  deleteHoliday: async (obj) => {
     const data = await deleted(routes.deleteHoliday, obj);
     return data;
   },

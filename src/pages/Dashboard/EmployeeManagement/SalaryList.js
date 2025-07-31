@@ -592,14 +592,29 @@ const generateDefaultEmployeeData2 = (salary) => {
                 value={selectedEmployeeIds}
                 onChange={handleEmployeeSelectionChange2}
                 input={<OutlinedInput label="Select Employees" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => {
-                      const employee = employess.find((emp) => emp.id === value)
-                      return <Chip key={value} label={`${employee?.user?.name} `} size="small" />
-                    })}
-                  </Box>
-                )}
+               renderValue={(selected) => (
+  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+    {selected.map((value) => {
+      const employee = employess.find((emp) => emp.id === value);
+      return (
+        <Box
+          key={value}
+          onMouseDown={(e) => e.stopPropagation()} // ✅ Prevent dropdown from opening
+        >
+          <Chip
+            label={`${employee?.user?.name}`}
+            size="small"
+            onDelete={() => {
+              const updated = selected.filter((v) => v !== value);
+              handleEmployeeSelectionChange2({ target: { value: updated } });
+            }}
+          />
+        </Box>
+      );
+    })}
+  </Box>
+)}
+
                 MenuProps={{
                   PaperProps: {
                     style: {
