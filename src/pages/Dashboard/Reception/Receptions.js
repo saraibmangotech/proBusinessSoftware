@@ -186,9 +186,9 @@ function ReceptionList() {
   }
 
   // *For Get Customer Queue
-useEffect(() => {
-  getCustomerQueue()
-}, [fromDate,toDate])
+  useEffect(() => {
+    getCustomerQueue()
+  }, [fromDate, toDate])
 
 
 
@@ -354,116 +354,116 @@ useEffect(() => {
   ]
 
 
-const downloadExcel = async () => {
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Reception List");
+  const downloadExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Reception List");
 
-  worksheet.headerFooter.oddHeader =
-    '&C&"Arial,Bold"&18RECEPTION LIST\n' +
-    '&C&"Arial,Regular"&12Your Company Name\n' +
-    '&C&"Arial,Regular"&10Generated on: &D - &T\n' +
-    '&R&"Arial,Regular"&8Page &P of &N';
+    worksheet.headerFooter.oddHeader =
+      '&C&"Arial,Bold"&18RECEPTION LIST\n' +
+      '&C&"Arial,Regular"&12Your Company Name\n' +
+      '&C&"Arial,Regular"&10Generated on: &D - &T\n' +
+      '&R&"Arial,Regular"&8Page &P of &N';
 
-  worksheet.headerFooter.oddFooter =
-    '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
-    '&C&"Arial,Regular"&8This report contains customer data\n' +
-    '&C&"Arial,Regular"&8Powered by MangotechDevs.ae';
+    worksheet.headerFooter.oddFooter =
+      '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+      '&C&"Arial,Regular"&8This report contains customer data\n' +
+      '&C&"Arial,Regular"&8Powered by MangotechDevs.ae';
 
-  worksheet.pageSetup = {
-    paperSize: 9,
-    orientation: "landscape",
-    fitToPage: true,
-    fitToWidth: 1,
-    margins: {
-      left: 0.7,
-      right: 0.7,
-      top: 1.0,
-      bottom: 1.0,
-      header: 0.3,
-      footer: 0.3,
-    },
-  };
-
-  const titleRow = worksheet.addRow(["RECEPTION LIST"]);
-  titleRow.getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } };
-  titleRow.getCell(1).alignment = { horizontal: "center" };
-  worksheet.mergeCells("A1:E1");
-
-  const dateRow = worksheet.addRow([
-    `Report Generated: ${new Date().toLocaleDateString("en-GB")} at ${new Date().toLocaleTimeString("en-GB", {
-      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-    })}`,
-  ]);
-  dateRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } };
-  dateRow.getCell(1).alignment = { horizontal: "center" };
-  worksheet.mergeCells("A2:E2");
-
-  worksheet.addRow([]); // spacing
-
-  const headers = ["SR No.", "Token Number", "Customer", "Mobile", "Token Date"];
-  const headerRow = worksheet.addRow(headers);
-
-  headerRow.eachCell((cell) => {
-    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
-    cell.font = { bold: true, color: { argb: "FFFFFF" } };
-    cell.alignment = { horizontal: "center", vertical: "middle" };
-    cell.border = {
-      top: { style: "thin" }, left: { style: "thin" },
-      bottom: { style: "thin" }, right: { style: "thin" },
+    worksheet.pageSetup = {
+      paperSize: 9,
+      orientation: "landscape",
+      fitToPage: true,
+      fitToWidth: 1,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 1.0,
+        bottom: 1.0,
+        header: 0.3,
+        footer: 0.3,
+      },
     };
-  });
 
-  customerQueue?.forEach((row, index) => {
-    const excelRow = worksheet.addRow([
-      index + 1,
-      row.token_number,
-      row.customer_name,
-      row.mobile,
-      moment(row.created_at).format("DD/MM/YYYY"),
+    const titleRow = worksheet.addRow(["RECEPTION LIST"]);
+    titleRow.getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } };
+    titleRow.getCell(1).alignment = { horizontal: "center" };
+    worksheet.mergeCells("A1:E1");
+
+    const dateRow = worksheet.addRow([
+      `Report Generated: ${new Date().toLocaleDateString("en-GB")} at ${new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+      })}`,
     ]);
+    dateRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } };
+    dateRow.getCell(1).alignment = { horizontal: "center" };
+    worksheet.mergeCells("A2:E2");
 
-    excelRow.eachCell((cell) => {
+    worksheet.addRow([]); // spacing
+
+    const headers = ["SR No.", "Token Number", "Customer", "Mobile", "Token Date"];
+    const headerRow = worksheet.addRow(headers);
+
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
+      cell.font = { bold: true, color: { argb: "FFFFFF" } };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
       cell.border = {
         top: { style: "thin" }, left: { style: "thin" },
         bottom: { style: "thin" }, right: { style: "thin" },
       };
-      cell.alignment = { horizontal: "center", vertical: "middle" };
     });
-  });
 
-  worksheet.addRow([]); // spacing
+    customerQueue?.forEach((row, index) => {
+      const excelRow = worksheet.addRow([
+        index + 1,
+        row.token_number,
+        row.customer_name,
+        row.mobile,
+        moment(row.created_at).format("DD/MM/YYYY"),
+      ]);
 
-  const reportRow = worksheet.addRow(["This is an electronically generated report."]);
-  reportRow.getCell(1).font = { name: "Arial", size: 12, color: { argb: "000000" } };
-  reportRow.getCell(1).alignment = { horizontal: "center" };
-  reportRow.getCell(1).border = {
-    top: { style: "medium" }, left: { style: "medium" },
-    bottom: { style: "medium" }, right: { style: "medium" },
+      excelRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" }, left: { style: "thin" },
+          bottom: { style: "thin" }, right: { style: "thin" },
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+      });
+    });
+
+    worksheet.addRow([]); // spacing
+
+    const reportRow = worksheet.addRow(["This is an electronically generated report."]);
+    reportRow.getCell(1).font = { name: "Arial", size: 12, color: { argb: "000000" } };
+    reportRow.getCell(1).alignment = { horizontal: "center" };
+    reportRow.getCell(1).border = {
+      top: { style: "medium" }, left: { style: "medium" },
+      bottom: { style: "medium" }, right: { style: "medium" },
+    };
+    worksheet.mergeCells(`A${reportRow.number}:E${reportRow.number}`);
+
+    worksheet.addRow([]);
+
+    const poweredRow = worksheet.addRow(["Powered By: MangotechDevs.ae"]);
+    poweredRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } };
+    poweredRow.getCell(1).alignment = { horizontal: "center" };
+    worksheet.mergeCells(`A${poweredRow.number}:E${poweredRow.number}`);
+
+    worksheet.columns = [
+      { width: 10 },
+      { width: 20 },
+      { width: 30 },
+      { width: 18 },
+      { width: 20 },
+    ];
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(blob, `Reception_list_${new Date().toLocaleDateString("en-GB").replace(/\//g, "-")}.xlsx`);
   };
-  worksheet.mergeCells(`A${reportRow.number}:E${reportRow.number}`);
-
-  worksheet.addRow([]);
-
-  const poweredRow = worksheet.addRow(["Powered By: MangotechDevs.ae"]);
-  poweredRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } };
-  poweredRow.getCell(1).alignment = { horizontal: "center" };
-  worksheet.mergeCells(`A${poweredRow.number}:E${poweredRow.number}`);
-
-  worksheet.columns = [
-    { width: 10 },
-    { width: 20 },
-    { width: 30 },
-    { width: 18 },
-    { width: 20 },
-  ];
-
-  const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-
-  saveAs(blob, `Reception_list_${new Date().toLocaleDateString("en-GB").replace(/\//g, "-")}.xlsx`);
-};
 
 
 
@@ -543,18 +543,25 @@ const downloadExcel = async () => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Reception List</Typography>
-        <Box sx={{display:'flex',gap:2}}>
-        <PrimaryButton
-          title={"Download Excel"}
-          onClick={() => downloadExcel()}
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <PrimaryButton
+            title={"Download PDF"}
+            onClick={() => window.open(
+              `${process.env.REACT_APP_INVOICE_GENERATOR}generate-reception-report?from_date=${moment(fromDate).format('MM-DD-YYYY')}&to_date=${moment(toDate).format('MM-DD-YYYY')}&instance=${process.env.REACT_APP_TYPE}`,
+              '_blank'
+            )}
         />
-        {user?.role_id != 1003 && <PrimaryButton
-          bgcolor={'#001f3f'}
-          title="Create "
-          onClick={() => { navigate('/create-reception'); localStorage.setItem("currentUrl", '/create-customer') }}
-          loading={loading}
-        />}
-</Box>
+          <PrimaryButton
+            title={"Download Excel"}
+            onClick={() => downloadExcel()}
+          />
+          {user?.role_id != 1003 && <PrimaryButton
+            bgcolor={'#001f3f'}
+            title="Create "
+            onClick={() => { navigate('/create-reception'); localStorage.setItem("currentUrl", '/create-customer') }}
+            loading={loading}
+          />}
+        </Box>
 
       </Box>
 
