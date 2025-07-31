@@ -385,6 +385,27 @@ function ServiceReport() {
       total: false,
     },
     {
+      header: "Token Number",
+      accessorKey: "token_number",
+      total: false,
+      accessorFn: (row) => row?.receipt?.token_number,
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>{row?.original?.receipt?.token_number}</Box>
+      ),
+    },
+    {
+      header: "Token Date",
+      accessorFn: (row) => (row?.receipt?.token_date ? moment(row?.receipt?.token_date).format("DD/MM/YYYY") : ""),
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.receipt?.token_date
+            ? moment(row?.original?.receipt?.token_date).format("DD/MM/YYYY")
+            : ""}
+        </Box>
+      ),
+      total: false,
+    },
+    {
       header: "Department",
       accessorKey: "department",
       accessorFn: () =>
@@ -758,6 +779,8 @@ function ServiceReport() {
       "SR No.",
       "Inv No.",
       "Inv Date",
+      "Token Number",
+      "Token Date",
       "Department",
       "Stock ID",
       "Service Name",
@@ -821,6 +844,8 @@ function ServiceReport() {
         item.id || "",
         item?.receipt?.invoice_number || "",
         item?.receipt?.invoice_date ? new Date(moment(item.receipt.invoice_date).format("YYYY-MM-DD")) : null,
+        item?.receipt?.token_number || "",
+        item?.receipt?.token_date ? new Date(moment(item.receipt.token_date).format("YYYY-MM-DD")) : null,
         agencyType?.[process.env.REACT_APP_TYPE]?.category || "",
         item?.service?.item_code || "",
         item?.service?.name || "",
