@@ -1,14 +1,9 @@
 "use client"
-
-import {
-  useEffect,
-  useState
-} from "react"
+import { useEffect, useState } from "react"
 import {
   Box,
   Paper,
   Typography,
-  IconButton,
   Chip,
   Avatar,
   Divider,
@@ -20,7 +15,6 @@ import {
   MenuItem as SelectItem,
 } from "@mui/material"
 import {
-  MoreVert as MoreVertIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
   Info as InfoIcon,
@@ -28,7 +22,7 @@ import {
   Schedule as ScheduleIcon,
   Build as BuildIcon,
   Cancel as CancelIcon,
-  Notifications as NotificationsIcon
+  Notifications as NotificationsIcon,
 } from "@mui/icons-material"
 import { styled } from "@mui/material/styles"
 import SystemServices from "services/System"
@@ -81,7 +75,8 @@ function NotificationsList() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [filters, setFilters] = useState({})
-  const unreadCount = notifications.filter(n => !n.read).length
+
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   const getNotifications = async (page = currentPage, limit = pageSize, filter = {}) => {
     try {
@@ -117,26 +112,47 @@ function NotificationsList() {
     setSelectedNotification(null)
   }
 
+const iconMap = {
+  AssignmentIcon: AssignmentIcon,
+  WarningIcon: WarningIcon,
+  CheckCircleIcon: CheckCircleIcon,
+  ScheduleIcon: ScheduleIcon,
+  InfoIcon: InfoIcon,
+  BuildIcon: BuildIcon,
+  CancelIcon: CancelIcon,
+};
+
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "high": return "#f44336"
-      case "medium": return "#ff9800"
-      case "low": return "#4caf50"
-      default: return "#9e9e9e"
+      case "high":
+        return "#f44336"
+      case "medium":
+        return "#ff9800"
+      case "low":
+        return "#4caf50"
+      default:
+        return "#9e9e9e"
     }
   }
 
-  const getPriorityLabel = (priority) =>
-    priority.charAt(0).toUpperCase() + priority.slice(1)
+  const getPriorityLabel = (priority) => priority.charAt(0).toUpperCase() + priority.slice(1)
 
   const handleNotificationClick = (notification) => {
     console.log("Notification clicked:", notification)
     // Handle view logic here
   }
 
+  const renderIcon = (iconName) => {
+    const IconComponent = iconMap[iconName]
+    if (IconComponent) {
+      return <IconComponent sx={{ color: "white", fontSize: 20 }} />
+    }
+    // Fallback icon if the specified icon is not found
+    return <NotificationsIcon sx={{ color: "white", fontSize: 20 }} />
+  }
+
   return (
     <Box sx={{ p: 3, maxWidth: "1200px", margin: "0 auto" }}>
-      
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 3, justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -147,13 +163,11 @@ function NotificationsList() {
             Notifications
           </Typography>
         </Box>
-      
       </Box>
 
       {/* Notifications */}
       <Box>
         {notifications.map((notification) => {
-          const IconComponent = notification.icon
           return (
             <NotificationContainer
               key={notification.id}
@@ -167,15 +181,13 @@ function NotificationsList() {
               <NotificationContent>
                 <Avatar
                   sx={{
-                    backgroundColor: notification.iconColor,
+                    backgroundColor: notification.icon_color,
                     width: 40,
                     height: 40,
                   }}
                 >
-                  {console.log(IconComponent,'IconComponent')}
-                  {IconComponent && <IconComponent sx={{ color: "white", fontSize: 20 }} />}
+                  {renderIcon(notification.icon)}
                 </Avatar>
-
                 <NotificationDetails>
                   <NotificationHeader>
                     <Box sx={{ flex: 1 }}>
@@ -265,11 +277,19 @@ function NotificationsList() {
         onClose={handleMenuClose}
         PaperProps={{ sx: { minWidth: 150 } }}
       >
-        <MenuItem onClick={handleMenuClose}><Typography variant="body2">Mark as Read</Typography></MenuItem>
-        <MenuItem onClick={handleMenuClose}><Typography variant="body2">Archive</Typography></MenuItem>
-        <MenuItem onClick={handleMenuClose}><Typography variant="body2">Delete</Typography></MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Typography variant="body2">Mark as Read</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Typography variant="body2">Archive</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Typography variant="body2">Delete</Typography>
+        </MenuItem>
         <Divider />
-        <MenuItem onClick={handleMenuClose}><Typography variant="body2">View Details</Typography></MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Typography variant="body2">View Details</Typography>
+        </MenuItem>
       </Menu>
     </Box>
   )
