@@ -25,6 +25,7 @@ import {
   ListItemText,
   Collapse,
   CardMedia,
+  Badge,
 } from "@mui/material"
 import {
   Logout,
@@ -48,6 +49,7 @@ import {
   Language,
 } from "@mui/icons-material"
 import { useAuth } from "context/UseContext"
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import { useLocation, useNavigate } from "react-router-dom"
 import ConfirmationDialog from "components/Dialog/ConfirmationDialog"
 import Avatar from "@mui/material/Avatar"
@@ -4939,50 +4941,66 @@ function Header() {
             {/* <Box sx={{ flexGrow: 1 }} /> */}
 
             {/* Right side - Language and User */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              {/* Language Selector */}
-              <IconButton sx={{ p: 0 }}>
-                <Language sx={{ color: "#666" }} />
-              </IconButton>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      
+      {/* Notification Icon with optional badge */}
+      <Box
+        sx={{
+          p: 1,
+          borderRadius: "6px",
+          cursor: "pointer",
+          "&:hover": {
+            backgroundColor: "rgba(52, 152, 219, 0.04)",
+          },
+        }}
+        onClick={() => {
+          // handle notification click logic here
+          console.log("Notification clicked");
+        }}
+      >
+        <Badge  color="error"> {/* You can replace `3` with your dynamic notification count */}
+          <NotificationsNoneOutlinedIcon sx={{ color: "#555" }} />
+        </Badge>
+      </Box>
 
-              {/* User Avatar */}
-              <Box
-                onClick={(e) => setAnchorEl(e.currentTarget)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  py: 1,
-                  px: 1,
-                  borderRadius: "6px",
-                  "&:hover": {
-                    backgroundColor: "rgba(52, 152, 219, 0.04)",
-                  },
-                }}
-              >
-                <Typography
-                  sx={{
-                    mr: 1,
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#333",
-                    display: { xs: "none", sm: "block" },
-                  }}
-                >
-                  Hi, {user?.name || "Admin"}
-                </Typography>
-                <Avatar
-                  className="avatar-image"
-                  alt={user?.name}
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    border: "2px solid #f0f0f0",
-                  }}
-                  src={process.env.REACT_APP_IMAGE_BASE_URL + user?.picture}
-                />
-              </Box>
-            </Box>
+      {/* User Avatar and Name */}
+      <Box
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+          py: 1,
+          px: 1,
+          borderRadius: "6px",
+          "&:hover": {
+            backgroundColor: "rgba(52, 152, 219, 0.04)",
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            mr: 1,
+            fontSize: "14px",
+            fontWeight: "500",
+            color: "#333",
+            display: { xs: "none", sm: "block" },
+          }}
+        >
+          Hi, {user?.name || "Admin"}
+        </Typography>
+        <Avatar
+          className="avatar-image"
+          alt={user?.name}
+          sx={{
+            width: 36,
+            height: 36,
+            border: "2px solid #f0f0f0",
+          }}
+          src={process.env.REACT_APP_IMAGE_BASE_URL + user?.picture}
+        />
+      </Box>
+    </Box>
           </Toolbar>
         </Container>
       </AppBar>

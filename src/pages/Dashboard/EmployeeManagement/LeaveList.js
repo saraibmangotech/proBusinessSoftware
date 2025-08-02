@@ -447,7 +447,7 @@ function LeaveList() {
             accessorFn: (row) => row?.employee?.name,
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.employee?.name}
+                    {row?.original?.employee?.name}-{row?.original?.employee?.employee_id}
                 </Box>
             ),
 
