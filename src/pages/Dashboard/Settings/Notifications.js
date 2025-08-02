@@ -27,6 +27,7 @@ import {
 import { styled } from "@mui/material/styles"
 import SystemServices from "services/System"
 import { showErrorToast } from "components/NewToaster"
+import moment from "moment"
 
 // Styled components
 const NotificationContainer = styled(Paper)(() => ({
@@ -224,7 +225,7 @@ const iconMap = {
                   <NotificationMeta>
                     <Typography variant="caption">{notification.sender?.name}</Typography>
                     <Typography variant="caption">•</Typography>
-                    <Typography variant="caption">{notification.timestamp}</Typography>
+                    <Typography variant="caption">{moment(notification.created_at).format('DD-MM-YYYY')}</Typography>
                     <Typography variant="caption">•</Typography>
                     <Chip
                       label={notification.category}
