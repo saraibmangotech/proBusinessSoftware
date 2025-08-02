@@ -316,10 +316,10 @@ function LeaveList() {
             }
 
             else if (newData?.type == 'Sick') {
-                console.log(data, 'leavesleaves');
+                console.log(leaves, 'leavesleaves');
 
-
-                let leaveBalance = parseFloat(leaves?.sick_leave_full_balance || 0) || parseFloat(leaves?.sick_leave_half_balance || 0) || parseFloat(leaves?.sick_leave_unpaid_balance || 0)
+                console.log(newData, 'leavesleaves');
+                let leaveBalance = parseFloat(leaves?.sick_leave_full_balance || 0) + parseFloat(leaves?.sick_leave_half_balance || 0) + parseFloat(leaves?.sick_leave_unpaid_balance || 0)
                 let appliedDays = parseFloat(newData?.total_days)
                 let approvedDays = appliedDays > leaveBalance ?
                     leaveBalance :
@@ -337,7 +337,7 @@ function LeaveList() {
             else if (newData?.type == 'Maternity') {
                 console.log(data, 'leavesleaves');
 
-                let leaveBalance = parseFloat(leaves?.maternity_leave_full_balance || 0) || parseFloat(leaves?.maternity_leave_half_balance || 0) || parseFloat(leaves?.maternity_leave_unpaid_balance || 0)
+                let leaveBalance = parseFloat(leaves?.maternity_leave_full_balance || 0) + parseFloat(leaves?.maternity_leave_half_balance || 0) + parseFloat(leaves?.maternity_leave_unpaid_balance || 0)
                 let appliedDays = parseFloat(newData?.total_days)
                 let approvedDays = appliedDays > leaveBalance ?
                     leaveBalance :
@@ -399,8 +399,8 @@ function LeaveList() {
     const UpdateStatus = async () => {
         let appliedDays = parseFloat(selectedData?.total_days)
         let approvedDays = Math.floor(employeeData?.leaves_balance)
-        console.log(employeeData,'employeeData');
-        
+        console.log(employeeData, 'employeeData');
+
         console.log(appliedDays, 'appliedDays');
         console.log(approvedDays, 'appliedDays');
         try {
