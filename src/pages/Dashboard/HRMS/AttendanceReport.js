@@ -101,6 +101,8 @@ const getStatusStyles = (status) => {
 // Memoized employee row component
 const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
     const theme = useTheme()
+    console.log(employee,'employee');
+    
     return (
         <TableRow
             hover
@@ -482,7 +484,7 @@ export default function AttendanceTable() {
                 return
             }
             const mappedData = attendanceData.attendance.map((employee) => ({
-                id: employee.user_id,
+                id: employee.employee_id,
                 name: employee.user_name,
                 avatar: `/placeholder.svg?height=40&width=40&text=${employee.user_name.charAt(0)}`,
                 attendance:

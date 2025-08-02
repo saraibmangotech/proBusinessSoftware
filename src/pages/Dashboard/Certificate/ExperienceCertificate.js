@@ -490,7 +490,7 @@ function ExperienceCertificate() {
                                                                     {moment(item?.created_at).format('MM-DD-YYYY')}
                                                                 </Cell>
                                                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
-                                                                    {item?.employee?.name}
+                                                                         {item?.employee?.name}-{item?.employee?.employee_id}
                                                                 </Cell>
 
                                                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">

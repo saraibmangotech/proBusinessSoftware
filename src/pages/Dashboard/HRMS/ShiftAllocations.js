@@ -926,7 +926,7 @@ function ShiftAllocations() {
                                             onChange={() => handleRowSelect(user.id)}
                                         />
                                     </TableCell>
-                                    <TableCell>{user.name}</TableCell>
+                                    <TableCell>{user.name}-{user?.employee_id}</TableCell>
                                     {uniqueDates.map(date => {
                                         const row = data.find(item => item.user_id === user.id && item.log_date === date);
                                         const currentShiftId = row?.shift_id || "";

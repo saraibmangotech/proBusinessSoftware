@@ -399,17 +399,22 @@ function LeaveList() {
     const UpdateStatus = async () => {
         let appliedDays = parseFloat(selectedData?.total_days)
         let approvedDays = Math.floor(employeeData?.leaves_balance)
+        console.log(employeeData,'employeeData');
+        
+        console.log(appliedDays, 'appliedDays');
+        console.log(approvedDays, 'appliedDays');
         try {
             let obj = {
                 id: selectedData?.id,
                 status: status?.id,
                 hr_statement: getValues('statement'),
                 user_id: selectedData?.user_id,
-                approved_days:selectedData?.is_halfday ? 0.5 : approvedDays,
+                approved_days: selectedData?.is_halfday ? 0.5 : getValues('approved'),
                 requested_minutes: getValues('requested_mint'),
-                absent_days: selectedData?.is_halfday ? 0 : appliedDays - approvedDays,
-                balance_after:  selectedData?.is_halfday ? Math.floor(employeeData?.leaves_balance) - 0.5 :Math.floor(employeeData?.leaves_balance) - approvedDays,
+                absent_days: selectedData?.is_halfday ? 0 : getValues('applied') - getValues('approved'),
+                balance_after: selectedData?.is_halfday ? Math.floor(getValues('balanced')) - 0.5 : Math.floor(getValues('balanced')) - getValues('approved'),
             };
+            console.log(obj, 'obj');
 
             const promise = CustomerServices.LeaveStatus(obj);
             console.log(promise);
@@ -447,7 +452,7 @@ function LeaveList() {
             accessorFn: (row) => row?.employee?.name,
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.employee?.name} ({row?.original?.employee?.employee_id})
+                    {row?.original?.employee?.name}-{row?.original?.employee?.employee_id}
                 </Box>
             ),
 
