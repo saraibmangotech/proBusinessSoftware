@@ -4956,7 +4956,7 @@ function Header() {
         }}
         onClick={() => {
           // handle notification click logic here
-          console.log("Notification clicked");
+            navigate("/notifications");
         }}
       >
         <Badge  color="error"> {/* You can replace `3` with your dynamic notification count */}
