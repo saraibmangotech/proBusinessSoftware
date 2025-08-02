@@ -1,7 +1,24 @@
 "use client"
 
-import { useState } from "react"
-import { Box, Paper, Typography, IconButton, Chip, Avatar, Divider, Menu, MenuItem, Badge } from "@mui/material"
+import {
+  useEffect,
+  useState
+} from "react"
+import {
+  Box,
+  Paper,
+  Typography,
+  IconButton,
+  Chip,
+  Avatar,
+  Divider,
+  Menu,
+  MenuItem,
+  Badge,
+  Pagination,
+  Select,
+  MenuItem as SelectItem,
+} from "@mui/material"
 import {
   MoreVert as MoreVertIcon,
   CheckCircle as CheckCircleIcon,
@@ -11,12 +28,14 @@ import {
   Schedule as ScheduleIcon,
   Build as BuildIcon,
   Cancel as CancelIcon,
-  Notifications as NotificationsIcon,
+  Notifications as NotificationsIcon
 } from "@mui/icons-material"
 import { styled } from "@mui/material/styles"
+import SystemServices from "services/System"
+import { showErrorToast } from "components/NewToaster"
 
 // Styled components
-const NotificationContainer = styled(Paper)(({ theme }) => ({
+const NotificationContainer = styled(Paper)(() => ({
   padding: "16px",
   marginBottom: "8px",
   borderRadius: "8px",
@@ -54,104 +73,38 @@ const NotificationMeta = styled(Box)({
   color: "#666",
 })
 
-// Dummy data
-const notificationsData = [
-  {
-    id: 1,
-    type: "leave_request",
-    title: "Leave Request Approval",
-    description: "Sarah Johnson has requested 3 days of annual leave from Dec 20-22, 2024",
-    sender: "Sarah Johnson",
-    timestamp: "2 hours ago",
-    category: "Marketing",
-    priority: "medium",
-    icon: AssignmentIcon,
-    iconColor: "#2196f3",
-    read: false,
-  },
-  {
-    id: 2,
-    type: "policy_update",
-    title: "Updated Remote Work Policy",
-    description: "New remote work guidelines have been published. Please review the updated policy document.",
-    sender: "HR Department",
-    timestamp: "4 hours ago",
-    category: "HR",
-    priority: "high",
-    icon: WarningIcon,
-    iconColor: "#ff9800",
-    read: false,
-  },
-  {
-    id: 3,
-    type: "payroll",
-    title: "Payroll Processing Complete",
-    description: "December 2024 payroll has been processed. Salary slips are now available in your portal.",
-    sender: "Payroll System",
-    timestamp: "6 hours ago",
-    category: "Finance",
-    priority: "low",
-    icon: CheckCircleIcon,
-    iconColor: "#4caf50",
-    read: true,
-  },
-  {
-    id: 4,
-    type: "training",
-    title: "Mandatory Training Reminder",
-    description: "Cybersecurity training deadline is approaching. Complete by Dec 31, 2024.",
-    sender: "Learning & Development",
-    timestamp: "1 day ago",
-    category: "IT",
-    priority: "high",
-    icon: ScheduleIcon,
-    iconColor: "#9c27b0",
-    read: false,
-  },
-  {
-    id: 5,
-    type: "announcement",
-    title: "Holiday Schedule Announcement",
-    description: "Company holiday schedule for 2025 has been published. Check the calendar for details.",
-    sender: "Management",
-    timestamp: "2 days ago",
-    category: "Management",
-    priority: "medium",
-    icon: InfoIcon,
-    iconColor: "#ffc107",
-    read: true,
-  },
-  {
-    id: 6,
-    type: "maintenance",
-    title: "System Maintenance Notice",
-    description: "HRMS system will undergo maintenance on Dec 28, 2024 from 2:00 AM to 4:00 AM.",
-    sender: "IT Support",
-    timestamp: "3 days ago",
-    category: "IT",
-    priority: "medium",
-    icon: BuildIcon,
-    iconColor: "#607d8b",
-    read: true,
-  },
-  {
-    id: 7,
-    type: "leave_denied",
-    title: "Leave Request Denied",
-    description: "Your leave request for Jan 15-17, 2025 has been denied due to project deadlines.",
-    sender: "Project Manager",
-    timestamp: "4 days ago",
-    category: "Engineering",
-    priority: "high",
-    icon: CancelIcon,
-    iconColor: "#f44336",
-    read: false,
-  },
-]
-
 function NotificationsList() {
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedNotification, setSelectedNotification] = useState(null)
+  const [notifications, setNotifications] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [filters, setFilters] = useState({})
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const getNotifications = async (page = currentPage, limit = pageSize, filter = {}) => {
+    try {
+      const params = {
+        page,
+        limit,
+        ...filters,
+        ...filter,
+      }
+      const { data } = await SystemServices.getNotifications(params)
+      setNotifications(data?.notifications?.rows || [])
+      setTotalCount(data?.count || 0)
+      setCurrentPage(page)
+      setPageSize(limit)
+      setFilters(filter)
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
+
+  useEffect(() => {
+    getNotifications(1)
+  }, [])
 
   const handleMenuClick = (event, notification) => {
     event.stopPropagation()
@@ -166,43 +119,40 @@ function NotificationsList() {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "high":
-        return "#f44336"
-      case "medium":
-        return "#ff9800"
-      case "low":
-        return "#4caf50"
-      default:
-        return "#9e9e9e"
+      case "high": return "#f44336"
+      case "medium": return "#ff9800"
+      case "low": return "#4caf50"
+      default: return "#9e9e9e"
     }
   }
 
-  const getPriorityLabel = (priority) => {
-    return priority.charAt(0).toUpperCase() + priority.slice(1)
-  }
+  const getPriorityLabel = (priority) =>
+    priority.charAt(0).toUpperCase() + priority.slice(1)
 
   const handleNotificationClick = (notification) => {
     console.log("Notification clicked:", notification)
-    // Handle notification click logic here
+    // Handle view logic here
   }
-
-  const unreadCount = notificationsData.filter((n) => !n.read).length
 
   return (
     <Box sx={{ p: 3, maxWidth: "1200px", margin: "0 auto" }}>
+      
       {/* Header */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 2 }}>
-        <Badge badgeContent={unreadCount} color="error">
-          <NotificationsIcon sx={{ fontSize: 32, color: "#1976d2" }} />
-        </Badge>
-        <Typography variant="h4" sx={{ fontWeight: "bold", color: "#333" }}>
-          Notifications
-        </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 3, justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Badge badgeContent={unreadCount} color="error">
+            <NotificationsIcon sx={{ fontSize: 32, color: "#1976d2" }} />
+          </Badge>
+          <Typography variant="h4" sx={{ fontWeight: "bold", color: "#333" }}>
+            Notifications
+          </Typography>
+        </Box>
+      
       </Box>
 
-      {/* Notifications List */}
+      {/* Notifications */}
       <Box>
-        {notificationsData.map((notification, index) => {
+        {notifications.map((notification) => {
           const IconComponent = notification.icon
           return (
             <NotificationContainer
@@ -215,7 +165,6 @@ function NotificationsList() {
               }}
             >
               <NotificationContent>
-                {/* Icon */}
                 <Avatar
                   sx={{
                     backgroundColor: notification.iconColor,
@@ -223,10 +172,10 @@ function NotificationsList() {
                     height: 40,
                   }}
                 >
-                  <IconComponent sx={{ color: "white", fontSize: 20 }} />
+                  {console.log(IconComponent,'IconComponent')}
+                  {IconComponent && <IconComponent sx={{ color: "white", fontSize: 20 }} />}
                 </Avatar>
 
-                {/* Content */}
                 <NotificationDetails>
                   <NotificationHeader>
                     <Box sx={{ flex: 1 }}>
@@ -240,18 +189,10 @@ function NotificationsList() {
                       >
                         {notification.title}
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "#666",
-                          lineHeight: 1.4,
-                        }}
-                      >
+                      <Typography variant="body2" sx={{ color: "#666", lineHeight: 1.4 }}>
                         {notification.description}
                       </Typography>
                     </Box>
-
-                    {/* Priority and Actions */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Chip
                         label={getPriorityLabel(notification.priority)}
@@ -263,26 +204,16 @@ function NotificationsList() {
                           fontSize: "11px",
                         }}
                       />
-                      <IconButton size="small" onClick={(e) => handleMenuClick(e, notification)} sx={{ color: "#666" }}>
+                      {/* <IconButton size="small" onClick={(e) => handleMenuClick(e, notification)} sx={{ color: "#666" }}>
                         <MoreVertIcon fontSize="small" />
-                      </IconButton>
+                      </IconButton> */}
                     </Box>
                   </NotificationHeader>
-
-                  {/* Meta information */}
                   <NotificationMeta>
-                    <Typography variant="caption" sx={{ color: "#666" }}>
-                      {notification.sender}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: "#666" }}>
-                      •
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: "#666" }}>
-                      {notification.timestamp}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: "#666" }}>
-                      •
-                    </Typography>
+                    <Typography variant="caption">{notification.sender?.name}</Typography>
+                    <Typography variant="caption">•</Typography>
+                    <Typography variant="caption">{notification.timestamp}</Typography>
+                    <Typography variant="caption">•</Typography>
                     <Chip
                       label={notification.category}
                       size="small"
@@ -302,28 +233,43 @@ function NotificationsList() {
         })}
       </Box>
 
+      {/* Pagination */}
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end", gap: 2, alignItems: "center" }}>
+        <Typography variant="body2">Rows per page:</Typography>
+        <Select
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(e.target.value)
+            getNotifications(1, e.target.value)
+          }}
+          size="small"
+        >
+          {[5, 10, 20, 50].map((limit) => (
+            <SelectItem key={limit} value={limit}>
+              {limit}
+            </SelectItem>
+          ))}
+        </Select>
+        <Pagination
+          count={Math.ceil(totalCount / pageSize)}
+          page={currentPage}
+          onChange={(e, value) => getNotifications(value)}
+          color="primary"
+        />
+      </Box>
+
       {/* Context Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        PaperProps={{
-          sx: { minWidth: 150 },
-        }}
+        PaperProps={{ sx: { minWidth: 150 } }}
       >
-        <MenuItem onClick={handleMenuClose}>
-          <Typography variant="body2">Mark as Read</Typography>
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <Typography variant="body2">Archive</Typography>
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <Typography variant="body2">Delete</Typography>
-        </MenuItem>
+        <MenuItem onClick={handleMenuClose}><Typography variant="body2">Mark as Read</Typography></MenuItem>
+        <MenuItem onClick={handleMenuClose}><Typography variant="body2">Archive</Typography></MenuItem>
+        <MenuItem onClick={handleMenuClose}><Typography variant="body2">Delete</Typography></MenuItem>
         <Divider />
-        <MenuItem onClick={handleMenuClose}>
-          <Typography variant="body2">View Details</Typography>
-        </MenuItem>
+        <MenuItem onClick={handleMenuClose}><Typography variant="body2">View Details</Typography></MenuItem>
       </Menu>
     </Box>
   )

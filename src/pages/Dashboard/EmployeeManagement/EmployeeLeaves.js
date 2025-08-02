@@ -386,6 +386,7 @@ function EmployeeLeaves() {
                             <Cell sx={{ minWidth: 80 }}>Bereavement Leave Spouse</Cell>
                             <Cell sx={{ minWidth: 80 }}>Bereavement Leave Other</Cell>
                             <Cell sx={{ minWidth: 80 }}>Parental Leave</Cell>
+                            <Cell sx={{ minWidth: 80 }}>Personal Time</Cell>
                             <Cell sx={{ minWidth: 120 }}>Actions</Cell>
                         </Row>
                     </TableHead>
@@ -442,6 +443,7 @@ function EmployeeLeaves() {
                                     <Cell>{renderEditableField(row, "bereavement_leave_spouse", row.bereavement_leave_spouse)}</Cell>
                                     <Cell>{renderEditableField(row, "bereavement_leave_other", row.bereavement_leave_other)}</Cell>
                                     <Cell>{renderEditableField(row, "parental_leave", row.parental_leave)}</Cell>
+                                    <Cell>{renderEditableField(row, "personal_time_balance", row.personal_time_balance)}</Cell>
                                     <Cell>
                                         <Box sx={{ display: "flex", gap: 1, flexDirection: "column" }}>
                                             {editingRow === row.id ? (
