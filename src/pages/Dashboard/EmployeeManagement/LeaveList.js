@@ -234,7 +234,7 @@ function LeaveList() {
             const status = newData?.status?.toLowerCase();
             const type = newData?.type?.toLowerCase();
 
-            if ((status.toLowerCase() === 'pending' || status.toLowerCase()=='partial')  && (newData?.user_id != user?.id)) {
+            if ((status?.toLowerCase() === 'pending' || status?.toLowerCase()=='partial')  && (newData?.user_id != user?.id)) {
                 setStatusDialog(true);
             }
 
@@ -406,7 +406,7 @@ function LeaveList() {
             accessorFn: (row) => row?.employee?.name,
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {row?.original?.employee?.name}
+                    {row?.original?.employee?.name} ({row?.original?.employee?.employee_id})
                 </Box>
             ),
 
@@ -471,8 +471,7 @@ function LeaveList() {
             header: "Document",
             accessorKey: "document",
             cell: ({ row }) => {
-                let { document: file, name } = row.original;
-                if (file) file = file.substring(1);
+                const { document: file, name } = row.original;
                 const extension = file?.split('.').pop().toLowerCase();
 
                 const getIcon = () => {
@@ -492,7 +491,7 @@ function LeaveList() {
                             sx={{ cursor: 'pointer' }}
                             onClick={() =>
                                 window.open(
-                                    `${process.env.REACT_APP_IMAGE_BASE_URL}${file}`,
+                                    `${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${file}`,
                                     '_blank'
                                 )
                             }
@@ -500,7 +499,7 @@ function LeaveList() {
                         <p
                             onClick={() =>
                                 window.open(
-                                    `${process.env.REACT_APP_IMAGE_BASE_URL}${file}`,
+                                    `${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${file}`,
                                     '_blank'
                                 )
                             }
@@ -534,9 +533,6 @@ function LeaveList() {
                             await getEmployeeDetail(row?.original?.user_id, row?.original);
 
 
-                            if ((status.toLowerCase() === 'pending' || status.toLowerCase() == "partial") && (row?.original?.user_id != user?.id)) {
-                                setStatusDialog(true);
-                            }
                         }}
 
 
@@ -925,7 +921,7 @@ function LeaveList() {
             </SimpleDialog>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Leave List</Typography>
+                <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Leave Requests</Typography>
                 {true && <PrimaryButton
                     bgcolor={'#001f3f'}
                     title="Create "
