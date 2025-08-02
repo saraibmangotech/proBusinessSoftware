@@ -4960,7 +4960,10 @@ function Header() {
         }}
       >
         <Badge  color="error"> {/* You can replace `3` with your dynamic notification count */}
-          <NotificationsNoneOutlinedIcon sx={{ color: "#555" }} />
+          <NotificationsNoneOutlinedIcon onClick={() => {
+          // handle notification click logic here
+          navigate("/notifications");
+        }} sx={{ color: "#555" }} />
         </Badge>
       </Box>
 
