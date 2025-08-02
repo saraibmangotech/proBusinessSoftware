@@ -665,6 +665,10 @@ function DetailSalaryList() {
                     employeeId: employee?.employee_code,
                     salaryPaid: parseFloat(employee?.basic_salary) || 0,
                     commission: parseFloat(salary?.commission) || 0,
+                    other_allowance: parseFloat(salary?.other_allowance) || 0,
+                    housing_allowance: parseFloat(salary?.housing_allowance) || 0,
+                    transport_allowance: parseFloat(salary?.transport_allowance) || 0,
+                    salaryPackage: parseFloat(salary?.salary_package) || 0,
                     otherAdd: parseFloat(salary?.other_add) || 0,
                     al: parseFloat(salary?.al) || 0,
                     sl: parseFloat(salary?.sl) || 0,
@@ -690,6 +694,7 @@ function DetailSalaryList() {
                     alDay: parseFloat(salary?.al_day) || 0,
                 };
             });
+            console.log(transformedData, 'transformedData');
 
             setData(transformedData)
 

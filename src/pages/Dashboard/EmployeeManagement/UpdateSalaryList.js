@@ -119,40 +119,40 @@ function UpdateSalaryList() {
 
 
     // Updated column configuration with action column
-    const columnConfig = [
-        { key: "employeeName", header: "Employee Name", type: "auto" },
-        { key: "employeeId", header: "Employee ID", type: "auto" },
-        { key: "salaryPaid", header: "Salary Basic", type: "auto" },
-        { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
-        { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
-        { key: "other_allowance", header: "Others", type: "auto" },
-        { key: "salaryPackage", header: "Salary Package", type: "auto" },
-        { key: "commission", header: "Commission", type: "manual" },
-        { key: "otherAdd", header: "Other Add", type: "manual" },
-        { key: "al", header: "AL/SL", type: "manual" },
+const columnConfig = [
+    { key: "employeeName", header: "Employee Name", type: "auto" },
+    { key: "employeeId", header: "Employee ID", type: "auto" },
+    { key: "salaryPaid", header: "Salary Basic", type: "auto" },
+    { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
+    { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
+    { key: "other_allowance", header: "Others", type: "auto" },
+    { key: "salaryPackage", header: "Salary Package", type: "auto" },
+    { key: "commission", header: "Commission", type: "manual" },
+    { key: "otherAdd", header: "Other Add", type: "manual" },
+    { key: "al", header: "AL/SL", type: "manual" },
 
-        { key: "arrear", header: "Airfare", type: "manual" },
-        { key: "gpssaEmp", header: "GPSSA", type: "manual", isGpssa: true },
+    { key: "arrear", header: "Airfare", type: "manual" },
+    { key: "gpssaEmp", header: "GPSSA", type: "manual", isGpssa: true },
 
-        { key: "staffAdvance", header: "Staff Advance", type: "manual" },
-        { key: "lateComm", header: "Late Coming", type: "manual" },
-        { key: "additional", header: "Additional", type: "manual" },
-        { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
-        { key: "unpaidLeave", header: "Unpaid Deduction", type: "manual" },
-        { key: "totalPay", header: "Total pay", type: "auto" },
-        { key: "commissionFinal", header: "Commission Return", type: "manual" },
-        { key: "netSalary", header: "Net Salary", type: "auto" },
-        // New administrative columns - all auto
-        { key: "routingCode", header: "ROUTING CODE", type: "auto" },
-        { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
-        { key: "workPermit", header: "WORK PERMIT", type: "auto" },
-        { key: "visa", header: "Visa", type: "auto" },
-        { key: "branch", header: "BRANCH", type: "auto" },
+    { key: "staffAdvance", header: "Staff Advance", type: "manual" },
+    { key: "lateComm", header: "Late Coming", type: "manual" },
+    { key: "additional", header: "Additional", type: "manual" },
+    { key: "salaryDeduction", header: "Salary Deduction", type: "manual" },
+    { key: "unpaidLeave", header: "Unpaid Deduction", type: "manual" },
+    { key: "totalPay", header: "Total pay", type: "auto" },
+    { key: "commissionFinal", header: "Commission Return", type: "manual" },
+    { key: "netSalary", header: "Net Salary", type: "auto" },
+    // New administrative columns - all auto
+    { key: "routingCode", header: "ROUTING CODE", type: "auto" },
+    { key: "salaryIban", header: "SALARY IBAN", type: "auto" },
+    { key: "workPermit", header: "WORK PERMIT", type: "auto" },
+    { key: "visa", header: "Visa", type: "auto" },
+    { key: "branch", header: "BRANCH", type: "auto" },
 
-        { key: "minutesLate", header: "Minutes Late", type: "auto" },
-        { key: "alDay", header: "AL Day", type: "auto" },
-        // { key: "actions", header: "Actions", type: "action" },
-    ]
+    { key: "minutesLate", header: "Minutes Late", type: "auto" },
+    { key: "alDay", header: "AL Day", type: "auto" },
+    { key: "actions", header: "Actions", type: "action" },
+  ]
 
     // Start with empty table
     const [data, setData] = useState([])
@@ -409,44 +409,53 @@ const generateDefaultEmployeeData = (employee, salary) => {
 
 
     // Handle input changes for manual fields
-    const handleInputChange = useCallback((id, field, value) => {
-        const numericValue = Number.parseFloat(value) || 0
+  // Handle input changes for manual fields
+  const handleInputChange = useCallback((id, field, value) => {
+    const numericValue = Number.parseFloat(value) || 0
 
-        setData((prevData) =>
-            prevData.map((row) => {
-                if (row.id === id) {
-                    const updatedRow = { ...row, [field]: numericValue }
+    setData((prevData) => {
+      // Remove duplicate user_ids, keeping the first occurrence
+      const seenUserIds = new Set();
+      const uniqueData = prevData.filter((row) => {
+        if (seenUserIds.has(row.user_id)) return false;
+        seenUserIds.add(row.user_id);
+        return true;
+      });
 
-                    // Calculate total pay (sum of relevant fields)
-                    const totalPay =
-                        updatedRow.salaryPaid +
-                        updatedRow.commission +
-                        updatedRow.otherAdd +
-                        updatedRow.al +
-                        updatedRow.sl +
-                        updatedRow.arrear
+      // Now update the matching row
+      return uniqueData.map((row) => {
+        if (row.id === id) {
+          const updatedRow = { ...row, [field]: numericValue };
 
+          const totalPay =
+            (updatedRow.housing_allowance || 0) +
+            (updatedRow.transport_allowance || 0) +
+            (updatedRow.other_allowance || 0) +
+            (updatedRow.salaryPaid || 0) +
+            (updatedRow.commission || 0) +
+            (updatedRow.otherAdd || 0) +
+            (updatedRow.al || 0) +
+            (updatedRow.arrear || 0);
 
-                    // Calculate net salary (total pay minus deductions)
-                    const deductions =
-                        updatedRow.staffAdvance +
-                        updatedRow.lateComm +
+          const deductions =
+            (updatedRow.staffAdvance || 0) +
+            (updatedRow.gpssaEmp || 0) +
+            (updatedRow.lateComm || 0) +
+            (updatedRow.additional || 0) +
+            (updatedRow.salaryDeduction || 0) +
+            (updatedRow.unpaidLeave || 0) +
+            (updatedRow.commissionFinal || 0);
 
-                        updatedRow.additional +
-                        updatedRow.salaryDeduction +
-                        updatedRow.unpaidLeave +
-                        updatedRow.commissionFinal +
-                        updatedRow.gpssaEmp
+          updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal || 0);
+          updatedRow.netSalary = totalPay - deductions;
 
-                    updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal)
-                    updatedRow.netSalary = totalPay - deductions
+          return updatedRow;
+        }
+        return row;
+      });
+    });
 
-                    return updatedRow
-                }
-                return row
-            }),
-        )
-    }, [])
+  }, [])
 
     const renderCell = (row, column) => {
         const value = row[column.key]

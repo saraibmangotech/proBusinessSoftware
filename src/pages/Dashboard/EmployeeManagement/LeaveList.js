@@ -234,7 +234,7 @@ function LeaveList() {
             const status = newData?.status?.toLowerCase();
             const type = newData?.type?.toLowerCase();
 
-            if ((status?.toLowerCase() === 'pending' || status?.toLowerCase()=='partial')  && (newData?.user_id != user?.id)) {
+            if ((status?.toLowerCase() === 'pending' || status?.toLowerCase() == 'partial') && (newData?.user_id != user?.id)) {
                 setStatusDialog(true);
             }
 
@@ -278,25 +278,46 @@ function LeaveList() {
             }
             else if (newData?.type == 'Annual') {
                 console.log(data, 'leavesleaves');
+                if (newData?.is_halfday) {
 
-                let leaveBalance = parseFloat(leaves?.annual_leave_balance)
-                let appliedDays = parseFloat(newData?.total_days)
-                let approvedDays = appliedDays > leaveBalance ?
-                    leaveBalance :
-                    appliedDays
-                console.log(appliedDays, 'appliedDays');
-                setValue('leaves', leaveBalance)
-                setValue('applied', appliedDays)
-                setValue('approved',
-                    approvedDays)
-                setValue('balanced',
-                    leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
-                setValue('absent',
-                    appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                    let leaveBalance = parseFloat(leaves?.annual_leave_balance)
+                    let appliedDays = parseFloat(newData?.total_days)
+                    let approvedDays = appliedDays > leaveBalance ?
+                        leaveBalance :
+                        appliedDays
+                    console.log(appliedDays, 'appliedDays');
+                    setValue('leaves', leaveBalance)
+                    setValue('applied', 0.5)
+                    setValue('approved',
+                        0.5)
+                    setValue('balanced',
+                        leaveBalance - appliedDays < 0 ? 0 : leaveBalance - 0.5)
+                    setValue('absent',
+                        appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                }
+                else {
+
+                    let leaveBalance = parseFloat(leaves?.annual_leave_balance)
+                    let appliedDays = parseFloat(newData?.total_days)
+                    let approvedDays = appliedDays > leaveBalance ?
+                        leaveBalance :
+                        appliedDays
+                    console.log(appliedDays, 'appliedDays');
+                    setValue('leaves', leaveBalance)
+                    setValue('applied', appliedDays)
+                    setValue('approved',
+                        approvedDays)
+                    setValue('balanced',
+                        leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                    setValue('absent',
+                        appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                }
+
             }
 
             else if (newData?.type == 'Sick') {
                 console.log(data, 'leavesleaves');
+
 
                 let leaveBalance = parseFloat(leaves?.sick_leave_full_balance || 0) || parseFloat(leaves?.sick_leave_half_balance || 0) || parseFloat(leaves?.sick_leave_unpaid_balance || 0)
                 let appliedDays = parseFloat(newData?.total_days)
@@ -349,6 +370,25 @@ function LeaveList() {
                 setValue('absent',
                     appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
             }
+            else if (newData?.type == 'Personal Time') {
+                console.log(leaves, 'leavesleaves');
+                setValue('requested_mint', newData?.requested_minutes)
+                setValue('balanceMint', leaves?.personal_time_balance)
+                let leaveBalance = parseFloat(leaves?.annual_leave_balance)
+                let appliedDays = parseFloat(newData?.total_days)
+                let approvedDays = appliedDays > leaveBalance ?
+                    leaveBalance :
+                    appliedDays
+                console.log(appliedDays, 'appliedDays');
+                setValue('leaves', leaveBalance)
+                setValue('applied', appliedDays)
+                setValue('approved',
+                    approvedDays)
+                setValue('balanced',
+                    leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                setValue('absent',
+                    appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+            }
 
         } catch (error) {
             showErrorToast(error)
@@ -365,9 +405,10 @@ function LeaveList() {
                 status: status?.id,
                 hr_statement: getValues('statement'),
                 user_id: selectedData?.user_id,
-                approved_days: approvedDays,
-                absent_days: appliedDays - approvedDays,
-                balance_after: Math.floor(employeeData?.leaves_balance) - approvedDays,
+                approved_days:selectedData?.is_halfday ? 0.5 : approvedDays,
+                requested_minutes: getValues('requested_mint'),
+                absent_days: selectedData?.is_halfday ? 0 : appliedDays - approvedDays,
+                balance_after:  selectedData?.is_halfday ? Math.floor(employeeData?.leaves_balance) - 0.5 :Math.floor(employeeData?.leaves_balance) - approvedDays,
             };
 
             const promise = CustomerServices.LeaveStatus(obj);
@@ -631,91 +672,127 @@ function LeaveList() {
                                 })}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={12}>
+                        {selectedData?.type != 'Personal Time' ? <Grid container m={1} spacing={2}>
+                            <Grid item xs={12} sm={12}>
 
-                            <InputField
-                                label={"Employee Leaves :"}
-                                size={'small'}
-                                disabled={true}
-                                placeholder={"Employee Leaves "}
-                                error={errors?.leaves?.message}
-                                register={register("leaves", {
-                                    required:
-                                        "Please enter leaves."
+                                <InputField
+                                    label={"Employee Leaves :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Employee Leaves "}
+                                    error={errors?.leaves?.message}
+                                    register={register("leaves", {
+                                        required:
+                                            "Please enter leaves."
 
-                                })}
-                            />
-
-
-                        </Grid>
-                        <Grid item xs={6} sm={6}>
-
-                            <InputField
-                                label={"Applied Days :"}
-                                size={'small'}
-                                disabled={true}
-                                placeholder={"Applied Days "}
-                                error={errors?.applied?.message}
-                                register={register("applied", {
-                                    required:
-                                        "Please enter applied."
-
-                                })}
-                            />
+                                    })}
+                                />
 
 
-                        </Grid>
-                        <Grid item xs={6} sm={6}>
+                            </Grid>
+                            <Grid item xs={6} sm={6}>
 
-                            <InputField
-                                label={"Approved Days :"}
-                                size={'small'}
-                                disabled={true}
-                                placeholder={"Approved Days "}
-                                error={errors?.approved?.message}
-                                register={register("approved", {
-                                    required:
-                                        "Please enter approved."
+                                <InputField
+                                    label={"Applied Days :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Applied Days "}
+                                    error={errors?.applied?.message}
+                                    register={register("applied", {
+                                        required:
+                                            "Please enter applied."
 
-                                })}
-                            />
-
-
-                        </Grid>
-                        <Grid item xs={6} sm={6}>
-
-                            <InputField
-                                label={"Absent Days :"}
-                                size={'small'}
-                                disabled={true}
-                                placeholder={"Absent Days "}
-                                error={errors?.absent?.message}
-                                register={register("absent", {
-                                    required:
-                                        "Please enter absent."
-
-                                })}
-                            />
+                                    })}
+                                />
 
 
-                        </Grid>
-                        <Grid item xs={6} sm={6}>
+                            </Grid>
+                            <Grid item xs={6} sm={6}>
 
-                            <InputField
-                                label={"Balanced Days :"}
-                                size={'small'}
-                                disabled={true}
-                                placeholder={"Balanced Days "}
-                                error={errors?.balanced?.message}
-                                register={register("balanced", {
-                                    required:
-                                        "Please enter balanced."
+                                <InputField
+                                    label={"Approved Days :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Approved Days "}
+                                    error={errors?.approved?.message}
+                                    register={register("approved", {
+                                        required:
+                                            "Please enter approved."
 
-                                })}
-                            />
+                                    })}
+                                />
 
 
-                        </Grid>
+                            </Grid>
+                            <Grid item xs={6} sm={6}>
+
+                                <InputField
+                                    label={"Absent Days :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Absent Days "}
+                                    error={errors?.absent?.message}
+                                    register={register("absent", {
+                                        required:
+                                            "Please enter absent."
+
+                                    })}
+                                />
+
+
+                            </Grid>
+                            <Grid item xs={6} sm={6}>
+
+                                <InputField
+                                    label={"Balanced Days :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Balanced Days "}
+                                    error={errors?.balanced?.message}
+                                    register={register("balanced", {
+                                        required:
+                                            "Please enter balanced."
+
+                                    })}
+                                />
+
+
+                            </Grid>
+                        </Grid> : <>
+                            <Grid item xs={6} sm={6}>
+
+                                <InputField
+                                    label={"Balanced :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Balanced "}
+                                    error={errors?.balanceMint?.message}
+                                    register={register("balanceMint", {
+                                        required:
+                                            "Please enter balanceMint."
+
+                                    })}
+                                />
+
+
+                            </Grid>
+                            <Grid item xs={6} sm={6}>
+
+                                <InputField
+                                    label={"Requested Minutes :"}
+                                    size={'small'}
+                                    disabled={true}
+                                    placeholder={"Requested Minutes "}
+                                    error={errors?.requested_mint?.message}
+                                    register={register("requested_mint", {
+                                        required:
+                                            "Please enter requested_mint."
+
+                                    })}
+                                />
+
+
+                            </Grid></>}
                         <Grid item xs={12} sm={12}>
 
                             <InputField
