@@ -484,7 +484,7 @@ export default function AttendanceTable() {
                 return
             }
             const mappedData = attendanceData.attendance.map((employee) => ({
-                id: employee.employee_id,
+                id: employee.user_id,
                 name: employee.user_name,
                 avatar: `/placeholder.svg?height=40&width=40&text=${employee.user_name.charAt(0)}`,
                 attendance:
@@ -733,7 +733,7 @@ export default function AttendanceTable() {
         } else {
             setShifts([])
         }
-        console.log(dateStr, "dateStr")
+        console.log(employee, "employeeemployeeemployee")
         setTableDate(dateStr)
         setSelectedData(employee)
         if (user?.role_id == 6) {
