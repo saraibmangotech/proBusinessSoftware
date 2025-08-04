@@ -1,5 +1,4 @@
 "use client"
-
 import { Fragment, useEffect, useRef, useState } from "react"
 import {
   Box,
@@ -36,8 +35,8 @@ import CustomerServices from "services/Customer" // Assuming this service exists
 import { showErrorToast } from "components/NewToaster" // Assuming this component exists
 import DatePicker from "components/DatePicker" // Assuming this component exists
 import InputField from "components/Input" // Assuming this component exists
-import SelectField from "components/Select" // Assuming this component exists
 import ExcelJS from "exceljs"
+import SelectField from "components/Select"
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -47,14 +46,13 @@ const Row = styled(TableRow)(({ theme }) => ({
 const Cell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     fontSize: 14,
-    fontFamily: "Public Sans",
+    fontFamily: FontFamily.Montserrat,
     border: 0,
     padding: "15px",
     textAlign: "center",
     whiteSpace: "nowrap",
-    background: Colors.primary,
+    background: `${Colors.secondary} !important`,
     color: Colors.white,
-    fontWeight: "bold",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -76,7 +74,7 @@ const Cell = styled(TableCell)(({ theme }) => ({
     },
     ".MuiTypography-root": {
       textTransform: "capitalize",
-      fontFamily: FontFamily.NunitoRegular,
+      fontFamily: FontFamily.Montserrat,
       textWrap: "nowrap",
     },
     ".MuiButtonBase-root": {
@@ -108,46 +106,72 @@ const formatAmount = (amount) => {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
+  }).format(Number.parseFloat(amount).toFixed(2))
 }
 
 // Update the `calculateAccountTotals` function to correctly handle opening balance, debit, credit, period difference, and final balance, including recursive summation for child accounts.
 const calculateAccountTotals = (account) => {
-  const opening = account?.nature == "credit"
-            ? -1 * (Number.parseFloat(account.opening_balance) || 0)
-            : Number.parseFloat(account.opening_balance) || 0
-  const debit = Number.parseFloat(account.total_debit) || 0
-  const credit = Number.parseFloat(account.total_credit) || 0
+  console.log(account, 'hanahan');
+
+  const opening =
+    account?.nature == "credit"
+      ? -1 * (Number.parseFloat(account.opening_balance).toFixed(2) || 0)
+      : Number.parseFloat(account.opening_balance).toFixed(2) || 0
+
+  const debit = Number.parseFloat(account.total_debit).toFixed(2) || 0
+  const credit = Number.parseFloat(account.total_credit).toFixed(2) || 0
 
   // Determine the effective opening balance based on account nature for summation
-  let effectiveOpeningBalance = opening
-  
-
-  let accumulatedTotalDebit = debit
-  let accumulatedTotalCredit = credit
+  let effectiveOpeningBalance = Number.parseFloat(opening).toFixed(2)
+  let accumulatedTotalDebit = Number.parseFloat(debit).toFixed(2)
+  let accumulatedTotalCredit = Number.parseFloat(credit).toFixed(2)
   let accumulatedOpeningBalance = 0
+  if (account.account_code == "A2-20001") {
+    console.log(accumulatedOpeningBalance, effectiveOpeningBalance, "KuchLikheTo")
+  }
 
   if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
     account?.childAccounts?.forEach((child) => {
       const childTotals = calculateAccountTotals(child)
-      accumulatedOpeningBalance += childTotals.effectiveOpeningBalance
-      accumulatedTotalDebit += childTotals.totalDebit
-      accumulatedTotalCredit += childTotals.totalCredit
+      console.log(childTotals, 'childTotalsNew');
+
+      accumulatedOpeningBalance = Number.parseFloat(
+        parseFloat(accumulatedOpeningBalance) + Number.parseFloat(childTotals.effectiveOpeningBalance),
+      ).toFixed(2)
+      if (account.account_code == "A2-20001") {
+        console.log(accumulatedOpeningBalance, effectiveOpeningBalance, childTotals.effectiveOpeningBalance, "KuchLikheTo")
+      }
+      accumulatedTotalDebit = Number.parseFloat(
+        Number.parseFloat(accumulatedTotalDebit) + Number.parseFloat(childTotals.totalDebit),
+      ).toFixed(2)
+      accumulatedTotalCredit = Number.parseFloat(
+        Number.parseFloat(accumulatedTotalCredit) + Number.parseFloat(childTotals.totalCredit),
+      ).toFixed(2)
     })
   }
 
+  if (account.account_code == "A2-20001") {
+    console.log(accumulatedOpeningBalance, effectiveOpeningBalance, "KuchLikheTo")
+  }
+
   // Period difference is always (accumulated) Debit - (accumulated) Credit
-  const periodDifference = accumulatedTotalDebit - accumulatedTotalCredit
+  const periodDifference = Number.parseFloat(
+    Number.parseFloat(accumulatedTotalDebit) - Number.parseFloat(accumulatedTotalCredit),
+  ).toFixed(2)
 
   // Final balance is the effective opening balance + the period difference
-  const balance = effectiveOpeningBalance + periodDifference
+  const balance = Number.parseFloat(
+    Number.parseFloat(effectiveOpeningBalance) + Number.parseFloat(periodDifference),
+  ).toFixed(2)
+  console.log(effectiveOpeningBalance, account.account_code, 'effectiveOpeningBalanceeffectiveOpeningBalance');
+  console.log(accumulatedOpeningBalance, account.account_code, 'effectiveOpeningBalanceeffectiveOpeningBalance');
 
   return {
-    effectiveOpeningBalance: effectiveOpeningBalance, // This is the signed opening balance for display/accumulation
-    totalDebit: accumulatedTotalDebit,
-    totalCredit: accumulatedTotalCredit,
-    periodDifference: periodDifference, // This is the raw debit - credit difference
-    balance: balance,
+    effectiveOpeningBalance: Math.abs(parseFloat(accumulatedOpeningBalance)) > 0 ? parseFloat(accumulatedOpeningBalance).toFixed(2) : Number.parseFloat(effectiveOpeningBalance).toFixed(2), // This is the signed opening balance for display/accumulation
+    totalDebit: Number.parseFloat(accumulatedTotalDebit).toFixed(2),
+    totalCredit: Number.parseFloat(accumulatedTotalCredit).toFixed(2),
+    periodDifference: Number.parseFloat(periodDifference).toFixed(2), // This is the raw debit - credit difference
+    balance: Number.parseFloat(balance).toFixed(2),
   }
 }
 
@@ -167,33 +191,40 @@ const transformDataForDisplay = (data, searchTerm) => {
 
   const processAccountsRecursively = (accounts) => {
     const processed = []
+
     accounts?.forEach((account) => {
+      const allChildAccounts = Array.isArray(account.childAccounts) ? account.childAccounts : []
       const childAccountsProcessed = []
-      if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
-        account?.childAccounts?.forEach((child) => {
-          const childTotals = calculateAccountTotals(child)
-          if (filterAccount(child)) {
-            childAccountsProcessed.push({
-              ...child,
-              calculatedTotals: childTotals,
-              isChild: true,
-            })
-          }
-        })
+
+      allChildAccounts.forEach((child) => {
+        const childTotals = calculateAccountTotals(child)
+
+        if (filterAccount(child)) {
+          childAccountsProcessed.push({
+            ...child,
+            calculatedTotals: childTotals,
+            isChild: true,
+          })
+        }
+      })
+
+      // Calculate totals using all children (not just the ones that matched filter)
+      const accountWithAllChildren = {
+        ...account,
+        childAccounts: allChildAccounts,
       }
 
-      // Calculate totals for the current account (including its children)
-      const accountTotals = calculateAccountTotals(account) // This will recursively sum up from children
+      const accountTotals = calculateAccountTotals(accountWithAllChildren)
 
-      // Only include parent account if it matches search or has matching children
       if (filterAccount(account) || childAccountsProcessed.length > 0) {
         processed.push({
           ...account,
           calculatedTotals: accountTotals,
-          childAccounts: childAccountsProcessed, // Replace original children with filtered/processed ones
+          childAccounts: childAccountsProcessed,
         })
       }
     })
+
     return processed
   }
 
@@ -210,9 +241,9 @@ const transformDataForDisplay = (data, searchTerm) => {
         const filteredAccounts = processAccountsRecursively(subItem?.accounts)
 
         if (filteredAccounts.length > 0) {
-          // Group by subcategory type
-          filteredAccounts?.forEach((account) => {
+          filteredAccounts.forEach((account) => {
             const subcategoryName = account.account_subcategory || "Uncategorized"
+
             if (!groupedSubcategories[subcategoryName]) {
               groupedSubcategories[subcategoryName] = {
                 name: subcategoryName,
@@ -224,36 +255,72 @@ const transformDataForDisplay = (data, searchTerm) => {
                 balanceTotal: 0,
               }
             }
+
             groupedSubcategories[subcategoryName].accounts.push(account)
-            groupedSubcategories[subcategoryName].openingTotal += account.calculatedTotals.effectiveOpeningBalance
-            groupedSubcategories[subcategoryName].debitTotal += account.calculatedTotals.totalDebit
-            groupedSubcategories[subcategoryName].creditTotal += account.calculatedTotals.totalCredit
-            groupedSubcategories[subcategoryName].periodDiffTotal += account.calculatedTotals.periodDifference
-            groupedSubcategories[subcategoryName].balanceTotal += account.calculatedTotals.balance
+
+            groupedSubcategories[subcategoryName].openingTotal = Number.parseFloat(
+              Number.parseFloat(groupedSubcategories[subcategoryName].openingTotal) +
+              Number.parseFloat(account.calculatedTotals.effectiveOpeningBalance),
+            ).toFixed(2)
+
+            groupedSubcategories[subcategoryName].debitTotal = Number.parseFloat(
+              Number.parseFloat(groupedSubcategories[subcategoryName].debitTotal) +
+              Number.parseFloat(account.calculatedTotals.totalDebit),
+            ).toFixed(2)
+
+            groupedSubcategories[subcategoryName].creditTotal = Number.parseFloat(
+              Number.parseFloat(groupedSubcategories[subcategoryName].creditTotal) +
+              Number.parseFloat(account.calculatedTotals.totalCredit),
+            ).toFixed(2)
+
+            groupedSubcategories[subcategoryName].periodDiffTotal = Number.parseFloat(
+              Number.parseFloat(groupedSubcategories[subcategoryName].periodDiffTotal) +
+              Number.parseFloat(account.calculatedTotals.periodDifference),
+            ).toFixed(2)
+
+            groupedSubcategories[subcategoryName].balanceTotal = Number.parseFloat(
+              Number.parseFloat(groupedSubcategories[subcategoryName].balanceTotal) +
+              Number.parseFloat(account.calculatedTotals.balance),
+            ).toFixed(2)
           })
         }
       })
 
       Object.values(groupedSubcategories).forEach((group) => {
-        majorCategoryOpeningTotal += group.openingTotal
-        majorCategoryDebitTotal += group.debitTotal
-        majorCategoryCreditTotal += group.creditTotal
-        majorCategoryPeriodDiffTotal += group.periodDiffTotal
-        majorCategoryBalanceTotal += group.balanceTotal
+        majorCategoryOpeningTotal = Number.parseFloat(
+          Number.parseFloat(majorCategoryOpeningTotal) + Number.parseFloat(group.openingTotal),
+        ).toFixed(2)
+
+        majorCategoryDebitTotal = Number.parseFloat(
+          Number.parseFloat(majorCategoryDebitTotal) + Number.parseFloat(group.debitTotal),
+        ).toFixed(2)
+
+        majorCategoryCreditTotal = Number.parseFloat(
+          Number.parseFloat(majorCategoryCreditTotal) + Number.parseFloat(group.creditTotal),
+        ).toFixed(2)
+
+        majorCategoryPeriodDiffTotal = Number.parseFloat(
+          Number.parseFloat(majorCategoryPeriodDiffTotal) + Number.parseFloat(group.periodDiffTotal),
+        ).toFixed(2)
+
+        majorCategoryBalanceTotal = Number.parseFloat(
+          Number.parseFloat(majorCategoryBalanceTotal) + Number.parseFloat(group.balanceTotal),
+        ).toFixed(2)
       })
 
       return {
         ...majorCategory,
         subcategories_grouped: Object.values(groupedSubcategories),
-        majorCategoryOpeningTotal,
-        majorCategoryDebitTotal,
-        majorCategoryCreditTotal,
-        majorCategoryPeriodDiffTotal,
-        majorCategoryBalanceTotal,
+        majorCategoryOpeningTotal: Number.parseFloat(majorCategoryOpeningTotal).toFixed(2),
+        majorCategoryDebitTotal: Number.parseFloat(majorCategoryDebitTotal).toFixed(2),
+        majorCategoryCreditTotal: Number.parseFloat(majorCategoryCreditTotal).toFixed(2),
+        majorCategoryPeriodDiffTotal: Number.parseFloat(majorCategoryPeriodDiffTotal).toFixed(2),
+        majorCategoryBalanceTotal: Number.parseFloat(majorCategoryBalanceTotal).toFixed(2),
       }
     })
     .filter((majorCategory) => majorCategory.subcategories_grouped.length > 0)
 }
+
 
 function BalanceSheetDetailed() {
   const classes = useStyles()
@@ -347,6 +414,7 @@ function BalanceSheetDetailed() {
       }
       const { data } = await FinanceServices.getAccountReportsDetail(params)
       const myData = data?.detail
+
       setBalanceSheet(myData?.slice(0, -2)) // Keep original for tabs
       setFilteredBalanceSheet(myData?.slice(0, -2)) // Keep original for tabs and initial display data source
 
@@ -356,10 +424,13 @@ function BalanceSheetDetailed() {
         .filter((account) => account.type_code === "E2")
         .reduce(
           (sum, account) =>
-            sum + (Number.parseFloat(account.total_debit || 0) - Number.parseFloat(account.total_credit || 0)),
+            Number.parseFloat(
+              sum + (Number.parseFloat(account.total_debit || 0) - Number.parseFloat(account.total_credit || 0)),
+            ).toFixed(2),
           0,
         )
-      setAdminOpTotal(Number.parseFloat(e2Total))
+
+      setAdminOpTotal(Number.parseFloat(e2Total).toFixed(2))
 
       const fil = []
       myData?.slice(0, -2).forEach((e) => {
@@ -378,20 +449,30 @@ function BalanceSheetDetailed() {
         if (categoryItem) {
           categoryItem.sub?.forEach((subItem) => {
             subItem.accounts?.forEach((account) => {
-              const credit = Number.parseFloat(account.total_credit) || 0
-              const debit = Number.parseFloat(account.total_debit) || 0
-              total += account.nature === "debit" ? debit - credit : credit - debit
+              const credit = Number.parseFloat(account.total_credit).toFixed(2) || 0
+              const debit = Number.parseFloat(account.total_debit).toFixed(2) || 0
+              total = Number.parseFloat(
+                Number.parseFloat(total) +
+                (account.nature === "debit"
+                  ? Number.parseFloat(debit) - Number.parseFloat(credit)
+                  : Number.parseFloat(credit) - Number.parseFloat(debit)),
+              ).toFixed(2)
               if (account.childAccounts) {
                 account?.childAccounts?.forEach((child) => {
-                  const childCredit = Number.parseFloat(child.total_credit) || 0
-                  const childDebit = Number.parseFloat(child.total_debit) || 0
-                  total += child.nature === "debit" ? childDebit - childCredit : childCredit - childDebit
+                  const childCredit = Number.parseFloat(child.total_credit).toFixed(2) || 0
+                  const childDebit = Number.parseFloat(child.total_debit).toFixed(2) || 0
+                  total = Number.parseFloat(
+                    Number.parseFloat(total) +
+                    (child.nature === "debit"
+                      ? Number.parseFloat(childDebit) - Number.parseFloat(childCredit)
+                      : Number.parseFloat(childCredit) - Number.parseFloat(childDebit)),
+                  ).toFixed(2)
                 })
               }
             })
           })
         }
-        return total.toFixed(2)
+        return Number.parseFloat(total).toFixed(2)
       }
 
       const totalSales = (subItems) => {
@@ -399,34 +480,44 @@ function BalanceSheetDetailed() {
         subItems?.forEach((subItem) => {
           subItem.accounts?.forEach((account) => {
             let accountTotal = 0
-            const credit = Number.parseFloat(account.total_credit) || 0
-            const debit = Number.parseFloat(account.total_debit) || 0
-            accountTotal = account.nature === "debit" ? debit - credit : credit - debit
+            const credit = Number.parseFloat(account.total_credit).toFixed(2) || 0
+            const debit = Number.parseFloat(account.total_debit).toFixed(2) || 0
+            accountTotal =
+              account.nature === "debit"
+                ? Number.parseFloat(debit) - Number.parseFloat(credit)
+                : Number.parseFloat(credit) - Number.parseFloat(debit)
             if (account.childAccounts && account.childAccounts.length > 0) {
               const childSum = account.childAccounts.reduce((sum, child) => {
-                const cc = Number.parseFloat(child.total_credit) || 0
-                const cd = Number.parseFloat(child.total_debit) || 0
-                return sum + (child.nature === "debit" ? cd - cc : cc - cd)
+                const cc = Number.parseFloat(child.total_credit).toFixed(2) || 0
+                const cd = Number.parseFloat(child.total_debit).toFixed(2) || 0
+                return Number.parseFloat(
+                  Number.parseFloat(sum) +
+                  (child.nature === "debit"
+                    ? Number.parseFloat(cd) - Number.parseFloat(cc)
+                    : Number.parseFloat(cc) - Number.parseFloat(cd)),
+                ).toFixed(2)
               }, 0)
-              accountTotal = childSum
+              accountTotal = Number.parseFloat(childSum).toFixed(2)
             }
-            grandTotal += accountTotal
+            grandTotal = Number.parseFloat(Number.parseFloat(grandTotal) + Number.parseFloat(accountTotal)).toFixed(2)
           })
         })
-        return grandTotal
+        return Number.parseFloat(grandTotal).toFixed(2)
       }
 
       const costData = myData.filter((item) => item?.name == "Expenses")
       const costSalesTotal = totalSales(costData[0]?.sub?.filter((item) => item?.type_number == 1))
-      setTotalCost(costSalesTotal)
+      setTotalCost(Number.parseFloat(costSalesTotal).toFixed(2))
+
       const revenueTotal = calculateTotal(myData, "Revenue")
       const totalEnxpensesVal = calculateTotal(myData, "Expenses")
-      setTotalRevenue(revenueTotal)
-      setTotalExpenses(totalEnxpensesVal)
+      setTotalRevenue(Number.parseFloat(revenueTotal).toFixed(2))
+      setTotalExpenses(Number.parseFloat(totalEnxpensesVal).toFixed(2))
+
       const LiabilitiesTotal = calculateTotal(myData, "Liabilities")
       const OwnerCapitalTotal = calculateTotal(myData, "Owner Capital")
-      setCapitalTotal(OwnerCapitalTotal)
-      setLibalTotal(LiabilitiesTotal)
+      setCapitalTotal(Number.parseFloat(OwnerCapitalTotal).toFixed(2))
+      setLibalTotal(Number.parseFloat(LiabilitiesTotal).toFixed(2))
     } catch (error) {
       ErrorToaster(error)
     } finally {
@@ -474,120 +565,121 @@ function BalanceSheetDetailed() {
       ErrorToaster(error)
     }
   }
+
   const downloadExcel = async () => {
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet("Balance Sheet Summary")
-
-    // Set professional header and footer
-    worksheet.headerFooter.oddHeader =
-      '&C&"Arial,Bold"&18BALANCE SHEET SUMMARY\n' +
-      '&C&"Arial,Regular"&12Your Company Name\n' +
-      '&C&"Arial,Regular"&10Period: &D - &T\n' +
-      '&L&"Arial,Regular"&8Generated on: ' +
-      new Date().toLocaleDateString() +
-      "\n" +
-      '&R&"Arial,Regular"&8Page &P of &N'
-    worksheet.headerFooter.oddFooter =
-      '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
-      '&C&"Arial,Regular"&8This report contains financial data as of ' +
-      new Date().toLocaleDateString() +
-      '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
-      '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
-    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
-
-    // Set page setup for professional printing
-    worksheet.pageSetup = {
-      paperSize: 9, // A4
-      orientation: "landscape",
-      fitToPage: true,
-      fitToWidth: 1,
-      fitToHeight: 0,
-      margins: {
-        left: 0.7,
-        right: 0.7,
-        top: 1.0,
-        bottom: 1.0,
-        header: 0.3,
-        footer: 0.5,
-      },
-    }
-
-    // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["BALANCE SHEET SUMMARY REPORT"])
-    titleRow.getCell(1).font = {
-      name: "Arial",
-      size: 16,
-      bold: true,
-      color: { argb: "2F4F4F" },
-    }
-    titleRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A1:G1")
-
-    const name =
-      agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-        ? "PREMIUM BUSINESSMEN SERVICES"
-        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-    const companyRow = worksheet.addRow([name])
-    companyRow.getCell(1).font = {
-      name: "Arial",
-      size: 14,
-      bold: true,
-      color: { argb: "4472C4" },
-    }
-    companyRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A2:G2")
-
-    const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
-    ])
-    dateRow.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    dateRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A3:G3")
-
-    const dateRow2 = worksheet.addRow([
-      toDate && fromDate
-        ? `Period:  ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
-        : `Period: All `,
-    ])
-    dateRow2.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    dateRow2.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A4:G4")
-
-    const costCenter = worksheet.addRow([`Cost Center: ${selectedCostCenter?.name}`])
-    costCenter.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    costCenter.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A5:G5")
-
-    const system = worksheet.addRow([
-      `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
-    ])
-    system.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    system.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A6:G6")
-
-    // Add empty row for spacing
-    worksheet.addRow([])
-
+     const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet("Balance Sheet")
+    
+      // Set professional header and footer
+      worksheet.headerFooter.oddHeader =
+        '&C&"Arial,Bold"&18TRIAL BALANCE REPORT\n' +
+        '&C&"Arial,Regular"&12Your Company Name\n' +
+        '&C&"Arial,Regular"&10Period: &D - &T\n' +
+        '&L&"Arial,Regular"&8Generated on: ' +
+        new Date().toLocaleDateString() +
+        "\n" +
+        '&R&"Arial,Regular"&8Page &P of &N'
+      worksheet.headerFooter.oddFooter =
+        '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+        '&C&"Arial,Regular"&8This report contains financial data as of ' +
+        new Date().toLocaleDateString() +
+        '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
+        '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+      // Alternative simpler footer format
+      worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+    
+      // Set page setup for professional printing
+      worksheet.pageSetup = {
+        paperSize: 9, // A4
+        orientation: "landscape",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        margins: {
+          left: 0.7,
+          right: 0.7,
+          top: 1.0,
+          bottom: 1.0,
+          header: 0.3,
+          footer: 0.3,
+        },
+      }
+    
+      // Add title section at the top of the worksheet
+      const titleRow = worksheet.addRow([" BALANCE SHEET SUMMARY"])
+      titleRow.getCell(1).font = {
+        name: "Arial",
+        size: 16,
+        bold: true,
+        color: { argb: "2F4F4F" },
+      }
+      titleRow.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A1:G1")
+    
+      const name =
+        agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+          ? "PREMIUM BUSINESSMEN SERVICES"
+          : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+      const companyRow = worksheet.addRow([name])
+      companyRow.getCell(1).font = {
+        name: "Arial",
+        size: 14,
+        bold: true,
+        color: { argb: "4472C4" },
+      }
+      companyRow.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A2:G2")
+    
+      const dateRow = worksheet.addRow([
+        `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
+      ])
+      dateRow.getCell(1).font = {
+        name: "Arial",
+        size: 10,
+        italic: true,
+        color: { argb: "666666" },
+      }
+      dateRow.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A3:G3")
+    
+      const dateRow2 = worksheet.addRow([
+        toDate && fromDate
+          ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
+          : `Period: All `,
+      ])
+      dateRow2.getCell(1).font = {
+        name: "Arial",
+        size: 10,
+        italic: true,
+        color: { argb: "666666" },
+      }
+      dateRow2.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A4:G4")
+    
+      const costCenter = worksheet.addRow([`Cost Center: ${selectedCostCenter?.name}`])
+      costCenter.getCell(1).font = {
+        name: "Arial",
+        size: 10,
+        italic: true,
+        color: { argb: "666666" },
+      }
+      costCenter.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A5:G5")
+    
+      const system = worksheet.addRow([
+        `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
+      ])
+      system.getCell(1).font = {
+        name: "Arial",
+        size: 10,
+        italic: true,
+        color: { argb: "666666" },
+      }
+      system.getCell(1).alignment = { horizontal: "center" }
+      worksheet.mergeCells("A6:G6")
+    
+      // Add empty row for spacing
+      worksheet.addRow([])
     // Add headers with professional styling
     const headers = [
       "Account Code",
@@ -649,16 +741,16 @@ function BalanceSheetDetailed() {
           const row = worksheet.addRow([
             account.account_code,
             account.account_name,
-            accountTotals.effectiveOpeningBalance,
-            accountTotals.totalDebit,
-            accountTotals.totalCredit,
-            accountTotals.periodDifference,
-            accountTotals.balance,
+            Number.parseFloat(accountTotals.effectiveOpeningBalance).toFixed(2),
+            Number.parseFloat(accountTotals.totalDebit).toFixed(2),
+            Number.parseFloat(accountTotals.totalCredit).toFixed(2),
+            Number.parseFloat(accountTotals.periodDifference).toFixed(2),
+            Number.parseFloat(accountTotals.balance).toFixed(2),
           ])
 
-          // Format numerical columns as numbers with 4 decimal places
+          // Format numerical columns as numbers with 2 decimal places
           for (let i = 3; i <= 7; i++) {
-            row.getCell(i).numFmt = "#,##0.0000"
+            row.getCell(i).numFmt = "#,##0.00"
           }
 
           // Style account rows
@@ -675,6 +767,7 @@ function BalanceSheetDetailed() {
               right: { style: "hair", color: { argb: "CCCCCC" } },
             }
           })
+
           // IMPORTANT: No child accounts are added here for the "short" report
         })
 
@@ -683,16 +776,18 @@ function BalanceSheetDetailed() {
           const totalRow = worksheet.addRow([
             "",
             `${groupedSubcategory.name} Total`,
-            groupedSubcategory.openingTotal,
-            groupedSubcategory.debitTotal,
-            groupedSubcategory.creditTotal,
-            groupedSubcategory.periodDiffTotal,
-            groupedSubcategory.balanceTotal,
+            Number.parseFloat(groupedSubcategory.openingTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.debitTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.creditTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.periodDiffTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.balanceTotal).toFixed(2),
           ])
+
           // Format numerical columns
           for (let i = 3; i <= 7; i++) {
-            totalRow.getCell(i).numFmt = "#,##0.0000"
+            totalRow.getCell(i).numFmt = "#,##0.00"
           }
+
           totalRow.eachCell((cell) => {
             cell.fill = {
               type: "pattern",
@@ -709,16 +804,18 @@ function BalanceSheetDetailed() {
         const catTotalRow = worksheet.addRow([
           `${majorCategoryItem.name} Total`,
           "",
-          majorCategoryItem.majorCategoryOpeningTotal,
-          majorCategoryItem.majorCategoryDebitTotal,
-          majorCategoryItem.majorCategoryCreditTotal,
-          majorCategoryItem.majorCategoryPeriodDiffTotal,
-          majorCategoryItem.majorCategoryBalanceTotal,
+          Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryPeriodDiffTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal).toFixed(2),
         ])
+
         // Format numerical columns
         for (let i = 3; i <= 7; i++) {
-          catTotalRow.getCell(i).numFmt = "#,##0.0000"
+          catTotalRow.getCell(i).numFmt = "#,##0.00"
         }
+
         catTotalRow.eachCell((cell) => {
           cell.fill = {
             type: "pattern",
@@ -729,11 +826,21 @@ function BalanceSheetDetailed() {
         })
 
         // Update grand totals
-        grandOpening += majorCategoryItem.majorCategoryOpeningTotal
-        grandDebit += majorCategoryItem.majorCategoryDebitTotal
-        grandCredit += majorCategoryItem.majorCategoryCreditTotal
-        grandDiff += majorCategoryItem.majorCategoryPeriodDiffTotal
-        grandBalance += majorCategoryItem.majorCategoryBalanceTotal
+        grandOpening = Number.parseFloat(
+          Number.parseFloat(grandOpening) + Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal),
+        ).toFixed(2)
+        grandDebit = Number.parseFloat(
+          Number.parseFloat(grandDebit) + Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal),
+        ).toFixed(2)
+        grandCredit = Number.parseFloat(
+          Number.parseFloat(grandCredit) + Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal),
+        ).toFixed(2)
+        grandDiff = Number.parseFloat(
+          Number.parseFloat(grandDiff) + Number.parseFloat(majorCategoryItem.majorCategoryPeriodDiffTotal),
+        ).toFixed(2)
+        grandBalance = Number.parseFloat(
+          Number.parseFloat(grandBalance) + Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal),
+        ).toFixed(2)
       }
     })
 
@@ -741,16 +848,18 @@ function BalanceSheetDetailed() {
     const grandTotalRow = worksheet.addRow([
       "Grand Total",
       "",
-      grandOpening,
-      grandDebit,
-      grandCredit,
-      grandDiff,
-      grandBalance,
+      Number.parseFloat(grandOpening).toFixed(2),
+      Number.parseFloat(grandDebit).toFixed(2),
+      Number.parseFloat(grandCredit).toFixed(2),
+      Number.parseFloat(grandDiff).toFixed(2),
+      Number.parseFloat(grandBalance).toFixed(2),
     ])
+
     // Format numerical columns
     for (let i = 3; i <= 7; i++) {
-      grandTotalRow.getCell(i).numFmt = "#,##0.0000"
+      grandTotalRow.getCell(i).numFmt = "#,##0.00"
     }
+
     grandTotalRow.eachCell((cell) => {
       cell.fill = {
         type: "pattern",
@@ -774,11 +883,11 @@ function BalanceSheetDetailed() {
       "",
       CommaSeparator(
         (
-          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
-          Number.parseFloat(adminOpTotal)
+          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))
         ).toFixed(2),
       ),
     ])
+
     retainProfitRow.eachCell((cell, colNumber) => {
       cell.fill = {
         type: "pattern",
@@ -814,12 +923,12 @@ function BalanceSheetDetailed() {
       CommaSeparator(
         Number.parseFloat(
           Number.parseFloat(libalTotal) +
-            Number.parseFloat(capitalTotal) +
-            (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
-              Number.parseFloat(adminOpTotal)),
+          Number.parseFloat(capitalTotal) +
+          (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
         ).toFixed(2),
       ),
     ])
+
     grandTotalFinalRow.eachCell((cell, colNumber) => {
       cell.fill = {
         type: "pattern",
@@ -900,117 +1009,118 @@ function BalanceSheetDetailed() {
 
   const downloadExcelDetailed = async () => {
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet("Balance Sheet")
-
-    // Set professional header and footer
-    worksheet.headerFooter.oddHeader =
-      '&C&"Arial,Bold"&18BALANCE SHEET\n' +
-      '&C&"Arial,Regular"&12Your Company Name\n' +
-      '&C&"Arial,Regular"&10Period: &D - &T\n' +
-      '&L&"Arial,Regular"&8Generated on: ' +
-      new Date().toLocaleDateString() +
-      "\n" +
-      '&R&"Arial,Regular"&8Page &P of &N'
-    worksheet.headerFooter.oddFooter =
-      '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
-      '&C&"Arial,Regular"&8This report contains financial data as of ' +
-      new Date().toLocaleDateString() +
-      '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
-      '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
-    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
-
-    // Set page setup for professional printing
-    worksheet.pageSetup = {
-      paperSize: 9, // A4
-      orientation: "landscape",
-      fitToPage: true,
-      fitToWidth: 1,
-      fitToHeight: 0,
-      margins: {
-        left: 0.7,
-        right: 0.7,
-        top: 1.0,
-        bottom: 1.0,
-        header: 0.3,
-        footer: 0.5,
-      },
-    }
-
-    // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["BALANCE SHEET REPORT"])
-    titleRow.getCell(1).font = {
-      name: "Arial",
-      size: 16,
-      bold: true,
-      color: { argb: "2F4F4F" },
-    }
-    titleRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A1:G1")
-
-    const name =
-      agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-        ? "PREMIUM BUSINESSMEN SERVICES"
-        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
-    const companyRow = worksheet.addRow([name])
-    companyRow.getCell(1).font = {
-      name: "Arial",
-      size: 14,
-      bold: true,
-      color: { argb: "4472C4" },
-    }
-    companyRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A2:G2")
-
-    const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
-    ])
-    dateRow.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    dateRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A3:G3")
-
-    const dateRow2 = worksheet.addRow([
-      toDate && fromDate
-        ? `Period:  ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
-        : `Period: All `,
-    ])
-    dateRow2.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    dateRow2.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A4:G4")
-
-    const costCenter = worksheet.addRow([`Cost Center: ${selectedCostCenter?.name}`])
-    costCenter.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    costCenter.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A5:G5")
-
-    const system = worksheet.addRow([
-      `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
-    ])
-    system.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    system.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A6:G6")
-
-    // Add empty row for spacing
-    worksheet.addRow([])
+     const worksheet = workbook.addWorksheet("Detailed Balance Sheet")
+   
+     // Set professional header and footer
+     worksheet.headerFooter.oddHeader =
+       '&C&"Arial,Bold"&18TRIAL BALANCE REPORT\n' +
+       '&C&"Arial,Regular"&12Your Company Name\n' +
+       '&C&"Arial,Regular"&10Period: &D - &T\n' +
+       '&L&"Arial,Regular"&8Generated on: ' +
+       new Date().toLocaleDateString() +
+       "\n" +
+       '&R&"Arial,Regular"&8Page &P of &N'
+     worksheet.headerFooter.oddFooter =
+       '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+       '&C&"Arial,Regular"&8This report contains financial data as of ' +
+       new Date().toLocaleDateString() +
+       '&R&"Arial,Regular"&8Generated by: Finance Department\n' +
+       '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+     // Alternative simpler footer format
+     worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+   
+     // Set page setup for professional printing
+     worksheet.pageSetup = {
+       paperSize: 9, // A4
+       orientation: "landscape",
+       fitToPage: true,
+       fitToWidth: 1,
+       fitToHeight: 0,
+       margins: {
+         left: 0.7,
+         right: 0.7,
+         top: 1.0,
+         bottom: 1.0,
+         header: 0.3,
+         footer: 0.3,
+       },
+     }
+   
+     // Add title section at the top of the worksheet
+     const titleRow = worksheet.addRow([" BALANCE SHEET SUMMARY DETAILED"])
+     titleRow.getCell(1).font = {
+       name: "Arial",
+       size: 16,
+       bold: true,
+       color: { argb: "2F4F4F" },
+     }
+     titleRow.getCell(1).alignment = { horizontal: "center" }
+     worksheet.mergeCells("A1:G1")
+   
+     const name =
+       agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+         ? "PREMIUM BUSINESSMEN SERVICES"
+         : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+     const companyRow = worksheet.addRow([name])
+     companyRow.getCell(1).font = {
+       name: "Arial",
+       size: 14,
+       bold: true,
+       color: { argb: "4472C4" },
+     }
+     companyRow.getCell(1).alignment = { horizontal: "center" }
+     worksheet.mergeCells("A2:G2")
+   
+     const dateRow = worksheet.addRow([
+       `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
+     ])
+     dateRow.getCell(1).font = {
+       name: "Arial",
+       size: 10,
+       italic: true,
+       color: { argb: "666666" },
+     }
+     dateRow.getCell(1).alignment = { horizontal: "center" }
+     worksheet.mergeCells("A3:G3")
+   
+     const dateRow2 = worksheet.addRow([
+       toDate && fromDate
+         ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "Present"}`
+         : `Period: All `,
+     ])
+     dateRow2.getCell(1).font = {
+       name: "Arial",
+       size: 10,
+       italic: true,
+       color: { argb: "666666" },
+     }
+     dateRow2.getCell(1).alignment = { horizontal: "center" }
+     worksheet.mergeCells("A4:G4")
+   
+     const costCenter = worksheet.addRow([`Cost Center: ${selectedCostCenter?.name}`])
+     costCenter.getCell(1).font = {
+       name: "Arial",
+       size: 10,
+       italic: true,
+       color: { argb: "666666" },
+     }
+     costCenter.getCell(1).alignment = { horizontal: "center" }
+     worksheet.mergeCells("A5:G5")
+   
+     const system = worksheet.addRow([
+       `System: ${agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL" ? "TASHEEL" : "Al-ADHEED"}`,
+     ])
+     system.getCell(1).font = {
+       name: "Arial",
+       size: 10,
+       italic: true,
+       color: { argb: "666666" },
+     }
+     system.getCell(1).alignment = { horizontal: "center" }
+     worksheet.mergeCells("A6:G6")
+   
+     // Add empty row for spacing
+     worksheet.addRow([])
 
     // Add headers with professional styling
     const headers = [
@@ -1073,16 +1183,16 @@ function BalanceSheetDetailed() {
           const row = worksheet.addRow([
             account.account_code,
             account.account_name,
-            accountTotals.effectiveOpeningBalance,
-            accountTotals.effectiveTotalDebit,
-            accountTotals.effectiveTotalCredit,
-            accountTotals.periodDifference,
-            accountTotals.balance,
+            Number.parseFloat(accountTotals.effectiveOpeningBalance).toFixed(2),
+            Number.parseFloat(accountTotals.totalDebit).toFixed(2),
+            Number.parseFloat(accountTotals.totalCredit).toFixed(2),
+            Number.parseFloat(accountTotals.periodDifference).toFixed(2),
+            Number.parseFloat(accountTotals.balance).toFixed(2),
           ])
 
-          // Format numerical columns as numbers with 4 decimal places
+          // Format numerical columns as numbers with 2 decimal places
           for (let i = 3; i <= 7; i++) {
-            row.getCell(i).numFmt = "#,##0.0000"
+            row.getCell(i).numFmt = "#,##0.00"
           }
 
           // Style account rows
@@ -1107,16 +1217,16 @@ function BalanceSheetDetailed() {
               const childRow = worksheet.addRow([
                 child.account_code,
                 `-- ${child.account_name}`, // Indent child account name
-                childTotals.effectiveOpeningBalance,
-                childTotals.effectiveTotalDebit,
-                childTotals.effectiveTotalCredit,
-                childTotals.periodDifference,
-                childTotals.balance,
+                Number.parseFloat(childTotals.effectiveOpeningBalance).toFixed(2),
+                Number.parseFloat(childTotals.totalDebit).toFixed(2),
+                Number.parseFloat(childTotals.totalCredit).toFixed(2),
+                Number.parseFloat(childTotals.periodDifference).toFixed(2),
+                Number.parseFloat(childTotals.balance).toFixed(2),
               ])
 
               // Format numerical columns
               for (let i = 3; i <= 7; i++) {
-                childRow.getCell(i).numFmt = "#,##0.0000"
+                childRow.getCell(i).numFmt = "#,##0.00"
               }
 
               // Style child rows
@@ -1142,16 +1252,18 @@ function BalanceSheetDetailed() {
           const totalRow = worksheet.addRow([
             "",
             `${groupedSubcategory.name} Total`,
-            groupedSubcategory.openingTotal,
-            groupedSubcategory.debitTotal,
-            groupedSubcategory.creditTotal,
-            groupedSubcategory.periodDiffTotal,
-            groupedSubcategory.balanceTotal,
+            Number.parseFloat(groupedSubcategory.openingTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.debitTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.creditTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.periodDiffTotal).toFixed(2),
+            Number.parseFloat(groupedSubcategory.balanceTotal).toFixed(2),
           ])
+
           // Format numerical columns
           for (let i = 3; i <= 7; i++) {
-            totalRow.getCell(i).numFmt = "#,##0.0000"
+            totalRow.getCell(i).numFmt = "#,##0.00"
           }
+
           totalRow.eachCell((cell) => {
             cell.fill = {
               type: "pattern",
@@ -1168,16 +1280,18 @@ function BalanceSheetDetailed() {
         const catTotalRow = worksheet.addRow([
           `${majorCategoryItem.name} Total`,
           "",
-          majorCategoryItem.majorCategoryOpeningTotal,
-          majorCategoryItem.majorCategoryDebitTotal,
-          majorCategoryItem.majorCategoryCreditTotal,
-          majorCategoryItem.majorCategoryPeriodDiffTotal,
-          majorCategoryItem.majorCategoryBalanceTotal,
+          Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryPeriodDiffTotal).toFixed(2),
+          Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal).toFixed(2),
         ])
+
         // Format numerical columns
         for (let i = 3; i <= 7; i++) {
-          catTotalRow.getCell(i).numFmt = "#,##0.0000"
+          catTotalRow.getCell(i).numFmt = "#,##0.00"
         }
+
         catTotalRow.eachCell((cell) => {
           cell.fill = {
             type: "pattern",
@@ -1188,11 +1302,21 @@ function BalanceSheetDetailed() {
         })
 
         // Update grand totals
-        grandOpening += majorCategoryItem.majorCategoryOpeningTotal
-        grandDebit += majorCategoryItem.majorCategoryDebitTotal
-        grandCredit += majorCategoryItem.majorCategoryCreditTotal
-        grandDiff += majorCategoryItem.majorCategoryPeriodDiffTotal
-        grandBalance += majorCategoryItem.majorCategoryBalanceTotal
+        grandOpening = Number.parseFloat(
+          Number.parseFloat(grandOpening) + Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal),
+        ).toFixed(2)
+        grandDebit = Number.parseFloat(
+          Number.parseFloat(grandDebit) + Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal),
+        ).toFixed(2)
+        grandCredit = Number.parseFloat(
+          Number.parseFloat(grandCredit) + Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal),
+        ).toFixed(2)
+        grandDiff = Number.parseFloat(
+          Number.parseFloat(grandDiff) + Number.parseFloat(majorCategoryItem.majorCategoryPeriodDiffTotal),
+        ).toFixed(2)
+        grandBalance = Number.parseFloat(
+          Number.parseFloat(grandBalance) + Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal),
+        ).toFixed(2)
       }
     })
 
@@ -1200,16 +1324,18 @@ function BalanceSheetDetailed() {
     const grandTotalRow = worksheet.addRow([
       "Grand Total",
       "",
-      grandOpening,
-      grandDebit,
-      grandCredit,
-      grandDiff,
-      grandBalance,
+      Number.parseFloat(grandOpening).toFixed(2),
+      Number.parseFloat(grandDebit).toFixed(2),
+      Number.parseFloat(grandCredit).toFixed(2),
+      Number.parseFloat(grandDiff).toFixed(2),
+      Number.parseFloat(grandBalance).toFixed(2),
     ])
+
     // Format numerical columns
     for (let i = 3; i <= 7; i++) {
-      grandTotalRow.getCell(i).numFmt = "#,##0.0000"
+      grandTotalRow.getCell(i).numFmt = "#,##0.00"
     }
+
     grandTotalRow.eachCell((cell) => {
       cell.fill = {
         type: "pattern",
@@ -1233,11 +1359,11 @@ function BalanceSheetDetailed() {
       "",
       CommaSeparator(
         (
-          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
-          Number.parseFloat(adminOpTotal)
+          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))
         ).toFixed(2),
       ),
     ])
+
     retainProfitRow.eachCell((cell, colNumber) => {
       cell.fill = {
         type: "pattern",
@@ -1273,12 +1399,12 @@ function BalanceSheetDetailed() {
       CommaSeparator(
         Number.parseFloat(
           Number.parseFloat(libalTotal) +
-            Number.parseFloat(capitalTotal) +
-            (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
-              Number.parseFloat(adminOpTotal)),
+          Number.parseFloat(capitalTotal) +
+          (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
         ).toFixed(2),
       ),
     ])
+
     grandTotalFinalRow.eachCell((cell, colNumber) => {
       cell.fill = {
         type: "pattern",
@@ -1373,8 +1499,10 @@ function BalanceSheetDetailed() {
             selected={selectedCostCenter}
             onSelect={(value) => {
               setSelectedCostCenter(value)
+
             }}
-            register={register("costcenter", { required: "costcenter is required" })}
+
+
           />
         </Grid>
         <Grid item xs={3}>
@@ -1405,6 +1533,7 @@ function BalanceSheetDetailed() {
           />
         </Grid>
       </Grid>
+
       <Grid container spacing={1}>
         <Grid item xs={3}>
           <div className="container">
@@ -1421,6 +1550,7 @@ function BalanceSheetDetailed() {
           </div>
         </Grid>
       </Grid>
+
       <Box
         sx={{
           display: "flex",
@@ -1434,24 +1564,25 @@ function BalanceSheetDetailed() {
           variant="h5"
           sx={{
             color: Colors.charcoalGrey,
-            fontFamily: FontFamily.NunitoRegular,
+            fontFamily: FontFamily.Montserrat,
           }}
         >
           Balance Sheet
         </Typography>
-        <Box sx={{display:'flex',gap:2}}>
+        <Box sx={{ display: "flex", gap: 2 }}>
           {balanceSheet?.length > 0 && (
-          <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
-            <PrimaryButton title={"Download Report"} onClick={() => downloadExcel()} />
-          </Box>
-        )}
-        {balanceSheet?.length > 0 && (
-          <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
-            <PrimaryButton title={"Download Detailed Report"} onClick={() => downloadExcelDetailed()} />
-          </Box>
-        )}
+            <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
+              <PrimaryButton title={"Download Report"} onClick={() => downloadExcel()} />
+            </Box>
+          )}
+          {balanceSheet?.length > 0 && (
+            <Box sx={{ textAlign: "right", p: 4, display: "flex", gap: 2 }}>
+              <PrimaryButton title={"Download Detailed Report"} onClick={() => downloadExcelDetailed()} />
+            </Box>
+          )}
         </Box>
       </Box>
+
       {/* Filters */}
       <Grid container spacing={1} sx={{ mb: 2 }}>
         <Grid item xs={12} sm={12}>
@@ -1468,15 +1599,13 @@ function BalanceSheetDetailed() {
           </Tabs>
         </Grid>
       </Grid>
+
       {displayData ? (
         <Fragment>
           <PDFExport ref={contentRef} landscape={true} paperSize="A4" margin={5} fileName="Balance Sheet">
             <Box className="pdf-show" sx={{ display: "none" }}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography
-                  variant="h5"
-                  sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.NunitoRegular, mb: 2 }}
-                >
+                <Typography variant="h5" sx={{ color: Colors.charcoalGrey, fontFamily: FontFamily.Montserrat, mb: 2 }}>
                   Balance Sheet
                 </Typography>
                 <Box sx={{ fontWeight: 400, fontSize: "12px", mt: 1.5, color: Colors.charcoalGrey }}>
@@ -1545,6 +1674,8 @@ function BalanceSheetDetailed() {
                                           <Fragment>
                                             {groupedSubcategory.accounts?.map((account, accIndex) => {
                                               const accountTotals = account.calculatedTotals
+                                              console.log(account, 'accountaccount1');
+
                                               return (
                                                 <Fragment key={accIndex}>
                                                   {/* Account Row */}
@@ -1558,6 +1689,7 @@ function BalanceSheetDetailed() {
                                                     <TableCell sx={{ pl: 3 }}>{account?.account_code ?? "-"}</TableCell>
                                                     <TableCell>{account?.account_name ?? "-"}</TableCell>
                                                     <TableCell className="text-right">
+                                                      {console.log(account, 'asdasd')}
                                                       {formatAmount(account.calculatedTotals.effectiveOpeningBalance)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
@@ -1570,13 +1702,15 @@ function BalanceSheetDetailed() {
                                                       {formatAmount(account.calculatedTotals.periodDifference)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                      {formatAmount(account.calculatedTotals.balance)}
+                                                      {parseFloat(account.calculatedTotals.balance) + parseFloat(account.calculatedTotals.effectiveOpeningBalance)}
                                                     </TableCell>
                                                   </TableRow>
                                                   {expand.indexOf(account.id) !== -1 && ( // If account is expanded, show child accounts
                                                     <Fragment>
                                                       {account?.childAccounts?.map((child, childAccIndex) => {
                                                         const childTotals = child.calculatedTotals
+                                                        console.log(childTotals, 'accountaccount2');
+
                                                         return (
                                                           <Fragment key={childAccIndex}>
                                                             <Row sx={{ bgcolor: "#EEFBEE" }}>
@@ -1630,7 +1764,7 @@ function BalanceSheetDetailed() {
                                                   {formatAmount(groupedSubcategory.periodDiffTotal)}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                  {formatAmount(groupedSubcategory.balanceTotal)}
+                                                  {formatAmount(parseFloat(groupedSubcategory.balanceTotal) + parseFloat(groupedSubcategory.openingTotal))}
                                                 </TableCell>
                                               </Row>
                                             )}
@@ -1659,21 +1793,21 @@ function BalanceSheetDetailed() {
                                       <TableCell className="text-right">
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
                                           {CommaSeparator(
-                                            Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal).toFixed(4),
+                                            Number.parseFloat(majorCategoryItem.majorCategoryOpeningTotal).toFixed(2),
                                           )}
                                         </Typography>
                                       </TableCell>
                                       <TableCell className="text-right">
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
                                           {CommaSeparator(
-                                            Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal).toFixed(4),
+                                            Number.parseFloat(majorCategoryItem.majorCategoryDebitTotal).toFixed(2),
                                           )}
                                         </Typography>
                                       </TableCell>
                                       <TableCell className="text-right">
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
                                           {CommaSeparator(
-                                            Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal).toFixed(4),
+                                            Number.parseFloat(majorCategoryItem.majorCategoryCreditTotal).toFixed(2),
                                           )}
                                         </Typography>
                                       </TableCell>
@@ -1681,7 +1815,7 @@ function BalanceSheetDetailed() {
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
                                           {CommaSeparator(
                                             Number.parseFloat(majorCategoryItem.majorCategoryPeriodDiffTotal).toFixed(
-                                              4,
+                                              2,
                                             ),
                                           )}
                                         </Typography>
@@ -1689,7 +1823,7 @@ function BalanceSheetDetailed() {
                                       <TableCell className="text-right">
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: Colors.white }}>
                                           {CommaSeparator(
-                                            Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal).toFixed(4),
+                                            Number.parseFloat(majorCategoryItem.majorCategoryBalanceTotal).toFixed(2),
                                           )}
                                         </Typography>
                                       </TableCell>
@@ -1721,8 +1855,8 @@ function BalanceSheetDetailed() {
                             >
                               {CommaSeparator(
                                 (
-                                  Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
-                                  Number.parseFloat(adminOpTotal)
+                                  Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))
+
                                 ).toFixed(2),
                               )}
                             </Typography>
@@ -1743,9 +1877,8 @@ function BalanceSheetDetailed() {
                               {CommaSeparator(
                                 Number.parseFloat(
                                   Number.parseFloat(libalTotal) +
-                                    Number.parseFloat(capitalTotal) +
-                                    (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)) -
-                                      Number.parseFloat(adminOpTotal)),
+                                  Number.parseFloat(capitalTotal) +
+                                  (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
                                 ).toFixed(2),
                               )}
                             </Typography>
