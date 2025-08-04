@@ -837,7 +837,7 @@ function ShiftAllocations() {
                 </Grid>
                 <Grid item xs={12} sm={3} >
                     <DatePicker
-                        disableFuture={true}
+                       
                         size="small"
                         minDate={fromDate}
                         label={"To Date"}
@@ -881,7 +881,7 @@ function ShiftAllocations() {
                     </Grid>
                     <Grid item xs={12} sm={3} >
                         <DatePicker
-                            disableFuture={true}
+                          
                             size="small"
                             minDate={fromDate}
                             label={"To Date"}
