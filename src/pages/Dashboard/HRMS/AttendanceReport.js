@@ -101,8 +101,8 @@ const getStatusStyles = (status) => {
 // Memoized employee row component
 const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
     const theme = useTheme()
-    console.log(employee,'employee');
-    
+    console.log(employee, 'employee');
+
     return (
         <TableRow
             hover
@@ -130,7 +130,7 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                             {employee.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                            ID: {employee.id}
+                            ID: {employee.employee_id}
                         </Typography>
                     </Box>
                 </Box>
@@ -484,7 +484,8 @@ export default function AttendanceTable() {
                 return
             }
             const mappedData = attendanceData.attendance.map((employee) => ({
-                id: employee.employee_id,
+                id: employee.user_id,
+                employee_id: employee?.employee_id,
                 name: employee.user_name,
                 avatar: `/placeholder.svg?height=40&width=40&text=${employee.user_name.charAt(0)}`,
                 attendance:
@@ -733,7 +734,7 @@ export default function AttendanceTable() {
         } else {
             setShifts([])
         }
-        console.log(dateStr, "dateStr")
+        console.log(employee, "employeeemployeeemployee")
         setTableDate(dateStr)
         setSelectedData(employee)
         if (user?.role_id == 6) {
