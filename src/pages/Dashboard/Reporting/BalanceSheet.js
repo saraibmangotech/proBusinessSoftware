@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form"
 import FinanceServices from "services/Finance" // Assuming this service exists
 import { PrimaryButton } from "components/Buttons" // Assuming this component exists
 import { saveAs } from "file-saver"
-import { CommaSeparator } from "utils" // Assuming agencyType and CommaSeparator exist
+import { agencyType, CommaSeparator } from "utils" // Assuming agencyType and CommaSeparator exist
 import { PDFExport } from "@progress/kendo-react-pdf"
 import SearchIcon from "@mui/icons-material/Search"
 import moment from "moment"
@@ -111,8 +111,8 @@ const formatAmount = (amount) => {
 
 // Update the `calculateAccountTotals` function to correctly handle opening balance, debit, credit, period difference, and final balance, including recursive summation for child accounts.
 const calculateAccountTotals = (account) => {
-  console.log(account, 'hanahan');
-
+  console.log(account,'hanahan');
+  
   const opening =
     account?.nature == "credit"
       ? -1 * (Number.parseFloat(account.opening_balance).toFixed(2) || 0)
@@ -127,19 +127,19 @@ const calculateAccountTotals = (account) => {
   let accumulatedTotalCredit = Number.parseFloat(credit).toFixed(2)
   let accumulatedOpeningBalance = 0
   if (account.account_code == "A2-20001") {
-    console.log(accumulatedOpeningBalance, effectiveOpeningBalance, "KuchLikheTo")
-  }
+        console.log(accumulatedOpeningBalance, effectiveOpeningBalance, "KuchLikheTo")
+      }
 
   if (Array.isArray(account.childAccounts) && account.childAccounts.length > 0) {
     account?.childAccounts?.forEach((child) => {
       const childTotals = calculateAccountTotals(child)
-      console.log(childTotals, 'childTotalsNew');
-
+      console.log(childTotals,'childTotalsNew');
+     
       accumulatedOpeningBalance = Number.parseFloat(
         parseFloat(accumulatedOpeningBalance) + Number.parseFloat(childTotals.effectiveOpeningBalance),
       ).toFixed(2)
-      if (account.account_code == "A2-20001") {
-        console.log(accumulatedOpeningBalance, effectiveOpeningBalance, childTotals.effectiveOpeningBalance, "KuchLikheTo")
+       if (account.account_code == "A2-20001") {
+        console.log(accumulatedOpeningBalance, effectiveOpeningBalance,childTotals.effectiveOpeningBalance, "KuchLikheTo")
       }
       accumulatedTotalDebit = Number.parseFloat(
         Number.parseFloat(accumulatedTotalDebit) + Number.parseFloat(childTotals.totalDebit),
@@ -151,20 +151,25 @@ const calculateAccountTotals = (account) => {
   }
 
   if (account.account_code == "A2-20001") {
-    console.log(accumulatedOpeningBalance, effectiveOpeningBalance, "KuchLikheTo")
-  }
+        console.log(accumulatedOpeningBalance, effectiveOpeningBalance, "KuchLikheTo")
+      }
 
   // Period difference is always (accumulated) Debit - (accumulated) Credit
   const periodDifference = Number.parseFloat(
     Number.parseFloat(accumulatedTotalDebit) - Number.parseFloat(accumulatedTotalCredit),
   ).toFixed(2)
 
+  let ob =  Math.abs(parseFloat(accumulatedOpeningBalance)) > 0 ? parseFloat(accumulatedOpeningBalance) : Number.parseFloat(effectiveOpeningBalance)
+
   // Final balance is the effective opening balance + the period difference
   const balance = Number.parseFloat(
-    Number.parseFloat(effectiveOpeningBalance) + Number.parseFloat(periodDifference),
+    Number.parseFloat(ob) + Number.parseFloat(periodDifference),
   ).toFixed(2)
-  console.log(effectiveOpeningBalance, account.account_code, 'effectiveOpeningBalanceeffectiveOpeningBalance');
-  console.log(accumulatedOpeningBalance, account.account_code, 'effectiveOpeningBalanceeffectiveOpeningBalance');
+   if (account.account_code == "A2-20001") {
+        console.log(balance, "KuchLikheTo")
+      }
+console.log(effectiveOpeningBalance,account.account_code,'effectiveOpeningBalanceeffectiveOpeningBalance');
+console.log(accumulatedOpeningBalance,account.account_code,'effectiveOpeningBalanceeffectiveOpeningBalance');
 
   return {
     effectiveOpeningBalance: Math.abs(parseFloat(accumulatedOpeningBalance)) > 0 ? parseFloat(accumulatedOpeningBalance).toFixed(2) : Number.parseFloat(effectiveOpeningBalance).toFixed(2), // This is the signed opening balance for display/accumulation
@@ -260,27 +265,29 @@ const transformDataForDisplay = (data, searchTerm) => {
 
             groupedSubcategories[subcategoryName].openingTotal = Number.parseFloat(
               Number.parseFloat(groupedSubcategories[subcategoryName].openingTotal) +
-              Number.parseFloat(account.calculatedTotals.effectiveOpeningBalance),
+                Number.parseFloat(account.calculatedTotals.effectiveOpeningBalance),
             ).toFixed(2)
 
             groupedSubcategories[subcategoryName].debitTotal = Number.parseFloat(
               Number.parseFloat(groupedSubcategories[subcategoryName].debitTotal) +
-              Number.parseFloat(account.calculatedTotals.totalDebit),
+                Number.parseFloat(account.calculatedTotals.totalDebit),
             ).toFixed(2)
 
             groupedSubcategories[subcategoryName].creditTotal = Number.parseFloat(
               Number.parseFloat(groupedSubcategories[subcategoryName].creditTotal) +
-              Number.parseFloat(account.calculatedTotals.totalCredit),
+                Number.parseFloat(account.calculatedTotals.totalCredit),
             ).toFixed(2)
 
             groupedSubcategories[subcategoryName].periodDiffTotal = Number.parseFloat(
               Number.parseFloat(groupedSubcategories[subcategoryName].periodDiffTotal) +
-              Number.parseFloat(account.calculatedTotals.periodDifference),
+                Number.parseFloat(account.calculatedTotals.periodDifference),
             ).toFixed(2)
+
+            console.log(groupedSubcategories[subcategoryName].balanceTotal, "groupedSubcategories",groupedSubcategories[subcategoryName]);
 
             groupedSubcategories[subcategoryName].balanceTotal = Number.parseFloat(
               Number.parseFloat(groupedSubcategories[subcategoryName].balanceTotal) +
-              Number.parseFloat(account.calculatedTotals.balance),
+                Number.parseFloat(account.calculatedTotals.balance),
             ).toFixed(2)
           })
         }
@@ -453,20 +460,24 @@ function BalanceSheet() {
               const debit = Number.parseFloat(account.total_debit).toFixed(2) || 0
               total = Number.parseFloat(
                 Number.parseFloat(total) +
-                (account.nature === "debit"
-                  ? Number.parseFloat(debit) - Number.parseFloat(credit)
-                  : Number.parseFloat(credit) - Number.parseFloat(debit)),
-              ).toFixed(2)
+                  (account.nature === "debit"
+                    ? Number.parseFloat(debit) - Number.parseFloat(credit)
+                    : Number.parseFloat(credit) - Number.parseFloat(debit)),
+              )
+                      total += parseFloat(account.opening_balance)
+
               if (account.childAccounts) {
                 account?.childAccounts?.forEach((child) => {
                   const childCredit = Number.parseFloat(child.total_credit).toFixed(2) || 0
                   const childDebit = Number.parseFloat(child.total_debit).toFixed(2) || 0
                   total = Number.parseFloat(
                     Number.parseFloat(total) +
-                    (child.nature === "debit"
-                      ? Number.parseFloat(childDebit) - Number.parseFloat(childCredit)
-                      : Number.parseFloat(childCredit) - Number.parseFloat(childDebit)),
-                  ).toFixed(2)
+                      (child.nature === "debit"
+                        ? Number.parseFloat(childDebit) - Number.parseFloat(childCredit)
+                        : Number.parseFloat(childCredit) - Number.parseFloat(childDebit)),
+                  )
+                                  total += parseFloat(account.opening_balance)
+
                 })
               }
             })
@@ -492,9 +503,9 @@ function BalanceSheet() {
                 const cd = Number.parseFloat(child.total_debit).toFixed(2) || 0
                 return Number.parseFloat(
                   Number.parseFloat(sum) +
-                  (child.nature === "debit"
-                    ? Number.parseFloat(cd) - Number.parseFloat(cc)
-                    : Number.parseFloat(cc) - Number.parseFloat(cd)),
+                    (child.nature === "debit"
+                      ? Number.parseFloat(cd) - Number.parseFloat(cc)
+                      : Number.parseFloat(cc) - Number.parseFloat(cd)),
                 ).toFixed(2)
               }, 0)
               accountTotal = Number.parseFloat(childSum).toFixed(2)
@@ -617,8 +628,11 @@ function BalanceSheet() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:G1")
 
-    const name = "MABDE TRADING LLC"
-    const companyRow = worksheet.addRow([name])
+      const name =
+    agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+      ? "PREMIUM BUSINESSMEN SERVICES"
+      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+  const companyRow = worksheet.addRow([name])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,
@@ -860,7 +874,7 @@ function BalanceSheet() {
       "",
       CommaSeparator(
         (
-          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))
+          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses)) 
         ).toFixed(2),
       ),
     ])
@@ -900,8 +914,8 @@ function BalanceSheet() {
       CommaSeparator(
         Number.parseFloat(
           Number.parseFloat(libalTotal) +
-          Number.parseFloat(capitalTotal) +
-          (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
+            Number.parseFloat(capitalTotal) +
+            (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
         ).toFixed(2),
       ),
     ])
@@ -1035,8 +1049,11 @@ function BalanceSheet() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:G1")
 
-    const name = "MABDE TRADING LLC"
-    const companyRow = worksheet.addRow([name])
+      const name =
+    agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+      ? "PREMIUM BUSINESSMEN SERVICES"
+      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+  const companyRow = worksheet.addRow([name])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,
@@ -1312,7 +1329,7 @@ function BalanceSheet() {
       "",
       CommaSeparator(
         (
-          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))
+          Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses)) 
         ).toFixed(2),
       ),
     ])
@@ -1352,8 +1369,8 @@ function BalanceSheet() {
       CommaSeparator(
         Number.parseFloat(
           Number.parseFloat(libalTotal) +
-          Number.parseFloat(capitalTotal) +
-          (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
+            Number.parseFloat(capitalTotal) +
+            (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses)) ),
         ).toFixed(2),
       ),
     ])
@@ -1444,7 +1461,7 @@ function BalanceSheet() {
   return (
     <Box sx={{ m: 4, mb: 2 }}>
       <Grid container spacing={2}>
-        <Grid item xs={3}>
+           <Grid item xs={3}>
           <SelectField
             size="small"
             label="Select Cost Center"
@@ -1627,8 +1644,8 @@ function BalanceSheet() {
                                           <Fragment>
                                             {groupedSubcategory.accounts?.map((account, accIndex) => {
                                               const accountTotals = account.calculatedTotals
-                                              console.log(account, 'accountaccount1');
-
+                                              console.log(account,'accountaccount1');
+                                              
                                               return (
                                                 <Fragment key={accIndex}>
                                                   {/* Account Row */}
@@ -1642,7 +1659,7 @@ function BalanceSheet() {
                                                     <TableCell sx={{ pl: 3 }}>{account?.account_code ?? "-"}</TableCell>
                                                     <TableCell>{account?.account_name ?? "-"}</TableCell>
                                                     <TableCell className="text-right">
-                                                      {console.log(account, 'asdasd')}
+                                                      {console.log(account,'asdasd')}
                                                       {formatAmount(account.calculatedTotals.effectiveOpeningBalance)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
@@ -1655,15 +1672,15 @@ function BalanceSheet() {
                                                       {formatAmount(account.calculatedTotals.periodDifference)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                      {parseFloat(account.calculatedTotals.balance) + parseFloat(account.calculatedTotals.effectiveOpeningBalance)}
+                                                      {parseFloat(account.calculatedTotals.balance)}
                                                     </TableCell>
                                                   </TableRow>
                                                   {expand.indexOf(account.id) !== -1 && ( // If account is expanded, show child accounts
                                                     <Fragment>
                                                       {account?.childAccounts?.map((child, childAccIndex) => {
                                                         const childTotals = child.calculatedTotals
-                                                        console.log(childTotals, 'accountaccount2');
-
+                                                        console.log(childTotals,'accountaccount2');
+                                                        
                                                         return (
                                                           <Fragment key={childAccIndex}>
                                                             <Row sx={{ bgcolor: "#EEFBEE" }}>
@@ -1717,7 +1734,7 @@ function BalanceSheet() {
                                                   {formatAmount(groupedSubcategory.periodDiffTotal)}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                  {formatAmount(parseFloat(groupedSubcategory.balanceTotal) + parseFloat(groupedSubcategory.openingTotal))}
+                                                  {formatAmount(parseFloat(groupedSubcategory.balanceTotal))}
                                                 </TableCell>
                                               </Row>
                                             )}
@@ -1808,8 +1825,8 @@ function BalanceSheet() {
                             >
                               {CommaSeparator(
                                 (
-                                  Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))
-
+                                  Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses)) 
+                                  
                                 ).toFixed(2),
                               )}
                             </Typography>
@@ -1830,8 +1847,8 @@ function BalanceSheet() {
                               {CommaSeparator(
                                 Number.parseFloat(
                                   Number.parseFloat(libalTotal) +
-                                  Number.parseFloat(capitalTotal) +
-                                  (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses))),
+                                    Number.parseFloat(capitalTotal) +
+                                    (Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses)) ),
                                 ).toFixed(2),
                               )}
                             </Typography>
