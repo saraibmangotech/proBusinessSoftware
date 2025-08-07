@@ -323,6 +323,7 @@ function EmployeeAttendanceReport() {
             "Day",
             "Day Type",
             "Status",
+            "Type",
             "Check In",
             "Check Out",
             "Worked Hours",
@@ -359,10 +360,11 @@ function EmployeeAttendanceReport() {
                 moment(day.date).format("ddd"),
                 dayType,
                 status,
+                day.leave?.type || "N/A",
                 day.check_in || "N/A",
                 day.check_out || "N/A",
                 day.worked_hours || 0,
-                formatMinutesToTime(day?.shift?.start_time) +' - ' +  formatMinutesToTime(day?.shift?.end_time),
+                formatMinutesToTime(day?.shift?.start_time) + ' - ' + formatMinutesToTime(day?.shift?.end_time),
                 day.short_hours || 0,
                 day.excess_hours || 0,
                 day.worked_time || "N/A",
@@ -505,8 +507,8 @@ function EmployeeAttendanceReport() {
         console.log(minutesStr, 'minutesStrminutesStr');
 
         const totalMinutes = parseInt(parseFloat(minutesStr), 10);
-        console.log(totalMinutes,'totalMinutestotalMinutes');
-        
+        console.log(totalMinutes, 'totalMinutestotalMinutes');
+
         return moment().startOf("day").add(totalMinutes, "minutes").format("hh:mm A");
     };
 
@@ -574,6 +576,11 @@ function EmployeeAttendanceReport() {
             },
         },
         {
+            header: "Type",
+            accessorKey: "type",
+            cell: ({ row }) => <Box sx={{ fontFamily: "monospace", fontSize: "12px" }}>{row.original.leave?.type || "N/A"}</Box>,
+        },
+        {
             header: "Check In",
             accessorKey: "check_in",
             cell: ({ row }) => <Box sx={{ fontFamily: "monospace", fontSize: "12px" }}>{row.original.check_in || "N/A"}</Box>,
@@ -595,7 +602,7 @@ function EmployeeAttendanceReport() {
 
                 return (
                     <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
-                        {formatMinutesToTime(row?.original?.shift?.start_time) +' - ' +  formatMinutesToTime(row?.original?.shift?.end_time)}
+                        {formatMinutesToTime(row?.original?.shift?.start_time) + ' - ' + formatMinutesToTime(row?.original?.shift?.end_time)}
                     </Box>
                 );
             }
