@@ -271,7 +271,7 @@ function UpdateUser() {
           </Grid> */}
         </Grid>
       </Box>
-      <Box component="form" onSubmit={handleSubmit1(UpdatePassword)} >
+      {/* <Box component="form" onSubmit={handleSubmit1(UpdatePassword)} >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'flex-end' }}>
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }}>Update User Password</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
@@ -356,7 +356,7 @@ function UpdateUser() {
             />
           </Grid>
         </Grid>
-      </Box>
+      </Box> */}
     </Box>
   );
 }
