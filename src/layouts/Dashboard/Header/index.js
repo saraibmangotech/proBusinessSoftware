@@ -3610,19 +3610,7 @@ function Header() {
               children: [],
               childRoute: [],
             },
-            {
-              id: 14,
-              name: "Notifications",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/roles",
-              route: "/notifications",
-              identifier: null,
-              navigation: true,
-              order_by: 14,
-              children: [],
-              childRoute: [],
-            },
+        
             {
               id: 14,
               name: "Role management",
@@ -4715,19 +4703,7 @@ function Header() {
               children: [],
               childRoute: [],
             },
-            {
-              id: 14,
-              name: "Notifications",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/roles",
-              route: "/notifications",
-              identifier: null,
-              navigation: true,
-              order_by: 14,
-              children: [],
-              childRoute: [],
-            },
+         
             {
               id: 14,
               name: "Role management",
