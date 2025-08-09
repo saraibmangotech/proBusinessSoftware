@@ -585,16 +585,17 @@ function CreateEmployee() {
         limit: 999999,
       };
 
-      const { data } = await CustomerServices.getEmployees(params);
+      const { data } = await UserServices.getUsers(params);
+      console.log(data, 'datadata');
 
-      const formattedData = data?.employees?.rows?.map((item, index) => ({
+      const formattedData = data?.users?.rows?.map((item, index) => ({
         ...item,
         id: item?.id,
         name: item?.user?.name,
       }));
 
 
-      setEmployees(formattedData);
+      setEmployees(data?.users?.rows);
 
 
 
