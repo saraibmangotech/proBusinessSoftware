@@ -689,7 +689,7 @@ function UpdateEmployee() {
                 limit: 999999,
             };
 
-            const { data } = await CustomerServices.getEmployees(params);
+            const { data } = await UserServices.getUsers(params);
 
             const formattedData = data?.employees?.rows?.map((item, index) => ({
                 ...item,
@@ -698,7 +698,7 @@ function UpdateEmployee() {
             }));
 
 
-            setEmployees(formattedData);
+            setEmployees(data?.users?.rows);
 
 
 
