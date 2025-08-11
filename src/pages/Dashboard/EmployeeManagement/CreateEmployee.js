@@ -1615,6 +1615,7 @@ function CreateEmployee() {
 
           </Grid>
         </Grid>
+        {console.log(approvers,'approvers')}
         <Box display="flex" alignItems="center" mt={2}>
           <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
           <Typography variant="subtitle1" sx={{ color: '#2f3b52' }}>
@@ -1632,8 +1633,8 @@ function CreateEmployee() {
                   size="small"
                   label={`Leave Approval ${index + 1}`}
                   options={employees}
-                  selected={employees.find(emp => emp.user_id === approver.value)}
-                  onSelect={(val) => handleApproverChange(index, val.user_id)}
+                  selected={employees.find(emp => emp.id === approver.value)}
+                  onSelect={(val) => handleApproverChange(index, val.id)}
                   register={register(approver.key, {
                     required: 'Approver is required',
                   })}
