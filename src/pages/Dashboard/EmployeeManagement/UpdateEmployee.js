@@ -178,6 +178,7 @@ function UpdateEmployee() {
     const handleApproverChange = (index, value) => {
         // Check if value already exists at a different index
         const isDuplicate = approvers.some((item, i) => i !== index && item.value === value);
+        console.log(isDuplicate, 'isDuplicate');
 
         if (isDuplicate) {
             showErrorToast('This approver is already selected.');
@@ -713,7 +714,7 @@ function UpdateEmployee() {
         getNationalities()
         getCategoryList()
         getRoles()
-    
+
     }, [])
 
     // useEffect(() => {
@@ -1599,68 +1600,68 @@ function UpdateEmployee() {
 
 
                     </Grid>
-                      <Grid item xs={12} sm={2.8}>
-                                <InputField
-                                  label={" Basic Salary :*"}
-                                  size={"small"}
-                                  type={"number"}
-                                  placeholder={"  Basic Salary "}
-                                  error={errors?.basicSalary?.message}
-                                  register={register("basicSalary", {
-                                    required: "Please enter basic salary.",
-                                  })}
-                                />
-                              </Grid>
-                    
-                              <Grid item xs={12} sm={2.8}>
-                                <InputField
-                                  label={"Housing Allowance :*"}
-                                  size={"small"}
-                                  type={"number"}
-                                  placeholder={"  Housing Allowance  "}
-                                  error={errors?.housing_allowance?.message}
-                                  register={register("housing_allowance", {
-                                    required: "Please enter housing allowance.",
-                                  })}
-                                />
-                              </Grid>
-                    
-                              <Grid item xs={12} sm={2.8}>
-                                <InputField
-                                  label={"Transport Allowance :*"}
-                                  size={"small"}
-                                  type={"number"}
-                                  placeholder={"  Transport Allowance "}
-                                  error={errors?.transport_allowance?.message}
-                                  register={register("transport_allowance", {
-                                    required: "Please enter transport allowance.",
-                                  })}
-                                />
-                              </Grid>
-                    
-                              <Grid item xs={12} sm={2.8}>
-                                <InputField
-                                  label={"Other Allowance :*"}
-                                  size={"small"}
-                                  type={"number"}
-                                  placeholder={" Other Allowance "}
-                                  error={errors?.other_allowance?.message}
-                                  register={register("other_allowance", {
-                                    required: "Please enter other allowance.",
-                                  })}
-                                />
-                              </Grid>
-                    
-                              <Grid item xs={12} sm={2.8}>
-                                <InputField
-                                  label={"Total Salary"}
-                                  size={"small"}
-                                  type={"number"}
-                                  placeholder={"Total Salary"}
-                                  disabled
-                                  value={totalSalary}
-                                />
-                              </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={" Basic Salary :*"}
+                            size={"small"}
+                            type={"number"}
+                            placeholder={"  Basic Salary "}
+                            error={errors?.basicSalary?.message}
+                            register={register("basicSalary", {
+                                required: "Please enter basic salary.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Housing Allowance :*"}
+                            size={"small"}
+                            type={"number"}
+                            placeholder={"  Housing Allowance  "}
+                            error={errors?.housing_allowance?.message}
+                            register={register("housing_allowance", {
+                                required: "Please enter housing allowance.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Transport Allowance :*"}
+                            size={"small"}
+                            type={"number"}
+                            placeholder={"  Transport Allowance "}
+                            error={errors?.transport_allowance?.message}
+                            register={register("transport_allowance", {
+                                required: "Please enter transport allowance.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Other Allowance :*"}
+                            size={"small"}
+                            type={"number"}
+                            placeholder={" Other Allowance "}
+                            error={errors?.other_allowance?.message}
+                            register={register("other_allowance", {
+                                required: "Please enter other allowance.",
+                            })}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Total Salary"}
+                            size={"small"}
+                            type={"number"}
+                            placeholder={"Total Salary"}
+                            disabled
+                            value={totalSalary}
+                        />
+                    </Grid>
 
                     <Grid item xs={12} sm={2.8}>
 
@@ -1750,9 +1751,9 @@ function UpdateEmployee() {
                                     label={`Leave Approval ${index + 1}`}
                                     options={employees}
                                     // ✅ Pass the selected employee object here by finding it from value
-                                    selected={employees.find(emp => emp.user_id === approver.value) || null}
+                                    selected={employees.find(emp => emp.id === approver.value) || null}
                                     // ✅ Set value only, not object (you’ll reconstruct object in `SelectField`)
-                                    onSelect={(selectedObj) => handleApproverChange(index, selectedObj?.user_id)}
+                                    onSelect={(selectedObj) => handleApproverChange(index, selectedObj?.id)}
                                     register={register(approver.key, {
                                         required: approver.value ? false : 'Approver is required',
                                     })}
