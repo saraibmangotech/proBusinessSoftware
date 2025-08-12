@@ -187,7 +187,9 @@ const routes = {
   getFPPayments:'/purchases/FPinvoice/payments',
   getPaySlips:'/hrms/payslips',
   getRoutedShifts:'/hrms/shifts/roasterallocations',
-  AllocateNewShift:'/hrms/shifts/allocate'
+  AllocateNewShift:'/hrms/shifts/allocate',
+  CreateInvoiceDebitNote:'purchases/FPinvoice/debitNote/add',
+  deleteInvoiceDebitNote:'purchases/FPinvoice/debitNote/delete'
 
 
 };

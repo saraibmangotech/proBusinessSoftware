@@ -10,6 +10,7 @@ import {
     InputAdornment,
     Button,
 } from '@mui/material';
+import CloseIcon from "@mui/icons-material/Close";
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -347,7 +348,38 @@ function PrepaidExpenses() {
 
 
         // },
-
+  {
+            header: "Debit Note",
+            accessorKey: "debit_note",
+            cell: ({ row }) => (
+                <Box>{row?.original?.debit_note ? (
+                    <Chip
+                        label={"DN-" + row?.original?.debit_note?.id}
+                        onDelete={() => {
+                            setSelectedData(row?.original)
+                            setConfirmationDialog(true)
+                            console.log("Delete chip for:", row?.original?.debit_note);
+                            // your delete logic here
+                        }}
+                        color="success"
+                        variant="outlined"
+                        deleteIcon={<CloseIcon />}
+                    />
+                ) : (
+                    <Chip
+                        label="Not Available"
+                        color="error"
+                        variant="outlined"
+                        onClick={() =>
+                            navigate("/create-invoice-debit-note", {
+                                state: { tableData: row?.original } // pass any data you need
+                            })
+                        }
+                        sx={{ cursor: "pointer" }}
+                    />
+                )}</Box>
+            ),
+        },
 
         {
             header: "Actions",
@@ -398,6 +430,26 @@ function PrepaidExpenses() {
         },
 
     ]
+     const handleDelete = async (item) => {
+
+
+        try {
+            let params = {
+                id: selectedData?.debit_note?.id,
+                invoice_id: selectedData?.id
+            }
+
+
+            const { message } = await CustomerServices.deleteInvoiceDebitNote(params)
+
+            SuccessToaster(message);
+            getData()
+        } catch (error) {
+            showErrorToast(error)
+        } finally {
+            // setLoader(false)
+        }
+    }
 
 
 
@@ -414,6 +466,7 @@ function PrepaidExpenses() {
                 message={"Are You Sure?"}
                 action={() => {
                     setConfirmationDialog(false);
+                    handleDelete()
 
                 }}
             />

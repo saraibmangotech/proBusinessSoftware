@@ -6,6 +6,10 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+    deleteInvoiceDebitNote: async (obj) => {
+    const data = await deleted(routes.deleteInvoiceDebitNote, obj);
+    return data;
+  },
   AllocateNewShift: async (obj) => {
     const data = await post(routes.AllocateNewShift, obj);
     return data;
@@ -13,6 +17,10 @@ const CustomerServices = {
 
   CreateLocation: async (obj) => {
     const data = await post(routes.CreateLocation, obj);
+    return data;
+  },
+   CreateInvoiceDebitNote: async (obj) => {
+    const data = await post(routes.CreateInvoiceDebitNote, obj);
     return data;
   },
   UpdateLocation: async (obj) => {

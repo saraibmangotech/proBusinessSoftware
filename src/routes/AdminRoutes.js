@@ -395,6 +395,9 @@ const CreateCreditNote = lazy(() =>
 const CreateDebitNote = lazy(() =>
   import("pages/Dashboard/Payments/CreateDebitNote")
 );
+const CreateInvoiceDebitNote = lazy(() =>
+  import("pages/Dashboard/Payments/CreateInvoiceDebitNote")
+);
 const CreatePaymentVoucher = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentVoucher")
 );
@@ -722,6 +725,10 @@ const AdminRoutes = [
   {
     path: "/create-debit-note",
     component: <CreateDebitNote />,
+  },
+   {
+    path: "/create-invoice-debit-note",
+    component: <CreateInvoiceDebitNote />,
   },
   {
     path: "/create-payment-voucher",
