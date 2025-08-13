@@ -339,59 +339,59 @@ function Header() {
 
         ],
       },
-    {
-              id: 22,
-              name: "HRMS",
-              icon: "customer",
-              parent_id: null,
-              api: "/api/customers",
-              route: "",
-              identifier: null,
-              navigation: true,
-              order_by: 2,
-              children: [
+      {
+        id: 22,
+        name: "HRMS",
+        icon: "customer",
+        parent_id: null,
+        api: "/api/customers",
+        route: "",
+        identifier: null,
+        navigation: true,
+        order_by: 2,
+        children: [
 
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
+          {
+            id: 13,
+            name: "Dashboard",
+            icon: "customer",
+            parent_id: null,
+            api: "/api/users",
+            route: "/employee-dashboard",
+            identifier: null,
+            navigation: true,
+            order_by: 13,
+            childRoute: [],
+          },
 
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
+          {
+            id: 13,
+            name: "Leave management",
+            icon: "customer",
+            parent_id: null,
+            api: "/api/users",
+            route: "/leave-list",
+            identifier: null,
+            navigation: true,
+            order_by: 13,
+            childRoute: [],
+          },
 
 
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
+          {
+            id: 55,
+            name: "Attendance Report",
+            icon: "customer",
+            parent_id: 22,
+            api: null,
+            route: "/attendance-report",
+            identifier: null,
+            navigation: true,
+            order_by: 55,
+          },
 
-              ],
-            },])
+        ],
+      },])
     }
     else if (user?.role_id == 1003) {
       setNavigationData([
@@ -511,59 +511,59 @@ function Header() {
 
           ],
         },
-{
-              id: 22,
-              name: "HRMS",
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
-              api: "/api/customers",
-              route: "",
+              api: "/api/users",
+              route: "/employee-dashboard",
               identifier: null,
               navigation: true,
-              order_by: 2,
-              children: [
-
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
-
-              ],
+              order_by: 13,
+              childRoute: [],
             },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
         {
           id: 13,
           name: "Settings",
@@ -755,59 +755,59 @@ function Header() {
 
           ],
         },
-{
-              id: 22,
-              name: "HRMS",
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
-              api: "/api/customers",
-              route: "",
+              api: "/api/users",
+              route: "/employee-dashboard",
               identifier: null,
               navigation: true,
-              order_by: 2,
-              children: [
-
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
-
-              ],
+              order_by: 13,
+              childRoute: [],
             },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
         {
           id: 13,
           name: "Settings",
@@ -1126,58 +1126,58 @@ function Header() {
           ],
         },
         {
-              id: 22,
-              name: "HRMS",
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
-              api: "/api/customers",
-              route: "",
+              api: "/api/users",
+              route: "/employee-dashboard",
               identifier: null,
               navigation: true,
-              order_by: 2,
-              children: [
-
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
-
-              ],
+              order_by: 13,
+              childRoute: [],
             },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
       ]);
 
     }
@@ -1477,7 +1477,7 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-              {
+            {
               id: 1502,
               name: "  FP Settlement",
               icon: "customer",
@@ -1488,7 +1488,7 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-              {
+            {
               id: 1502,
               name: "  FP Settlement List",
               icon: "customer",
@@ -1803,6 +1803,17 @@ function Header() {
             },
             {
               id: 33,
+              name: " Account Payroll List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/account-payroll-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
               name: "Payment Vouchers",
               icon: "customer",
               parent_id: 12,
@@ -2061,59 +2072,59 @@ function Header() {
             "/profit-loss-visa-report",
           ],
         },
-       {
-              id: 22,
-              name: "HRMS",
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
-              api: "/api/customers",
-              route: "",
+              api: "/api/users",
+              route: "/employee-dashboard",
               identifier: null,
               navigation: true,
-              order_by: 2,
-              children: [
-
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
-
-              ],
+              order_by: 13,
+              childRoute: [],
             },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
         {
           id: 13,
           name: "Settings",
@@ -2298,11 +2309,11 @@ function Header() {
 
       ])
     }
-     else if (user?.role_id == 4) {
+    else if (user?.role_id == 4) {
       setNavigationData([
 
-        
-       {
+
+        {
           id: 2,
           name: "Leave Management",
           icon: "customer",
@@ -2313,7 +2324,7 @@ function Header() {
           navigation: true,
 
         },
-         {
+        {
           id: 2,
           name: "Attendance Report",
           icon: "customer",
@@ -2324,7 +2335,7 @@ function Header() {
           navigation: true,
 
         },
- {
+        {
           id: 2,
           name: "Document Expiry Report",
           icon: "customer",
@@ -2338,8 +2349,8 @@ function Header() {
 
       ])
     }
-      else if (user?.role_id == 6) {
-           setNavigationData([
+    else if (user?.role_id == 6) {
+      setNavigationData([
 
         {
           id: 22,
@@ -2534,13 +2545,13 @@ function Header() {
 
           ],
         },
-       
+
 
 
       ])
-      }
-      else if (user?.role_id == 1001) {
-  setNavigationData([
+    }
+    else if (user?.role_id == 1000) {
+      setNavigationData([
 
         {
           id: 2,
@@ -2813,7 +2824,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-  {
+            {
               id: 1502,
               name: " Add FP Payment",
               icon: "customer",
@@ -2835,7 +2846,7 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-             {
+            {
               id: 1502,
               name: "  FP Settlement",
               icon: "customer",
@@ -2846,7 +2857,7 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-              {
+            {
               id: 1502,
               name: "  FP Settlement List",
               icon: "customer",
@@ -3161,6 +3172,17 @@ function Header() {
             },
             {
               id: 33,
+              name: " Account Payroll List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/account-payroll-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
               name: "Payment Vouchers",
               icon: "customer",
               parent_id: 12,
@@ -3419,59 +3441,59 @@ function Header() {
             "/profit-loss-visa-report",
           ],
         },
-     {
-              id: 22,
-              name: "HRMS",
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
-              api: "/api/customers",
-              route: "",
+              api: "/api/users",
+              route: "/employee-dashboard",
               identifier: null,
               navigation: true,
-              order_by: 2,
-              children: [
-
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
-
-              ],
+              order_by: 13,
+              childRoute: [],
             },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
         {
           id: 13,
           name: "Settings",
@@ -3610,7 +3632,7 @@ function Header() {
               children: [],
               childRoute: [],
             },
-        
+
             {
               id: 14,
               name: "Role management",
@@ -3631,7 +3653,1111 @@ function Header() {
 
 
       ])
-      }
+    }
+    else if (user?.role_id == 1001) {
+      setNavigationData([
+
+        {
+          id: 2,
+          name: "Receptions",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/reception-list",
+          identifier: null,
+          navigation: true,
+
+        },
+        {
+          id: 2,
+          name: "Sales",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+            // {
+            //   id: 33,
+            //   name: "Create  Sale Invoice Payment",
+            //   icon: "customer",
+            //   parent_id: 12,
+            //   api: null,
+            //   route: "/create-sale-invoice-payment",
+            //   identifier: null,
+            //   navigation: true,
+            //   order_by: 33,
+            // },
+            {
+              id: 33,
+              name: "Create  Sale Request",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/sales-receipt",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Sale Request List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/pre-sales",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Sale Settlement List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/sales-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+
+
+          ],
+        },
+        {
+          id: 8,
+          name: "Cashier",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/create-paid-receipt",
+          identifier: null,
+          navigation: true,
+          children: [
+
+            {
+              id: 33,
+              name: "Create Paid Receipt",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/create-paid-receipt",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Paid Receipt List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/paid-receipts",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Void Invoice List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/void-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+            {
+              id: 33,
+              name: "Void Receipt List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/void-receipts",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Unsettled Receipt List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/unsettled-receipts",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+          ],
+
+        },
+
+        {
+          id: 15,
+          name: "Purchase",
+          icon: "customer",
+          parent_id: null,
+          api: null,
+          route: null,
+          identifier: null,
+          navigation: true,
+          order_by: 15,
+          children: [
+
+            {
+              id: 1501,
+              name: "Vendor Management",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/purchase/orders",
+              route: "/vendor-list",
+              identifier: null,
+              navigation: true,
+              order_by: 1,
+            },
+
+            {
+              id: 1502,
+              name: "Products Management",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/product-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+
+
+            },
+            {
+              id: 1502,
+              name: "Product Category Management",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/product-category-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Inventory List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/inventory-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true,
+            },
+            {
+              id: 1502,
+              name: "Inventory Location List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/inventory-locations",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true,
+            },
+
+            {
+              id: 1502,
+              name: "Purchase  Invoices",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-invoices",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Purchase Invoice Settlement",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: " Add Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/create-payment-invoice",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Invoice Payment History ",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/purchase-payment-invoice-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "  Payment Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/payment-invoice-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true,
+            },
+            {
+              id: 1502,
+              name: " Add FP Payment",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/pay-fp-payment",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "  FP Payment List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fp-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "  FP Settlement",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fp-settlement",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "  FP Settlement List",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fp-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            {
+              id: 1502,
+              name: "Prepaid Expenses",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/prepaid-expenses",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            // {
+            //   id: 1502,
+            //   name: "Add PE Payment",
+            //   icon: "customer",
+            //   parent_id: 15,
+            //   api: "/api/suppliers",
+            //   route: "/create-prepaid-expense-payment",
+            //   identifier: null,
+            //   navigation: true,
+            //   order_by: 2,
+            // },
+            // {
+            //   id: 1502,
+            //   name: "PE Payment Receipts",
+            //   icon: "customer",
+            //   parent_id: 15,
+            //   api: "/api/suppliers",
+            //   route: "/prepaid-expense-payments",
+            //   identifier: null,
+            //   navigation: true,
+            //   order_by: 2,
+            //   lineBreak: true
+
+            // },
+
+            {
+              id: 1502,
+              name: "Fixed Assets",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/fixed-assets",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+            },
+            // {
+            //   id: 1502,
+            //   name: "Add FA Payment",
+            //   icon: "customer",
+            //   parent_id: 15,
+            //   api: "/api/suppliers",
+            //   route: "/create-fixed-asset-payment",
+            //   identifier: null,
+            //   navigation: true,
+            //   order_by: 2,
+            // },
+            // {
+            //   id: 1502,
+            //   name: "FA Payment Receipts",
+            //   icon: "customer",
+            //   parent_id: 15,
+            //   api: "/api/suppliers",
+            //   route: "/fixed-asset-payments",
+            //   identifier: null,
+            //   navigation: true,
+            //   order_by: 2,
+
+            // },
+
+
+          ],
+          childRoute: [
+            "/purchase-orders",
+            "/supplier-list"
+          ],
+        },
+        {
+          id: 9,
+          name: "Reports",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 33,
+              name: "Service Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Collection Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/collection-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Vat Output Register",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/vat-output-register",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Vat Input Register",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/vat-input-register",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Vat Register",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/vat-register",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Detailed Collection Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/collection-detailed-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Category Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/snapshot-category-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Aging Report Payable",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/aging-report-payable",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Aging Report Receivable",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/aging-report-receivable",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Employee  Sales Summary Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/employee-sales-summary-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Employee Wise Sales Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/employee-wise-sales-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Overview Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/snapshot-overview-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Complete Transaction Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/complete-transaction-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Employee Service Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/snapshot-employee-service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+          ],
+        },
+        {
+          id: 12,
+          name: "Accounts",
+          icon: "customer",
+          parent_id: null,
+          api: null,
+          route: null,
+          identifier: null,
+          navigation: true,
+          order_by: 12,
+          children: [
+
+            {
+              id: 33,
+              name: "Create Account",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/create-account",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Create journal voucher",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/create-journal-voucher",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Credit Notes",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/credit-note-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Debit Notes",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/debit-note-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Account Payroll List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/account-payroll-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Payment Vouchers",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/payment-voucher-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Receipt Vouchers",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/payment-receipt-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 34,
+              name: "Journal vouchers",
+              icon: "customer",
+              parent_id: 12,
+              api: "/api/accounts/journalVouchers",
+              route: "/journal-voucher-list",
+              identifier: null,
+              navigation: true,
+              order_by: 34,
+            },
+            {
+              id: 33,
+              name: "Customer Payments",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/customer-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Supplier  On Account Payments",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/vendor-payment-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 1502,
+              name: "  Payment Supplier Receipts",
+              icon: "customer",
+              parent_id: 15,
+              api: "/api/suppliers",
+              route: "/supplier-payment-receipt-list",
+              identifier: null,
+              navigation: true,
+              order_by: 2,
+              lineBreak: true,
+            },
+            {
+              id: 33,
+              name: "IFT Vouchers",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/fund-transfer-vouchers",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 35,
+              name: "Account list",
+              icon: "customer",
+              parent_id: 12,
+              api: "/api/accounts",
+              route: "/account-list",
+              identifier: null,
+              navigation: true,
+              order_by: 35,
+            },
+            {
+              id: 36,
+              name: "Account ledger",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/general-ledger",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 36,
+              name: "Customer ledger",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/customer-ledgers",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 36,
+              name: "Supplier ledger",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/supplier-ledgers",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 360,
+              name: "Cash Flow Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/cash-flow-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 360,
+              name: "Consolidated Supplier Ledger Report",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/supplier-consolidated-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: "Consolidated Customer Ledger Report",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/pro-consolidated-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: "Account Consolidated Statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/account-consolidated-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: " Consolidated Supplier Payable",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/consolidated-supplier-payable",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 362,
+              name: " Consolidated Customer Receivable",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/consolidated-customer-receivable",
+              identifier: null,
+              navigation: true,
+              order_by: 36,
+            },
+            {
+              id: 37,
+              name: "General journal ledger",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/general-journal-ledger",
+              identifier: null,
+              navigation: true,
+              order_by: 37,
+            },
+            {
+              id: 38,
+              name: "Chart of accounts",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/chart-of-accounts",
+              identifier: null,
+              navigation: true,
+              order_by: 38,
+            },
+            {
+              id: 39,
+              name: "Trial balance",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/trial-balance-detailed",
+              identifier: null,
+              navigation: true,
+              order_by: 39,
+            },
+            {
+              id: 40,
+              name: "Profit loss statement",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/profit-loss-statement",
+              identifier: null,
+              navigation: true,
+              order_by: 40,
+            },
+
+            {
+              id: 41,
+              name: "Balance sheet",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/balance-sheet",
+              identifier: null,
+              navigation: true,
+              order_by: 41,
+            },
+
+          ],
+          childRoute: [
+            "/create-journal-voucher",
+            "/journal-voucher-list",
+            "/account-list",
+            "/general-ledger",
+            "/general-journal-ledger",
+            "/chart-of-accounts",
+            "/trial-balance",
+            "/profit-loss-statement",
+            "/profit-loss-customer-report",
+            "/balance-sheet",
+            "/profit-loss-visa-report",
+          ],
+        },
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/employee-dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
+        {
+          id: 13,
+          name: "Settings",
+          icon: "settings",
+          parent_id: null,
+          api: "/api/users",
+          route: "/user-list",
+          identifier: null,
+          navigation: true,
+          order_by: 13,
+          childRoute: [
+            {
+              id: 33,
+              name: "Customer Management",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/customer-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+            {
+              id: 13,
+              name: "User management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/user-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            {
+              id: 14,
+              name: "Role management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/role-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },],
+          children: [
+            {
+              id: 33,
+              name: "Customer Management",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/customer-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+            {
+              id: 14,
+              name: "Service Categories",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/category-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+            {
+              id: 14,
+              name: "Service Items",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/service-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+            {
+              id: 14,
+              name: "Banks",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/bank-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+            {
+              id: 14,
+              name: "Cards",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/card-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+            {
+              id: 13,
+              name: "User management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/user-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+            {
+              id: 14,
+              name: "Notifications",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/notifications",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+
+            {
+              id: 14,
+              name: "Role management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/role-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+
+
+          ],
+        },
+
+
+      ])
+    }
     else {
       setNavigationData([
 
@@ -3906,7 +5032,7 @@ function Header() {
               order_by: 2,
               lineBreak: true,
             },
-  {
+            {
               id: 1502,
               name: " Add FP Payment",
               icon: "customer",
@@ -3928,7 +5054,7 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-             {
+            {
               id: 1502,
               name: "  FP Settlement",
               icon: "customer",
@@ -3939,7 +5065,7 @@ function Header() {
               navigation: true,
               order_by: 2,
             },
-              {
+            {
               id: 1502,
               name: "  FP Settlement List",
               icon: "customer",
@@ -4512,59 +5638,59 @@ function Header() {
             "/profit-loss-visa-report",
           ],
         },
-      {
-              id: 22,
-              name: "HRMS",
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
               icon: "customer",
               parent_id: null,
-              api: "/api/customers",
-              route: "",
+              api: "/api/users",
+              route: "/employee-dashboard",
               identifier: null,
               navigation: true,
-              order_by: 2,
-              children: [
-
-                {
-                  id: 13,
-                  name: "Dashboard",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/employee-dashboard",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-                {
-                  id: 13,
-                  name: "Leave management",
-                  icon: "customer",
-                  parent_id: null,
-                  api: "/api/users",
-                  route: "/leave-list",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 13,
-                  childRoute: [],
-                },
-
-
-                {
-                  id: 55,
-                  name: "Attendance Report",
-                  icon: "customer",
-                  parent_id: 22,
-                  api: null,
-                  route: "/attendance-report",
-                  identifier: null,
-                  navigation: true,
-                  order_by: 55,
-                },
-
-              ],
+              order_by: 13,
+              childRoute: [],
             },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
         {
           id: 13,
           name: "Settings",
@@ -4703,7 +5829,7 @@ function Header() {
               children: [],
               childRoute: [],
             },
-         
+
             {
               id: 14,
               name: "Role management",
@@ -4917,69 +6043,69 @@ function Header() {
             {/* <Box sx={{ flexGrow: 1 }} /> */}
 
             {/* Right side - Language and User */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      
-      {/* Notification Icon with optional badge */}
-      <Box
-        sx={{
-          p: 1,
-          borderRadius: "6px",
-          cursor: "pointer",
-          "&:hover": {
-            backgroundColor: "rgba(52, 152, 219, 0.04)",
-          },
-        }}
-        onClick={() => {
-          // handle notification click logic here
-          console.log("Notification clicked");
-        }}
-      >
-        <Badge  color="error"> {/* You can replace `3` with your dynamic notification count */}
-          <NotificationsNoneOutlinedIcon onClick={() => {
-          // handle notification click logic here
-          navigate("/notifications");
-        }} sx={{ color: "#555" }} />
-        </Badge>
-      </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
 
-      {/* User Avatar and Name */}
-      <Box
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          cursor: "pointer",
-          py: 1,
-          px: 1,
-          borderRadius: "6px",
-          "&:hover": {
-            backgroundColor: "rgba(52, 152, 219, 0.04)",
-          },
-        }}
-      >
-        <Typography
-          sx={{
-            mr: 1,
-            fontSize: "14px",
-            fontWeight: "500",
-            color: "#333",
-            display: { xs: "none", sm: "block" },
-          }}
-        >
-          Hi, {user?.name || "Admin"}
-        </Typography>
-        <Avatar
-          className="avatar-image"
-          alt={user?.name}
-          sx={{
-            width: 36,
-            height: 36,
-            border: "2px solid #f0f0f0",
-          }}
-          src={process.env.REACT_APP_IMAGE_BASE_URL + user?.picture}
-        />
-      </Box>
-    </Box>
+              {/* Notification Icon with optional badge */}
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "rgba(52, 152, 219, 0.04)",
+                  },
+                }}
+                onClick={() => {
+                  // handle notification click logic here
+                  console.log("Notification clicked");
+                }}
+              >
+                <Badge color="error"> {/* You can replace `3` with your dynamic notification count */}
+                  <NotificationsNoneOutlinedIcon onClick={() => {
+                    // handle notification click logic here
+                    navigate("/notifications");
+                  }} sx={{ color: "#555" }} />
+                </Badge>
+              </Box>
+
+              {/* User Avatar and Name */}
+              <Box
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  py: 1,
+                  px: 1,
+                  borderRadius: "6px",
+                  "&:hover": {
+                    backgroundColor: "rgba(52, 152, 219, 0.04)",
+                  },
+                }}
+              >
+                <Typography
+                  sx={{
+                    mr: 1,
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#333",
+                    display: { xs: "none", sm: "block" },
+                  }}
+                >
+                  Hi, {user?.name || "Admin"}
+                </Typography>
+                <Avatar
+                  className="avatar-image"
+                  alt={user?.name}
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    border: "2px solid #f0f0f0",
+                  }}
+                  src={process.env.REACT_APP_IMAGE_BASE_URL + user?.picture}
+                />
+              </Box>
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>
