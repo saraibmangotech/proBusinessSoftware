@@ -559,6 +559,9 @@ const SalaryList = lazy(() =>
 const SalariesList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/Salaries")
 );
+const AccountPayrollList = lazy(() =>
+  import("pages/Dashboard/Accounts/AccountPayrollList")
+);
 const UpdateSalaryList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/UpdateSalaryList")
 );
@@ -717,6 +720,10 @@ const AdminRoutes = [
   {
     path: "/salary-list",
     component: <SalariesList />,
+  },
+    {
+    path: "/account-payroll-list",
+    component: <AccountPayrollList />,
   },
   {
     path: "/create-credit-note",
