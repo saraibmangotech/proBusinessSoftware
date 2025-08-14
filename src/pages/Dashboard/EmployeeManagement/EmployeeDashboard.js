@@ -241,6 +241,7 @@ function EmployeeDashboard() {
   const { user } = useAuth()
   const { getStorageItem } = Storage()
   const [employeeDetail, setEmployeeDetail] = useState(null)
+    const [employeeDetail2, setEmployeeDetail2] = useState(null)
   const userJourney = getStorageItem("journey")
   const [renderState, setRenderState] = useState(false)
   const [stepperLabel, setStepperLabel] = useState([])
@@ -465,13 +466,13 @@ function EmployeeDashboard() {
   }
 
   const getStatusCheck = (record) => {
-  if (record.isHoliday) return { label: "Holiday", color: "error" }
-  if (record.isWeekend) return { label: "Weekend", color: "default" }
-  if (record.present) return { label: "Present", color: "success" }
-  if (record.absent) return { label: "Absent", color: "error" }
-  if (record.onLeave) return { label: "On Leave", color: "info" }
-  return { label: "No Record", color: "default" }
-}
+    if (record.isHoliday) return { label: "Holiday", color: "error" }
+    if (record.isWeekend) return { label: "Weekend", color: "default" }
+    if (record.present) return { label: "Present", color: "success" }
+    if (record.absent) return { label: "Absent", color: "error" }
+    if (record.onLeave) return { label: "On Leave", color: "info" }
+    return { label: "No Record", color: "default" }
+  }
 
   const getEmployeeAttendance = async (id) => {
     try {
@@ -524,9 +525,29 @@ function EmployeeDashboard() {
       showErrorToast(error)
     }
   }
+  const getEmployeeDetail = async (id) => {
+
+
+    try {
+      let params = { user_id: user?.id}
+
+
+      const { data } = await CustomerServices.getLeaveDetail(params)
+      console.log(data);
+      setEmployeeDetail2(data?.leaves)
+
+
+
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      // setLoader(false)
+    }
+  }
   useEffect(() => {
     getStats()
     getData()
+    getEmployeeDetail()
   }, [])
 
   const onPieEnter = (_, index) => {
@@ -534,72 +555,72 @@ function EmployeeDashboard() {
   }
 
   return (
-     <Box sx={{ p: 4, bgcolor: "#f0f2f5", minHeight: "100vh" }}>
-          {/* Header Section */}
-          <Card
-            sx={{
-              mb: 4,
-              borderRadius: 3,
-              background: "linear-gradient(to right, #6A0DAD, #4169E1)", // Purple to Royal Blue gradient
-              color: "white",
-              p: 4,
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <Grid container spacing={4} alignItems="center">
-              {/* Profile Info */}
-              <Grid item xs={12} md={8}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Avatar sx={{ width: 80, height: 80, mr: 3, bgcolor: "rgba(255,255,255,0.2)" }}>
-                    <PersonOutline sx={{ fontSize: 40 }} />
-                  </Avatar>
+    <Box sx={{ p: 4, bgcolor: "#f0f2f5", minHeight: "100vh" }}>
+      {/* Header Section */}
+      <Card
+        sx={{
+          mb: 4,
+          borderRadius: 3,
+          background: "linear-gradient(to right, #6A0DAD, #4169E1)", // Purple to Royal Blue gradient
+          color: "white",
+          p: 4,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Grid container spacing={4} alignItems="center">
+          {/* Profile Info */}
+          <Grid item xs={12} md={8}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <Avatar sx={{ width: 80, height: 80, mr: 3, bgcolor: "rgba(255,255,255,0.2)" }}>
+                <PersonOutline sx={{ fontSize: 40 }} />
+              </Avatar>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                  Welcome back, {employeeDetail?.user?.name}! 👋
+                </Typography>
+                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                  {employeeDetail?.designation}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                  Employee ID: {employeeDetail?.employee_code}
+                </Typography>
+              </Box>
+            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={4}>
+                <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                  <EmailOutlined sx={{ mr: 1, fontSize: 18 }} />
                   <Box>
-                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                      Welcome back, {employeeDetail?.user?.name}! 👋
+                    <Typography variant="caption" display="block">
+                      Email
                     </Typography>
-                    <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-                      {employeeDetail?.designation}
-                    </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                      Employee ID: {employeeDetail?.employee_code}
-                    </Typography>
+                    <Typography variant="body2">{employeeDetail?.user?.email}</Typography>
                   </Box>
                 </Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
-                      <EmailOutlined sx={{ mr: 1, fontSize: 18 }} />
-                      <Box>
-                        <Typography variant="caption" display="block">
-                          Email
-                        </Typography>
-                        <Typography variant="body2">{employeeDetail?.user?.email}</Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
-                      <PhoneOutlined sx={{ mr: 1, fontSize: 18 }} />
-                      <Box>
-                        <Typography variant="caption" display="block">
-                          Mobile
-                        </Typography>
-                        <Typography variant="body2">{employeeDetail?.user?.phone}</Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
-                      <CalendarTodayOutlined sx={{ mr: 1, fontSize: 18 }} />
-                      <Box>
-                        <Typography variant="caption" display="block">
-                          Joined
-                        </Typography>
-                        <Typography variant="body2">{moment(employeeDetail?.date_of_joining).format('DD-MM-YYYY')}</Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  {/* <Grid item xs={12} sm={6} md={3}>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                  <PhoneOutlined sx={{ mr: 1, fontSize: 18 }} />
+                  <Box>
+                    <Typography variant="caption" display="block">
+                      Mobile
+                    </Typography>
+                    <Typography variant="body2">{employeeDetail?.user?.phone}</Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
+                  <CalendarTodayOutlined sx={{ mr: 1, fontSize: 18 }} />
+                  <Box>
+                    <Typography variant="caption" display="block">
+                      Joined
+                    </Typography>
+                    <Typography variant="body2">{moment(employeeDetail?.date_of_joining).format('DD-MM-YYYY')}</Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              {/* <Grid item xs={12} sm={6} md={3}>
                     <Box sx={{ display: "flex", alignItems: "center", opacity: 0.9 }}>
                       <AttachMoneyOutlined sx={{ mr: 1, fontSize: 18 }} />
                       <Box>
@@ -610,318 +631,318 @@ function EmployeeDashboard() {
                       </Box>
                     </Box>
                   </Grid> */}
+            </Grid>
+          </Grid>
+
+          {/* Quick Stats */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ borderLeft: { md: "1px solid rgba(255,255,255,0.3)" }, pl: { md: 4 }, pt: { xs: 3, md: 0 } }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+                Quick Stats
+              </Typography>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    Total Hours
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: "right" }}>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    N/A
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    Completed Shifts
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: "right" }}>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    N/A
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                   Annual Leave Balance
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: "right" }}>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {employeeDetail2?.annual_leave_balance}
+                  </Typography>
                 </Grid>
               </Grid>
+            </Box>
+          </Grid>
+        </Grid>
+      </Card>
 
-              {/* Quick Stats */}
-              <Grid item xs={12} md={4}>
-                <Box sx={{ borderLeft: { md: "1px solid rgba(255,255,255,0.3)" }, pl: { md: 4 }, pt: { xs: 3, md: 0 } }}>
-                  <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-                    Quick Stats
+      {/* Document Status & Expiry Tracking */}
+      <Card sx={{ mb: 4, borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <DescriptionOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+            Document Status & Expiry Tracking
+          </Typography>
+        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Monitor your important document expiry dates
+        </Typography>
+
+        <Grid container spacing={2}>
+          {employeeDetail?.documents?.map((doc, index) => {
+            const { icon, color: bgColor, statusColor } = getIconAndColor(doc.key);
+            const { label, color: chipColor, icon: chipIcon } = getStatus(doc.expiry_date);
+            const daysLeft = doc.expiry_date
+              ? moment(doc.expiry_date).diff(moment(), "days")
+              : null;
+
+            return (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card sx={{ borderRadius: 2, p: 2, bgcolor: bgColor, boxShadow: "none" }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      {icon}
+                      <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#333" }}>
+                        {doc.name}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={label}
+                      icon={chipIcon}
+                      sx={{
+                        bgcolor: chipColor,
+                        color: "white",
+                        height: 24,
+                        "& .MuiChip-icon": { color: "white" },
+                      }}
+                    />
+                  </Box>
+
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    Expires:
                   </Typography>
-                  <Grid container spacing={1}>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Total Hours
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sx={{ textAlign: "right" }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        N/A
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Completed Shifts
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sx={{ textAlign: "right" }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                           N/A
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Bank Account
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sx={{ textAlign: "right" }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        {employeeDetail?.iban}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-            </Grid>
-          </Card>
+                  <Typography variant="body1" sx={{ fontWeight: "medium", mb: 1 }}>
+                    {doc.expiry_date ? moment(doc.expiry_date).format("YYYY-MM-DD") : "N/A"}
+                  </Typography>
 
-          {/* Document Status & Expiry Tracking */}
-          <Card sx={{ mb: 4, borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    Days left:
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: chipColor,
+                      mb: 2,
+                    }}
+                  >
+                    {doc.expiry_date
+                      ? daysLeft >= 0
+                        ? `${daysLeft} days`
+                        : `${Math.abs(daysLeft)} days ago`
+                      : "N/A"}
+                  </Typography>
+
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<VisibilityOutlined />}
+                    sx={{
+                      borderColor: chipColor,
+                      color: chipColor,
+                      "&:hover": { borderColor: chipColor, bgcolor: bgColor },
+                      width: "100%",
+                    }}
+                    onClick={() => {
+                      if (doc.path) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${doc.path}`, "_blank");
+                    }}
+                    disabled={!doc.path}
+                  >
+                    View Document
+                  </Button>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+
+      </Card>
+
+      {/* Current Shift Status */}
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
+          <Card sx={{ borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <DescriptionOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
+              <HourglassEmptyOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
               <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
-                Document Status & Expiry Tracking
+                Current Shift Status
               </Typography>
             </Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Monitor your important document expiry dates
+              Your active shift details and progress
             </Typography>
 
-            <Grid container spacing={2}>
-              {employeeDetail?.documents?.map((doc, index) => {
-                const { icon, color: bgColor, statusColor } = getIconAndColor(doc.key);
-                const { label, color: chipColor, icon: chipIcon } = getStatus(doc.expiry_date);
-                const daysLeft = doc.expiry_date
-                  ? moment(doc.expiry_date).diff(moment(), "days")
-                  : null;
-
-                return (
-                  <Grid item xs={12} sm={6} md={3} key={index}>
-                    <Card sx={{ borderRadius: 2, p: 2, bgcolor: bgColor, boxShadow: "none" }}>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          {icon}
-                          <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#333" }}>
-                            {doc.name}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={label}
-                          icon={chipIcon}
-                          sx={{
-                            bgcolor: chipColor,
-                            color: "white",
-                            height: 24,
-                            "& .MuiChip-icon": { color: "white" },
-                          }}
-                        />
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={12}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <EventNoteOutlined sx={{ mr: 1, color: "#666" }} />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Date
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                          {moment(shift?.created_at).format('DD-MM-YYYY')}
+                        </Typography>
                       </Box>
-
-                      <Typography variant="caption" color="text.secondary" display="block">
-                        Expires:
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: "medium", mb: 1 }}>
-                        {doc.expiry_date ? moment(doc.expiry_date).format("YYYY-MM-DD") : "N/A"}
-                      </Typography>
-
-                      <Typography variant="caption" color="text.secondary" display="block">
-                        Days left:
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: "bold",
-                          color: chipColor,
-                          mb: 2,
-                        }}
-                      >
-                        {doc.expiry_date
-                          ? daysLeft >= 0
-                            ? `${daysLeft} days`
-                            : `${Math.abs(daysLeft)} days ago`
-                          : "N/A"}
-                      </Typography>
-
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<VisibilityOutlined />}
-                        sx={{
-                          borderColor: chipColor,
-                          color: chipColor,
-                          "&:hover": { borderColor: chipColor, bgcolor: bgColor },
-                          width: "100%",
-                        }}
-                        onClick={() => {
-                          if (doc.path) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${doc.path}`, "_blank");
-                        }}
-                        disabled={!doc.path}
-                      >
-                        View Document
-                      </Button>
-                    </Card>
+                    </Box>
                   </Grid>
-                );
-              })}
-            </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <ScheduleOutlined sx={{ mr: 1, color: "#666" }} />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Time
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                          {moment().startOf("day").add(shift?.start_time, "minutes").format("hh:mm A")} - {moment().startOf("day").add(shift?.end_time, "minutes").format("hh:mm A")}
 
+
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+
+                </Grid>
+              </Grid>
+
+
+            </Grid>
           </Card>
-
-          {/* Current Shift Status */}
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <Card sx={{ borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <HourglassEmptyOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
-                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
-                    Current Shift Status
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Your active shift details and progress
-                </Typography>
-
-                <Grid container spacing={3} alignItems="center">
-                  <Grid item xs={12} md={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <EventNoteOutlined sx={{ mr: 1, color: "#666" }} />
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Date
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
-                              {moment(shift?.created_at).format('DD-MM-YYYY')}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <ScheduleOutlined sx={{ mr: 1, color: "#666" }} />
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Time
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
-                              {moment().startOf("day").add(shift?.start_time, "minutes").format("hh:mm A")} - {moment().startOf("day").add(shift?.end_time, "minutes").format("hh:mm A")}
-
-
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-
-                    </Grid>
-                  </Grid>
-
-
-                </Grid>
-              </Card>
-            </Grid>
-            <Grid item xs={6}>
-              <Card sx={{ borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <HourglassEmptyOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
-                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
-                    Today Shift Status
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Your today shift details and progress
-                </Typography>
-
-                <Grid container spacing={3} alignItems="center">
-                  <Grid item xs={12} md={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <EventNoteOutlined sx={{ mr: 1, color: "#666" }} />
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Date
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
-                              {moment(shift?.created_at).format('DD-MM-YYYY')}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <ScheduleOutlined sx={{ mr: 1, color: "#666" }} />
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Time
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
-                              {moment().startOf("day").add(shift?.start_time, "minutes").format("hh:mm A")} - {moment().startOf("day").add(shift?.end_time, "minutes").format("hh:mm A")}
-
-
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-
-                    </Grid>
-                  </Grid>
-
-
-                </Grid>
-              </Card>
-            </Grid>
-          </Grid>
-       <Box px={2} py={4}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Attendance Record
-      </Typography>
-      <Typography variant="body2" color="textSecondary" gutterBottom>
-        Your recent attendance and working hours
-      </Typography>
-
-      <Stack spacing={2}>
-        {employeeAttendance?.map((record, index) => (
-          <Paper
-            key={index}
-            elevation={0}
-            sx={{
-              p: 2,
-              borderRadius: 2,
-              border: "1px solid #E0E0E0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-            }}
-          >
-            <Box display="flex" alignItems="center" gap={2}>
-              <CalendarTodayIcon color="primary" />
-              <Box>
-                <Typography variant="subtitle1" fontWeight="medium">
-                  {record.date}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {record.check_in && record.check_out
-                    ? `${record.check_in} - ${record.check_out}`
-                    : "No attendance"}
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box textAlign="right">
-              <Typography variant="subtitle2">
-                {record.worked_hours}h
+        </Grid>
+        <Grid item xs={6}>
+          <Card sx={{ borderRadius: 3, p: 3, boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)" }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <HourglassEmptyOutlined sx={{ mr: 1, color: "#6A0DAD" }} />
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+                Today Shift Status
               </Typography>
-              {record.excess_hours > 0 && (
-                <Typography variant="caption" color="orange">
-                  +{record.excess_hours.toFixed(2)}h OT
-                </Typography>
-              )}
-              {record.status === "Present" ? (
-                <Chip
-                  label="Present"
-                  size="small"
-                  color="success"
-                  icon={<CheckCircleIcon />}
-                  sx={{ ml: 1 }}
-                />
-              ) : (
-                <Chip
-                  label="Absent"
-                  size="small"
-                  color="error"
-                  icon={<CancelIcon />}
-                  sx={{ ml: 1 }}
-                />
-              )}
             </Box>
-          </Paper>
-        ))}
-      </Stack>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Your today shift details and progress
+            </Typography>
+
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={12}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <EventNoteOutlined sx={{ mr: 1, color: "#666" }} />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Date
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                          {moment(shift?.created_at).format('DD-MM-YYYY')}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <ScheduleOutlined sx={{ mr: 1, color: "#666" }} />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Time
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+                          {moment().startOf("day").add(shift?.start_time, "minutes").format("hh:mm A")} - {moment().startOf("day").add(shift?.end_time, "minutes").format("hh:mm A")}
+
+
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+
+                </Grid>
+              </Grid>
+
+
+            </Grid>
+          </Card>
+        </Grid>
+      </Grid>
+      <Box px={2} py={4}>
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Attendance Record
+        </Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom>
+          Your recent attendance and working hours
+        </Typography>
+
+        <Stack spacing={2}>
+          {employeeAttendance?.map((record, index) => (
+            <Paper
+              key={index}
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                border: "1px solid #E0E0E0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={2}>
+                <CalendarTodayIcon color="primary" />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="medium">
+                    {record.date}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {record.check_in && record.check_out
+                      ? `${record.check_in} - ${record.check_out}`
+                      : "No attendance"}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box textAlign="right">
+                <Typography variant="subtitle2">
+                  {record.worked_hours}h
+                </Typography>
+                {record.excess_hours > 0 && (
+                  <Typography variant="caption" color="orange">
+                    +{record.excess_hours.toFixed(2)}h OT
+                  </Typography>
+                )}
+                {record.status === "Present" ? (
+                  <Chip
+                    label="Present"
+                    size="small"
+                    color="success"
+                    icon={<CheckCircleIcon />}
+                    sx={{ ml: 1 }}
+                  />
+                ) : (
+                  <Chip
+                    label="Absent"
+                    size="small"
+                    color="error"
+                    icon={<CancelIcon />}
+                    sx={{ ml: 1 }}
+                  />
+                )}
+              </Box>
+            </Paper>
+          ))}
+        </Stack>
+      </Box>
     </Box>
-        </Box>
   )
 }
 

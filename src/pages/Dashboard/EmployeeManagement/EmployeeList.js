@@ -9,6 +9,7 @@ import {
     Checkbox,
     InputAdornment,
 } from '@mui/material';
+import ExcelJS from "exceljs";
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +22,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -308,7 +309,7 @@ function EmployeeList() {
             let obj = {
                 user_id: selectedData?.user_id,
                 password: getValues2('password'),
-               
+
             };
 
             const promise = CustomerServices.updateEmployeePassword(obj);
@@ -333,125 +334,576 @@ function EmployeeList() {
             console.log(error);
         }
     };
-  const columns = [
-  {
-    header: "SR No.",
-    accessorKey: "id",
-    
-  },
-  {
-    header: "Employee Code",
-    accessorKey: "employee_code",
-      cell: ({ row }) => (
-      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        {row?.original?.employee_code}
-      </Box>
-    ),
-  },
-  {
-    header: "Name",
-    accessorKey: "user.name", // ✅ Corrected for search
-    cell: ({ row }) => (
-      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        {row?.original?.user?.name}
-      </Box>
-    ),
-  },
-  {
-    header: "Phone",
-    accessorKey: "user.phone", // ✅ Corrected for search
-    cell: ({ row }) => (
-      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        {row?.original?.user?.phone}
-      </Box>
-    ),
-  },
-  {
-    header: "Email",
-    accessorKey: "user.email", // ✅ Corrected for search
-    cell: ({ row }) => (
-      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        {row?.original?.user?.email}
-      </Box>
-    ),
-  },
-  {
-    header: "Designation",
-    accessorKey: "designation", // ✅ already correct
-    cell: ({ row }) => (
-      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        {row?.original?.designation}
-      </Box>
-    ),
-  },
-  {
-    header: "Department",
-    accessorKey: "department", // ✅ already correct
-    cell: ({ row }) => (
-      <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        {row?.original?.department}
-      </Box>
-    ),
-  },
-  {
-    header: "Status",
-    accessorKey: "is_active", // ✅ change this to allow search/filter on active status
-    cell: ({ row }) => (
-      <Box className="pdf-hide" sx={{ display: 'flex', justifyContent: 'center' }}>
-        <SwitchButton
-          sx={{
-            '& .MuiButtonBase-root': {
-              width: '28px',
-              height: '28px'
-            }
-          }}
-          isChecked={row?.original?.is_active}
-          setIsChecked={() => updateAccountStatus(row?.original?.id, !row?.original?.is_active)}
-        />
-      </Box>
-    ),
-  },
-  {
-    header: "Actions",
-    cell: ({ row }) => (
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <Tooltip title="Update Password" arrow>
-          <IconButton
-            onClick={() => {
-              setSelectedData(row?.original);
-              setStatusDialog2(true);
-            }}
-          >
-            <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Adjust Leaves" arrow>
-          <IconButton
-            onClick={() => {
-              setSelectedData(row?.original);
-              setStatusDialog(true);
-            }}
-          >
-            <BuildIcon sx={{ color: 'black', fontSize: '14px' }} />
-          </IconButton>
-        </Tooltip>
-       
-        <Box
-          component="img"
-          sx={{ cursor: "pointer" }}
-          onClick={() => {
-            navigate(`/update-employee/${row?.original?.user_id}`);
-            localStorage.setItem("currentUrl", '/update-customer');
-          }}
-          src={Images.editIcon}
-          width="35px"
-        />
-      </Box>
-    ),
-  },
-];
+    const columns = [
+        {
+            header: "SR No.",
+            accessorKey: "id",
 
+        },
+        {
+            header: "Employee Code",
+            accessorKey: "employee_code",
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.employee_code}
+                </Box>
+            ),
+        },
+        {
+            header: "Name",
+            accessorKey: "user.name", // ✅ Corrected for search
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.user?.name}
+                </Box>
+            ),
+        },
+        {
+            header: "Phone",
+            accessorKey: "user.phone", // ✅ Corrected for search
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.user?.phone}
+                </Box>
+            ),
+        },
+        {
+            header: "Email",
+            accessorKey: "user.email", // ✅ Corrected for search
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.user?.email}
+                </Box>
+            ),
+        },
+        {
+            header: "Designation",
+            accessorKey: "designation", // ✅ already correct
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.designation}
+                </Box>
+            ),
+        },
+        {
+            header: "Department",
+            accessorKey: "department", // ✅ already correct
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.department}
+                </Box>
+            ),
+        },
+        {
+            header: "Status",
+            accessorKey: "is_active", // ✅ change this to allow search/filter on active status
+            cell: ({ row }) => (
+                <Box className="pdf-hide" sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <SwitchButton
+                        sx={{
+                            '& .MuiButtonBase-root': {
+                                width: '28px',
+                                height: '28px'
+                            }
+                        }}
+                        isChecked={row?.original?.is_active}
+                        setIsChecked={() => updateAccountStatus(row?.original?.id, !row?.original?.is_active)}
+                    />
+                </Box>
+            ),
+        },
+        {
+            header: "Actions",
+            cell: ({ row }) => (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="Update Password" arrow>
+                        <IconButton
+                            onClick={() => {
+                                setSelectedData(row?.original);
+                                setStatusDialog2(true);
+                            }}
+                        >
+                            <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Adjust Leaves" arrow>
+                        <IconButton
+                            onClick={() => {
+                                setSelectedData(row?.original);
+                                setStatusDialog(true);
+                            }}
+                        >
+                            <BuildIcon sx={{ color: 'black', fontSize: '14px' }} />
+                        </IconButton>
+                    </Tooltip>
 
+                    <Box
+                        component="img"
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => {
+                            navigate(`/update-employee/${row?.original?.user_id}`);
+                            localStorage.setItem("currentUrl", '/update-customer');
+                        }}
+                        src={Images.editIcon}
+                        width="35px"
+                    />
+                </Box>
+            ),
+        },
+    ];
+
+const downloadEmployeeExcel = () => {
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet("Employee List")
+
+  // Set professional header and footer
+  worksheet.headerFooter.oddHeader =
+    '&C&"Arial,Bold"&18EMPLOYEE LIST\n' +
+    '&C&"Arial,Regular"&12Your Company Name\n' +
+    '&C&"Arial,Regular"&10Period: &D - &T\n' +
+    '&L&"Arial,Regular"&8Generated on: ' +
+    new Date().toLocaleDateString() +
+    "\n" +
+    '&R&"Arial,Regular"&8Page &P of &N'
+
+  worksheet.headerFooter.oddFooter =
+    '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
+    '&C&"Arial,Regular"&8This report contains employee data as of ' +
+    new Date().toLocaleDateString() +
+    '&R&"Arial,Regular"&8Generated by: HR Department\n' +
+    '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
+
+  worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+
+  // Set page setup for professional printing
+  worksheet.pageSetup = {
+    paperSize: 9, // A4
+    orientation: "landscape",
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
+    margins: {
+      left: 0.7,
+      right: 0.7,
+      top: 1.0,
+      bottom: 1.0,
+      header: 0.3,
+      footer: 0.5,
+    },
+  }
+
+  // Add title section at the top of the worksheet
+  const titleRow = worksheet.addRow(["EMPLOYEE LIST"])
+  titleRow.getCell(1).font = {
+    name: "Arial",
+    size: 16,
+    bold: true,
+    color: { argb: "2F4F4F" },
+  }
+  titleRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A1:AO1")
+
+  const companyRow = worksheet.addRow([
+    agencyType && agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
+      ? "PREMIUM BUSINESSMEN SERVICES"
+      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC",
+  ])
+  companyRow.getCell(1).font = {
+    name: "Arial",
+    size: 14,
+    bold: true,
+    color: { argb: "4472C4" },
+  }
+  companyRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A2:AO2")
+
+  const dateRow = worksheet.addRow([
+    `Report Generated: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })} at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}`,
+  ])
+  dateRow.getCell(1).font = {
+    name: "Arial",
+    size: 10,
+    italic: true,
+    color: { argb: "666666" },
+  }
+  dateRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A3:AO3")
+
+  // Add empty row for spacing
+  worksheet.addRow([])
+
+  // Updated headers to include all employee fields
+  const headers = [
+    "SR No.",
+    "Employee Code",
+    "User ID",
+    "Ref ID",
+    "Name",
+    "First Name",
+    "Last Name",
+    "Phone",
+    "Email",
+    "Passport Number",
+    "Date of Birth",
+    "Date of Joining",
+    "Probation Period (Months)",
+    "Probation End Date",
+    "Employment Status",
+    "Emirates ID",
+    "Shift Start",
+    "Shift End",
+    "Grace Period (Minutes)",
+    "Minimum Required Minutes",
+    "Short Time Deduction Type",
+    "Personal Time Minutes/Month",
+    "Leaves Balance",
+    "Leave Allocation/Month",
+    "Leave Allocation Start After Probation",
+    "Carry Forward Leaves",
+    "Pension Applicable",
+    "Pension Percentage",
+    "Pension Percentage Employer",
+    "Eligible for Airfare",
+    "Airfare Cycle Years",
+    "Next Airfare Due Date",
+    "Basic Salary",
+    "Housing Allowance",
+    "Other Allowance",
+    "Transport Allowance",
+    "Airfare Amount",
+    "Designation",
+    "Department",
+    "Is Active",
+    "Is Overtime Eligible",
+    "Has Left Job",
+    "Date of Leaving",
+    "Leaving Reason",
+    "Branch",
+    "Visa",
+    "Work Permit",
+    "IBAN",
+    "Routing",
+    "Cost Center",
+    "Is Local",
+    "Shift Type",
+    "Shift ID",
+    "Leave Approver 1",
+    "Leave Approver 2",
+    "Gender",
+    "Nationality",
+    "Emergency Contact Name",
+    "Emergency Contact Number",
+    "Working Days",
+    "User Type ID",
+    "Role ID",
+    "Machine ID",
+    "Picture",
+    "Created At",
+    "Updated At",
+  ]
+
+  // Add headers with professional styling
+  const headerRow = worksheet.addRow(headers)
+  headerRow.eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "2F4F4F" }, // Dark slate gray
+    }
+    cell.font = {
+      name: "Arial",
+      bold: true,
+      color: { argb: "FFFFFF" },
+      size: 11,
+    }
+    cell.alignment = { horizontal: "center", vertical: "middle" }
+    cell.border = {
+      top: { style: "thin", color: { argb: "000000" } },
+      left: { style: "thin", color: { argb: "000000" } },
+      bottom: { style: "thin", color: { argb: "000000" } },
+      right: { style: "thin", color: { argb: "000000" } },
+    }
+  })
+
+  customerQueue.forEach((employee, index) => {
+    const dataRow = worksheet.addRow([
+      index + 1, // SR No.
+      employee?.employee_code ?? "-",
+      employee?.user_id ?? "-",
+      employee?.user?.ref_id ?? "-",
+      employee?.user?.name ?? "-",
+      employee?.first_name ?? "-",
+      employee?.last_name ?? "-",
+      employee?.user?.phone ?? "-",
+      employee?.user?.email ?? "-",
+      employee?.passport_number ?? "-",
+      employee?.date_of_birth ? new Date(employee.date_of_birth).toLocaleDateString() : "-",
+      employee?.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString() : "-",
+      employee?.probation_period_months ?? "-",
+      employee?.probation_end_date ? new Date(employee.probation_end_date).toLocaleDateString() : "-",
+      employee?.employment_status ?? "-",
+      employee?.emirates_id ?? "-",
+      employee?.shift_start ?? "-",
+      employee?.shift_end ?? "-",
+      employee?.grace_period_minutes ?? "-",
+      employee?.minimum_required_minutes ?? "-",
+      employee?.short_time_deduction_type ?? "-",
+      employee?.personal_time_minutes_per_month ?? "-",
+      employee?.leaves_balance ?? "-",
+      employee?.leave_allocation_per_month ?? "-",
+      employee?.leave_allocation_start_after_probation ?? "-",
+      employee?.carry_forward_leaves ?? "-",
+      employee?.pension_applicable ? "Yes" : "No",
+      employee?.pension_percentage ?? "-",
+      employee?.pension_percentage_employer ?? "-",
+      employee?.eligible_for_airfare ? "Yes" : "No",
+      employee?.airfare_cycle_years ?? "-",
+      employee?.next_airfare_due_date ? new Date(employee.next_airfare_due_date).toLocaleDateString() : "-",
+      employee?.basic_salary ?? "-",
+      employee?.housing_allowance ?? "-",
+      employee?.other_allowance ?? "-",
+      employee?.transport_allowance ?? "-",
+      employee?.airfare_amount ?? "-",
+      employee?.designation ?? "-",
+      employee?.department ?? "-",
+      employee?.is_active ? "Active" : "Inactive",
+      employee?.is_overtime_eligible ? "Yes" : "No",
+      employee?.has_left_job ? "Yes" : "No",
+      employee?.date_of_leaving ? new Date(employee.date_of_leaving).toLocaleDateString() : "-",
+      employee?.leaving_reason ?? "-",
+      employee?.branch ?? "-",
+      employee?.visa ?? "-",
+      employee?.work_permit ?? "-",
+      employee?.iban ?? "-",
+      employee?.routing ?? "-",
+      employee?.cost_center ?? "-",
+      employee?.is_local ? "Yes" : "No",
+      employee?.shift_type ?? "-",
+      employee?.shift_id ?? "-",
+      employee?.leave_approver_1 ?? "-",
+      employee?.leave_approver_2 ?? "-",
+      employee?.gender ?? "-",
+      employee?.nationality ?? "-",
+      employee?.emergency_contact_name ?? "-",
+      employee?.emergency_contact_number ?? "-",
+      employee?.working_days ?? "-",
+      employee?.user?.user_type_id ?? "-",
+      employee?.user?.role_id ?? "-",
+      employee?.user?.machine_id ?? "-",
+      employee?.user?.picture ?? "-",
+      employee?.createdAt ? new Date(employee.createdAt).toLocaleDateString() : "-",
+      employee?.updatedAt ? new Date(employee.updatedAt).toLocaleDateString() : "-",
+    ])
+
+    // Style data rows
+    dataRow.eachCell((cell, colNumber) => {
+      cell.font = { name: "Arial", size: 10 }
+      cell.alignment = {
+        horizontal: "left",
+        vertical: "middle",
+      }
+      cell.border = {
+        top: { style: "hair", color: { argb: "CCCCCC" } },
+        left: { style: "hair", color: { argb: "CCCCCC" } },
+        bottom: { style: "hair", color: { argb: "CCCCCC" } },
+        right: { style: "hair", color: { argb: "CCCCCC" } },
+      }
+
+      // Highlight status column with different colors (column 40 - Is Active)
+      if (colNumber === 40) {
+        if (cell.value === "Active") {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "E8F5E8" }, // Light green for Active
+          }
+        } else if (cell.value === "Inactive") {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFE8E8" }, // Light red for Inactive
+          }
+        }
+      }
+    })
+  })
+
+  // Add summary information
+  if (customerQueue.length > 0) {
+    // Count active and inactive employees
+    const activeCount = customerQueue.filter((emp) => emp?.is_active).length
+    const inactiveCount = customerQueue.filter((emp) => !emp?.is_active).length
+
+    // Get unique departments
+    const departments = [...new Set(customerQueue.map((emp) => emp?.department).filter(Boolean))]
+
+    // Add empty row before summary
+    worksheet.addRow([])
+
+    // Add summary rows
+    const summaryRow1 = worksheet.addRow([
+      "Summary:",
+      "",
+      "",
+      "",
+      "",
+      `Total Employees: ${customerQueue.length}`,
+      "",
+      "",
+    ])
+
+    const summaryRow2 = worksheet.addRow(["", "", "", "", "", `Active Employees: ${activeCount}`, "", ""])
+
+    const summaryRow3 = worksheet.addRow(["", "", "", "", "", `Inactive Employees: ${inactiveCount}`, "", ""])
+
+    const summaryRow4 = worksheet.addRow(["", "", "", "", "", `Departments: ${departments.length}`, "", ""])
+
+    // Style summary rows
+    ;[summaryRow1, summaryRow2, summaryRow3, summaryRow4].forEach((row) => {
+      row.eachCell((cell, colNumber) => {
+        if (colNumber === 1 || colNumber === 6) {
+          cell.font = {
+            name: "Arial",
+            bold: colNumber === 1,
+            size: 10,
+            color: { argb: "2F4F4F" },
+          }
+        }
+      })
+    })
+  }
+
+  // Set column widths for all the new columns
+  worksheet.columns = [
+    { width: 8 }, // SR No.
+    { width: 15 }, // Employee Code
+    { width: 10 }, // User ID
+    { width: 12 }, // Ref ID
+    { width: 20 }, // Name
+    { width: 15 }, // First Name
+    { width: 15 }, // Last Name
+    { width: 15 }, // Phone
+    { width: 25 }, // Email
+    { width: 15 }, // Passport Number
+    { width: 12 }, // Date of Birth
+    { width: 12 }, // Date of Joining
+    { width: 12 }, // Probation Period
+    { width: 12 }, // Probation End Date
+    { width: 15 }, // Employment Status
+    { width: 15 }, // Emirates ID
+    { width: 12 }, // Shift Start
+    { width: 12 }, // Shift End
+    { width: 12 }, // Grace Period
+    { width: 12 }, // Min Required Minutes
+    { width: 15 }, // Short Time Deduction
+    { width: 15 }, // Personal Time Minutes
+    { width: 12 }, // Leaves Balance
+    { width: 15 }, // Leave Allocation
+    { width: 20 }, // Leave Allocation Start
+    { width: 15 }, // Carry Forward Leaves
+    { width: 12 }, // Pension Applicable
+    { width: 12 }, // Pension Percentage
+    { width: 15 }, // Pension Percentage Employer
+    { width: 12 }, // Eligible for Airfare
+    { width: 12 }, // Airfare Cycle Years
+    { width: 15 }, // Next Airfare Due Date
+    { width: 12 }, // Basic Salary
+    { width: 12 }, // Housing Allowance
+    { width: 12 }, // Other Allowance
+    { width: 12 }, // Transport Allowance
+    { width: 12 }, // Airfare Amount
+    { width: 20 }, // Designation
+    { width: 15 }, // Department
+    { width: 10 }, // Is Active
+    { width: 12 }, // Is Overtime Eligible
+    { width: 12 }, // Has Left Job
+    { width: 12 }, // Date of Leaving
+    { width: 20 }, // Leaving Reason
+    { width: 15 }, // Branch
+    { width: 15 }, // Visa
+    { width: 15 }, // Work Permit
+    { width: 20 }, // IBAN
+    { width: 15 }, // Routing
+    { width: 15 }, // Cost Center
+    { width: 10 }, // Is Local
+    { width: 12 }, // Shift Type
+    { width: 10 }, // Shift ID
+    { width: 12 }, // Leave Approver 1
+    { width: 12 }, // Leave Approver 2
+    { width: 10 }, // Gender
+    { width: 15 }, // Nationality
+    { width: 20 }, // Emergency Contact Name
+    { width: 18 }, // Emergency Contact Number
+    { width: 12 }, // Working Days
+    { width: 12 }, // User Type ID
+    { width: 10 }, // Role ID
+    { width: 12 }, // Machine ID
+    { width: 15 }, // Picture
+    { width: 12 }, // Created At
+    { width: 12 }, // Updated At
+  ]
+
+  // Add workbook properties
+  workbook.creator = "HR Department"
+  workbook.lastModifiedBy = "HR System"
+  workbook.created = new Date()
+  workbook.modified = new Date()
+  workbook.lastPrinted = new Date()
+
+  // Set workbook properties
+  workbook.properties = {
+    title: "Employee List",
+    subject: "HR Report",
+    keywords: "employee list, staff, human resources, personnel",
+    category: "HR Reports",
+    description: "Employee list report generated from HR system",
+    company: "Your Company Name",
+  }
+
+  // Add empty rows for spacing before footer
+  worksheet.addRow([])
+  worksheet.addRow([])
+
+  // Add the electronically generated report text with black border
+  const reportRow = worksheet.addRow(["This is electronically generated report"])
+  reportRow.getCell(1).font = {
+    name: "Arial",
+    size: 12,
+    bold: false,
+    color: { argb: "000000" },
+  }
+  reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+  reportRow.getCell(1).border = {
+    top: { style: "medium", color: { argb: "000000" } },
+    left: { style: "medium", color: { argb: "000000" } },
+    bottom: { style: "medium", color: { argb: "000000" } },
+    right: { style: "medium", color: { argb: "000000" } },
+  }
+  worksheet.mergeCells(`A${reportRow.number}:AO${reportRow.number}`)
+
+  // Add powered by line
+  const poweredByRow = worksheet.addRow(["Powered by : MangotechDevs.ae"])
+  poweredByRow.getCell(1).font = {
+    name: "Arial",
+    size: 10,
+    italic: true,
+    color: { argb: "666666" },
+  }
+  poweredByRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells(`A${poweredByRow.number}:AO${poweredByRow.number}`)
+
+  // Add empty row for spacing
+  worksheet.addRow([])
+
+  const download = async () => {
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+    saveAs(blob, `Employee_List_${moment().format("MM-DD-YYYY")}.xlsx`)
+  }
+  download()
+}
 
 
     useEffect(() => {
@@ -635,13 +1087,20 @@ function EmployeeList() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography sx={{ fontSize: '24px', fontWeight: 'bold' }}>Employee List</Typography>
-                {user?.role_id != 1003 && <PrimaryButton
-                    bgcolor={'#001f3f'}
-                    title="Create "
-                    onClick={() => { navigate('/create-employee'); localStorage.setItem("currentUrl", '/create-customer') }}
-                    loading={loading}
-                />}
-
+                <Box sx={{display:'flex',gap:1}}>
+                    {true && <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Download Excel "
+                        onClick={() => { downloadEmployeeExcel() }}
+                        loading={loading}
+                    />}
+                    {user?.role_id != 1003 && <PrimaryButton
+                        bgcolor={'#001f3f'}
+                        title="Create "
+                        onClick={() => { navigate('/create-employee'); localStorage.setItem("currentUrl", '/create-customer') }}
+                        loading={loading}
+                    />}
+                </Box>
 
             </Box>
 

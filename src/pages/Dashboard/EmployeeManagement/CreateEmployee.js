@@ -1,39 +1,48 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, InputAdornment, ListItemText, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Typography } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
-import { Images, SvgIcon, SvgIcon as SvgIconss } from 'assets';
-import { useNavigate } from "react-router-dom";
-import { PrimaryButton } from "components/Buttons";
-import Colors from "assets/Style/Colors";
-import { useTheme } from '@mui/material/styles';
-import { FontFamily } from "assets";
-import { ErrorToaster, SuccessToaster } from "components/Toaster";
-import InputField from "components/Input";
-import RoleServices from "services/Role";
-import { showErrorToast, showPromiseToast } from "components/NewToaster";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import SelectField from "components/Select";
-import UserServices from "services/User";
-import SystemServices from "services/System";
-import CloseIcon from '@mui/icons-material/Close';
-import { useCallbackPrompt } from "hooks/useCallBackPrompt";
-import CustomerServices from "services/Customer";
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { InputLabel } from "@mui/material";
-import { Checkbox } from "@mui/material";
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import DatePicker from "components/DatePicker";
-import { TextField } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import moment from "moment";
-import UploadFile from "components/UploadFile";
-import { getFileSize } from "utils";
-import instance from "config/axios";
-import routes from "services/System/routes";
+"use client"
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
+import React, { useEffect, useMemo, useState } from "react"
+import {
+  Box,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  IconButton,
+  InputAdornment,
+  ListItemText,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Typography,
+} from "@mui/material"
+import { Controller, useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
+import { PrimaryButton } from "components/Buttons"
+import Colors from "assets/Style/Colors"
+import { useTheme } from "@mui/material/styles"
+import { ErrorToaster } from "components/Toaster"
+import InputField from "components/Input"
+import { showErrorToast, showPromiseToast } from "components/NewToaster"
+import { Visibility, VisibilityOff } from "@mui/icons-material"
+import SelectField from "components/Select"
+import UserServices from "services/User"
+import SystemServices from "services/System"
+import { useCallbackPrompt } from "hooks/useCallBackPrompt"
+import CustomerServices from "services/Customer"
+import { InputLabel } from "@mui/material"
+import { Checkbox } from "@mui/material"
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline"
+import DatePicker from "components/DatePicker"
+import moment from "moment"
+import UploadFile from "components/UploadFile"
+import { getFileSize } from "utils"
+import instance from "config/axios"
+import routes from "services/System/routes"
+
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
 const MenuProps = {
   PaperProps: {
     style: {
@@ -41,7 +50,7 @@ const MenuProps = {
       width: 250,
     },
   },
-};
+}
 // function PasswordIcon(props) {
 // 	return (
 // 		<SvgIcon className='saraib' {...props}>
@@ -54,37 +63,44 @@ const MenuProps = {
 // }
 
 function CreateEmployee() {
-  const [handleBlockedNavigation] =
-    useCallbackPrompt(false)
-  const navigate = useNavigate();
+  const [handleBlockedNavigation] = useCallbackPrompt(false)
+  const navigate = useNavigate()
 
-  const { register, handleSubmit, formState: { errors }, control, getValues, watch, setError, setValue,
-    clearErrors, } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    getValues,
+    watch,
+    setError,
+    setValue,
+    clearErrors,
+  } = useForm()
 
-
-  const basicSalary = watch("basicSalary") || 0;
-  const housing = watch("housing_allowance") || 0;
-  const transport = watch("transport_allowance") || 0;
-  const other = watch("other_allowance") || 0;
+  const basicSalary = watch("basicSalary") || 0
+  const housing = watch("housing_allowance") || 0
+  const transport = watch("transport_allowance") || 0
+  const other = watch("other_allowance") || 0
 
   const totalSalary = useMemo(() => {
     return (
-      (parseFloat(basicSalary) || 0) +
-      (parseFloat(housing) || 0) +
-      (parseFloat(transport) || 0) +
-      (parseFloat(other) || 0)
-    );
-  }, [basicSalary, housing, transport, other]);
+      (Number.parseFloat(basicSalary) || 0) +
+      (Number.parseFloat(housing) || 0) +
+      (Number.parseFloat(transport) || 0) +
+      (Number.parseFloat(other) || 0)
+    )
+  }, [basicSalary, housing, transport, other])
 
   useEffect(() => {
-    setValue("total_salary", totalSalary);
-  }, [totalSalary, setValue]);
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+    setValue("total_salary", totalSalary)
+  }, [totalSalary, setValue])
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [inputError, setInputError] = useState(false);
+  const [inputError, setInputError] = useState(false)
   const [roles, setRoles] = useState([])
-  const [selectedDays, setSelectedDays] = useState([]);
+  const [selectedDays, setSelectedDays] = useState([])
   const [selectedRole, setSelectedRole] = useState(null)
   const [buttondisabled, setButtondisabled] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState([])
@@ -93,14 +109,15 @@ function CreateEmployee() {
   const [doj, setDoj] = useState(null)
   const [airFareDueDate, setAirFareDueDate] = useState(null)
   const [probEndDate, setProbEndDate] = useState(null)
+
   const [leavingDate, setLeavingDate] = useState(null)
-  const [isActive, setIsActive] = useState('yes');
-  const [isApplicable, setIsApplicable] = useState('yes')
-  const [leftJob, setLeftJob] = useState('no');
-  const [overtime, setOvertime] = useState('no');
+  const [isActive, setIsActive] = useState("yes")
+  const [isApplicable, setIsApplicable] = useState("yes")
+  const [leftJob, setLeftJob] = useState("no")
+  const [overtime, setOvertime] = useState("no")
   const [costCenters, setCostCenters] = useState([])
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
-  const [isLocal, setisLocal] = useState('no')
+  const [isLocal, setisLocal] = useState("no")
   const [shiftType, setShiftType] = useState(null)
   const [shifts, setShifts] = useState([])
   const [selectedGender, setSelectedGender] = useState(null)
@@ -110,28 +127,26 @@ function CreateEmployee() {
   const [selectedEmployee, setSelectedEmployee] = useState(null)
   const [selectedNationality, setSelectedNationality] = useState(null)
   const [approvals, setApprovals] = useState([])
-  const [isUploading, setIsUploading] = useState(false);
-  const [loader, setLoader] = useState(false);
-  const [selectedTimeDetection, setSelectedTimeDetection] = useState({ id: 'Time', name: 'Time' })
-  const [approvers, setApprovers] = useState([{ key: 'leave_approver_1', value: '' }]);
-  const [progress, setProgress] = useState(0);
-  const [uploadedSize, setUploadedSize] = useState(0);
+  const [isUploading, setIsUploading] = useState(false)
+  const [loader, setLoader] = useState(false)
+  const [selectedTimeDetection, setSelectedTimeDetection] = useState({ id: "Time", name: "Time" })
+  const [approvers, setApprovers] = useState([{ key: "leave_approver_1", value: "" }])
+  const [progress, setProgress] = useState(0)
+  const [uploadedSize, setUploadedSize] = useState(0)
   const [documents, setDocuments] = useState([
     {
       name: "Emirates  IDs",
       key: "emirates_id",
       path: "",
       expiry_date: null,
-      is_required: false
-
-
+      is_required: false,
     },
     {
       name: "Passport ",
       key: "passport",
       path: "",
       expiry_date: null,
-      is_required: false
+      is_required: false,
     },
 
     {
@@ -139,220 +154,238 @@ function CreateEmployee() {
       key: "visa_copy",
       path: "",
       expiry_date: null,
-      is_required: false
+      is_required: false,
     },
     {
       name: "Labor Card",
       key: "labor",
       path: "",
       expiry_date: null,
-      is_required: false
+      is_required: false,
     },
-
-
-
-  ]
-  )
+  ])
   const allowFilesType = [
-    'image/png',
-    'image/jpg',
-    'image/jpeg',
-    'application/pdf',
-    'application/vnd.ms-excel',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  ];
+    "image/png",
+    "image/jpg",
+    "image/jpeg",
+    "application/pdf",
+    "application/vnd.ms-excel",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ]
 
   const handleDocArrayUpdate = async (field, value, key) => {
-    console.log(documents);
+    console.log(documents)
 
-    if (field === 'path') {
-      const updatedDocuments = documents.map(doc => {
+    if (field === "path") {
+      const updatedDocuments = documents.map((doc) => {
         if (doc.key === key) {
-          return { ...doc, path: value }; // Update the path
+          return { ...doc, path: value } // Update the path
         }
-        return doc; // Return the document as is if the key doesn't match
-      });
-      console.log(updatedDocuments);
+        return doc // Return the document as is if the key doesn't match
+      })
+      console.log(updatedDocuments)
       // Assuming you want to update the documents array
       // You can replace the following line with your state updating logic
       setDocuments(updatedDocuments)
     } else {
-      const updatedDocuments = documents.map(doc => {
+      const updatedDocuments = documents.map((doc) => {
         if (doc.key === key) {
-          return { ...doc, expiry_date: moment(value).format('YYYY-MM-DD') }; // Update the path
+          return { ...doc, expiry_date: moment(value).format("YYYY-MM-DD") } // Update the path
         }
-        return doc; // Return the document as is if the key doesn't match
-      });
-      console.log(updatedDocuments);
+        return doc // Return the document as is if the key doesn't match
+      })
+      console.log(updatedDocuments)
       setDocuments(updatedDocuments)
       // Handle other fields if needed
     }
   }
   const handleUpload = async (file, docs) => {
-    setProgress(0);
+    setProgress(0)
     try {
-      const formData = new FormData();
-      formData.append("document", file);
-      console.log(file);
+      const formData = new FormData()
+      formData.append("document", file)
+      console.log(file)
       const { data } = await instance.post(routes.uploadDocuments, formData, {
         onUploadProgress: (progressEvent) => {
-          const uploadedBytes = progressEvent.loaded;
-          const percentCompleted = Math.round(
-            (uploadedBytes * 100) / progressEvent.total
-          );
+          const uploadedBytes = progressEvent.loaded
+          const percentCompleted = Math.round((uploadedBytes * 100) / progressEvent.total)
 
-          setProgress(percentCompleted);
-          console.log(getFileSize(uploadedBytes));
-          setUploadedSize(getFileSize(uploadedBytes));
+          setProgress(percentCompleted)
+          console.log(getFileSize(uploadedBytes))
+          setUploadedSize(getFileSize(uploadedBytes))
         },
-      });
+      })
       if (data) {
-        docs[0].isUpload = true;
-        docs[0].file = data?.data?.nations;
+        docs[0].isUpload = true
+        docs[0].file = data?.data?.nations
 
-        console.log(data, 'asddasasd');
+        console.log(data, "asddasasd")
         return data?.data?.path
-
       }
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     }
-  };
+  }
   const handleAddApprover = () => {
     if (approvers.length < 2) {
-      const nextIndex = approvers.length + 1;
-      setApprovers([...approvers, { key: `leave_approver_${nextIndex}`, value: '' }]);
+      const nextIndex = approvers.length + 1
+      setApprovers([...approvers, { key: `leave_approver_${nextIndex}`, value: "" }])
     }
-  };
+  }
 
   const handleRemoveApprover = (indexToRemove) => {
     const updated = approvers
       .filter((_, index) => index !== indexToRemove)
-      .map((item, idx) => ({ ...item, key: `leave_approver_${idx + 1}` }));
+      .map((item, idx) => ({ ...item, key: `leave_approver_${idx + 1}` }))
 
-    setApprovers(updated);
-  };
+    setApprovers(updated)
+  }
 
   const handleApproverChange = (index, value) => {
     // Check if value already exists at a different index
-    const isDuplicate = approvers.some((item, i) => i !== index && item.value === value);
+    const isDuplicate = approvers.some((item, i) => i !== index && item.value === value)
 
     if (isDuplicate) {
-      showErrorToast('This approver is already selected.');
-      return; // Don't update
+      showErrorToast("This approver is already selected.")
+      return // Don't update
     }
 
-    const updated = [...approvers];
-    updated[index].value = value;
-    setApprovers(updated);
-  };
+    const updated = [...approvers]
+    updated[index].value = value
+    setApprovers(updated)
+  }
 
-  const theme = useTheme();
+  const theme = useTheme()
   function getStyles(name, personName, theme) {
     return {
-      fontWeight: personName.includes(name)
-        ? theme.typography.fontWeightMedium
-        : theme.typography.fontWeightRegular,
-    };
+      fontWeight: personName.includes(name) ? theme.typography.fontWeightMedium : theme.typography.fontWeightRegular,
+    }
   }
   const handleChangeDays = (event) => {
     const {
       target: { value },
-    } = event;
-    setSelectedDays(value);
-    console.log(value, 'valuevalue');
+    } = event
+    setSelectedDays(value)
+    console.log(value, "valuevalue")
 
-    setValue("workingDays", value);
-  };
+    setValue("workingDays", value)
+  }
   // Watch both password and confirm password fields for changes
-  const password = watch('password', '');
-  const confirmPassword = watch('confirmpassword', '');
-  console.log(watch());
+  const password = watch("password", "")
+  const confirmPassword = watch("confirmpassword", "")
+  console.log(watch())
 
-  const [personName, setPersonName] = React.useState([]);
+  const [personName, setPersonName] = React.useState([])
 
   const handleChange = (event) => {
     const {
       target: { value },
-    } = event;
+    } = event
 
-    const selected = typeof value === 'string' ? value.split(',') : value;
+    const selected = typeof value === "string" ? value.split(",") : value
 
-    const selectedObjects = categories.filter((item) => selected.includes(item.label));
+    const selectedObjects = categories.filter((item) => selected.includes(item.label))
 
-    setPersonName(selectedObjects); // Now you're storing the whole objects
-  };
+    setPersonName(selectedObjects) // Now you're storing the whole objects
+  }
 
   const addItem = () => {
-    if (!selectedEmployee || !selectedEmployee.user_id) return;
+    if (!selectedEmployee || !selectedEmployee.user_id) return
 
-    const isAlreadyAdded = Object.values(approvals).includes(selectedEmployee.user_id);
+    const isAlreadyAdded = Object.values(approvals).includes(selectedEmployee.user_id)
 
     if (isAlreadyAdded) {
-      showErrorToast("Approver is already added");
-      return;
+      showErrorToast("Approver is already added")
+      return
     }
 
-    const currentIndex = Object.keys(approvals).length + 1;
-    const newKey = `leave_approver_${currentIndex}`;
-    const newApprovals = { ...approvals, [newKey]: selectedEmployee.user_id };
+    const currentIndex = Object.keys(approvals).length + 1
+    const newKey = `leave_approver_${currentIndex}`
+    const newApprovals = { ...approvals, [newKey]: selectedEmployee.user_id }
 
-    setApprovals(newApprovals);
-  };
+    setApprovals(newApprovals)
+  }
 
   const getRoles = async (search) => {
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
         search: search,
-      };
-      const { data } = await SystemServices.getRoles(params);
+      }
+      const { data } = await SystemServices.getRoles(params)
       setRoles(data?.roles?.rows)
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
-  };
+  }
   const daysOfWeek = [
-    { id: 0, name: 'Sunday' },
-    { id: 1, name: 'Monday' },
-    { id: 2, name: 'Tuesday' },
-    { id: 3, name: 'Wednesday' },
-    { id: 4, name: 'Thursday' },
-    { id: 5, name: 'Friday' },
-    { id: 6, name: 'Saturday' },
-  ];
+    { id: 0, name: "Sunday" },
+    { id: 1, name: "Monday" },
+    { id: 2, name: "Tuesday" },
+    { id: 3, name: "Wednesday" },
+    { id: 4, name: "Thursday" },
+    { id: 5, name: "Friday" },
+    { id: 6, name: "Saturday" },
+  ]
 
+  useEffect(() => {
+    if (doj) {
+      // Calculate probation end date (6 months from date of joining)
+      const probationEndDate = moment(doj).add(6, "months").toDate()
+      setProbEndDate(probationEndDate)
+      setValue("probEndDate", probationEndDate)
+    }
+  }, [doj, setValue])
 
+  useEffect(() => {
+    const airfareCycleYears = getValues("airfaireCycleYear")
+    if (doj && airfareCycleYears) {
+      // Calculate airfare due date (add cycle years to date of joining)
+      const airfareDueDate = moment(doj).add(Number.parseInt(airfareCycleYears), "years").toDate()
+      setAirFareDueDate(airfareDueDate)
+      setValue("AirFareDueDate", airfareDueDate)
+    }
+  }, [doj, getValues, setValue])
+
+  useEffect(() => {
+    const airfareCycleYears = getValues("airfaireCycleYear")
+    if (doj && airfareCycleYears) {
+      const airfareDueDate = moment(doj).add(Number.parseInt(airfareCycleYears), "years").toDate()
+      setAirFareDueDate(airfareDueDate)
+      setValue("AirFareDueDate", airfareDueDate)
+    }
+  }, [watch("airfaireCycleYear"), doj, getValues, setValue])
 
   // *For Create Role
   const CreateEmployee = async (formData) => {
-    console.log(approvers, 'approversapprovers');
+    console.log(approvers, "approversapprovers")
 
     setLoading(true)
     setButtondisabled(true)
-    console.log(formData);
+    console.log(formData)
     try {
-      let obj = {
-        name: getValues('name'),
-        employee_id: getValues('id'),
-        email: getValues('email'),
-        phone: getValues('phone'),
-        password: getValues('password'),
+      const obj = {
+        name: getValues("name"),
+        employee_id: getValues("id"),
+        emirates_id: getValues("emirates"),
+        airfare_amount:getValues("airfareAmount"),
+        email: getValues("email"),
+        phone: getValues("phone"),
+        password: getValues("password"),
         documents: documents,
-        permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
+        permittedCategories: selectedRole?.name == "Typist" ? selectedCategoryObjects : null,
         role_id: selectedRole?.id,
         employee_detail: {
-
           date_of_joining: doj,
           date_of_birth: dob,
           passport_number: formData?.passportnumber,
           probation_period_months: formData?.probation,
           probation_end_date: probEndDate,
           employment_status: formData?.status,
-          shift_start: moment(formData?.shiftStartTime).format('HH:mm'),
-          shift_end: moment(formData?.shiftEndTime).format('HH:mm'),
+          shift_start: moment(formData?.shiftStartTime).format("HH:mm"),
+          shift_end: moment(formData?.shiftEndTime).format("HH:mm"),
           grace_period_minutes: formData?.graceMonths,
           minimum_required_minutes: formData?.minHours,
           short_time_deduction_type: selectedTimeDetection?.id,
@@ -360,16 +393,16 @@ function CreateEmployee() {
           leave_allocation_per_month: formData?.leavesPerMonth,
           emergency_contact_name: formData?.emergencyName,
           emergency_contact_number: formData?.emergencyContact,
-          eligible_for_airfare: formData?.eligibleForAirfare == 'yes' ? true : false,
+          eligible_for_airfare: formData?.eligibleForAirfare == "yes" ? true : false,
           airfare_cycle_years: formData?.airfaireCycleYear,
           next_airfare_due_date: airFareDueDate,
           basic_salary: formData?.basicSalary,
           designation: formData?.designation,
           department: formData?.department,
-          is_active: isActive == 'yes' ? true : false,
+          is_active: isActive == "yes" ? true : false,
 
-          is_overtime_eligible: overtime == 'yes' ? true : false,
-          has_left_job: leftJob == 'yes' ? true : false,
+          is_overtime_eligible: overtime == "yes" ? true : false,
+          has_left_job: leftJob == "yes" ? true : false,
           date_of_leaving: leavingDate,
           leaving_reason: formData?.reason,
           branch: formData?.branch,
@@ -381,37 +414,28 @@ function CreateEmployee() {
           iban: formData?.iban,
           routing: formData?.routing,
           pension_percentage: formData?.pensionPercentage,
-          pension_applicable: isApplicable == 'yes' ? true : false,
+          pension_applicable: isApplicable == "yes" ? true : false,
           pension_percentage_employer: formData?.pensionPercentageEmp,
           is_local: isLocal,
           cost_center: selectedCostCenter?.name,
           shift_type: shiftType?.id,
           shift_id: selectedShift?.id,
-          working_days: selectedDays.join(','),
+          working_days: selectedDays.join(","),
           gender: selectedGender?.id,
           nationality: selectedNationality?.name,
           leave_approver_1: approvers[0]?.value,
-          leave_approver_2: approvers[1]?.value ? approvers[1]?.value : null
-        }
-
+          leave_approver_2: approvers[1]?.value ? approvers[1]?.value : null,
+        },
       }
 
+      console.log(obj)
+      const promise = UserServices.CreateEmployee(obj)
 
-      console.log(obj);
-      const promise = UserServices.CreateEmployee(obj);
-
-      showPromiseToast(
-        promise,
-        'Saving ...',
-        'Success',
-        'Something Went Wrong'
-      );
-      const response = await promise;
+      showPromiseToast(promise, "Saving ...", "Success", "Something Went Wrong")
+      const response = await promise
       if (response?.responseCode === 200) {
-        navigate('/employee-list')
+        navigate("/employee-list")
       }
-
-
     } catch (error) {
       setButtondisabled(false)
       // showErrorToast(error)
@@ -421,22 +445,14 @@ function CreateEmployee() {
   }
   // *For Get Customer Queue
   const getCategoryList = async (page, limit, filter) => {
-
-
     try {
-
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-
-
       }
 
       const { data } = await CustomerServices.getCategoryList(params)
-      setCategories(data?.categories);
-
-
-
+      setCategories(data?.categories)
     } catch (error) {
       showErrorToast(error)
     }
@@ -444,74 +460,69 @@ function CreateEmployee() {
 
   const getCostCenters = async () => {
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-      };
+      }
 
-      const { data } = await CustomerServices.getCostCenters(params);
-      setCostCenters(data?.cost_centers);
-
+      const { data } = await CustomerServices.getCostCenters(params)
+      setCostCenters(data?.cost_centers)
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
-  };
+  }
   const getShifts = async () => {
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-      };
+      }
 
-      const { data } = await CustomerServices.getShifts(params);
-      setShifts(data?.shifts?.rows);
-
+      const { data } = await CustomerServices.getShifts(params)
+      setShifts(data?.shifts?.rows)
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
-  };
+  }
   const handleDeleteApproval = (keyToDelete) => {
-
     const filteredUserIds = Object.entries(approvals)
       .filter(([key]) => key !== keyToDelete)
-      .map(([_, userId]) => userId);
+      .map(([_, userId]) => userId)
 
-
-    const reIndexedApprovals = {};
+    const reIndexedApprovals = {}
     filteredUserIds.forEach((userId, index) => {
-      reIndexedApprovals[`leave_approver_${index + 1}`] = userId;
-    });
+      reIndexedApprovals[`leave_approver_${index + 1}`] = userId
+    })
 
-    setApprovals(reIndexedApprovals);
-  };
+    setApprovals(reIndexedApprovals)
+  }
 
-  console.log(approvals);
+  console.log(approvals)
 
   const updateResult = (key, newResult) => {
-
     console.log(newResult)
-    const updatedDocuments = documents.map(doc => {
+    const updatedDocuments = documents.map((doc) => {
       if (doc.key === key) {
-        return { ...doc, path: newResult }; // Update the path
+        return { ...doc, path: newResult } // Update the path
       }
-      return doc; // Return the document as is if the key doesn't match
-    });
-    console.log(updatedDocuments, 'updatedDocuments');
+      return doc // Return the document as is if the key doesn't match
+    })
+    console.log(updatedDocuments, "updatedDocuments")
     setDocuments(updatedDocuments)
-  };
+  }
 
   const handleUploadDocument = async (e, key) => {
     setLoader(key)
     try {
-      e.preventDefault();
-      let path = "";
-      console.log(e.target.files.length, "length");
+      e.preventDefault()
+      let path = ""
+      console.log(e.target.files.length, "length")
 
-      const inputElement = e.target; // Store a reference to the file input element
+      const inputElement = e.target // Store a reference to the file input element
 
       for (let i = 0; i < e.target.files.length; i++) {
-        const file = e.target.files[i];
-        let arr = [
+        const file = e.target.files[i]
+        const arr = [
           {
             name: file?.name,
             file: "",
@@ -519,89 +530,81 @@ function CreateEmployee() {
             size: getFileSize(file.size),
             isUpload: false,
           },
-        ];
+        ]
 
-        let maxSize = 10 * 1024 * 1024;
+        const maxSize = 10 * 1024 * 1024
         if (file.size > maxSize) {
-          showErrorToast('File Size Must Be Less than 10 MB');
+          showErrorToast("File Size Must Be Less than 10 MB")
         } else {
           // Add the current date before the file name to ensure uniqueness
-          const currentDate = new Date().toISOString().split('T')[0]; // e.g., "2024-08-23"
-          const uniqueFileName = `${currentDate}_${file.name}`;
+          const currentDate = new Date().toISOString().split("T")[0] // e.g., "2024-08-23"
+          const uniqueFileName = `${currentDate}_${file.name}`
 
           // Create a new file with the date-prefixed name
-          const newFile = new File([file], uniqueFileName, { type: file.type });
+          const newFile = new File([file], uniqueFileName, { type: file.type })
 
           // Upload the file with the new name
-          const uploadedPath = await handleUpload(newFile, arr);
+          const uploadedPath = await handleUpload(newFile, arr)
 
           if (path) {
-            path += "," + uploadedPath;
+            path += "," + uploadedPath
           } else {
-            path = uploadedPath;
+            path = uploadedPath
           }
           setLoader(false)
-
         }
       }
 
-      console.log(path, "path");
+      console.log(path, "path")
 
       // Clear the file input after processing
-      inputElement.value = "";
+      inputElement.value = ""
 
-      return path;
+      return path
     } catch (error) {
-      ErrorToaster(error);
+      ErrorToaster(error)
     }
-  };
+  }
   const getNationalities = async () => {
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-      };
+      }
 
-      const { data } = await SystemServices.getNationalities(params);
+      const { data } = await SystemServices.getNationalities(params)
       const formattedNationalities = data?.nationalities?.map((item, index) => ({
         id: item,
         name: item,
-      }));
+      }))
 
-      setNationalities(formattedNationalities);
-
-
-
+      setNationalities(formattedNationalities)
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
-  };
+  }
 
   const getEmployees = async () => {
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-      };
+      }
 
-      const { data } = await UserServices.getUsers(params);
-      console.log(data, 'datadata');
+      const { data } = await UserServices.getUsers(params)
+      console.log(data, "datadata")
 
       const formattedData = data?.users?.rows?.map((item, index) => ({
         ...item,
         id: item?.id,
         name: item?.user?.name,
-      }));
+      }))
 
-
-      setEmployees(data?.users?.rows);
-
-
-
+      setEmployees(data?.users?.rows)
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
-  };
+  }
   useEffect(() => {
     getEmployees()
     getCostCenters()
@@ -626,117 +629,105 @@ function CreateEmployee() {
     })
   }
 
-
-
-
   return (
-    <Box sx={{ p: 3, borderRadius: 3, backgroundColor: 'white !important', boxShadow: ' rgba(100, 100, 111, 0.2) 0px 7px 29px 0px' }}>
-
-      <Box component="form" onSubmit={handleSubmit(CreateEmployee)} >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'flex-end' }}>
-          <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Create Employee</Typography>
-
+    <Box
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        backgroundColor: "white !important",
+        boxShadow: " rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+      }}
+    >
+      <Box component="form" onSubmit={handleSubmit(CreateEmployee)}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "flex-end" }}>
+          <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Create Employee</Typography>
         </Box>
         <Box>
           <Box display="flex" alignItems="center" mt={2}>
-            <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
-            <Typography variant="subtitle1" sx={{ color: '#2f3b52' }}>
+            <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: "#2f3b52" }} />
+            <Typography variant="subtitle1" sx={{ color: "#2f3b52" }}>
               Personal Info
             </Typography>
           </Box>
-          <Divider mt={1} sx={{ borderColor: '#2f3b52' }} />
+          <Divider mt={1} sx={{ borderColor: "#2f3b52" }} />
         </Box>
-        <Grid container spacing={0} mt={3} p={1} gap={'0px 20px'} >
-
+        <Grid container spacing={0} mt={3} p={1} gap={"0px 20px"}>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Name :*"}
-              size={'small'}
+              size={"small"}
               placeholder={" Name"}
               error={errors?.name?.message}
               register={register("name", {
-                required:
-                  "Please enter name."
-
+                required: "Please enter name.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Employee ID :*"}
-              size={'small'}
+              size={"small"}
               placeholder={" Employee ID "}
               error={errors?.id?.message}
               register={register("id", {
-                required:
-                  "Please enter id."
-
+                required: "Please enter id.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
+            <InputField
+              label={" Emirates ID :*"}
+              size={"small"}
+              placeholder={" Emirates ID "}
+              error={errors?.emirates?.message}
+              register={register("emirates", {
+                required: false,
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
             <InputField
               label={"Email :"}
-              size={'small'}
+              size={"small"}
               placeholder={"Email"}
               error={errors?.email?.message}
               register={register("email", {
                 required: false,
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Please enter a valid email address."
-                }
+                  message: "Please enter a valid email address.",
+                },
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={"Phone :*"}
-              size={'small'}
+              size={"small"}
               placeholder={"Phone "}
-              type={'number'}
+              type={"number"}
               error={errors?.phone?.message}
               register={register("phone", {
-                required:
-                  false,
+                required: false,
                 pattern: {
                   value: /^05[0-9]{8}$/,
-                  message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                }
-
+                  message: "Please enter a valid UAE phone number (starting with 05 and 8 digits).",
+                },
               })}
             />
-
-
           </Grid>
 
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Passport Number :*"}
-              size={'small'}
+              size={"small"}
               placeholder={"Passport Number"}
               error={errors?.passportnumber?.message}
               register={register("passportnumber", {
-                required:
-                  "Please enter passport number."
-
+                required: "Please enter passport number.",
               })}
             />
-
-
           </Grid>
-
 
           <Grid item xs={12} sm={2.8}>
             <DatePicker
@@ -745,91 +736,77 @@ function CreateEmployee() {
               size={"small"}
               error={errors?.dob?.message}
               register={register("dob", {
-                required: dob ? false : 'Date is required'
+                required: dob ? false : "Date is required",
               })}
               onChange={(date) => {
                 setValue("dob", date)
                 setDob(new Date(date))
-
               }}
             />
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <SelectField
-
               size={"small"}
               label={"Gender"}
-              options={[{ id: 'Male', name: 'Male' }, { id: 'Female', name: 'Female' }]}
+              options={[
+                { id: "Male", name: "Male" },
+                { id: "Female", name: "Female" },
+              ]}
               selected={selectedGender}
               onSelect={(value) => {
-                setSelectedGender(value);
+                setSelectedGender(value)
               }}
               register={register("gender", {
-                required: 'gender is required'
+                required: "gender is required",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <SelectField
-
               size={"small"}
               label={"Nationality"}
               options={nationalities}
               selected={selectedNationality}
               onSelect={(value) => {
-                setSelectedNationality(value);
+                setSelectedNationality(value)
               }}
               register={register("nationality", {
-                required: 'nationality is required'
+                required: "nationality is required",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Emergency Contact Name :*"}
-              size={'small'}
+              size={"small"}
               placeholder={" Emergency Contact Name"}
               error={errors?.emergencyName?.message}
               register={register("emergencyName", {
-                required:
-                  "Please enter name."
-
+                required: "Please enter name.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={"Emergency Contact :*"}
-              size={'small'}
+              size={"small"}
               placeholder={"Emergency Contact "}
-              type={'number'}
+              type={"number"}
               error={errors?.emergencyContact?.message}
               register={register("emergencyContact", {
-                required:
-                  false,
+                required: false,
                 pattern: {
                   value: /^05[0-9]{8}$/,
-                  message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                }
-
+                  message: "Please enter a valid UAE phone number (starting with 05 and 8 digits).",
+                },
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <InputField
               size="small"
               label="Password :*"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Enter Your Password"
               InputProps={{
                 endAdornment: (
@@ -840,9 +817,9 @@ function CreateEmployee() {
                   </InputAdornment>
                 ),
               }}
-              error={errors.password?.message || (inputError && 'You have entered an invalid email or password.')}
-              register={register('password', {
-                required: 'Please enter the password.',
+              error={errors.password?.message || (inputError && "You have entered an invalid email or password.")}
+              register={register("password", {
+                required: "Please enter the password.",
               })}
             />
           </Grid>
@@ -850,7 +827,7 @@ function CreateEmployee() {
             <InputField
               size="small"
               label="Confirm Password :*"
-              type={showConfirmPassword ? 'text' : 'password'}
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Enter Your Confirm Password"
               InputProps={{
                 endAdornment: (
@@ -861,17 +838,17 @@ function CreateEmployee() {
                   </InputAdornment>
                 ),
               }}
-              error={errors.confirmpassword?.message || (inputError && 'You have entered an invalid email or password.')}
-              register={register('confirmpassword', {
-                required: 'Please enter the confirm password.',
-                validate: value => value === password || 'Passwords do not match.',
+              error={
+                errors.confirmpassword?.message || (inputError && "You have entered an invalid email or password.")
+              }
+              register={register("confirmpassword", {
+                required: "Please enter the confirm password.",
+                validate: (value) => value === password || "Passwords do not match.",
               })}
             />
-
           </Grid>
-          {selectedRole?.name === 'Typist' && (
+          {selectedRole?.name === "Typist" && (
             <Grid item xs={12} sm={12}>
-
               <Typography variant="h5" gutterBottom>
                 Select Categories
               </Typography>
@@ -894,31 +871,25 @@ function CreateEmployee() {
                       ))}
                     </FormGroup>
                   </Grid>
-
-
                 </Grid>
               )}
-
             </Grid>
           )}
         </Grid>
-        {console.log(documents, 'documents')}
+        {console.log(documents, "documents")}
 
-        <Grid item xs={12}  >
-          <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: Colors.textColorDarkBlue }}>Documents : </Typography>
+        <Grid item xs={12}>
+          <Typography sx={{ fontSize: "20px", fontWeight: "bold", color: Colors.textColorDarkBlue }}>
+            Documents :{" "}
+          </Typography>
         </Grid>
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {documents?.length > 0 &&
             documents.map((item, index) => (
               <Grid item xs={12} md={4} key={item.key}>
                 {/* Upload Section */}
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                  sx={{ color: Colors.gray }}
-                >
-                  {item?.is_required ? item?.name : `${item?.name} (If Any)`} :{" "}
-                  {item?.is_required ? "*" : ""}
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: Colors.gray }}>
+                  {item?.is_required ? item?.name : `${item?.name} (If Any)`} : {item?.is_required ? "*" : ""}
                 </Typography>
 
                 <UploadFile
@@ -938,13 +909,13 @@ function CreateEmployee() {
                         : "Please upload document."
                       : false,
                     onChange: async (e) => {
-                      setIsUploading(true);
-                      const path = await handleUploadDocument(e, item?.key);
+                      setIsUploading(true)
+                      const path = await handleUploadDocument(e, item?.key)
                       if (path) {
-                        handleDocArrayUpdate("path", path, item?.key);
-                        console.log(path);
+                        handleDocArrayUpdate("path", path, item?.key)
+                        console.log(path)
                       }
-                      setIsUploading(false);
+                      setIsUploading(false)
                     },
                   })}
                 />
@@ -956,40 +927,27 @@ function CreateEmployee() {
                   value={item?.expiry_date ? new Date(item.expiry_date) : null}
                   error={errors[`${item?.key}_expiry`]?.message}
                   register={register(`${item?.key}_expiry`, {
-                    required: item?.is_required
-                      ? item?.expiry_date
-                        ? false
-                        : "Please select expiry date."
-                      : false,
-
+                    required: item?.is_required ? (item?.expiry_date ? false : "Please select expiry date.") : false,
                   })}
                   onChange={(date) => {
-
-
-
-                    setValue(`${item?.key}_expiry`, date);
-                    handleDocArrayUpdate("date", date, item?.key);
+                    setValue(`${item?.key}_expiry`, date)
+                    handleDocArrayUpdate("date", date, item?.key)
                   }}
                 />
               </Grid>
             ))}
         </Grid>
 
-
         <Box>
           <Box display="flex" alignItems="center" mt={2}>
-            <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
-            <Typography variant="subtitle1" sx={{ color: '#2f3b52' }}>
+            <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: "#2f3b52" }} />
+            <Typography variant="subtitle1" sx={{ color: "#2f3b52" }}>
               Employeement Info
             </Typography>
           </Box>
-          <Divider mt={1} sx={{ borderColor: '#2f3b52' }} />
+          <Divider mt={1} sx={{ borderColor: "#2f3b52" }} />
         </Box>
-        <Grid container spacing={0} mt={3} p={1} gap={'0px 20px'} >
-
-
-
-
+        <Grid container spacing={0} mt={3} p={1} gap={"0px 20px"}>
           <Grid item xs={12} sm={2.8}>
             <DatePicker
               label={"Date of Joining:*"}
@@ -997,12 +955,11 @@ function CreateEmployee() {
               size={"small"}
               error={errors?.doj?.message}
               register={register("doj", {
-                required: doj ? false : 'Date is required'
+                required: doj ? false : "Date is required",
               })}
               onChange={(date) => {
                 setValue("doj", date)
                 setDoj(new Date(date))
-
               }}
             />
           </Grid>
@@ -1014,96 +971,75 @@ function CreateEmployee() {
               size={"small"}
               error={errors?.probEndDate?.message}
               register={register("probEndDate", {
-                required: probEndDate ? false : 'Date is required'
+                required: probEndDate ? false : "Date is required",
               })}
               onChange={(date) => {
                 setValue("probEndDate", date)
                 setProbEndDate(new Date(date))
-
               }}
             />
           </Grid>
 
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Grace Period Minutes :*"}
-              size={'small'}
+              size={"small"}
               placeholder={"Grace Period Minutes"}
               error={errors?.graceMonths?.message}
               register={register("graceMonths", {
-                required:
-                  "Please enter graceMonths."
-
+                required: "Please enter graceMonths.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={"Minimum Required Minutes :*"}
-              size={'small'}
+              size={"small"}
               placeholder={"Minimum Required Minutes"}
               error={errors?.minHours?.message}
               register={register("minHours", {
-                required:
-                  "Please enter min hours."
-
+                required: "Please enter min hours.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <SelectField
-
               size={"small"}
               label={"Short Time Deduction Type"}
-              options={[{ id: 'Time', name: 'Time' }, { id: 'Hours', name: 'Hours' }]}
+              options={[
+                { id: "Time", name: "Time" },
+                { id: "Hours", name: "Hours" },
+              ]}
               selected={selectedTimeDetection}
               onSelect={(value) => {
-                setSelectedTimeDetection(value);
+                setSelectedTimeDetection(value)
               }}
               register={register("timedetection")}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={"Personal Time Minutes Per Month :*"}
-              size={'small'}
+              size={"small"}
               placeholder={"Personal Time Minutes Per Month"}
               error={errors?.personalMintPerMonth?.message}
               register={register("personalMintPerMonth", {
-                required:
-                  "Please enter personal time mint per month."
-
+                required: "Please enter personal time mint per month.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={"Leaves Allocation Per Month :*"}
-              size={'small'}
-              type={'number'}
-              step={'any'}
+              size={"small"}
+              type={"number"}
+              step={"any"}
               placeholder={"Leaves Allocation Per Month"}
               error={errors?.leavesPerMonth?.message}
               register={register("leavesPerMonth", {
-                required:
-                  "Please enter leaves per month."
-
+                required: "Please enter leaves per month.",
               })}
             />
-
-
           </Grid>
 
           <Grid item xs={12} sm={2.8}>
@@ -1155,13 +1091,12 @@ function CreateEmployee() {
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <SelectField
-
               size={"small"}
               label={"Cost Center"}
               options={costCenters}
               selected={selectedCostCenter}
               onSelect={(value) => {
-                setSelectedCostCenter(value);
+                setSelectedCostCenter(value)
               }}
               register={register("costCenter")}
             />
@@ -1180,39 +1115,37 @@ function CreateEmployee() {
 
           <Grid item xs={12} sm={2.8}>
             <SelectField
-
               size={"small"}
               label={"Shift Type *:"}
-              options={[{ id: 'Fixed', name: 'Fixed' }, { id: 'Roaster', name: 'Roaster' }]}
+              options={[
+                { id: "Fixed", name: "Fixed" },
+                { id: "Roaster", name: "Roaster" },
+              ]}
               selected={shiftType}
               onSelect={(value) => {
-                setShiftType(value);
+                setShiftType(value)
               }}
               register={register("shiftType", { required: "Shift type is required" })}
             />
-
-
           </Grid>
 
-          {shiftType?.id == 'Fixed' && <Grid item xs={12} sm={2.8}>
-            <SelectField
-
-              size={"small"}
-              label={"Shifts "}
-              options={shifts}
-              selected={selectedShift}
-              onSelect={(value) => {
-                setSelectedShift(value);
-              }}
-              register={register("shift")}
-            />
-
-
-          </Grid>}
+          {shiftType?.id == "Fixed" && (
+            <Grid item xs={12} sm={2.8}>
+              <SelectField
+                size={"small"}
+                label={"Shifts "}
+                options={shifts}
+                selected={selectedShift}
+                onSelect={(value) => {
+                  setSelectedShift(value)
+                }}
+                register={register("shift")}
+              />
+            </Grid>
+          )}
 
           <Grid item xs={12} sm={2.8}>
-            <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
-
+            <InputLabel sx={{ textTransform: "capitalize", textAlign: "left", fontWeight: 700, color: Colors.gray }}>
               Working Days
             </InputLabel>
             <FormControl
@@ -1220,25 +1153,25 @@ function CreateEmployee() {
               size="small"
               sx={{
                 mt: 1,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  paddingRight: '8px',
-                  height: '40px',
-                  borderColor: '#000',
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "8px",
+                  paddingRight: "8px",
+                  height: "40px",
+                  borderColor: "#000",
                 },
-                '& .MuiSelect-select': {
-                  padding: '10px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
+                "& .MuiSelect-select": {
+                  padding: "10px 14px",
+                  display: "flex",
+                  alignItems: "center",
                 },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#000',
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#000",
                 },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#000',
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#000",
                 },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#000',
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#000",
                 },
               }}
             >
@@ -1248,9 +1181,11 @@ function CreateEmployee() {
                 value={selectedDays}
                 onChange={handleChangeDays}
                 renderValue={(selected) =>
-                  selected.length === 0
-                    ? <span style={{ color: '#aaa' }}>Select Shifts</span>
-                    : selected.map((day) => daysOfWeek.find((d) => d.id === day)?.name).join(', ')
+                  selected.length === 0 ? (
+                    <span style={{ color: "#aaa" }}>Select Shifts</span>
+                  ) : (
+                    selected.map((day) => daysOfWeek.find((d) => d.id === day)?.name).join(", ")
+                  )
                 }
               >
                 {daysOfWeek.map((day) => (
@@ -1261,26 +1196,18 @@ function CreateEmployee() {
                 ))}
               </Select>
             </FormControl>
-
-
-
           </Grid>
-
         </Grid>
         <Box>
           <Box display="flex" alignItems="center" mt={2}>
-            <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
-            <Typography variant="subtitle1" sx={{ color: '#2f3b52' }}>
+            <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: "#2f3b52" }} />
+            <Typography variant="subtitle1" sx={{ color: "#2f3b52" }}>
               Salary Info
             </Typography>
           </Box>
-          <Divider mt={1} sx={{ borderColor: '#2f3b52' }} />
+          <Divider mt={1} sx={{ borderColor: "#2f3b52" }} />
         </Box>
-        <Grid container spacing={0} mt={3} p={1} gap={'0px 20px'} >
-
-
-
-
+        <Grid container spacing={0} mt={3} p={1} gap={"0px 20px"}>
           <Grid item xs={12} sm={2.8}>
             <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Is Active :*</InputLabel>
             <Controller
@@ -1293,8 +1220,8 @@ function CreateEmployee() {
                   {...field}
                   value={isActive}
                   onChange={(e) => {
-                    setIsActive(e.target.value);
-                    field.onChange(e);
+                    setIsActive(e.target.value)
+                    field.onChange(e)
                   }}
                 >
                   <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
@@ -1302,7 +1229,11 @@ function CreateEmployee() {
                 </RadioGroup>
               )}
             />
-            {errors.isActive && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isActive.message}</Typography>}
+            {errors.isActive && (
+              <Typography color="error" sx={{ fontSize: 12 }}>
+                {errors.isActive.message}
+              </Typography>
+            )}
           </Grid>
 
           {/* Has Left Job */}
@@ -1318,8 +1249,8 @@ function CreateEmployee() {
                   {...field}
                   value={leftJob}
                   onChange={(e) => {
-                    setLeftJob(e.target.value);
-                    field.onChange(e);
+                    setLeftJob(e.target.value)
+                    field.onChange(e)
                   }}
                 >
                   <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
@@ -1327,7 +1258,11 @@ function CreateEmployee() {
                 </RadioGroup>
               )}
             />
-            {errors.leftJob && <Typography color="error" sx={{ fontSize: 12 }}>{errors.leftJob.message}</Typography>}
+            {errors.leftJob && (
+              <Typography color="error" sx={{ fontSize: 12 }}>
+                {errors.leftJob.message}
+              </Typography>
+            )}
           </Grid>
 
           {/* Overtime */}
@@ -1343,8 +1278,8 @@ function CreateEmployee() {
                   {...field}
                   value={overtime}
                   onChange={(e) => {
-                    setOvertime(e.target.value);
-                    field.onChange(e);
+                    setOvertime(e.target.value)
+                    field.onChange(e)
                   }}
                 >
                   <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
@@ -1352,7 +1287,11 @@ function CreateEmployee() {
                 </RadioGroup>
               )}
             />
-            {errors.overtime && <Typography color="error" sx={{ fontSize: 12 }}>{errors.overtime.message}</Typography>}
+            {errors.overtime && (
+              <Typography color="error" sx={{ fontSize: 12 }}>
+                {errors.overtime.message}
+              </Typography>
+            )}
           </Grid>
 
           <Grid item xs={12} sm={2.8}>
@@ -1367,8 +1306,8 @@ function CreateEmployee() {
                   {...field}
                   value={isLocal}
                   onChange={(e) => {
-                    setisLocal(e.target.value);
-                    field.onChange(e);
+                    setisLocal(e.target.value)
+                    field.onChange(e)
                   }}
                 >
                   <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
@@ -1376,7 +1315,11 @@ function CreateEmployee() {
                 </RadioGroup>
               )}
             />
-            {errors.isLocal && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isLocal.message}</Typography>}
+            {errors.isLocal && (
+              <Typography color="error" sx={{ fontSize: 12 }}>
+                {errors.isLocal.message}
+              </Typography>
+            )}
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <InputLabel sx={{ fontWeight: 700, color: "#434343", mb: 1 }}>Pension Applicable :*</InputLabel>
@@ -1390,13 +1333,12 @@ function CreateEmployee() {
                   {...field}
                   value={isApplicable}
                   onChange={(e) => {
-                    setIsApplicable(e.target.value);
-                    if (e.target.value == 'no') {
-                      setValue('pensionPercentage', 0)
-                      setValue('pensionPercentageEmp', 0)
-
+                    setIsApplicable(e.target.value)
+                    if (e.target.value == "no") {
+                      setValue("pensionPercentage", 0)
+                      setValue("pensionPercentageEmp", 0)
                     }
-                    field.onChange(e);
+                    field.onChange(e)
                   }}
                 >
                   <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
@@ -1404,43 +1346,37 @@ function CreateEmployee() {
                 </RadioGroup>
               )}
             />
-            {errors.isApplicable && <Typography color="error" sx={{ fontSize: 12 }}>{errors.isApplicable.message}</Typography>}
+            {errors.isApplicable && (
+              <Typography color="error" sx={{ fontSize: 12 }}>
+                {errors.isApplicable.message}
+              </Typography>
+            )}
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Pension Percentage :"}
-              size={'small'}
-              type={'number'}
-              disabled={isApplicable == 'no'}
+              size={"small"}
+              type={"number"}
+              disabled={isApplicable == "no"}
               placeholder={"  Pension Percentage "}
               error={errors?.pensionPercentage?.message}
               register={register("pensionPercentage", {
-                required:
-                  false
-
+                required: false,
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Pension Percentage Employer :"}
-              size={'small'}
-              type={'number'}
-              disabled={isApplicable == 'no'}
+              size={"small"}
+              type={"number"}
+              disabled={isApplicable == "no"}
               placeholder={"  Pension Percentage Employer "}
               error={errors?.pensionPercentageEmp?.message}
               register={register("pensionPercentageEmp", {
-                required:
-                  false
-
+                required: false,
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <DatePicker
@@ -1449,35 +1385,37 @@ function CreateEmployee() {
               size={"small"}
               error={errors?.AirFareDueDate?.message}
               register={register("AirFareDueDate", {
-                required: airFareDueDate ? false : 'Date is required'
+                required: airFareDueDate ? false : "Date is required",
               })}
               onChange={(date) => {
                 setValue("AirFareDueDate", date)
                 setAirFareDueDate(new Date(date))
-
               }}
             />
           </Grid>
 
-
-
-
-
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Airfare Cycle Years :*"}
-              size={'small'}
+              size={"small"}
               placeholder={" Airfare Cycle Years "}
               error={errors?.airfaireCycleYear?.message}
               register={register("airfaireCycleYear", {
-                required:
-                  "Please enter airfaireCycleYear."
-
+                required: "Please enter airfaireCycleYear.",
               })}
             />
+          </Grid>
 
-
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={" Airfare Amount :*"}
+              size={"small"}
+              placeholder={" Airfare Amount "}
+              error={errors?.airfareAmount?.message}
+              register={register("airfareAmount", {
+                required: "Please enter airfareAmount.",
+              })}
+            />
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <InputField
@@ -1543,40 +1481,27 @@ function CreateEmployee() {
           </Grid>
 
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Designation :*"}
-              size={'small'}
-
+              size={"small"}
               placeholder={"  Designation "}
               error={errors?.designation?.message}
               register={register("designation", {
-                required:
-                  "Please enter designation."
-
+                required: "Please enter designation.",
               })}
             />
-
-
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Department :*"}
-              size={'small'}
-
+              size={"small"}
               placeholder={"  Department "}
               error={errors?.department?.message}
               register={register("department", {
-                required:
-                  "Please enter department."
-
+                required: "Please enter department.",
               })}
             />
-
-
           </Grid>
-
 
           <Grid item xs={12} sm={2.8}>
             <DatePicker
@@ -1585,58 +1510,48 @@ function CreateEmployee() {
               size={"small"}
               error={errors?.leavingDate?.message}
               register={register("leavingDate", {
-                required: false
+                required: false,
               })}
               onChange={(date) => {
                 setValue("leavingDate", date)
                 setLeavingDate(new Date(date))
-
               }}
             />
           </Grid>
           <Grid item xs={12} sm={2.8}>
-
             <InputField
               label={" Leaving Reason :"}
-              size={'small'}
-
+              size={"small"}
               placeholder={"  Leaving Reason "}
               error={errors?.reason?.message}
               register={register("reason", {
-                required:
-                  false
-
+                required: false,
               })}
             />
-
-
           </Grid>
         </Grid>
-        {console.log(approvers,'approvers')}
+        {console.log(approvers, "approvers")}
         <Box display="flex" alignItems="center" mt={2}>
-          <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: '#2f3b52' }} />
-          <Typography variant="subtitle1" sx={{ color: '#2f3b52' }}>
+          <PersonOutlineIcon sx={{ fontSize: 20, mr: 1, color: "#2f3b52" }} />
+          <Typography variant="subtitle1" sx={{ color: "#2f3b52" }}>
             Leave Approval Info
           </Typography>
-
         </Box>
-        <Divider mt={1} sx={{ borderColor: '#2f3b52' }} />
+        <Divider mt={1} sx={{ borderColor: "#2f3b52" }} />
         <Grid container xs={12} mt={4} spacing={2}>
           {approvers.map((approver, index) => (
             <Grid item xs={6} sm={4} key={approver.key}>
-              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 1 }}>
-
+              <Box sx={{ width: "100%", display: "flex", alignItems: "center", gap: 1 }}>
                 <SelectField
                   size="small"
                   label={`Leave Approval ${index + 1}`}
                   options={employees}
-                  selected={employees.find(emp => emp.id === approver.value)}
+                  selected={employees.find((emp) => emp.id === approver.value)}
                   onSelect={(val) => handleApproverChange(index, val.id)}
                   register={register(approver.key, {
-                    required: 'Approver is required',
+                    required: "Approver is required",
                   })}
                   error={errors?.[approver.key]?.message}
-
                 />
                 {index > 0 && (
                   <PrimaryButton
@@ -1653,31 +1568,17 @@ function CreateEmployee() {
           {/* Show Add Button only if less than 2 approvers */}
           {approvers.length < 2 && (
             <Grid item xs={12} sm={2.8} mt={3.8}>
-              <PrimaryButton
-                bgcolor="#001f3f"
-                title="Add"
-                onClick={handleAddApprover}
-              />
+              <PrimaryButton bgcolor="#001f3f" title="Add" onClick={handleAddApprover} />
             </Grid>
           )}
-
         </Grid>
 
-
-        <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-          <PrimaryButton
-            bgcolor={'#001f3f'}
-            title="Submit"
-            type={'submit'}
-            disabled={buttondisabled}
-
-          />
-
+        <Box sx={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+          <PrimaryButton bgcolor={"#001f3f"} title="Submit" type={"submit"} disabled={buttondisabled} />
         </Box>
       </Box>
-
-    </Box >
-  );
+    </Box>
+  )
 }
 
-export default CreateEmployee;
+export default CreateEmployee

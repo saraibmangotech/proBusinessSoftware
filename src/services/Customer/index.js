@@ -76,6 +76,10 @@ const CustomerServices = {
     const data = await get(routes.getSalesSettlement, params);
     return data;
   },
+    getHRStats: async (params) => {
+    const data = await get(routes.getHRStats, params);
+    return data;
+  },
   getEmployeeLeaves: async (params) => {
     const data = await get(routes.getEmployeeLeaves, params);
     return data;
