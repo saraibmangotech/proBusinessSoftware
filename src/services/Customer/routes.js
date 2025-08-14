@@ -189,7 +189,8 @@ const routes = {
   getRoutedShifts:'/hrms/shifts/roasterallocations',
   AllocateNewShift:'/hrms/shifts/allocate',
   CreateInvoiceDebitNote:'purchases/FPinvoice/debitNote/add',
-  deleteInvoiceDebitNote:'purchases/FPinvoice/debitNote/delete'
+  deleteInvoiceDebitNote:'purchases/FPinvoice/debitNote/delete',
+  getHRStats:'hrms/stats'
 
 
 };

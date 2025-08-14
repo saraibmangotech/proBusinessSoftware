@@ -273,6 +273,8 @@ function UpdateEmployee() {
                 email: getValues('email'),
                 phone: getValues('phone'),
                 password: getValues('password'),
+                emirates_id: getValues("emirates"),
+                airfare_amount: getValues("airfareAmount"),
                 documents: documents,
                 permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
                 role_id: selectedRole?.id,
@@ -526,6 +528,8 @@ function UpdateEmployee() {
             setValue('name', employee?.user?.name || '');
             setValue('id', employee?.user?.employee_id || '');
             setValue('email', employee?.user?.email || '');
+            setValue('emirates', employee?.emirates_id || '');
+            setValue('airfareAmount', employee?.airfare_amount || '');
             setValue('phone', employee?.user?.phone || '');
             setValue('password', ''); // Usually not returned
             console.log(details?.leave_approver_2, 'details?.leave_approver_2');
@@ -626,7 +630,33 @@ function UpdateEmployee() {
             (parseFloat(other) || 0)
         );
     }, [basicSalary, housing, transport, other]);
+    useEffect(() => {
+        if (doj) {
+            // Calculate probation end date (6 months from date of joining)
+            const probationEndDate = moment(doj).add(6, "months").toDate()
+            setProbEndDate(probationEndDate)
+            setValue("probEndDate", probationEndDate)
+        }
+    }, [doj, setValue])
 
+    useEffect(() => {
+        const airfareCycleYears = getValues("airfaireCycleYear")
+        if (doj && airfareCycleYears) {
+            // Calculate airfare due date (add cycle years to date of joining)
+            const airfareDueDate = moment(doj).add(Number.parseInt(airfareCycleYears), "years").toDate()
+            setAirFareDueDate(airfareDueDate)
+            setValue("AirFareDueDate", airfareDueDate)
+        }
+    }, [doj, getValues, setValue])
+
+    useEffect(() => {
+        const airfareCycleYears = getValues("airfaireCycleYear")
+        if (doj && airfareCycleYears) {
+            const airfareDueDate = moment(doj).add(Number.parseInt(airfareCycleYears), "years").toDate()
+            setAirFareDueDate(airfareDueDate)
+            setValue("AirFareDueDate", airfareDueDate)
+        }
+    }, [watch("airfaireCycleYear"), doj, getValues, setValue])
     useEffect(() => {
         setValue("total_salary", totalSalary);
     }, [totalSalary, setValue]);
@@ -802,6 +832,17 @@ function UpdateEmployee() {
                         />
 
 
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={" Emirates ID :*"}
+                            size={"small"}
+                            placeholder={" Emirates ID "}
+                            error={errors?.emirates?.message}
+                            register={register("emirates", {
+                                required: false,
+                            })}
+                        />
                     </Grid>
                     <Grid item xs={12} sm={2.8}>
 
@@ -1602,6 +1643,18 @@ function UpdateEmployee() {
                         />
 
 
+                    </Grid>
+
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={" Airfare Amount :*"}
+                            size={"small"}
+                            placeholder={" Airfare Amount "}
+                            error={errors?.airfareAmount?.message}
+                            register={register("airfareAmount", {
+                                required: "Please enter airfareAmount.",
+                            })}
+                        />
                     </Grid>
                     <Grid item xs={12} sm={2.8}>
                         <InputField

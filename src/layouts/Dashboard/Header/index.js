@@ -73,6 +73,7 @@ import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import SystemServices from "services/System"
 
 
 
@@ -275,6 +276,28 @@ function Header() {
 
     setCurrentPage(getCurrentPageName())
   }, [location.pathname])
+const [totalCount, setTotalCount] = useState(0)
+  const getNotificationsCount = async (page, limit, filter) => {
+    
+      try {
+       
+       
+       
+        const { data } =  SystemServices.getNotificationsCount()
+  
+        setTotalCount(data?.notifications)
+     
+  
+      } catch (error) {
+        console.log(error)
+      } 
+    }
+
+
+  useEffect(() => {
+    getNotificationsCount();
+  }, [location.pathname]); // runs every time the route changes
+
 
   useEffect(() => {
     if (user?.role_id == 1005) {
@@ -6061,7 +6084,7 @@ function Header() {
                   console.log("Notification clicked");
                 }}
               >
-                <Badge color="error"> {/* You can replace `3` with your dynamic notification count */}
+                <Badge color="error" badgeContent={totalCount}  > {/* You can replace `3` with your dynamic notification count */}
                   <NotificationsNoneOutlinedIcon onClick={() => {
                     // handle notification click logic here
                     navigate("/notifications");

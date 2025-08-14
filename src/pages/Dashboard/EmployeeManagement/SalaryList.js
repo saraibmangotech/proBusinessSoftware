@@ -23,6 +23,7 @@ import {
   IconButton,
   ListSubheader,
   InputAdornment,
+  Checkbox,
 } from "@mui/material"
 
 import styled from "@emotion/styled"
@@ -93,36 +94,33 @@ function SalaryList() {
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([])
   const [searchText, setSearchText] = useState("")
   const [employess, setEmployess] = useState([])
-  const [selectedMonth, setSelectedMonth] = useState(dayjs());
+  const [selectedMonth, setSelectedMonth] = useState(dayjs())
   const [selectedCostCenter, setSelectedCostCenter] = useState(null)
   const [costCenters, setCostCenters] = useState([])
   const [filtertedCostCenters, setFiltertedCostCenters] = useState([])
+  console.log(selectedEmployeeIds, 'selectedEmployeeIds222')
 
   const getCustomerQueue = async (page, limit, filter) => {
-
-
     try {
-
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-
-
       }
 
       const { data } = await CustomerServices.getEmployees(params)
       setEmployess(data?.employees?.rows)
-
     } catch (error) {
       showErrorToast(error)
     }
   }
 
-
   // Updated column configuration with action column
   const columnConfig = [
     { key: "employeeName", header: "Employee Name", type: "auto" },
+    { key: "joinDate", header: "Join Date", type: "auto" },
+    { key: "workingDays", header: "Working Days", type: "auto" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
+    { key: "local", header: "Local/Non Local ", type: "auto" },
     { key: "salaryPaid", header: "Salary Basic", type: "auto" },
     { key: "housing_allowance", header: "Housing Allowance", type: "auto" },
     { key: "transport_allowance", header: "Transport Allowance", type: "auto" },
@@ -131,10 +129,8 @@ function SalaryList() {
     { key: "commission", header: "Commission", type: "manual" },
     { key: "otherAdd", header: "Other Add", type: "manual" },
     { key: "al", header: "AL/SL", type: "manual" },
-
     { key: "arrear", header: "Airfare", type: "manual" },
     { key: "gpssaEmp", header: "GPSSA", type: "manual", isGpssa: true },
-
     { key: "staffAdvance", header: "Staff Advance", type: "manual" },
     { key: "lateComm", header: "Late Coming", type: "manual" },
     { key: "additional", header: "Additional", type: "manual" },
@@ -149,7 +145,7 @@ function SalaryList() {
     { key: "workPermit", header: "WORK PERMIT", type: "auto" },
     { key: "visa", header: "Visa", type: "auto" },
     { key: "branch", header: "BRANCH", type: "auto" },
-
+    { key: "remarks", header: "Remarks", type: "text" },
     { key: "minutesLate", header: "Minutes Late", type: "auto" },
     { key: "alDay", header: "AL Day", type: "auto" },
     { key: "actions", header: "Actions", type: "action" },
@@ -161,173 +157,180 @@ function SalaryList() {
   // Filter employees based on search text
   const filteredEmployees = employess.filter((employee) => {
     const searchLower = searchText?.toLowerCase()
-    return (
-      employee?.user?.name?.toLowerCase().includes(searchLower)
-
-    )
+    return employee?.user?.name?.toLowerCase().includes(searchLower)
   })
 
   // Generate default employee data
   const generateDefaultEmployeeData = (employee, salary) => {
-    console.log(salary, 'employeeemployee')
+    console.log(salary, "employeeemployee")
     return {
       user_id: employee?.user_id,
       id: employee.id,
       employeeName: employee.first_name + employee.last_name,
       employeeId: salary.employee?.employee_code,
-      salaryPaid: parseFloat(salary.basicSalary) || 0,
-      commission: parseFloat(salary?.commission),
+      salaryPaid: Number.parseFloat(salary.basicSalary) || 0,
+      commission: Number.parseFloat(salary?.commission),
       otherAdd: 0,
       al: 0,
       sl: 0,
       arrear: 0,
-      gpssaEmp: parseFloat(salary?.pension || 0),
-
+      gpssaEmp: Number.parseFloat(salary?.pension || 0),
       staffAdvance: 0,
-      lateComm: parseFloat(salary?.lateDeduction),
+      lateComm: Number.parseFloat(salary?.lateDeduction),
       additional: 0,
       salaryDeduction: 0,
-      unpaidLeave: parseFloat(salary?.absentDeduction || 0),
-      totalPay: parseFloat(salary?.netSalary) || 0,
+      unpaidLeave: Number.parseFloat(salary?.absentDeduction || 0),
+      totalPay: Number.parseFloat(salary?.netSalary) || 0,
       commissionFinal: 0,
-      netSalary: parseFloat(salary.netSalary) || 0,
+      netSalary: Number.parseFloat(salary.netSalary) || 0,
       // Default administrative data
       routingCode: salary?.employee?.routing,
       salaryIban: salary?.employee?.iban,
       workPermit: salary?.employee?.work_permit,
       visa: salary?.employee?.visa,
       branch: salary?.employee?.branch,
-      remark: "New Employee",
-      minutesLate: parseFloat(salary?.totalShortMinutes || 0),
-      alDay: parseFloat(salary?.approvedLeaveDays || 0),
+      remarks: "New Employee",
+      minutesLate: Number.parseFloat(salary?.totalShortMinutes || 0),
+      alDay: Number.parseFloat(salary?.approvedLeaveDays || 0),
     }
   }
-const generateDefaultEmployeeData2 = (salary) => {
-  console.log(salary, 'employeeemployee');
-  const toFixed3 = (val) => parseFloat((parseFloat(val || 0)).toFixed(3));
 
-  return {
-    user_id: salary?.employee?.user_id,
-    id: salary?.employee?.id,
-    employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
-    employeeId: salary.employee?.employee_code,
-    salaryPaid: toFixed3(salary.basicSalary),
-    commission: toFixed3(salary?.commission),
-    housing_allowance: toFixed3(salary?.employee?.housing_allowance),
-    transport_allowance: toFixed3(salary?.employee?.transport_allowance),
-    other_allowance: toFixed3(salary?.employee?.other_allowance),
-    salaryPackage: toFixed3(salary?.salaryPackage),
-    otherAdd: 0,
-    al: 0,
-    sl: 0,
-    arrear: 0,
-    gpssaEmp: toFixed3(salary?.pension),
+  const generateDefaultEmployeeData2 = (salary) => {
+    console.log(salary, "employeeemployee")
+    const toFixed3 = (val) => Number.parseFloat(Number.parseFloat(val || 0).toFixed(3))
 
-    staffAdvance: 0,
-    lateComm: toFixed3(salary?.lateDeduction),
-    additional: 0,
-    salaryDeduction: 0,
-    unpaidLeave: toFixed3(salary?.absentDeduction),
-    totalPay: toFixed3(salary?.netSalary),
-    commissionFinal: 0,
-    netSalary: toFixed3(salary?.netSalary),
+    return {
+      user_id: salary?.employee?.user_id,
+      id: salary?.employee?.id,
+      employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
+      joinDate: moment(salary?.employee?.date_of_joining).format("DD-MM-YYYY"),
+      workingDays: salary?.workingDays,
+      local: salary?.employee?.is_local ? "Local" : "Non Local",
+      employeeId: salary.employee?.employee_code,
+      remarks: salary.employee?.employee_code,
+      salaryPaid: toFixed3(salary.basicSalary),
+      commission: toFixed3(salary?.commission),
+      housing_allowance: toFixed3(salary?.employee?.housing_allowance),
+      transport_allowance: toFixed3(salary?.employee?.transport_allowance),
+      other_allowance: toFixed3(salary?.employee?.other_allowance),
+      salaryPackage: toFixed3(salary?.salaryPackage),
+      otherAdd: 0,
+      al: 0,
+      sl: 0,
+      arrear: toFixed3(salary?.airfareAmount),
+      gpssaEmp: toFixed3(salary?.pension),
+      staffAdvance: 0,
+      lateComm: toFixed3(salary?.lateDeduction),
+      additional: 0,
+      salaryDeduction: 0,
+      unpaidLeave: toFixed3(salary?.absentDeduction),
+      totalPay: toFixed3(salary?.netSalary),
+      commissionFinal: 0,
+      netSalary: toFixed3(salary?.netSalary),
+      routingCode: salary?.employee?.routing,
+      salaryIban: salary?.employee?.iban,
+      workPermit: salary?.employee?.work_permit,
+      visa: salary?.employee?.visa,
+      branch: salary?.employee?.branch,
+      remarks: "New Employee",
+      minutesLate: toFixed3(salary?.totalShortMinutes),
+      alDay: toFixed3(salary?.approvedLeaveDays),
+    }
+  }
 
-    routingCode: salary?.employee?.routing,
-    salaryIban: salary?.employee?.iban,
-    workPermit: salary?.employee?.work_permit,
-    visa: salary?.employee?.visa,
-    branch: salary?.employee?.branch,
-    remark: "New Employee",
-    minutesLate: toFixed3(salary?.totalShortMinutes),
-    alDay: toFixed3(salary?.approvedLeaveDays),
-  };
-};
-
-
-  // Handle employee selection change
-  // const handleEmployeeSelectionChange = (event) => {
-  //   const selectedIds = event.target.value
-  //   console.log(selectedIds,'selectedIds');
-
-  //   setSelectedEmployeeIds(selectedIds)
-
-  //   // Add new employees to table
-  //   const currentEmployeeIds = new Set(data.map((row) => row.id))
-  //   const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id))
-
-  //   if (newEmployeeIds.length > 0) {
-  //     const newEmployees = newEmployeeIds.map((id) => {
-  //       const employee = employess.find((emp) => emp.id === id)
-  //       return generateDefaultEmployeeData(employee)
-  //     })
-  //     setData((prevData) => [...prevData, ...newEmployees])
-  //   }
-
-  //   // Remove employees that are no longer selected
-  //   const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id))
-  //   if (removedEmployeeIds.length > 0) {
-  //     setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
-  //   }
-  // }
   const handleEmployeeSelectionChange2 = async (event) => {
-    const selectedIds = event.target.value;
-    setSelectedEmployeeIds(selectedIds);
+    const selectedIds = event.target.value
+    setSelectedEmployeeIds(selectedIds)
 
-    const currentEmployeeIds = new Set(data.map((row) => row.id));
-    const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id));
+    console.log(selectedIds, "selectedIdsselectedIds")
+    console.log(employess)
 
-    if (newEmployeeIds.length > 0) {
-      const newEmployees = await Promise.all(
-        newEmployeeIds.map(async (id) => {
-          const employee = employess.find((emp) => emp.id === id);
-          let salary = 0;
+    const currentEmployeeIds = new Set(data.map((row) => row.id))
+    const previousSelectedIds = new Set(selectedEmployeeIds)
 
-          try {
-            const { data } = await CustomerServices.employeeSalaryDetail({ user_id: employee.user_id, month: moment(selectedMonth).month() + 1, year: moment(selectedMonth).year() });
-            let salaries = data?.results;
+    // Check if we're adding new employees (selection increased)
+    const newEmployeeIds = selectedIds.filter((id) => !currentEmployeeIds.has(id))
+    const isSelectionIncreased = selectedIds.length > previousSelectedIds.size
 
-            const newEmployeeDataArray = salaries.map((salary) =>
-              generateDefaultEmployeeData2(salary)
-            );
-            console.log(newEmployeeDataArray, 'newEmployeeDataArray');
+    console.log(newEmployeeIds, "newEmployeeIds")
+    console.log("Selection increased:", isSelectionIncreased)
 
-            setData((prevData) => {
+    // ✅ Only call API if we're adding new employees
+    if (isSelectionIncreased && newEmployeeIds.length > 0) {
+      try {
+        // Get user_ids for only the NEW employees
+        const newSelectedUserIds = employess.filter((emp) => newEmployeeIds.includes(emp.id)).map((emp) => emp.user_id)
 
-              const updatedIds = newEmployeeDataArray.map((emp) => emp.id);
-              const filteredData = prevData.filter((row) => !updatedIds.includes(row.id));
+        console.log(newSelectedUserIds, "newSelectedUserIds")
 
-
-              const combinedData = [...filteredData, ...newEmployeeDataArray];
-
-
-              const uniqueByUserIdMap = new Map();
-              for (const row of combinedData) {
-                uniqueByUserIdMap.set(row.user_id, row);
-              }
-
-              // Convert back to array
-              const uniqueData = Array.from(uniqueByUserIdMap.values());
-
-              return uniqueData;
-            });
-
-
-
-          } catch (error) {
-            console.error(`Failed to fetch salary for ${employee.user_id}`, error);
-          }
-
-          return generateDefaultEmployeeData2(salary);
+        // API call for only new employees
+        const { data: salaryResponse } = await CustomerServices.employeeSalaryDetail({
+          user_ids: newSelectedUserIds.join(","),
+          month: moment(selectedMonth).month() + 1,
+          year: moment(selectedMonth).year(),
         })
-      );
 
+        const salaries = salaryResponse?.results || []
+        const newEmployeeDataArray = salaries.map((salary) => generateDefaultEmployeeData2(salary))
+
+        console.log(newEmployeeDataArray, "newEmployeeDataArray")
+
+        setData((prevData) => {
+          const combinedData = [...prevData, ...newEmployeeDataArray]
+          // Ensure uniqueness by user_id
+          const uniqueByUserIdMap = new Map()
+          for (const row of combinedData) {
+            uniqueByUserIdMap.set(row.user_id, row)
+          }
+          return Array.from(uniqueByUserIdMap.values())
+        })
+      } catch (error) {
+        console.error("Failed to fetch salaries", error)
+      }
     }
 
-    const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id));
+    // ✅ Remove employees that are deselected (no API call needed)
+    const removedEmployeeIds = Array.from(currentEmployeeIds).filter((id) => !selectedIds.includes(id))
+
     if (removedEmployeeIds.length > 0) {
-      setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)));
+      console.log("Removing employees:", removedEmployeeIds)
+      setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
     }
-  };
+  }
+
+  const handleSelectAll = () => {
+    const filteredIds = filteredEmployees.map((emp) => emp.id)
+
+    // Check if all filtered employees are currently selected
+    const allFilteredSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedEmployeeIds.includes(id))
+
+    let newSelection
+
+    if (allFilteredSelected) {
+      // ✅ Unselect all filtered employees
+      newSelection = selectedEmployeeIds.filter((id) => !filteredIds.includes(id))
+      console.log("Unselecting all filtered employees")
+    } else {
+      // ✅ Select all filtered employees (merge with existing, ensure uniqueness)
+      newSelection = [...new Set([...selectedEmployeeIds, ...filteredIds])]
+      console.log("Selecting all filtered employees")
+    }
+    console.log(newSelection, 'newSelectionnewSelection');
+
+    setSelectedEmployeeIds(newSelection)
+
+    // Call selection handler with the new selection
+    handleEmployeeSelectionChange2({ target: { value: newSelection } })
+  }
+
+  const handleChipDelete = (employeeIdToRemove) => {
+    // Remove from selected IDs
+    const updatedSelection = selectedEmployeeIds.filter((id) => id !== employeeIdToRemove)
+    setSelectedEmployeeIds(updatedSelection)
+
+    // Remove from data table (no API call needed)
+    setData((prevData) => prevData.filter((row) => row.id !== employeeIdToRemove))
+  }
 
   const CreateSalary = async (formData) => {
     try {
@@ -357,44 +360,34 @@ const generateDefaultEmployeeData2 = (salary) => {
         work_permit: item.workPermit,
         visa: item.visa,
         branch: item.branch,
-        remark: item.remark,
+        remark: item.remarks,
         minutes_late: item.minutesLate,
         al_day: item.alDay,
-      }));
+      }))
 
-      console.log(transformedData);
-
-      console.log(data);
-
+      console.log(transformedData)
+      console.log(data)
 
       const obj = {
-        status: 'Pending',
+        status: "Pending",
         month: moment(selectedMonth).month() + 1,
         year: moment(selectedMonth).year(),
-        salaries: transformedData
-      };
+        salaries: transformedData,
+      }
 
-      const promise = UserServices.CreateSalary(obj);
+      const promise = UserServices.CreateSalary(obj)
 
-      showPromiseToast(
-        promise,
-        'Saving ...',
-        'Success',
-        'Something Went Wrong'
-      );
+      showPromiseToast(promise, "Saving ...", "Success", "Something Went Wrong")
 
-      const response = await promise;
+      const response = await promise
 
       if (response?.responseCode === 200) {
-        navigate('/salary-list');
+        navigate("/salary-list")
       }
     } catch (error) {
-
-      console.log(error);
-
+      console.log(error)
     }
-  };
-
+  }
 
   // Handle remove employee
   const handleRemoveEmployee = (employeeId) => {
@@ -407,27 +400,27 @@ const generateDefaultEmployeeData2 = (salary) => {
     event.stopPropagation() // Prevent event bubbling
     setSearchText(event.target.value)
   }
+
   const getCostCenters = async () => {
     try {
-      let params = {
+      const params = {
         page: 1,
         limit: 999999,
-      };
+      }
 
-      const { data } = await CustomerServices.getCostCenters(params);
-      setCostCenters(data?.cost_centers);
+      const { data } = await CustomerServices.getCostCenters(params)
+      setCostCenters(data?.cost_centers)
       setFiltertedCostCenters(data?.cost_centers)
       setSelectedCostCenter(null)
-
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
-  };
+  }
+
   useEffect(() => {
     getCostCenters()
     getCustomerQueue()
   }, [])
-
 
   // Handle input changes for manual fields
   const handleInputChange = useCallback((id, field, value) => {
@@ -435,17 +428,17 @@ const generateDefaultEmployeeData2 = (salary) => {
 
     setData((prevData) => {
       // Remove duplicate user_ids, keeping the first occurrence
-      const seenUserIds = new Set();
+      const seenUserIds = new Set()
       const uniqueData = prevData.filter((row) => {
-        if (seenUserIds.has(row.user_id)) return false;
-        seenUserIds.add(row.user_id);
-        return true;
-      });
+        if (seenUserIds.has(row.user_id)) return false
+        seenUserIds.add(row.user_id)
+        return true
+      })
 
       // Now update the matching row
       return uniqueData.map((row) => {
         if (row.id === id) {
-          const updatedRow = { ...row, [field]: numericValue };
+          const updatedRow = { ...row, [field]: field === "remarks" ? value : numericValue }
 
           const totalPay =
             (updatedRow.housing_allowance || 0) +
@@ -455,7 +448,7 @@ const generateDefaultEmployeeData2 = (salary) => {
             (updatedRow.commission || 0) +
             (updatedRow.otherAdd || 0) +
             (updatedRow.al || 0) +
-            (updatedRow.arrear || 0);
+            (updatedRow.arrear || 0)
 
           const deductions =
             (updatedRow.staffAdvance || 0) +
@@ -464,22 +457,20 @@ const generateDefaultEmployeeData2 = (salary) => {
             (updatedRow.additional || 0) +
             (updatedRow.salaryDeduction || 0) +
             (updatedRow.unpaidLeave || 0) +
-            (updatedRow.commissionFinal || 0);
+            (updatedRow.commissionFinal || 0)
 
-          updatedRow.totalPay = (totalPay - deductions) + (updatedRow.commissionFinal || 0);
-          updatedRow.netSalary = totalPay - deductions;
+          updatedRow.totalPay = totalPay - deductions + (updatedRow.commissionFinal || 0)
+          updatedRow.netSalary = totalPay - deductions
 
-          return updatedRow;
+          return updatedRow
         }
-        return row;
-      });
-    });
-
+        return row
+      })
+    })
   }, [])
 
   const renderCell = (row, column) => {
     const value = row[column.key]
-
 
     // Handle action column
     if (column.key === "actions") {
@@ -504,9 +495,9 @@ const generateDefaultEmployeeData2 = (salary) => {
       column.key === "workPermit" ||
       column.key === "visa" ||
       column.key === "branch" ||
-      column.key === "remark"
+      column.key === "remarks"
     ) {
-      if (column.type === "manual") {
+      if (column.type === "text") {
         return (
           <TextField
             variant="standard"
@@ -516,11 +507,12 @@ const generateDefaultEmployeeData2 = (salary) => {
               disableUnderline: false,
               style: { fontSize: "11px" },
             }}
-            sx={{ width: "100%" }}
+            sx={{ width: column.key === "remarks" ? "200px" : "100%" }}
             inputProps={{ style: { textAlign: "center" } }}
           />
         )
       }
+
       return (
         <Typography
           variant="body2"
@@ -592,39 +584,34 @@ const generateDefaultEmployeeData2 = (salary) => {
                 value={selectedEmployeeIds}
                 onChange={handleEmployeeSelectionChange2}
                 input={<OutlinedInput label="Select Employees" />}
-               renderValue={(selected) => (
-  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-    {selected.map((value) => {
-      const employee = employess.find((emp) => emp.id === value);
-      return (
-        <Box
-          key={value}
-          onMouseDown={(e) => e.stopPropagation()} // ✅ Prevent dropdown from opening
-        >
-          <Chip
-            label={`${employee?.user?.name}`}
-            size="small"
-            onDelete={() => {
-              const updated = selected.filter((v) => v !== value);
-              handleEmployeeSelectionChange2({ target: { value: updated } });
-            }}
-          />
-        </Box>
-      );
-    })}
-  </Box>
-)}
-
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selectedEmployeeIds.map((value) => {
+                      const employee = employess.find((emp) => emp.id === value)
+                      return (
+                        <Box
+                          key={value}
+                          onMouseDown={(e) => e.stopPropagation()} // ✅ Prevent dropdown from opening
+                        >
+                          <Chip
+                            label={`${employee?.user?.name}`}
+                            size="small"
+                            onDelete={() => handleChipDelete(value)}
+                          />
+                        </Box>
+                      )
+                    })}
+                  </Box>
+                )}
                 MenuProps={{
                   PaperProps: {
                     style: {
                       maxHeight: 400,
                     },
                   },
-                  // Prevent menu from closing when clicking on search input
                   autoFocus: false,
                 }}
-                onClose={() => setSearchText("")} // Clear search when dropdown closes
+                onClose={() => setSearchText("")}
               >
                 {/* Search Input */}
                 <ListSubheader
@@ -648,33 +635,41 @@ const generateDefaultEmployeeData2 = (salary) => {
                     }}
                     value={searchText}
                     onChange={handleSearchChange}
-                    onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
+                    onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
-                      // Prevent dropdown from closing on any key except Escape
                       if (e.key !== "Escape") {
                         e.stopPropagation()
                       }
-                      // Clear search on Escape
                       if (e.key === "Escape") {
                         setSearchText("")
                       }
                     }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: "#e0e0e0",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#1976d2",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#1976d2",
-                        },
-                      },
-                    }}
                   />
                 </ListSubheader>
 
+                {/* ✅ Fixed Select All Option with proper checkbox state */}
+                {/* {filteredEmployees.length > 0 && (
+                  <MenuItem
+                    value="select_all"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleSelectAll()
+                    }}
+                  >
+                    <Checkbox
+                      checked={
+                        filteredEmployees.length > 0 &&
+                        filteredEmployees.every((emp) => selectedEmployeeIds.includes(emp.id))
+                      }
+
+                    />
+                    <Typography>Select All</Typography>
+                  </MenuItem>
+                )} */}
+                {console.log(filteredEmployees, 'filteredEmployeesfilteredEmployees')}
+                {console.log(selectedEmployeeIds, 'filteredEmployeesfilteredEmployees')}
+                {console.log(filteredEmployees.every((emp) => selectedEmployeeIds.includes(emp.id)), 'filteredEmployees')}
                 {/* Employee Options */}
                 {filteredEmployees.length > 0 ? (
                   filteredEmployees.map((employee) => (
@@ -688,13 +683,18 @@ const generateDefaultEmployeeData2 = (salary) => {
                         py: 1,
                       }}
                     >
+                      <Checkbox checked={selectedEmployeeIds.includes(employee.id)} sx={{ mr: 1 }} />
                       <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
                         <Box sx={{ flexGrow: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                             {employee?.user?.name}
                           </Typography>
                           <Typography variant="caption" color="textSecondary">
-                            Salary: {parseFloat(employee?.basic_salary || 0) + parseFloat(employee?.housing_allowance || 0) + parseFloat(employee?.other_allowance || 0) + parseFloat(employee?.transport_allowance || 0)}
+                            Salary:{" "}
+                            {Number.parseFloat(employee?.basic_salary || 0) +
+                              Number.parseFloat(employee?.housing_allowance || 0) +
+                              Number.parseFloat(employee?.other_allowance || 0) +
+                              Number.parseFloat(employee?.transport_allowance || 0)}
                           </Typography>
                         </Box>
                       </Box>
@@ -719,57 +719,50 @@ const generateDefaultEmployeeData2 = (salary) => {
                 labelId="cost-center-select-label"
                 value={selectedCostCenter}
                 onChange={async (e) => {
-                  const selectedId = e.target.value;
-                  setSelectedCostCenter(selectedId);
+                  const selectedId = e.target.value
+                  setSelectedCostCenter(selectedId)
 
-                  const selectedCenter = costCenters.find(center => center.id === selectedId);
+                  const selectedCenter = costCenters.find((center) => center.id === selectedId)
 
                   try {
                     const { data } = await CustomerServices.employeeSalaryDetail({
-
-                      cost_center: selectedCenter?.name || '',
+                      cost_center: selectedCenter?.name || "",
                       month: moment(selectedMonth).month() + 1,
                       year: moment(selectedMonth).year(),
-                    });
+                    })
 
-                    const salaries = data?.results || [];
+                    const salaries = data?.results || []
 
-                    const newEmployeeDataArray = salaries.map((salary) =>
-                      generateDefaultEmployeeData2(salary)
-                    );
-                    console.log(newEmployeeDataArray, 'newEmployeeDataArray');
+                    const newEmployeeDataArray = salaries.map((salary) => generateDefaultEmployeeData2(salary))
+                    console.log(newEmployeeDataArray, "newEmployeeDataArray")
 
                     setData((prevData) => {
-                      const combinedData = [...prevData, ...newEmployeeDataArray];
+                      const combinedData = [...prevData, ...newEmployeeDataArray]
 
-                      
-                      const uniqueByUserId = new Map();
+                      const uniqueByUserId = new Map()
                       for (const row of combinedData) {
-                        uniqueByUserId.set(row.user_id, row); 
+                        uniqueByUserId.set(row.user_id, row)
                       }
 
-                      return Array.from(uniqueByUserId.values());
-                    });
-
+                      return Array.from(uniqueByUserId.values())
+                    })
 
                     // Do something with `newEmployeeDataArray`, like:
                     // setData(newEmployeeDataArray); or merge with existing data
-
                   } catch (error) {
-                    console.error('Error fetching salary details:', error);
+                    console.error("Error fetching salary details:", error)
                   }
                 }}
-
                 input={<OutlinedInput label="Select Cost Center" />}
                 renderValue={(selected) => {
-                  const center = costCenters.find((c) => c.id === selected);
-                  return center ? center.name : '';
+                  const center = costCenters.find((c) => c.id === selected)
+                  return center ? center.name : ""
                 }}
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 400 } },
                   autoFocus: false,
                 }}
-                onClose={() => setSearchText('')}
+                onClose={() => setSearchText("")}
               >
                 {/* Search Input */}
                 <ListSubheader
@@ -795,8 +788,8 @@ const generateDefaultEmployeeData2 = (salary) => {
                     onChange={handleSearchChange}
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
-                      if (e.key !== 'Escape') e.stopPropagation();
-                      if (e.key === 'Escape') setSearchText('');
+                      if (e.key !== "Escape") e.stopPropagation()
+                      if (e.key === "Escape") setSearchText("")
                     }}
                   />
                 </ListSubheader>
@@ -818,12 +811,27 @@ const generateDefaultEmployeeData2 = (salary) => {
               </Select>
             </FormControl>
           </Box>
-
-
         </Grid>
 
-   
-
+        <Grid item xs={6}>
+          <Box sx={{ mb: 3 }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                views={["year", "month"]}
+                disabled={data?.length > 0}
+                label="Select Month & Year"
+                minDate={dayjs("2000-01-01")}
+                maxDate={dayjs("2100-12-31")}
+                value={selectedMonth}
+                onChange={(newValue) => {
+                  setSelectedMonth(new Date(newValue))
+                  console.log(newValue, "newValuenewValue")
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </LocalizationProvider>
+          </Box>
+        </Grid>
       </Grid>
       <Box sx={{ width: "100%" }}>
         <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
@@ -887,16 +895,8 @@ const generateDefaultEmployeeData2 = (salary) => {
           </Grid>
         </Box>
       )}
-      <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-        <PrimaryButton
-          bgcolor={'#001f3f'}
-          title="Create"
-          onClick={() => CreateSalary()}
-
-          disabled={data?.length == 0}
-
-        />
-
+      <Box sx={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+        <PrimaryButton bgcolor={"#001f3f"} title="Create" onClick={() => CreateSalary()} disabled={data?.length == 0} />
       </Box>
     </Box>
   )
