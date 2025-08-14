@@ -81,6 +81,7 @@ function SalaryList() {
   const navigate = useNavigate()
   const classes = useStyles()
   const contentRef = useRef(null)
+  const [selectAll, setSelectAll] = useState(false)
 
   const {
     register,
@@ -239,8 +240,13 @@ function SalaryList() {
   }
 
   const handleEmployeeSelectionChange2 = async (event) => {
-    const selectedIds = event.target.value
+    let selectedIds = event.target.value
+
+
+
+
     setSelectedEmployeeIds(selectedIds)
+    console.log(selectedIds[0] == 'select_all');
 
     console.log(selectedIds, "selectedIdsselectedIds")
     console.log(employess)
@@ -297,6 +303,16 @@ function SalaryList() {
       setData((prevData) => prevData.filter((row) => !removedEmployeeIds.includes(row.id)))
     }
   }
+  useEffect(() => {
+    if (selectAll) {
+      const userIds = filteredEmployees.map(emp => emp.id);
+
+      setSelectedEmployeeIds(userIds)
+    }
+    else {
+      setSelectedEmployeeIds([])
+    }
+  }, [selectAll])
 
   const handleSelectAll = () => {
     const filteredIds = filteredEmployees.map((emp) => emp.id)
@@ -315,9 +331,9 @@ function SalaryList() {
       newSelection = [...new Set([...selectedEmployeeIds, ...filteredIds])]
       console.log("Selecting all filtered employees")
     }
-    console.log(newSelection, 'newSelectionnewSelection');
+    // console.log(newSelection, 'newSelectionnewSelection');
 
-    setSelectedEmployeeIds(newSelection)
+    // setSelectedEmployeeIds(newSelection)
 
     // Call selection handler with the new selection
     handleEmployeeSelectionChange2({ target: { value: newSelection } })
@@ -568,7 +584,7 @@ function SalaryList() {
                 input={<OutlinedInput label="Select Employees" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selectedEmployeeIds.map((value) => {
+                    {!selectAll ? selectedEmployeeIds.map((value) => {
                       const employee = employess.find((emp) => emp.id === value)
                       return (
                         <Box
@@ -582,7 +598,16 @@ function SalaryList() {
                           />
                         </Box>
                       )
-                    })}
+                    }) : <Box
+
+                      onMouseDown={(e) => e.stopPropagation()} // ✅ Prevent dropdown from opening
+                    >
+                      <Chip
+                        label={'All Selected'}
+                        size="small"
+                        
+                      />
+                    </Box>}
                   </Box>
                 )}
                 MenuProps={{
@@ -630,25 +655,29 @@ function SalaryList() {
                 </ListSubheader>
 
                 {/* ✅ Fixed Select All Option with proper checkbox state */}
-                {/* {filteredEmployees.length > 0 && (
+                {filteredEmployees.length > 0 && (
                   <MenuItem
                     value="select_all"
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
+                      setSelectAll(!selectAll)
+                      // console.log(filteredEmployees, '343434343W');
+                      // const userIds = filteredEmployees.map(emp => emp.id);
+                      // console.log(userIds, 'userIdsuserIds');
+                      // setSelectedEmployeeIds(userIds)
                       handleSelectAll()
                     }}
                   >
                     <Checkbox
                       checked={
-                        filteredEmployees.length > 0 &&
-                        filteredEmployees.every((emp) => selectedEmployeeIds.includes(emp.id))
+                        selectAll
                       }
 
                     />
                     <Typography>Select All</Typography>
                   </MenuItem>
-                )} */}
+                )}
                 {console.log(filteredEmployees, 'filteredEmployeesfilteredEmployees')}
                 {console.log(selectedEmployeeIds, 'filteredEmployeesfilteredEmployees')}
                 {console.log(filteredEmployees.every((emp) => selectedEmployeeIds.includes(emp.id)), 'filteredEmployees')}
@@ -665,6 +694,8 @@ function SalaryList() {
                         py: 1,
                       }}
                     >
+                      {console.log(employee, 'employeelane')}
+
                       <Checkbox checked={selectedEmployeeIds.includes(employee.id)} sx={{ mr: 1 }} />
                       <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
                         <Box sx={{ flexGrow: 1 }}>

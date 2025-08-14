@@ -1322,6 +1322,7 @@ function LeaveList() {
 
                                 [
                                     { id: 'Pending', name: "Pending" },
+                                     { id: 'Partial', name: "Partial" },
                                     { id: 'Approved', name: "Approved" },
                                     { id: 'Rejected', name: "Rejected" },
                                 ]}
