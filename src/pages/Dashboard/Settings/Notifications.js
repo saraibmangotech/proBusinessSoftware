@@ -28,6 +28,7 @@ import { styled } from "@mui/material/styles"
 import SystemServices from "services/System"
 import { showErrorToast } from "components/NewToaster"
 import moment from "moment"
+import { useNavigate } from "react-router-dom"
 
 // Styled components
 const NotificationContainer = styled(Paper)(() => ({
@@ -76,7 +77,7 @@ function NotificationsList() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [filters, setFilters] = useState({})
-
+  const navigate = useNavigate()
   const unreadCount = notifications.filter((n) => !n.read).length
 
   const getNotifications = async (page = currentPage, limit = pageSize, filter = {}) => {
@@ -113,15 +114,15 @@ function NotificationsList() {
     setSelectedNotification(null)
   }
 
-const iconMap = {
-  AssignmentIcon: AssignmentIcon,
-  WarningIcon: WarningIcon,
-  CheckCircleIcon: CheckCircleIcon,
-  ScheduleIcon: ScheduleIcon,
-  InfoIcon: InfoIcon,
-  BuildIcon: BuildIcon,
-  CancelIcon: CancelIcon,
-};
+  const iconMap = {
+    AssignmentIcon: AssignmentIcon,
+    WarningIcon: WarningIcon,
+    CheckCircleIcon: CheckCircleIcon,
+    ScheduleIcon: ScheduleIcon,
+    InfoIcon: InfoIcon,
+    BuildIcon: BuildIcon,
+    CancelIcon: CancelIcon,
+  };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -140,6 +141,9 @@ const iconMap = {
 
   const handleNotificationClick = (notification) => {
     console.log("Notification clicked:", notification)
+    if (notification?.type == 'Leave Request') {
+      navigate('/leave-list')
+    }
     // Handle view logic here
   }
 
