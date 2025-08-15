@@ -119,6 +119,7 @@ function SalaryList() {
   const columnConfig = [
     { key: "employeeName", header: "Employee Name", type: "auto" },
     { key: "joinDate", header: "Join Date", type: "auto" },
+     { key: "division", header: "Division", type: "auto" },
     { key: "workingDays", header: "Working Days", type: "auto" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
     { key: "local", header: "Local/Non Local ", type: "auto" },
@@ -203,9 +204,10 @@ function SalaryList() {
     return {
       user_id: salary?.employee?.user_id,
       id: salary?.employee?.id,
-      employeeName: salary?.employee?.first_name + salary?.employee?.last_name,
+      division: salary?.employee?.cost_center ? salary?.employee?.cost_center : '-',
+      employeeName: salary?.employee?.first_name ,
       joinDate: moment(salary?.employee?.date_of_joining).format("DD-MM-YYYY"),
-      workingDays: salary?.workingDays,
+      workingDays: parseFloat(salary?.totalDays)-parseFloat(salary?.absentDays),
       local: salary?.employee?.is_local ? "Local" : "Non Local",
       employeeId: salary.employee?.employee_code,
       remarks: salary.employee?.employee_code,
@@ -233,7 +235,7 @@ function SalaryList() {
       workPermit: salary?.employee?.work_permit,
       visa: salary?.employee?.visa,
       branch: salary?.employee?.branch,
-      remarks: "New Employee",
+     
       minutesLate: toFixed3(salary?.totalShortMinutes),
       alDay: toFixed3(salary?.approvedLeaveDays),
     }

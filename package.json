@@ -110,9 +110,9 @@
     "yet-another-react-lightbox": "^3.15.2"
   },
   "scripts": {
-    "start": "set PORT=3029 && react-scripts start",
-    "start:staging": "set PORT=3029 && env-cmd -f .env.staging react-scripts start",
-    "start:prod": "set PORT=3029 && env-cmd -f .env.production react-scripts start",
+    "start": "set PORT=3031 && react-scripts start",
+    "start:staging": "set PORT=3031 && env-cmd -f .env.staging react-scripts start",
+    "start:prod": "set PORT=3031 && env-cmd -f .env.production react-scripts start",
     "build": "react-scripts build",
     "build:staging": "env-cmd -f .env.staging react-scripts build",
     "build:prod": "env-cmd -f .env.production react-scripts build",
