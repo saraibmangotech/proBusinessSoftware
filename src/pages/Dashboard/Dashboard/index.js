@@ -247,6 +247,8 @@ function Dashboard() {
         ? "Cashier"
         : user?.role_id == 1003
           ? "Typist"
+            : user?.role_id == 1006
+          ? "Typist Reception"
           : user?.role_id == 6
             ? "HR"
             : "",
@@ -909,7 +911,7 @@ function Dashboard() {
 
           {/* Stats Cards */}
           <Grid container mt={1} xs={12} spacing={2} justifyContent={"space-between"}>
-            {currentState == "Typist" &&
+            {(currentState == "Typist"  ||  currentState == "Typist Reception") &&
               statsData2.map((stat, index) => (
                 <Grid item xs={12} sm={6} md={2.4} key={index}>
                   <Card
@@ -1378,7 +1380,7 @@ function Dashboard() {
               </Grid>
             )}
             {console.log(statsDetail?.salesData)}
-            {currentState == "Typist" && (
+            {(currentState == "Typist"  ||  currentState == "Typist Reception") && (
               <Grid item xs={12} md={12}>
                 <Card
                   sx={{
