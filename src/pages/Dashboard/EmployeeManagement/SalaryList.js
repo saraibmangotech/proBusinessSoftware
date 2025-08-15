@@ -572,6 +572,26 @@ function SalaryList() {
 
       {/* Employee Multi-Select Dropdown with Search */}
       <Grid container xs={12} spacing={2}>
+         <Grid item xs={3}>
+          <Box sx={{ mb: 3 }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+              sx={{width:'100%'}}
+                views={["year", "month"]}
+                disabled={data?.length > 0}
+                label="Select Month & Year"
+                minDate={dayjs("2000-01-01")}
+                maxDate={dayjs("2100-12-31")}
+                value={selectedMonth}
+                onChange={(newValue) => {
+                  setSelectedMonth(new Date(newValue))
+                  console.log(newValue, "newValuenewValue")
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </LocalizationProvider>
+          </Box>
+        </Grid>
         <Grid item xs={3}>
           <Box sx={{ mb: 3 }}>
             <FormControl fullWidth>
@@ -826,25 +846,7 @@ function SalaryList() {
           </Box>
         </Grid>
 
-        <Grid item xs={6}>
-          <Box sx={{ mb: 3 }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                views={["year", "month"]}
-                disabled={data?.length > 0}
-                label="Select Month & Year"
-                minDate={dayjs("2000-01-01")}
-                maxDate={dayjs("2100-12-31")}
-                value={selectedMonth}
-                onChange={(newValue) => {
-                  setSelectedMonth(new Date(newValue))
-                  console.log(newValue, "newValuenewValue")
-                }}
-                renderInput={(params) => <TextField {...params} fullWidth />}
-              />
-            </LocalizationProvider>
-          </Box>
-        </Grid>
+       
       </Grid>
       <Box sx={{ width: "100%" }}>
         <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
