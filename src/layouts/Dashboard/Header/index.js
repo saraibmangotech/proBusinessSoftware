@@ -650,6 +650,240 @@ const [totalCount, setTotalCount] = useState(0)
       ])
 
     }
+    else if (user?.role_id == 1006) {
+      setNavigationData([
+        {
+          id: 2,
+          name: "Receptions",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/roles",
+          route: "/reception-list",
+          identifier: null,
+          navigation: true,
+
+        },
+
+        {
+          id: 2,
+          name: "Sales",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 33,
+              name: "Create  Sale Request",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/sales-receipt",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Sale Request List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/pre-sales",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: " Sale Settlement List",
+              icon: "customer",
+              parent_id: 12,
+              api: null,
+              route: "/sales-settlement-list",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+
+
+
+          ],
+        },
+        {
+          id: 9,
+          name: "Reports",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 33,
+              name: " Employee Service Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/snapshot-employee-service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Employee  Sales Summary Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/employee-sales-summary-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Employee Wise Sales Report",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "/employee-wise-sales-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+
+
+
+
+
+
+          ],
+        },
+        {
+          id: 22,
+          name: "HRMS",
+          icon: "customer",
+          parent_id: null,
+          api: "/api/customers",
+          route: "",
+          identifier: null,
+          navigation: true,
+          order_by: 2,
+          children: [
+
+            {
+              id: 13,
+              name: "Dashboard",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/employee-dashboard",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+            {
+              id: 13,
+              name: "Leave management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/leave-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+
+
+            {
+              id: 55,
+              name: "Attendance Report",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/attendance-report",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
+
+          ],
+        },
+        {
+          id: 13,
+          name: "Settings",
+          icon: "settings",
+          parent_id: null,
+          api: "/api/users",
+          route: "/user-list",
+          identifier: null,
+          navigation: true,
+          order_by: 13,
+          childRoute: [
+
+
+            {
+              id: 13,
+              name: "User management",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/users",
+              route: "/user-list",
+              identifier: null,
+              navigation: true,
+              order_by: 13,
+              childRoute: [],
+            },
+          ],
+          children: [
+
+
+            {
+              id: 14,
+              name: "Service Categories",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/category-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+            {
+              id: 14,
+              name: "Service Items",
+              icon: "customer",
+              parent_id: null,
+              api: "/api/roles",
+              route: "/service-list",
+              identifier: null,
+              navigation: true,
+              order_by: 14,
+              children: [],
+              childRoute: [],
+            },
+
+          ],
+        },
+
+
+      ])
+
+    }
     else if (user?.role_id == 5) {
       setNavigationData([
         // {
