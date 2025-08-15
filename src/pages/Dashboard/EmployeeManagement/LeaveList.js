@@ -1331,8 +1331,8 @@ function LeaveList() {
                                 setStatus2(value);
                                 getCustomerQueue(value)
                             }}
-                            error={errors?.status?.message}
-                            register={register("status", {
+                            error={errors?.status2?.message}
+                            register={register("status2", {
                                 required: "Please select status.",
                             })}
                         />
