@@ -376,7 +376,7 @@ console.log(params);
 																</Cell>
 
 																<Cell style={{ textAlign: 'left' }} className="pdf-table">
-																	{item?.system_default ?
+																	{!item?.system_default ?
 																		<Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
 																			{true &&  <Box component={'div'} onClick={() => {
 																				if(item?.name != 'Staff' || item?.name !='Customer' || item?.name !="Agent"){
