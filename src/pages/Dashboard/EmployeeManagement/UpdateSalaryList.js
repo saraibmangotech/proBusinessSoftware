@@ -102,6 +102,8 @@ function UpdateSalaryList() {
     const columnConfig = [
         { key: "employeeName", header: "Employee Name", type: "auto" },
         { key: "joinDate", header: "Join Date", type: "auto" },
+        { key: "division", header: "Division", type: "auto" },
+
         { key: "workingDays", header: "Working Days", type: "auto" },
         { key: "local", header: "Local/Non Local", type: "auto" },
         { key: "employeeId", header: "Employee ID", type: "auto" },
@@ -152,7 +154,7 @@ function UpdateSalaryList() {
         return {
             user_id: employee?.user_id,
             id: employee.id,
-            employeeName: employee.first_name + employee.last_name,
+            employeeName: employee.first_name,
             joinDate: moment(employee?.date_of_joining).format("DD-MM-YYYY"),
             workingDays: toFixed3(salary?.workingDays || 30),
             local: employee?.is_local ? "Local" : "Non Local",
@@ -309,9 +311,11 @@ function UpdateSalaryList() {
                 return {
                     user_id: salary?.user_id,
                     id: salary?.id,
-                    employeeName: employee?.first_name + " " + (employee?.last_name || ""),
+                    employeeName: employee?.first_name,
+                 division: employee?.user?.employee?.cost_center ? employee?.user?.employee?.cost_center : '-',
+                    workingDays: parseFloat(salary?.working_days || 0) ,
                     joinDate: moment(employee?.date_of_joining).format("DD-MM-YYYY"),
-                    workingDays: salary?.workingDays,
+
                     local: employee?.is_local ? "Local" : "Non Local",
                     employeeId: employee?.employee_code,
                     salaryPaid: Number.parseFloat(employee?.basic_salary) || 0,
