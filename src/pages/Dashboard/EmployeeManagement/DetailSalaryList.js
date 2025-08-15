@@ -709,7 +709,7 @@ function DetailSalaryList() {
                     user_id: salary?.user_id,
                     id: salary?.id,
                     employeeName: employee?.first_name,
-                    division: employee?.cost_center ? employee?.cost_center : '-',
+                    division: employee?.user?.employee?.cost_center ? employee?.user?.employee?.cost_center : '-',
                     workingDays: parseFloat(salary?.working_days || 0) ,
                     employeeId: employee?.employee_code,
                     joinDate: moment(salary?.employee?.date_of_joining).format("DD-MM-YYYY"),

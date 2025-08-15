@@ -312,7 +312,7 @@ function UpdateSalaryList() {
                     user_id: salary?.user_id,
                     id: salary?.id,
                     employeeName: employee?.first_name,
-                    division: employee?.cost_center ? employee?.cost_center : '-',
+                 division: employee?.user?.employee?.cost_center ? employee?.user?.employee?.cost_center : '-',
                     workingDays: parseFloat(salary?.working_days || 0) ,
                     joinDate: moment(employee?.date_of_joining).format("DD-MM-YYYY"),
 

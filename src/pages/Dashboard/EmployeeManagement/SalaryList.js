@@ -119,7 +119,7 @@ function SalaryList() {
   const columnConfig = [
     { key: "employeeName", header: "Employee Name", type: "auto" },
     { key: "joinDate", header: "Join Date", type: "auto" },
-     { key: "division", header: "Division", type: "auto" },
+    { key: "division", header: "Division", type: "auto" },
     { key: "working_days", header: "Working Days", type: "auto" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
     { key: "local", header: "Local/Non Local ", type: "auto" },
@@ -205,9 +205,9 @@ function SalaryList() {
       user_id: salary?.employee?.user_id,
       id: salary?.employee?.id,
       division: salary?.employee?.cost_center ? salary?.employee?.cost_center : '-',
-      employeeName: salary?.employee?.first_name ,
+      employeeName: salary?.employee?.first_name,
       joinDate: moment(salary?.employee?.date_of_joining).format("DD-MM-YYYY"),
-      working_days: parseFloat(salary?.totalDays)-parseFloat(salary?.absentDays),
+      working_days: parseFloat(salary?.totalDays) - parseFloat(salary?.absentDays),
       local: salary?.employee?.is_local ? "Local" : "Non Local",
       employeeId: salary.employee?.employee_code,
       remarks: salary.employee?.employee_code,
@@ -235,7 +235,7 @@ function SalaryList() {
       workPermit: salary?.employee?.work_permit,
       visa: salary?.employee?.visa,
       branch: salary?.employee?.branch,
-     
+
       minutesLate: toFixed3(salary?.totalShortMinutes),
       alDay: toFixed3(salary?.approvedLeaveDays),
     }
@@ -356,6 +356,7 @@ function SalaryList() {
         user_id: item.user_id,
         salary_paid: item.salaryPaid,
         commission: item.commission,
+        working_days: item.working_days,
         other_add: item.otherAdd,
         al: item.al,
         sl: item.sl,
@@ -574,11 +575,11 @@ function SalaryList() {
 
       {/* Employee Multi-Select Dropdown with Search */}
       <Grid container xs={12} spacing={2}>
-         <Grid item xs={3}>
+        <Grid item xs={3}>
           <Box sx={{ mb: 3 }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-              sx={{width:'100%'}}
+                sx={{ width: '100%' }}
                 views={["year", "month"]}
                 disabled={data?.length > 0}
                 label="Select Month & Year"
@@ -627,7 +628,7 @@ function SalaryList() {
                       <Chip
                         label={'All Selected'}
                         size="small"
-                        
+
                       />
                     </Box>}
                   </Box>
@@ -848,7 +849,7 @@ function SalaryList() {
           </Box>
         </Grid>
 
-       
+
       </Grid>
       <Box sx={{ width: "100%" }}>
         <TableContainer component={Paper} sx={{ maxHeight: 600, overflowX: "auto" }}>
