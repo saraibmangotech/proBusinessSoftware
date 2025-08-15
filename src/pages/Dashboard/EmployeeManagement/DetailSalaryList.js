@@ -710,7 +710,7 @@ function DetailSalaryList() {
                     id: salary?.id,
                     employeeName: employee?.first_name,
                     division: employee?.cost_center ? employee?.cost_center : '-',
-                    workingDays: parseFloat(salary?.totalDays || 0) - parseFloat(salary?.absentDays || 0),
+                    workingDays: parseFloat(salary?.working_days || 0) ,
                     employeeId: employee?.employee_code,
                     joinDate: moment(salary?.employee?.date_of_joining).format("DD-MM-YYYY"),
                
