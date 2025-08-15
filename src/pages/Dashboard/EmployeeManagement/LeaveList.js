@@ -129,6 +129,7 @@ function LeaveList() {
         getValues,
         reset,
     } = useForm();
+        const { register: register2, handleSubmit: handleSubmit2, formState: { errors: errors2 }, control: control2 } = useForm();
 
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Token Number.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
@@ -1331,8 +1332,8 @@ function LeaveList() {
                                 setStatus2(value);
                                 getCustomerQueue(value)
                             }}
-                            error={errors?.status2?.message}
-                            register={register("status2", {
+                            error={errors2?.status2?.message}
+                            register={register2("status2", {
                                 required: "Please select status.",
                             })}
                         />
