@@ -114,7 +114,7 @@ function CreateUser() {
         email: getValues('email'),
         phone: getValues('phone'),
         password: getValues('password'),
-        permittedCategories: selectedRole?.name == 'Typist' ? selectedCategoryObjects : null,
+        permittedCategories: (selectedRole?.id == 1006  || selectedRole?.id == 1003 )? selectedCategoryObjects : null,
         role_id: selectedRole?.id
       }
 
@@ -338,14 +338,14 @@ function CreateUser() {
             />
 
           </Grid>
-          {selectedRole?.name === 'Typist' && (
+          {(selectedRole?.id === 1003 || selectedRole?.id === 1006) && (
             <Grid item xs={12} sm={12}>
 
               <Typography variant="h5" gutterBottom>
                 Select Categories
               </Typography>
 
-              {selectedRole?.name === "Typist" && (
+              {(selectedRole?.id === 1003 || selectedRole?.id === 1006) && (
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={5}>
                     <FormGroup>

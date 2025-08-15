@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, IconButton, InputAdornment, Typography } from "@mui/material";
+import { Box, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Images, SvgIcon, SvgIcon as SvgIconss } from 'assets';
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -15,6 +15,7 @@ import SelectField from "components/Select";
 import UserServices from "services/User";
 import SystemServices from "services/System";
 import { encryptData } from "utils";
+import CustomerServices from "services/Customer";
 
 
 // function PasswordIcon(props) {
@@ -81,7 +82,7 @@ function UpdateUser() {
         id: state?.id,
         email: getValues('email'),
         phone: getValues('phone'),
-
+        permittedCategories: (selectedRole?.id == 1006 || selectedRole?.id == 1003) ? selectedCategoryObjects : null,
         role_id: selectedRole?.id
       }
 
@@ -143,7 +144,47 @@ function UpdateUser() {
       setLoading(false)
     }
   }
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [categories, setCategories] = useState([])
+  // *For Get Customer Queue
+  const getCategoryList = async (page, limit, filter) => {
+
+
+    try {
+
+      let params = {
+        page: 1,
+        limit: 999999,
+
+
+      }
+
+      const { data } = await CustomerServices.getCategoryList(params)
+      setCategories(data?.categories);
+
+
+
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
+
+  const selectedCategoryObjects = categories.filter((category) => selectedCategory.includes(category.id))
+
+  // Handle checkbox change
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory((prev) => {
+      if (prev.includes(categoryId)) {
+        // Remove if already selected
+        return prev.filter((id) => id !== categoryId)
+      } else {
+        // Add if not selected
+        return [...prev, categoryId]
+      }
+    })
+  }
   useEffect(() => {
+    getCategoryList()
     getRoles()
     if (state) {
       console.log(state);
@@ -164,7 +205,7 @@ function UpdateUser() {
           <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update User</Typography>
           <Box sx={{ display: 'flex', gap: '10px' }}>
             <PrimaryButton
-             bgcolor={'#001f3f'}
+              bgcolor={'#001f3f'}
               title="Save"
               type={'submit'}
               disabled={buttondisabled}
@@ -243,6 +284,38 @@ function UpdateUser() {
               })}
             />
           </Grid>
+          {(selectedRole?.id === 1003 || selectedRole?.id === 1006) && (
+            <Grid item xs={12} sm={12}>
+
+              <Typography variant="h5" gutterBottom>
+                Select Categories
+              </Typography>
+
+              {(selectedRole?.id === 1003 || selectedRole?.id === 1006) && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={5}>
+                    <FormGroup>
+                      {categories?.map((category) => (
+                        <FormControlLabel
+                          key={category.id}
+                          control={
+                            <Checkbox
+                              checked={selectedCategory?.includes(category.id)}
+                              onChange={() => handleCategoryChange(category.id)}
+                            />
+                          }
+                          label={category.name}
+                        />
+                      ))}
+                    </FormGroup>
+                  </Grid>
+
+
+                </Grid>
+              )}
+
+            </Grid>
+          )}
           {/* <Grid item xs={12} sm={5}>
 
             <InputField
