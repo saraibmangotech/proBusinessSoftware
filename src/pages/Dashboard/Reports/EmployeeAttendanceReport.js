@@ -331,6 +331,7 @@ function EmployeeAttendanceReport() {
             "Short Hours",
             "Excess Hours",
             "Worked Time",
+            "Remarks",
         ]
 
         const headerRow = worksheet.addRow(headers)
@@ -368,6 +369,7 @@ function EmployeeAttendanceReport() {
                 day.short_hours || 0,
                 day.excess_hours || 0,
                 day.worked_time || "N/A",
+                day.remarks || "N/A",
             ])
 
             // Add borders to all cells
@@ -634,6 +636,11 @@ function EmployeeAttendanceReport() {
             header: "Worked Time",
             accessorKey: "worked_time",
             cell: ({ row }) => <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>{row.original.worked_time || "N/A"}</Box>,
+        },
+        {
+            header: "Remarks",
+            accessorKey: "remarks",
+            cell: ({ row }) => <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>{row.original.remarks || "N/A"}</Box>,
         },
     ]
 

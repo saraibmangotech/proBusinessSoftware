@@ -25,6 +25,7 @@ import {
     Button,
     TablePagination, // Import TablePagination
 } from "@mui/material"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { v4 as uuidv4 } from "uuid" // For generating unique IDs
 import {
     Search as SearchIcon,
@@ -49,6 +50,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import dayjs from "dayjs"
 import { agencyType } from "utils"
 import { useAuth } from "context/UseContext"
+import InputField from "components/Input"
 const formatTime = (timeString) => {
     return timeString ? moment(timeString, "HH:mm").format("hh:mm A") : "--:--"
 }
@@ -137,85 +139,97 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
             </TableCell>
 
             {/* Attendance Days */}
-            {daysInMonth.map((day) => {
-                const dateStr = day.format("YYYY-MM-DD");
-                const isSunday = day.day() === 0;
-                console.log(employee.attendance[0], 'asdasd');
+          {daysInMonth.map((day) => {
+  const dateStr = day.format("YYYY-MM-DD");
+  const isSunday = day.day() === 0;
 
-                const dayAttendance = employee.attendance.find((att) => att.date === dateStr);
-                const status = dayAttendance?.status || "A";
-                const duration = dayAttendance?.duration || "0h 0m";
-                const logs = dayAttendance?.logs?.[0] || {};
-                const shift = dayAttendance?.shift_time
-                console.log(dayAttendance, 'shiftshift');
+  const dayAttendance = employee.attendance.find((att) => att.date === dateStr);
+  const status = dayAttendance?.status || "A";
+  const duration = dayAttendance?.duration || "0h 0m";
+  const remarks = dayAttendance?.logs?.[0]?.remarks;
+  const logs = dayAttendance?.logs?.[0] || {};
+  const shift = dayAttendance?.shift_time;
 
-                const { bg, border, color } = (logs.check_in && !logs.check_out) ? getStatusStyles('Pending') : getStatusStyles(status);
+  const { bg, border, color } =
+    logs.check_in && !logs.check_out
+      ? getStatusStyles("Pending")
+      : getStatusStyles(status);
 
-                return (
-                    <TableCell
-                        key={`${employee.id}-${dateStr}`}
-                        align="center"
-                        onClick={() => onCellClick(employee, dateStr, dayAttendance?.logs)}
-                        sx={{
-                            cursor: "pointer",
-                            p: 1,
-                        }}
-                    >
-                        <Tooltip title={`Duration: ${duration}`} arrow placement="top">
-                            <Box
-                                sx={{
-                                    width: 140,
-                                    height: 140,
-                                    py: 1,
-                                    px: 1.5,
-                                    borderRadius: "5px",
-                                    backgroundColor: bg,
-                                    border: border,
-                                    color: color,
-                                    fontSize: "0.75rem",
-                                    fontWeight: 500,
-                                    textAlign: "center",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 0.5,
-                                    transition: "all 0.2s",
-                                    "&:hover": {
-                                        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                                        transform: "scale(1.02)",
-                                    },
-                                }}
-                            >
+  return (
+    <TableCell
+      key={`${employee.id}-${dateStr}`}
+      align="center"
+      onClick={() => onCellClick(employee, dateStr, dayAttendance?.logs)}
+      sx={{
+        cursor: "pointer",
+        p: 1,
+      }}
+    >
+      <Tooltip title={`Duration: ${duration}`} arrow placement="top">
+        <Box
+          sx={{
+            width: 150,
+            height: 150,
+            py: 1,
+            px: 1.5,
+            borderRadius: "5px",
+            backgroundColor: bg,
+            border: border,
+            color: color,
+            fontSize: "0.75rem",
+            fontWeight: 500,
+            textAlign: "center",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 0.5,
+            transition: "all 0.2s",
+            "&:hover": {
+              boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+              transform: "scale(1.02)",
+            },
+          }}
+        >
+          <Box sx={{ fontWeight: 600 }}>{status}</Box>
+          <Box sx={{ fontWeight: 600 }}>{duration}</Box>
 
-                                <Box sx={{ fontWeight: 600 }}>{status}</Box>
-                                <Box sx={{ fontWeight: 600 }}>{duration}</Box>
-                                {status === "Present" && (
-                                    <>
-                                        <Box sx={{ fontSize: "0.7rem" }}>
-                                            In: {logs.check_in ? formatMinutesToTime(logs.check_in) : "--:--"}
-                                        </Box>
-                                        <Box sx={{ fontSize: "0.7rem" }}>
-                                            Out: {logs.check_out ? formatMinutesToTime(logs.check_out) : "--:--"}
-                                        </Box>
+          {status === "Present" && (
+            <>
+              <Box sx={{ fontSize: "0.7rem" }}>
+                In: {logs.check_in ? formatMinutesToTime(logs.check_in) : "--:--"}
+              </Box>
+              <Box sx={{ fontSize: "0.7rem" }}>
+                Out: {logs.check_out ? formatMinutesToTime(logs.check_out) : "--:--"}
+              </Box>
+            </>
+          )}
 
-                                    </>
-                                )}
-                                {status === "Present" && (
-                                    <>
-                                        <Box sx={{ fontSize: "0.7rem" }}>
-                                            Shift: {shift}
-                                        </Box>
+          {status === "Present" && (
+            <Box sx={{ fontSize: "0.7rem" }}>Shift: {shift}</Box>
+          )}
 
+          {/* Remarks Info Icon */}
+          {remarks && (
+            <Tooltip title={remarks} arrow placement="bottom">
+              <InfoOutlinedIcon
+                sx={{
+                  fontSize: "1rem",
+                  color: "#1976d2",
+                  cursor: "pointer",
+                  mt: 0.5,
+                  mb: 0.5,
+                }}
+              />
+            </Tooltip>
+          )}
+        </Box>
+      </Tooltip>
+    </TableCell>
+  );
+})}
 
-                                    </>
-                                )}
-                            </Box>
-                        </Tooltip>
-                    </TableCell>
-                );
-            })}
         </TableRow>
     )
 })
@@ -659,6 +673,7 @@ export default function AttendanceTable() {
                 user_id: selectedData?.id,
                 date: tableDate,
                 shifts: convertedShifts,
+                 remarks:getValues('remarks')
             }
             const promise = CustomerServices.markAttendance(obj)
             showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
@@ -688,6 +703,7 @@ export default function AttendanceTable() {
                 user_id: selectedData?.id,
                 date: tableDate,
                 shifts: [],
+                remarks:getValues('remarks')
             }
             const promise = CustomerServices.markAttendance(obj)
             showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
@@ -925,6 +941,19 @@ export default function AttendanceTable() {
                                     </Box>
                                 </Grid>
                             ))}
+                            <Grid item xs={12} sm={12}>
+                                <InputField
+                                    label={"Remarks"}
+                                    multiline
+                                    rows={5}
+                                    placeholder={"Remarks"}
+                                    error={errors?.remarks?.message}
+                                    register={register("remarks", {
+                                        required:
+                                            false
+                                    })}
+                                />
+                            </Grid>
                         </LocalizationProvider>
                         <Grid
                             item
@@ -1262,6 +1291,7 @@ export default function AttendanceTable() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
+                            {console.log(filteredData,'filteredDatafilteredData')}
                             {filteredData?.length > 0 ? (
                                 filteredData
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Apply pagination slice
