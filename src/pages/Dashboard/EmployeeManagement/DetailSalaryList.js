@@ -341,19 +341,23 @@ function DetailSalaryList() {
     // You will need to import these libraries:
 
 
- const downloadExcel = async () => {
+const downloadExcel = async () => {
   const workbook = new ExcelJS.Workbook()
   const worksheet = workbook.addWorksheet("Salary Details Report")
 
-  // Set professional header and footer
+  // Header & Footer
   worksheet.headerFooter.oddHeader =
     '&C&"Arial,Bold"&18SALARY DETAILS REPORT\n' +
     '&C&"Arial,Regular"&12Your Company Name\n' +
-    '&C&"Arial,Regular"&10Period: &D - &T\n' +
+    `&C&"Arial,Regular"&10Period: ${new Date().toLocaleDateString("en-GB", {
+      month: "long",
+      year: "numeric",
+    })}\n` +
     '&L&"Arial,Regular"&8Generated on: ' +
     new Date().toLocaleDateString() +
     "\n" +
     '&R&"Arial,Regular"&8Page &P of &N'
+
   worksheet.headerFooter.oddFooter =
     '&L&"Arial,Regular"&8Confidential - Internal Use Only' +
     '&C&"Arial,Regular"&8This report contains employee salary data as of ' +
@@ -362,47 +366,39 @@ function DetailSalaryList() {
     '&C&"Arial,Regular"&8Powered by Premium Business Solutions'
   worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
 
-  // Set page setup for professional printing
   worksheet.pageSetup = {
-    paperSize: 9, // A4
+    paperSize: 9,
     orientation: "landscape",
     fitToPage: true,
     fitToWidth: 1,
     fitToHeight: 0,
-    margins: {
-      left: 0.7,
-      right: 0.7,
-      top: 1.0,
-      bottom: 1.0,
-      header: 0.3,
-      footer: 0.3,
-    },
+    margins: { left: 0.7, right: 0.7, top: 1, bottom: 1, header: 0.3, footer: 0.3 },
   }
 
-  // Add title section at the top of the worksheet
-  const titleRow = worksheet.addRow(["SALARY DETAILS REPORT - EMPLOYEE WISE SALARY CALCULATION"])
-  titleRow.getCell(1).font = {
-    name: "Arial",
-    size: 16,
-    bold: true,
-    color: { argb: "2F4F4F" },
-  }
+  // Title Row
+  const titleRow = worksheet.addRow([
+    "SALARY DETAILS REPORT - EMPLOYEE WISE SALARY CALCULATION",
+  ])
+  titleRow.getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } }
   titleRow.getCell(1).alignment = { horizontal: "center" }
-  worksheet.mergeCells("A1:AD1") // Updated to merge across more columns
+  worksheet.mergeCells("A1:AD1")
 
-
-  const companyName =
-      agencyType[process.env.REACT_APP_TYPE]?.name
+  // Company Name
+  const companyName = agencyType[process.env.REACT_APP_TYPE]?.name
   const companyRow = worksheet.addRow([companyName])
-  companyRow.getCell(1).font = {
-    name: "Arial",
-    size: 14,
-    bold: true,
-    color: { argb: "4472C4" },
-  }
+  companyRow.getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } }
   companyRow.getCell(1).alignment = { horizontal: "center" }
-  worksheet.mergeCells("A2:AD2") // Updated to merge across more columns
+  worksheet.mergeCells("A2:AD2")
 
+  // 🔹 Salary Month Row (NEW)
+  const salaryMonthRow = worksheet.addRow([
+    `Salary Month: ${moment(data[0]?.employee_salary_month, "M").format("MMMM")}`,
+  ])
+  salaryMonthRow.getCell(1).font = { name: "Arial", size: 12, bold: true, color: { argb: "FF0000" } }
+  salaryMonthRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells(`A${salaryMonthRow.number}:AD${salaryMonthRow.number}`)
+
+  // Report Generated Row
   const dateRow = worksheet.addRow([
     `Report Generated: ${new Date().toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -415,61 +411,26 @@ function DetailSalaryList() {
       hour12: false,
     })}`,
   ])
-  dateRow.getCell(1).font = {
-    name: "Arial",
-    size: 10,
-    italic: true,
-    color: { argb: "666666" },
-  }
+  dateRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } }
   dateRow.getCell(1).alignment = { horizontal: "center" }
-  worksheet.mergeCells("A3:AD3") // Updated to merge across more columns
+  worksheet.mergeCells("A4:AD4")
 
-  // Add empty row for spacing
-  worksheet.addRow([])
+  worksheet.addRow([]) // spacing
 
+  // ===== HEADERS =====
   const headers = [
-    "Employee Name",
-    "Join Date",
-    "Division",
-    "Working Days",
-    "Local/Non Local",
-    "Employee ID",
-    "Salary Basic",
-    "Housing Allowance",
-    "Transport Allowance",
-    "Others",
-    "Salary Package",
-    "Commission",
-    "Other Add",
-    "AL/SL",
-    "Airfare",
-    "GPSSA",
-    "Staff Advance",
-    "Late Coming",
-    "Additional",
-    "Salary Deduction",
-    "Unpaid Deduction",
-    "Total pay",
-    "Commission Return",
-    "Net Salary",
-    "ROUTING CODE",
-    "SALARY IBAN",
-    "WORK PERMIT",
-    "Visa",
-    "BRANCH",
-    "Remarks",
-    "Minutes Late",
-    "AL Day",
+    "Employee Name", "Join Date", "Division", "Working Days", "Local/Non Local", "Employee ID",
+    "Salary Basic", "Housing Allowance", "Transport Allowance", "Others", "Salary Package",
+    "Commission", "Other Add", "AL/SL", "Airfare", "GPSSA", "Staff Advance", "Late Coming",
+    "Additional", "Salary Deduction", "Unpaid Deduction", "Total pay", "Commission Return",
+    "Net Salary", "ROUTING CODE", "SALARY IBAN", "WORK PERMIT", "Visa", "BRANCH",
+    "Remarks", "Minutes Late", "AL Day",
   ]
 
   const headerRow = worksheet.addRow(headers)
   headerRow.eachCell((cell) => {
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "808080" }, // Gray
-    }
-    cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "808080" } }
+    cell.font = { bold: true, color: { argb: "FFFFFF" } }
     cell.alignment = { horizontal: "center", vertical: "middle" }
     cell.border = {
       top: { style: "thin", color: { argb: "000000" } },
@@ -479,72 +440,29 @@ function DetailSalaryList() {
     }
   })
 
-  // Grand totals initialization - Added totals for all numerical columns
-  let grandTotalBasicSalary = 0
-  let grandTotalHousingAllowance = 0
-  let grandTotalTransportAllowance = 0
-  let grandTotalOtherAllowance = 0
-  let grandTotalSalaryPackage = 0
-  let grandTotalCommission = 0
-  let grandTotalOtherAdd = 0
-  let grandTotalAl = 0
-  let grandTotalArrear = 0
-  let grandTotalGpssaEmp = 0
-  let grandTotalStaffAdvance = 0
-  let grandTotalLateComm = 0
-  let grandTotalAdditional = 0
-  let grandTotalSalaryDeduction = 0
-  let grandTotalUnpaidLeave = 0
-  let grandTotalTotalPay = 0
-  let grandTotalCommissionFinal = 0
-  let grandTotalNetSalary = 0
-  console.log(data, "datadata")
+  // ===== DATA ROWS + TOTALS =====
+  let grandTotalBasicSalary = 0, grandTotalHousingAllowance = 0, grandTotalTransportAllowance = 0,
+      grandTotalOtherAllowance = 0, grandTotalSalaryPackage = 0, grandTotalCommission = 0,
+      grandTotalOtherAdd = 0, grandTotalAl = 0, grandTotalArrear = 0, grandTotalGpssaEmp = 0,
+      grandTotalStaffAdvance = 0, grandTotalLateComm = 0, grandTotalAdditional = 0,
+      grandTotalSalaryDeduction = 0, grandTotalUnpaidLeave = 0, grandTotalTotalPay = 0,
+      grandTotalCommissionFinal = 0, grandTotalNetSalary = 0
 
   data?.forEach((row) => {
     const rowData = [
-      row.employeeName,
-      row.joinDate, // Added Join Date
-      row.division, // Added Working Days
-      row.workingDays, // Added Working Days
-
-      row.local, // Added Local/Non Local
-      row.employeeId,
-      row.salaryPaid,
-      row.housing_allowance || 0,
-      row.transport_allowance || 0,
-      row.other_allowance || 0,
-      row.salaryPackage || 0,
-      row.commission,
-      row.otherAdd,
-      row.al,
-      row.arrear,
-      row.gpssaEmp,
-      row.staffAdvance,
-      row.lateComm,
-      row.additional,
-      row.salaryDeduction,
-      row.unpaidLeave,
-      row.totalPay,
-      row.commissionFinal,
-      row.netSalary,
-      row.routingCode,
-      row.salaryIban,
-      row.workPermit,
-      row.visa,
-      row.branch,
-      row.remark,
-      row.minutesLate,
-      row.alDay,
+      row.employeeName, row.joinDate, row.division, row.workingDays,
+      row.local, row.employeeId, row.salaryPaid, row.housing_allowance || 0,
+      row.transport_allowance || 0, row.other_allowance || 0, row.salaryPackage || 0,
+      row.commission, row.otherAdd, row.al, row.arrear, row.gpssaEmp,
+      row.staffAdvance, row.lateComm, row.additional, row.salaryDeduction,
+      row.unpaidLeave, row.totalPay, row.commissionFinal, row.netSalary,
+      row.routingCode, row.salaryIban, row.workPermit, row.visa, row.branch,
+      row.remark, row.minutesLate, row.alDay,
     ]
     const excelRow = worksheet.addRow(rowData)
 
-    // Format numerical columns (adjusted for new column positions)
-    // These correspond to columns 6 to 23 (Excel 1-indexed) - adjusted for new columns
-    for (let i = 5; i <= 22; i++) {
-      excelRow.getCell(i + 1).numFmt = "#,##0.00"
-    }
+    for (let i = 6; i <= 23; i++) excelRow.getCell(i + 1).numFmt = "#,##0.00"
 
-    // Add borders to all cells
     excelRow.eachCell((cell) => {
       cell.border = {
         top: { style: "thin", color: { argb: "000000" } },
@@ -555,69 +473,38 @@ function DetailSalaryList() {
       cell.alignment = { horizontal: "center", vertical: "middle" }
     })
 
-    grandTotalBasicSalary += Number.parseFloat(row.salaryPaid) || 0
-    grandTotalHousingAllowance += Number.parseFloat(row.housing_allowance) || 0
-    grandTotalTransportAllowance += Number.parseFloat(row.transport_allowance) || 0
-    grandTotalOtherAllowance += Number.parseFloat(row.other_allowance) || 0
-    grandTotalSalaryPackage += Number.parseFloat(row.salaryPackage) || 0
-    grandTotalCommission += Number.parseFloat(row.commission) || 0
-    grandTotalOtherAdd += Number.parseFloat(row.otherAdd) || 0
-    grandTotalAl += Number.parseFloat(row.al) || 0
-    grandTotalArrear += Number.parseFloat(row.arrear) || 0
-    grandTotalGpssaEmp += Number.parseFloat(row.gpssaEmp) || 0
-    grandTotalStaffAdvance += Number.parseFloat(row.staffAdvance) || 0
-    grandTotalLateComm += Number.parseFloat(row.lateComm) || 0
-    grandTotalAdditional += Number.parseFloat(row.additional) || 0
-    grandTotalSalaryDeduction += Number.parseFloat(row.salaryDeduction) || 0
-    grandTotalUnpaidLeave += Number.parseFloat(row.unpaidLeave) || 0
-    grandTotalTotalPay += Number.parseFloat(row.totalPay) || 0
-    grandTotalCommissionFinal += Number.parseFloat(row.commissionFinal) || 0
-    grandTotalNetSalary += Number.parseFloat(row.netSalary) || 0
+    grandTotalBasicSalary += Number(row.salaryPaid) || 0
+    grandTotalHousingAllowance += Number(row.housing_allowance) || 0
+    grandTotalTransportAllowance += Number(row.transport_allowance) || 0
+    grandTotalOtherAllowance += Number(row.other_allowance) || 0
+    grandTotalSalaryPackage += Number(row.salaryPackage) || 0
+    grandTotalCommission += Number(row.commission) || 0
+    grandTotalOtherAdd += Number(row.otherAdd) || 0
+    grandTotalAl += Number(row.al) || 0
+    grandTotalArrear += Number(row.arrear) || 0
+    grandTotalGpssaEmp += Number(row.gpssaEmp) || 0
+    grandTotalStaffAdvance += Number(row.staffAdvance) || 0
+    grandTotalLateComm += Number(row.lateComm) || 0
+    grandTotalAdditional += Number(row.additional) || 0
+    grandTotalSalaryDeduction += Number(row.salaryDeduction) || 0
+    grandTotalUnpaidLeave += Number(row.unpaidLeave) || 0
+    grandTotalTotalPay += Number(row.totalPay) || 0
+    grandTotalCommissionFinal += Number(row.commissionFinal) || 0
+    grandTotalNetSalary += Number(row.netSalary) || 0
   })
 
   const grandTotalRow = worksheet.addRow([
-    "GRAND TOTAL",
-    "", // Join Date (empty)
-    "", // Division (empty)
-    "", // Working Days (empty)
-    "", // Local/Non Local (empty)
-    `${data?.length} Total Employees`,
-    grandTotalBasicSalary, // Salary Basic
-    grandTotalHousingAllowance, // Housing Allowance
-    grandTotalTransportAllowance, // Transport Allowance
-    grandTotalOtherAllowance, // Others
-    grandTotalSalaryPackage, // Salary Package
-    grandTotalCommission, // Commission
-    grandTotalOtherAdd, // Other Add
-    grandTotalAl, // AL/SL
-    grandTotalArrear, // Airfare
-    grandTotalGpssaEmp, // GPSSA
-    grandTotalStaffAdvance, // Staff Advance
-    grandTotalLateComm, // Late Coming
-    grandTotalAdditional, // Additional
-    grandTotalSalaryDeduction, // Salary Deduction
-    grandTotalUnpaidLeave, // Unpaid Deduction
-    grandTotalTotalPay, // Total Pay
-    grandTotalCommissionFinal, // Commission Return
-    grandTotalNetSalary, // Net Salary
-    "", // ROUTING CODE (empty)
-    "", // SALARY IBAN (empty)
-    "", // WORK PERMIT (empty)
-    "", // Visa (empty)
-    "", // BRANCH (empty)
-    "", // Remarks (empty)
-    "", // Minutes Late (empty)
-    "", // AL Day (empty)
+    "GRAND TOTAL", "", "", "", "", `${data?.length} Total Employees`,
+    grandTotalBasicSalary, grandTotalHousingAllowance, grandTotalTransportAllowance,
+    grandTotalOtherAllowance, grandTotalSalaryPackage, grandTotalCommission, grandTotalOtherAdd,
+    grandTotalAl, grandTotalArrear, grandTotalGpssaEmp, grandTotalStaffAdvance, grandTotalLateComm,
+    grandTotalAdditional, grandTotalSalaryDeduction, grandTotalUnpaidLeave, grandTotalTotalPay,
+    grandTotalCommissionFinal, grandTotalNetSalary, "", "", "", "", "", "", "", "",
   ])
 
-  // Format grand total row
   grandTotalRow.eachCell((cell, colNumber) => {
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "000000" }, // Black
-    }
-    cell.font = { bold: true, color: { argb: "FFFFFF" } } // White bold
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "000000" } }
+    cell.font = { bold: true, color: { argb: "FFFFFF" } }
     cell.alignment = { horizontal: "center", vertical: "middle" }
     cell.border = {
       top: { style: "thick", color: { argb: "000000" } },
@@ -625,58 +512,23 @@ function DetailSalaryList() {
       bottom: { style: "thick", color: { argb: "000000" } },
       right: { style: "thick", color: { argb: "000000" } },
     }
-    if (colNumber >= 7 && colNumber <= 24) {
-      cell.numFmt = "#,##0.00"
-    }
+    if (colNumber >= 7 && colNumber <= 24) cell.numFmt = "#,##0.00"
   })
 
   worksheet.columns = [
-    { width: 25 }, // Employee Name
-    { width: 15 }, // Join Date
-    { width: 15 }, // Division
-    { width: 15 }, // Working Days
-    { width: 18 }, // Local/Non Local
-    { width: 15 }, // Employee ID
-    { width: 15 }, // Salary Basic
-    { width: 18 }, // Housing Allowance
-    { width: 18 }, // Transport Allowance
-    { width: 12 }, // Others
-    { width: 18 }, // Salary Package
-    { width: 15 }, // Commission
-    { width: 12 }, // Other Add
-    { width: 10 }, // AL/SL
-    { width: 10 }, // Airfare
-    { width: 10 }, // GPSSA
-    { width: 15 }, // Staff Advance
-    { width: 15 }, // Late Coming
-    { width: 12 }, // Additional
-    { width: 18 }, // Salary Deduction
-    { width: 18 }, // Unpaid Deduction
-    { width: 15 }, // Total pay
-    { width: 18 }, // Commission Return
-    { width: 15 }, // Net Salary
-    { width: 18 }, // ROUTING CODE
-    { width: 18 }, // SALARY IBAN
-    { width: 18 }, // WORK PERMIT
-    { width: 10 }, // Visa
-    { width: 12 }, // BRANCH
-    { width: 15 }, // Remarks
-    { width: 15 }, // Minutes Late
-    { width: 10 }, // AL Day
+    { width: 25 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 18 }, { width: 15 },
+    { width: 15 }, { width: 18 }, { width: 18 }, { width: 12 }, { width: 18 }, { width: 15 },
+    { width: 12 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 15 }, { width: 15 },
+    { width: 12 }, { width: 18 }, { width: 18 }, { width: 15 }, { width: 18 }, { width: 15 },
+    { width: 18 }, { width: 18 }, { width: 18 }, { width: 10 }, { width: 12 }, { width: 15 },
+    { width: 15 }, { width: 10 },
   ]
 
-  // Add empty rows for spacing before footer
   worksheet.addRow([])
   worksheet.addRow([])
 
-  // Add the electronic generated report text with black border as requested
   const reportRow = worksheet.addRow(["This is electronically generated report"])
-  reportRow.getCell(1).font = {
-    name: "Arial",
-    size: 12,
-    bold: false,
-    color: { argb: "000000" },
-  }
+  reportRow.getCell(1).font = { name: "Arial", size: 12, color: { argb: "000000" } }
   reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
   reportRow.getCell(1).border = {
     top: { style: "medium", color: { argb: "000000" } },
@@ -684,22 +536,15 @@ function DetailSalaryList() {
     bottom: { style: "medium", color: { argb: "000000" } },
     right: { style: "medium", color: { argb: "000000" } },
   }
-  worksheet.mergeCells(`A${reportRow.number}:AD${reportRow.number}`) // Updated merge range
+  worksheet.mergeCells(`A${reportRow.number}:AD${reportRow.number}`)
 
-  // Add empty row for spacing
   worksheet.addRow([])
 
   const system2 = worksheet.addRow(["Powered By: MangotechDevs.ae"])
-  system2.getCell(1).font = {
-    name: "Arial",
-    size: 10,
-    italic: true,
-    color: { argb: "666666" },
-  }
+  system2.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } }
   system2.getCell(1).alignment = { horizontal: "center" }
-  worksheet.mergeCells(`A${system2.number}:AD${system2.number}`) // Updated merge range
+  worksheet.mergeCells(`A${system2.number}:AD${system2.number}`)
 
-  // Add empty row for spacing
   worksheet.addRow([])
 
   const buffer = await workbook.xlsx.writeBuffer()
@@ -709,14 +554,12 @@ function DetailSalaryList() {
   saveAs(
     blob,
     `Salary_Details_Report_${new Date()
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
+      .toLocaleDateString("en-GB", { month: "long", year: "numeric" })
       .replace(/\//g, "-")}.xlsx`,
   )
 }
+
+
 
 
 
@@ -747,6 +590,7 @@ const getData = async () => {
         user_id: salary?.user_id,
         id: salary?.id,
         employeeName: employee?.first_name,
+        employee_salary_month:salary?.employee_salary?.month,
         division: employee?.cost_center ? employee?.cost_center : "-",
         workingDays: parseFloat(salary?.working_days || 0),
         employeeId: employee?.employee_code,
