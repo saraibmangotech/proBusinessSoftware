@@ -41,6 +41,7 @@ import { PrimaryButton } from "components/Buttons"
 import UserServices from "services/User"
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { agencyType } from "utils"
 // *For Table Style
 const Cell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -389,7 +390,9 @@ function DetailSalaryList() {
   titleRow.getCell(1).alignment = { horizontal: "center" }
   worksheet.mergeCells("A1:AD1") // Updated to merge across more columns
 
-  const companyName = "PREMIUM BUSINESSMEN SERVICES" // Hardcoded company name
+
+  const companyName =
+      agencyType[process.env.REACT_APP_TYPE]?.name
   const companyRow = worksheet.addRow([companyName])
   companyRow.getCell(1).font = {
     name: "Arial",

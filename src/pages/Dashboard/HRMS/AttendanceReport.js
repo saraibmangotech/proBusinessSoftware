@@ -139,96 +139,96 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
             </TableCell>
 
             {/* Attendance Days */}
-          {daysInMonth.map((day) => {
-  const dateStr = day.format("YYYY-MM-DD");
-  const isSunday = day.day() === 0;
+            {daysInMonth.map((day) => {
+                const dateStr = day.format("YYYY-MM-DD");
+                const isSunday = day.day() === 0;
 
-  const dayAttendance = employee.attendance.find((att) => att.date === dateStr);
-  const status = dayAttendance?.status || "A";
-  const duration = dayAttendance?.duration || "0h 0m";
-  const remarks = dayAttendance?.logs?.[0]?.remarks;
-  const logs = dayAttendance?.logs?.[0] || {};
-  const shift = dayAttendance?.shift_time;
+                const dayAttendance = employee.attendance.find((att) => att.date === dateStr);
+                const status = dayAttendance?.status || "A";
+                const duration = dayAttendance?.duration || "0h 0m";
+                const remarks = dayAttendance?.logs?.[0]?.remarks;
+                const logs = dayAttendance?.logs?.[0] || {};
+                const shift = dayAttendance?.shift_time;
 
-  const { bg, border, color } =
-    logs.check_in && !logs.check_out
-      ? getStatusStyles("Pending")
-      : getStatusStyles(status);
+                const { bg, border, color } =
+                    logs.check_in && !logs.check_out
+                        ? getStatusStyles("Pending")
+                        : getStatusStyles(status);
 
-  return (
-    <TableCell
-      key={`${employee.id}-${dateStr}`}
-      align="center"
-      onClick={() => onCellClick(employee, dateStr, dayAttendance?.logs)}
-      sx={{
-        cursor: "pointer",
-        p: 1,
-      }}
-    >
-      <Tooltip title={`Duration: ${duration}`} arrow placement="top">
-        <Box
-          sx={{
-            width: 150,
-            height: 150,
-            py: 1,
-            px: 1.5,
-            borderRadius: "5px",
-            backgroundColor: bg,
-            border: border,
-            color: color,
-            fontSize: "0.75rem",
-            fontWeight: 500,
-            textAlign: "center",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 0.5,
-            transition: "all 0.2s",
-            "&:hover": {
-              boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-              transform: "scale(1.02)",
-            },
-          }}
-        >
-          <Box sx={{ fontWeight: 600 }}>{status}</Box>
-          <Box sx={{ fontWeight: 600 }}>{duration}</Box>
+                return (
+                    <TableCell
+                        key={`${employee.id}-${dateStr}`}
+                        align="center"
+                        onClick={() => onCellClick(employee, dateStr, dayAttendance?.logs)}
+                        sx={{
+                            cursor: "pointer",
+                            p: 1,
+                        }}
+                    >
+                        <Tooltip title={`Duration: ${duration}`} arrow placement="top">
+                            <Box
+                                sx={{
+                                    width: 150,
+                                    height: 150,
+                                    py: 1,
+                                    px: 1.5,
+                                    borderRadius: "5px",
+                                    backgroundColor: bg,
+                                    border: border,
+                                    color: color,
+                                    fontSize: "0.75rem",
+                                    fontWeight: 500,
+                                    textAlign: "center",
+                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: 0.5,
+                                    transition: "all 0.2s",
+                                    "&:hover": {
+                                        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                                        transform: "scale(1.02)",
+                                    },
+                                }}
+                            >
+                                <Box sx={{ fontWeight: 600 }}>{status}</Box>
+                                <Box sx={{ fontWeight: 600 }}>{duration}</Box>
 
-          {status === "Present" && (
-            <>
-              <Box sx={{ fontSize: "0.7rem" }}>
-                In: {logs.check_in ? formatMinutesToTime(logs.check_in) : "--:--"}
-              </Box>
-              <Box sx={{ fontSize: "0.7rem" }}>
-                Out: {logs.check_out ? formatMinutesToTime(logs.check_out) : "--:--"}
-              </Box>
-            </>
-          )}
+                                {status === "Present" && (
+                                    <>
+                                        <Box sx={{ fontSize: "0.7rem" }}>
+                                            In: {logs.check_in ? formatMinutesToTime(logs.check_in) : "--:--"}
+                                        </Box>
+                                        <Box sx={{ fontSize: "0.7rem" }}>
+                                            Out: {logs.check_out ? formatMinutesToTime(logs.check_out) : "--:--"}
+                                        </Box>
+                                    </>
+                                )}
 
-          {status === "Present" && (
-            <Box sx={{ fontSize: "0.7rem" }}>Shift: {shift}</Box>
-          )}
+                                {status === "Present" && (
+                                    <Box sx={{ fontSize: "0.7rem" }}>Shift: {shift}</Box>
+                                )}
 
-          {/* Remarks Info Icon */}
-          {remarks && (
-            <Tooltip title={remarks} arrow placement="bottom">
-              <InfoOutlinedIcon
-                sx={{
-                  fontSize: "1rem",
-                  color: "#1976d2",
-                  cursor: "pointer",
-                  mt: 0.5,
-                  mb: 0.5,
-                }}
-              />
-            </Tooltip>
-          )}
-        </Box>
-      </Tooltip>
-    </TableCell>
-  );
-})}
+                                {/* Remarks Info Icon */}
+                                {remarks && (
+                                    <Tooltip title={remarks} arrow placement="bottom">
+                                        <InfoOutlinedIcon
+                                            sx={{
+                                                fontSize: "1rem",
+                                                color: "#1976d2",
+                                                cursor: "pointer",
+                                                mt: 0.5,
+                                                mb: 0.5,
+                                            }}
+                                        />
+                                    </Tooltip>
+                                )}
+                            </Box>
+                        </Tooltip>
+                    </TableCell>
+                );
+            })}
 
         </TableRow>
     )
@@ -301,10 +301,9 @@ export default function AttendanceTable() {
         titleRow.getCell(5).alignment = { horizontal: "center" }
         worksheet.mergeCells("E1:L1")
         // Company Name
+
         const name =
-            agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-                ? "PREMIUM BUSINESSMEN SERVICES"
-                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+            agencyType[process.env.REACT_APP_TYPE]?.name
         const companyRow = worksheet.addRow([])
         companyRow.getCell(5).value = name
         companyRow.getCell(5).font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } }
@@ -673,7 +672,7 @@ export default function AttendanceTable() {
                 user_id: selectedData?.id,
                 date: tableDate,
                 shifts: convertedShifts,
-                 remarks:getValues('remarks')
+                remarks: getValues('remarks')
             }
             const promise = CustomerServices.markAttendance(obj)
             showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
@@ -703,7 +702,7 @@ export default function AttendanceTable() {
                 user_id: selectedData?.id,
                 date: tableDate,
                 shifts: [],
-                remarks:getValues('remarks')
+                remarks: getValues('remarks')
             }
             const promise = CustomerServices.markAttendance(obj)
             showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
@@ -1291,7 +1290,7 @@ export default function AttendanceTable() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {console.log(filteredData,'filteredDatafilteredData')}
+                            {console.log(filteredData, 'filteredDatafilteredData')}
                             {filteredData?.length > 0 ? (
                                 filteredData
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Apply pagination slice

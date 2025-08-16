@@ -317,4 +317,15 @@ export let agencyType = {
     category: "AL-AHDEED",
     name:'PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC'
   },
+  "PCSS":{
+    imageUrl: Images.headerCenterLogoPCSS,
+    category: "PCSS",
+    name:'PREMIUM CLAIM SETTLEMENT SERVICES LLC'
+  },
+  "PGS":{
+    imageUrl: Images.headerCenterLogoPGS,
+    category: "PGS",
+    name:'PREMIUM GOVERNMENT SERVICES LLC'
+  },
+  
 }

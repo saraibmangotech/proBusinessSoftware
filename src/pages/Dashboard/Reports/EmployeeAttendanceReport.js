@@ -15,6 +15,7 @@ import SystemServices from "services/System"
 import CustomerServices from "services/Customer"
 import DatePicker from "components/DatePicker"
 import { useAuth } from "context/UseContext"
+import { agencyType } from "utils"
 
 // Mock data based on your API structure
 const mockData = {
@@ -265,10 +266,9 @@ function EmployeeAttendanceReport() {
         worksheet.mergeCells("A1:J1")
 
         // Dynamic company name based on environment
-        const name =
-            process.env.REACT_APP_TYPE === "TASHEEL"
-                ? "PREMIUM BUSINESSMEN SERVICES"
-                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+ 
+   const name =
+       agencyType[process.env.REACT_APP_TYPE]?.name
 
         const companyRow = worksheet.addRow([name])
         companyRow.getCell(1).font = {
