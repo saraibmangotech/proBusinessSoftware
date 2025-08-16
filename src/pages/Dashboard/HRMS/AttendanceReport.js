@@ -296,7 +296,7 @@ export default function AttendanceTable() {
         }
         // Title
         const titleRow = worksheet.addRow([])
-        titleRow.getCell(5).value = "TRIAL BALANCE REPORT"
+        titleRow.getCell(5).value = "ATTENDANCE REPORT"
         titleRow.getCell(5).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } }
         titleRow.getCell(5).alignment = { horizontal: "center" }
         worksheet.mergeCells("E1:L1")
