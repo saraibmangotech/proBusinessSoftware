@@ -233,6 +233,7 @@ function Dashboard() {
   const { user } = useAuth()
   const { getStorageItem } = Storage()
   const [employeeDetail, setEmployeeDetail] = useState(null)
+  const [employeeDetail2, setEmployeeDetail2] = useState(null)
   const userJourney = getStorageItem("journey")
   const [renderState, setRenderState] = useState(false)
   const [stepperLabel, setStepperLabel] = useState([])
@@ -247,11 +248,11 @@ function Dashboard() {
         ? "Cashier"
         : user?.role_id == 1003
           ? "Typist"
-            : user?.role_id == 1006
-          ? "Typist Reception"
-          : user?.role_id == 6
-            ? "HR"
-            : "",
+          : user?.role_id == 1006
+            ? "Typist Reception"
+            : user?.role_id == 6
+              ? "HR"
+              : "",
   )
   const [shift, setShift] = useState(null)
   const [employeeAttendance, setEmployeeAttendance] = useState(null)
@@ -575,10 +576,30 @@ function Dashboard() {
       showErrorToast(error)
     }
   }
+    const getEmployeeDetail = async (id) => {
+  
+  
+      try {
+        let params = { user_id: user?.id}
+  
+  
+        const { data } = await CustomerServices.getLeaveDetail(params)
+        console.log(data);
+        setEmployeeDetail2(data?.leaves)
+  
+  
+  
+      } catch (error) {
+        showErrorToast(error)
+      } finally {
+        // setLoader(false)
+      }
+    }
   useEffect(() => {
     getHRStats()
     getStats()
     getData()
+    getEmployeeDetail()
   }, [])
 
   const onPieEnter = (_, index) => {
@@ -658,144 +679,144 @@ function Dashboard() {
               </Typography>
 
               <Grid container spacing={3} sx={{ mb: 4 }}>
-  {/* Employee Birthdays */}
-  <Grid item xs={12} md={4}>
-    <Card sx={{ p: 3, borderRadius: 3, height: 400, display: "flex", flexDirection: "column" }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <CakeIcon sx={{ color: "#9C27B0", mr: 1 }} />
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          Employee Birthdays
-        </Typography>
-      </Box>
-      <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
-        Celebrate our team members' special days this month!
-      </Typography>
+                {/* Employee Birthdays */}
+                <Grid item xs={12} md={4}>
+                  <Card sx={{ p: 3, borderRadius: 3, height: 400, display: "flex", flexDirection: "column" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <CakeIcon sx={{ color: "#9C27B0", mr: 1 }} />
+                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                        Employee Birthdays
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
+                      Celebrate our team members' special days this month!
+                    </Typography>
 
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
-        {hrStats.birthdays?.map((birthday, index) => (
-          <Box
-            key={index}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              mb: 2,
-              p: 2,
-              backgroundColor: "#f8f9fa",
-              borderRadius: 2,
-            }}
-          >
-            <Avatar sx={{ width: 40, height: 40, mr: 2, bgcolor: "#9C27B0" }}>
-              {birthday.name?.charAt(0)}
-            </Avatar>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                {birthday.name}
-              </Typography>
-              <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                {birthday.department} • {birthday.designation}
-              </Typography>
-              <Typography variant="caption" sx={{ display: "block", color: "#9C27B0" }}>
-                Aug {birthday.dob_day}
-              </Typography>
-            </Box>
-          </Box>
-        ))}
-      </Box>
+                    <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
+                      {hrStats.birthdays?.map((birthday, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mb: 2,
+                            p: 2,
+                            backgroundColor: "#f8f9fa",
+                            borderRadius: 2,
+                          }}
+                        >
+                          <Avatar sx={{ width: 40, height: 40, mr: 2, bgcolor: "#9C27B0" }}>
+                            {birthday.name?.charAt(0)}
+                          </Avatar>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                              {birthday.name}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                              {birthday.department} • {birthday.designation}
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: "block", color: "#9C27B0" }}>
+                              Aug {birthday.dob_day}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
 
-      <Box sx={{ textAlign: "center", mt: 2, p: 2, backgroundColor: "#f3e5f5", borderRadius: 2 }}>
-        <Typography variant="body2" sx={{ color: "#9C27B0" }}>
-          {hrStats.birthdays?.length || 0} birthday
-          {hrStats.birthdays?.length !== 1 ? "s" : ""} this month
-        </Typography>
-      </Box>
-    </Card>
-  </Grid>
+                    <Box sx={{ textAlign: "center", mt: 2, p: 2, backgroundColor: "#f3e5f5", borderRadius: 2 }}>
+                      <Typography variant="body2" sx={{ color: "#9C27B0" }}>
+                        {hrStats.birthdays?.length || 0} birthday
+                        {hrStats.birthdays?.length !== 1 ? "s" : ""} this month
+                      </Typography>
+                    </Box>
+                  </Card>
+                </Grid>
 
-  {/* Probation Periods */}
-  <Grid item xs={12} md={4}>
-    <Card sx={{ p: 3, borderRadius: 3, height: 400, display: "flex", flexDirection: "column" }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <AssignmentIcon sx={{ color: "#FF9800", mr: 1 }} />
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          Probation Periods
-        </Typography>
-      </Box>
-      <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
-        Track upcoming evaluations to ensure timely feedback.
-      </Typography>
+                {/* Probation Periods */}
+                <Grid item xs={12} md={4}>
+                  <Card sx={{ p: 3, borderRadius: 3, height: 400, display: "flex", flexDirection: "column" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <AssignmentIcon sx={{ color: "#FF9800", mr: 1 }} />
+                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                        Probation Periods
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
+                      Track upcoming evaluations to ensure timely feedback.
+                    </Typography>
 
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
-        {hrStats.probations?.map((probation, index) => (
-          <Box key={index} sx={{ mb: 2, p: 2, backgroundColor: "#fff3e0", borderRadius: 2 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
-              {probation.name}
-            </Typography>
-            <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>
-              {probation.department} • {probation.designation}
-            </Typography>
-            <Typography variant="caption" sx={{ color: "#FF9800", display: "block" }}>
-              Ends: {new Date(probation.probation_end_date).toLocaleDateString()}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
+                    <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
+                      {hrStats.probations?.map((probation, index) => (
+                        <Box key={index} sx={{ mb: 2, p: 2, backgroundColor: "#fff3e0", borderRadius: 2 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
+                            {probation.name}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>
+                            {probation.department} • {probation.designation}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#FF9800", display: "block" }}>
+                            Ends: {new Date(probation.probation_end_date).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
 
-      <Box sx={{ textAlign: "center", mt: 2, p: 2, backgroundColor: "#fff3e0", borderRadius: 2 }}>
-        <Typography variant="body2" sx={{ color: "#FF9800" }}>
-          {hrStats.probations?.length || 0} evaluation
-          {hrStats.probations?.length !== 1 ? "s" : ""} due
-        </Typography>
-      </Box>
-    </Card>
-  </Grid>
+                    <Box sx={{ textAlign: "center", mt: 2, p: 2, backgroundColor: "#fff3e0", borderRadius: 2 }}>
+                      <Typography variant="body2" sx={{ color: "#FF9800" }}>
+                        {hrStats.probations?.length || 0} evaluation
+                        {hrStats.probations?.length !== 1 ? "s" : ""} due
+                      </Typography>
+                    </Box>
+                  </Card>
+                </Grid>
 
-  {/* Work Anniversaries */}
-  <Grid item xs={12} md={4}>
-    <Card sx={{ p: 3, borderRadius: 3, height: 400, display: "flex", flexDirection: "column" }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <EmojiEventsIcon sx={{ color: "#4CAF50", mr: 1 }} />
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          Work Anniversaries
-        </Typography>
-      </Box>
-      <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
-        Recognize milestones that matter.
-      </Typography>
+                {/* Work Anniversaries */}
+                <Grid item xs={12} md={4}>
+                  <Card sx={{ p: 3, borderRadius: 3, height: 400, display: "flex", flexDirection: "column" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <EmojiEventsIcon sx={{ color: "#4CAF50", mr: 1 }} />
+                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                        Work Anniversaries
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
+                      Recognize milestones that matter.
+                    </Typography>
 
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
-        {hrStats.anniversaries?.map((anniversary, index) => (
-          <Box key={index} sx={{ mb: 2, p: 2, backgroundColor: "#e8f5e8", borderRadius: 2 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                  {anniversary.name}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>
-                  {anniversary.department} • {anniversary.designation}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#4CAF50", display: "block" }}>
-                  Aug {new Date(anniversary.date_of_joining).getDate()}
-                </Typography>
-              </Box>
-              <Chip
-                label={`${anniversary.years} year${anniversary.years !== 1 ? "s" : ""}`}
-                size="small"
-                sx={{ bgcolor: "#4CAF50", color: "white" }}
-              />
-            </Box>
-          </Box>
-        ))}
-      </Box>
+                    <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
+                      {hrStats.anniversaries?.map((anniversary, index) => (
+                        <Box key={index} sx={{ mb: 2, p: 2, backgroundColor: "#e8f5e8", borderRadius: 2 }}>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                {anniversary.name}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>
+                                {anniversary.department} • {anniversary.designation}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: "#4CAF50", display: "block" }}>
+                                Aug {new Date(anniversary.date_of_joining).getDate()}
+                              </Typography>
+                            </Box>
+                            <Chip
+                              label={`${anniversary.years} year${anniversary.years !== 1 ? "s" : ""}`}
+                              size="small"
+                              sx={{ bgcolor: "#4CAF50", color: "white" }}
+                            />
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
 
-      <Box sx={{ textAlign: "center", mt: 2, p: 2, backgroundColor: "#e8f5e8", borderRadius: 2 }}>
-        <Typography variant="body2" sx={{ color: "#4CAF50" }}>
-          {hrStats.anniversaries?.length || 0} anniversar
-          {hrStats.anniversaries?.length !== 1 ? "ies" : "y"} this month
-        </Typography>
-      </Box>
-    </Card>
-  </Grid>
-</Grid>
+                    <Box sx={{ textAlign: "center", mt: 2, p: 2, backgroundColor: "#e8f5e8", borderRadius: 2 }}>
+                      <Typography variant="body2" sx={{ color: "#4CAF50" }}>
+                        {hrStats.anniversaries?.length || 0} anniversar
+                        {hrStats.anniversaries?.length !== 1 ? "ies" : "y"} this month
+                      </Typography>
+                    </Box>
+                  </Card>
+                </Grid>
+              </Grid>
 
 
               {/* Leave Requests and Document Expiries */}
@@ -833,7 +854,7 @@ function Dashboard() {
                       </Box>
                     ))}
 
-                    <Button variant="outlined" onClick={()=> navigate('/leave-list')} fullWidth sx={{ mt: 2, color: "#2196F3", borderColor: "#2196F3" }}>
+                    <Button variant="outlined" onClick={() => navigate('/leave-list')} fullWidth sx={{ mt: 2, color: "#2196F3", borderColor: "#2196F3" }}>
                       Review All Requests
                     </Button>
 
@@ -880,7 +901,7 @@ function Dashboard() {
                       </Box>
                     ))}
 
-                  
+
                   </Card>
                 </Grid>
               </Grid>
@@ -911,7 +932,7 @@ function Dashboard() {
 
           {/* Stats Cards */}
           <Grid container mt={1} xs={12} spacing={2} justifyContent={"space-between"}>
-            {(currentState == "Typist"  ||  currentState == "Typist Reception") &&
+            {(currentState == "Typist" || currentState == "Typist Reception") &&
               statsData2.map((stat, index) => (
                 <Grid item xs={12} sm={6} md={2.4} key={index}>
                   <Card
@@ -1380,7 +1401,7 @@ function Dashboard() {
               </Grid>
             )}
             {console.log(statsDetail?.salesData)}
-            {(currentState == "Typist"  ||  currentState == "Typist Reception") && (
+            {(currentState == "Typist" || currentState == "Typist Reception") && (
               <Grid item xs={12} md={12}>
                 <Card
                   sx={{
@@ -1536,12 +1557,12 @@ function Dashboard() {
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Bank Account
+                        Annual Leave Balance
                       </Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ textAlign: "right" }}>
                       <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        {employeeDetail?.iban}
+                        {employeeDetail2?.annual_leave_balance}
                       </Typography>
                     </Grid>
                   </Grid>

@@ -755,7 +755,7 @@ function EmployeeDashboard() {
                       width: "100%",
                     }}
                     onClick={() => {
-                      if (doc.path) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL_NEW}${doc.path}`, "_blank");
+                      if (doc.path) window.open(`${process.env.REACT_APP_IMAGE_BASE_URL}${doc.path}`, "_blank");
                     }}
                     disabled={!doc.path}
                   >
