@@ -436,6 +436,17 @@ function SalaryList() {
     }
   }
 
+    useEffect(() => {
+    if (data?.length > 0) {
+      const sorted = [...data].sort((a, b) => {
+        if (!a.rawJoinDate) return 1
+        if (!b.rawJoinDate) return -1
+        return a.rawJoinDate - b.rawJoinDate // ascending (oldest → newest)
+      })
+      console.log("Sorted by Join Date:", sorted)
+    }
+  }, [data]) // ✅ runs whenever data is updated
+
   useEffect(() => {
     getCostCenters()
     getCustomerQueue()
@@ -896,8 +907,10 @@ function SalaryList() {
               <Typography variant="body2">Total Employees: {data.length}</Typography>
             </Grid>
             <Grid item xs={3}>
+           
+              
               <Typography variant="body2">
-                Total Basic Salary: {data.reduce((sum, row) => sum + row.salaryPaid, 0)?.toLocaleString()}
+                Total  Salary Package: {data.reduce((sum, row) => sum + row.salaryPackage, 0)?.toLocaleString()}
               </Typography>
             </Grid>
             <Grid item xs={3}>
