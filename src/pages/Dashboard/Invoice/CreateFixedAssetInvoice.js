@@ -96,7 +96,7 @@ function CreateFixedAssetInvoice() {
     const [selectedCard, setSelectedCard] = useState(null)
     const [payments, setPayments] = useState([])
     const [isVatApplicable, setIsVatApplicable] = useState(true);
-
+    const [vatToggle, setVatToggle] = useState(false)
     console.log(rows, "data");
     const [items, setItems] = useState([
         {
@@ -170,8 +170,8 @@ function CreateFixedAssetInvoice() {
 
     useEffect(() => {
         setValue1('depreciation_months', 0)
-   
-  }, [])
+
+    }, [])
 
 
     useEffect(() => {
@@ -184,7 +184,7 @@ function CreateFixedAssetInvoice() {
         // setValue1('total', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
         // setValue1('finalTotal', parseFloat((parseFloat(grandTotal)*0.05)+parseFloat(grandTotal)).toFixed(2))
     }, [payments]);
-    const addItem = (item, cost_center,quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center, quantity, charges, description, ref, total, vatVal) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -193,7 +193,7 @@ function CreateFixedAssetInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Basic required field validation
-        if (!item  || !cost_center || quantity === "" || charges === "") {
+        if (!item || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center and charges are required!");
             return;
         }
@@ -230,7 +230,9 @@ function CreateFixedAssetInvoice() {
             ref,
             total: parsedTotal,
             selectedService: serviceItem,
-            cost_center:selectedCostCenter?.name
+            vat_enabled: vatVal,
+            cost_center: selectedCostCenter?.name,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05).toFixed(2) : 0
         };
         console.log(newRow);
 
@@ -270,7 +272,7 @@ function CreateFixedAssetInvoice() {
         try {
 
 
-            const { data } = await CustomerServices.getInvoiceNumberToken({type: "PE"});
+            const { data } = await CustomerServices.getInvoiceNumberToken({ type: "PE" });
             console.log(data);
             setValue1('invoiceNumber', "PE-" + data?.number)
 
@@ -355,15 +357,18 @@ function CreateFixedAssetInvoice() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     total_months: formData?.depreciation_months,
-                    debit_account_id:selectedAccount2?.id,
-                    credit_account_id:selectedAccount3?.id,
+                    debit_account_id: selectedAccount2?.id,
+                    credit_account_id: selectedAccount3?.id,
                     months_recorded: 0,
                     invoice_type: "Fixed Asset",
                     invoice_prefix: "FA",
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
                     paid_amount: existingTotal,
-                    total_amount: getValues1('finalTotal'),
+                    total_amount: (
+                        parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+
+                    ).toFixed(2),
                     payment_mode: paymentModesString,
                     payment_status: parseFloat(existingTotal) === 0
                         ? 'Unpaid'
@@ -513,7 +518,7 @@ function CreateFixedAssetInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2,cost_center, quantity, charges, description, ref, total) => {
+    const updateItem = (item2, cost_center, quantity, charges, description, ref, total, vatVal) => {
         console.log("Current serviceItem:", serviceItem);
 
         // Parse numeric values
@@ -522,7 +527,7 @@ function CreateFixedAssetInvoice() {
         const parsedTotal = parseFloat(total);
 
         // Validation
-        if (!item2 || !cost_center ||  quantity === "" || charges === "") {
+        if (!item2 || !cost_center || quantity === "" || charges === "") {
             showErrorToast("Item, quantity,cost center  and charges are required!");
             return;
         }
@@ -549,7 +554,9 @@ function CreateFixedAssetInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
-            cost_center:selectedCostCenter?.name
+            vat_enabled: vatVal,
+            cost_center: selectedCostCenter?.name,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05).toFixed(2) : 0
         };
 
         console.log("Updated item to be saved:", updatedItem);
@@ -805,7 +812,7 @@ function CreateFixedAssetInvoice() {
         setValue1("cost_center", { id: settings?.cost_center, name: settings?.cost_center })
     }, []);
 
-   
+
     useEffect(() => {
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
@@ -883,7 +890,7 @@ function CreateFixedAssetInvoice() {
                                         selected={selectedAccount2}
                                         onSelect={(value) => {
                                             setSelectedAccount2(value)
-                                   
+
                                         }}
                                         error={errors1?.description?.message}
                                         register={register1("description", {
@@ -900,7 +907,7 @@ function CreateFixedAssetInvoice() {
                                         selected={selectedAccount3}
                                         onSelect={(value) => {
                                             setSelectedAccount3(value)
-                                   
+
                                         }}
                                         error={errors1?.accumulated?.message}
                                         register={register1("accumulated", {
@@ -909,12 +916,12 @@ function CreateFixedAssetInvoice() {
                                     />
                                 </Grid>
 
-                            
+
 
 
                             </Grid>
                             <Grid container spacing={2} p={2}>
-                            <Grid item md={3} sm={5.5} xs={12}>
+                                <Grid item md={3} sm={5.5} xs={12}>
                                     <SelectField
                                         size={"small"}
                                         label={"Select Vendor "}
@@ -958,14 +965,14 @@ function CreateFixedAssetInvoice() {
                                     />
                                 </Grid>
 
-                                
+
                                 <Grid item md={3} sm={5.5} xs={12}>
                                     <InputField
                                         label="Depreciation Months"
                                         size="small"
                                         placeholder="Months"
                                         type="number"
-                                      
+
                                         register={register1("depreciation_months", {
                                             required: 'Depreciation Months is required'
                                         })}
@@ -977,13 +984,14 @@ function CreateFixedAssetInvoice() {
 
 
 
-                               
+
                             </Grid>
 
 
                         </Box>
 
                     </Box>
+
 
 
                     <TableContainer component={Paper}>
@@ -995,9 +1003,10 @@ function CreateFixedAssetInvoice() {
                                     <TableCell sx={{ width: "400px" }}>Cost Center</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Qty</TableCell>
 
-                                    <TableCell sx={{ width: "150px" }}>Charges</TableCell>
+                                    <TableCell sx={{ width: "150px" }}> Charges</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Description</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
+                                    <TableCell sx={{ width: "150px" }}>Vat</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Total</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Action</TableCell>
                                 </TableRow>
@@ -1058,23 +1067,64 @@ function CreateFixedAssetInvoice() {
                                             disabled={detail?.is_paid}
                                             placeholder="Quantity"
                                             type="number"
-                                            register={register("quantity", { required: false })}
+                                            register={register("quantity", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+
+                                                    }
+
+                                                },
+                                            })}
                                         />
-                                        {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
+                                        {errors.quantity && (
+                                            <span style={{ color: "red" }}>{errors.quantity.message}</span>
+                                        )}
                                     </TableCell>
 
+                                    {/* Charges Field */}
                                     <TableCell>
                                         <InputField
                                             size="small"
-
+                                            disabled={detail?.is_paid}
                                             placeholder="Charges"
+                                            type="number"
+                                            register={register("charges", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+                                                    }
 
-                                            register={register("charges", { required: false })}
-
+                                                },
+                                            })}
                                         />
-                                        {errors.charges && <span style={{ color: "red" }}>{errors.charges.message}</span>}
-
+                                        {errors.charges && (
+                                            <span style={{ color: "red" }}>{errors.charges.message}</span>
+                                        )}
                                     </TableCell>
+
 
                                     <TableCell>
                                         <InputField
@@ -1106,7 +1156,29 @@ function CreateFixedAssetInvoice() {
                                             </span>
                                         )}
                                     </TableCell>
+                                    <TableCell>
+                                        <Switch
+                                            checked={vatToggle}
+                                            onChange={(e) => {
+                                                setVatToggle(e.target.checked);
 
+                                                const quantity = parseFloat(getValues('quantity')) || 0;
+                                                const charges = parseFloat(getValues('charges')) || 0;
+                                                const subtotal = quantity * charges;
+                                                const vat = subtotal * 0.05;
+
+                                                console.log(vat, 'vatToggle');
+
+                                                if (e.target.checked) {
+                                                    setValue("total", (subtotal + vat).toFixed(2));
+                                                } else {
+                                                    setValue("total", subtotal.toFixed(2));
+                                                }
+                                            }}
+
+                                            color="primary"
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <InputField
                                             disabled={true}
@@ -1120,7 +1192,7 @@ function CreateFixedAssetInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1135,7 +1207,7 @@ function CreateFixedAssetInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter,getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1162,6 +1234,7 @@ function CreateFixedAssetInvoice() {
                                                     setValue("transaction_id", '');
                                                     setValue("application_id", '');
                                                     setValue("ref_no", '');
+                                                    setValue("total", '');
                                                     setServiceItem(null);
                                                     setValue("quantity", '');
                                                 }}
@@ -1191,34 +1264,34 @@ function CreateFixedAssetInvoice() {
                                         <TableCell>{item?.charge}</TableCell>
                                         <TableCell>{item?.description}</TableCell>
                                         <TableCell>{item?.ref}</TableCell>
-
+                                        <TableCell>{item?.vat_enabled ? 'Enabled' : 'Disabled'}</TableCell>
                                         <TableCell>{item?.total}</TableCell>
                                         <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
                                             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                 setSelectedRow(item); setEditState(true)
                                                 console.log(item);
-
+                                                setVatToggle(item?.vat_enabled)
                                                 setValue("id", item?.product_id);
                                                 setValue("item_code", item?.product_id);
                                                 setValue("description", item?.description);
                                                 setValue("ref", item?.ref);
                                                 setValue("charges", item?.charge);
-
+                                                setValue("total", item?.total);
+                                                setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                                 setValue("ref_no", item?.ref_no);
                                                 setValue("service", item?.service);
                                                 setServiceItem(item?.selectedService);
                                                 setValue("quantity", item?.quantity);
                                                 console.log(item?.service)
-                                                setSelectedCostCenter({id:item?.cost_center,name:item?.cost_center})
 
                                             }} src={Images.editIcon} width={'35px'}></Box>}
                                             <Box>
                                                 {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
-                                                    let selectedID = item?.id
-                                                    setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                    let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                                                    let selectedID = item?.unique_id
+                                                    setRows(rows?.filter(item2 => item2?.unique_id != item?.unique_id))
+                                                    let filteredData = rows?.filter(item2 => item2?.unique_id != item?.unique_id)
                                                     // 👇 Calculate total after updating rows
                                                     const total = filteredData.reduce((sum, item) => {
                                                         // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
@@ -1239,45 +1312,33 @@ function CreateFixedAssetInvoice() {
                                 ))}
 
                                 <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                    <TableCell colSpan={8} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)}</Typography> {/* Display the Sub-total */}
                                     </TableCell>
                                 </TableRow>
-
                                 <TableRow>
-
-                                    <TableCell colSpan={7} align="right">
-                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                            <Switch
-                                                checked={isVatApplicable}
-                                                onChange={(e) => setIsVatApplicable(e.target.checked)}
-                                                color="primary"
-                                            />
-                                            <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
-                                        </Box>
+                                    <TableCell colSpan={8} align="right">
+                                        {console.log(rows, 'rows')}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total-Vat:</Typography>
                                     </TableCell>
-
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                                            {isVatApplicable
-                                                ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
-                                                : "0.00"}
-                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item?.vat_enabled ? parseFloat(item.tax || 0) : 0), 0)}</Typography> {/* Display the Sub-total */}
                                     </TableCell>
                                 </TableRow>
 
+
                                 <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                    <TableCell colSpan={8} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
                                             {(
-                                                parseFloat(subTotal) +
-                                                (isVatApplicable ? parseFloat(subTotal) * 0.05 : 0)
+                                                parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+
                                             ).toFixed(2)}
                                         </Typography>
                                     </TableCell>
@@ -1286,7 +1347,7 @@ function CreateFixedAssetInvoice() {
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
-                                            {/* <Button
+                                            <Button
                                                 onClick={() => setPayButton(true)}
                                                 disabled={rows?.length == 0}
                                                 variant="contained"
@@ -1300,7 +1361,7 @@ function CreateFixedAssetInvoice() {
                                                 }}
                                             >
                                                 Pay
-                                            </Button> */}
+                                            </Button>
                                             {console.log(selectedCustomer, 'selectedCustomer')
                                             }
                                             {!payButton && <Button
@@ -1316,7 +1377,7 @@ function CreateFixedAssetInvoice() {
                                                     },
                                                 }}
                                             >
-                                                Submit
+                                                Mark As Unpaid
                                             </Button>}
                                             <Button
                                                 onClick={() => { setPayButton(false); setPayments([]) }}

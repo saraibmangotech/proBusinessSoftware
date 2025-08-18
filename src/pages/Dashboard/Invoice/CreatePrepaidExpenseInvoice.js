@@ -75,6 +75,7 @@ function CreatePurchaseInvoice() {
     const theme = useTheme();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [vatToggle, setVatToggle] = useState(false)
     const [selectedRow, setSelectedRow] = useState(null)
     const [editState, setEditState] = useState(false)
     const [formChange, setFormChange] = useState(false);
@@ -185,7 +186,7 @@ function CreatePurchaseInvoice() {
 
     }, [])
 
-    const addItem = (item, cost_center, quantity, charges, description, ref, total) => {
+    const addItem = (item, cost_center, quantity, charges, description, ref, total, vatVal) => {
         console.log(item?.impact_account_id);
 
         // Parse numeric inputs
@@ -231,7 +232,9 @@ function CreatePurchaseInvoice() {
             ref,
             total: parsedTotal,
             selectedService: serviceItem,
-            cost_center: selectedCostCenter?.name
+            vat_enabled: vatVal,
+            cost_center: selectedCostCenter?.name,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05).toFixed(2) : 0
         };
         console.log(newRow);
 
@@ -344,7 +347,7 @@ function CreatePurchaseInvoice() {
                 const obj = {
                     vendor_id: selectedVendor?.id,
                     vendor_account_id: selectedVendor?.account_id,
-                    debit_account_id:selectedAccount2?.id,
+                    debit_account_id: selectedAccount2?.id,
                     total_charges: subTotal,
                     tax: parseFloat(subTotal) * 0.05,
                     vat_enabled: isVatApplicable,
@@ -358,7 +361,10 @@ function CreatePurchaseInvoice() {
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
                     paid_amount: existingTotal,
-                    total_amount: getValues1('finalTotal'),
+                    total_amount: (
+                        parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+
+                    ).toFixed(2),
                     payment_mode: paymentModesString,
                     payment_status: parseFloat(existingTotal) === 0
                         ? 'Unpaid'
@@ -508,7 +514,7 @@ function CreatePurchaseInvoice() {
             // setLoader(false)
         }
     };
-    const updateItem = (item2, cost_center, quantity, charges, description, ref, total) => {
+    const updateItem = (item2, cost_center, quantity, charges, description, ref, total, vatVal) => {
         console.log("Current serviceItem:", serviceItem);
 
         // Parse numeric values
@@ -544,6 +550,8 @@ function CreatePurchaseInvoice() {
             total: parsedTotal,
             product_id: serviceItem?.id,
             selectedService: item2,
+            vat_enabled: vatVal,
+            tax: vatVal ? parseFloat((parseFloat(parsedCharges) * parseFloat(parsedQuantity)) * 0.05).toFixed(2) : 0,
             cost_center: selectedCostCenter?.name
         };
 
@@ -947,7 +955,6 @@ function CreatePurchaseInvoice() {
 
                     </Box>
 
-
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
@@ -957,9 +964,10 @@ function CreatePurchaseInvoice() {
                                     <TableCell sx={{ width: "400px" }}>Cost Center</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Qty</TableCell>
 
-                                    <TableCell sx={{ width: "150px" }}>Charges</TableCell>
+                                    <TableCell sx={{ width: "150px" }}> Charges</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Description</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Ref No</TableCell>
+                                    <TableCell sx={{ width: "150px" }}>Vat</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Total</TableCell>
                                     <TableCell sx={{ width: "150px" }}>Action</TableCell>
                                 </TableRow>
@@ -1020,23 +1028,64 @@ function CreatePurchaseInvoice() {
                                             disabled={detail?.is_paid}
                                             placeholder="Quantity"
                                             type="number"
-                                            register={register("quantity", { required: false })}
+                                            register={register("quantity", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const quantity = parseFloat(e.target.value) || 0;
+                                                        const charges = parseFloat(watch("charges")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+
+                                                    }
+
+                                                },
+                                            })}
                                         />
-                                        {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
+                                        {errors.quantity && (
+                                            <span style={{ color: "red" }}>{errors.quantity.message}</span>
+                                        )}
                                     </TableCell>
 
+                                    {/* Charges Field */}
                                     <TableCell>
                                         <InputField
                                             size="small"
-
+                                            disabled={detail?.is_paid}
                                             placeholder="Charges"
+                                            type="number"
+                                            register={register("charges", {
+                                                required: false,
+                                                onChange: (e) => {
+                                                    if (!vatToggle) {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        setValue("total", total.toFixed(2));
+                                                    }
+                                                    else {
+                                                        const charges = parseFloat(e.target.value) || 0;
+                                                        const quantity = parseFloat(watch("quantity")) || 0;
+                                                        const total = quantity * charges;
+                                                        let vat = total * 0.05
+                                                        setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+                                                    }
 
-                                            register={register("charges", { required: false })}
-
+                                                },
+                                            })}
                                         />
-                                        {errors.charges && <span style={{ color: "red" }}>{errors.charges.message}</span>}
-
+                                        {errors.charges && (
+                                            <span style={{ color: "red" }}>{errors.charges.message}</span>
+                                        )}
                                     </TableCell>
+
 
                                     <TableCell>
                                         <InputField
@@ -1068,7 +1117,29 @@ function CreatePurchaseInvoice() {
                                             </span>
                                         )}
                                     </TableCell>
+                                    <TableCell>
+                                        <Switch
+                                            checked={vatToggle}
+                                            onChange={(e) => {
+                                                setVatToggle(e.target.checked);
 
+                                                const quantity = parseFloat(getValues('quantity')) || 0;
+                                                const charges = parseFloat(getValues('charges')) || 0;
+                                                const subtotal = quantity * charges;
+                                                const vat = subtotal * 0.05;
+
+                                                console.log(vat, 'vatToggle');
+
+                                                if (e.target.checked) {
+                                                    setValue("total", (subtotal + vat).toFixed(2));
+                                                } else {
+                                                    setValue("total", subtotal.toFixed(2));
+                                                }
+                                            }}
+
+                                            color="primary"
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <InputField
                                             disabled={true}
@@ -1082,7 +1153,7 @@ function CreatePurchaseInvoice() {
                                         {(!editState && !detail?.is_paid) && <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => addItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1097,7 +1168,7 @@ function CreatePurchaseInvoice() {
                                         {editState && <> <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'))}
+                                            onClick={() => updateItem(serviceItem, selectedCostCenter, getValues('quantity'), getValues('charges'), getValues('description'), getValues('ref'), getValues('total'), vatToggle)}
                                             sx={{
                                                 textTransform: 'capitalize',
                                                 backgroundColor: "#001f3f",
@@ -1124,6 +1195,7 @@ function CreatePurchaseInvoice() {
                                                     setValue("transaction_id", '');
                                                     setValue("application_id", '');
                                                     setValue("ref_no", '');
+                                                    setValue("total", '');
                                                     setServiceItem(null);
                                                     setValue("quantity", '');
                                                 }}
@@ -1153,20 +1225,21 @@ function CreatePurchaseInvoice() {
                                         <TableCell>{item?.charge}</TableCell>
                                         <TableCell>{item?.description}</TableCell>
                                         <TableCell>{item?.ref}</TableCell>
-
+                                        <TableCell>{item?.vat_enabled ? 'Enabled' : 'Disabled'}</TableCell>
                                         <TableCell>{item?.total}</TableCell>
                                         <TableCell><Box sx={{ display: 'flex', gap: 1 }}>
 
                                             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                 setSelectedRow(item); setEditState(true)
                                                 console.log(item);
-
+                                                setVatToggle(item?.vat_enabled)
                                                 setValue("id", item?.product_id);
                                                 setValue("item_code", item?.product_id);
                                                 setValue("description", item?.description);
                                                 setValue("ref", item?.ref);
                                                 setValue("charges", item?.charge);
-
+                                                setValue("total", item?.total);
+                                                setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                                 setValue("ref_no", item?.ref_no);
                                                 setValue("service", item?.service);
                                                 setServiceItem(item?.selectedService);
@@ -1177,9 +1250,9 @@ function CreatePurchaseInvoice() {
                                             <Box>
                                                 {true && <Box sx={{ cursor: 'pointer' }} component={'img'} src={Images.deleteIcon} onClick={() => {
 
-                                                    let selectedID = item?.id
-                                                    setRows(rows?.filter(item2 => item2?.id != item?.id))
-                                                    let filteredData = rows?.filter(item2 => item2?.id != item?.id)
+                                                    let selectedID = item?.unique_id
+                                                    setRows(rows?.filter(item2 => item2?.unique_id != item?.unique_id))
+                                                    let filteredData = rows?.filter(item2 => item2?.unique_id != item?.unique_id)
                                                     // 👇 Calculate total after updating rows
                                                     const total = filteredData.reduce((sum, item) => {
                                                         // Replace `item.amount` with the correct field to total (e.g., item.price or item.total)
@@ -1200,45 +1273,33 @@ function CreatePurchaseInvoice() {
                                 ))}
 
                                 <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                    <TableCell colSpan={8} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Sub-total:</Typography>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{subTotal}</Typography> {/* Display the Sub-total */}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)}</Typography> {/* Display the Sub-total */}
                                     </TableCell>
                                 </TableRow>
-
                                 <TableRow>
-
-                                    <TableCell colSpan={7} align="right">
-                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                            <Switch
-                                                checked={isVatApplicable}
-                                                onChange={(e) => setIsVatApplicable(e.target.checked)}
-                                                color="primary"
-                                            />
-                                            <Typography variant="h6" sx={{ fontSize: "15px" }}>Total Vat:</Typography>
-                                        </Box>
+                                    <TableCell colSpan={8} align="right">
+                                        {console.log(rows, 'rows')}
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>Total-Vat:</Typography>
                                     </TableCell>
-
                                     <TableCell>
-                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>
-                                            {isVatApplicable
-                                                ? parseFloat(parseFloat(subTotal) * 0.05).toFixed(2)
-                                                : "0.00"}
-                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontSize: "15px" }}>{rows.reduce((acc, item) => acc + parseFloat(item?.vat_enabled ? parseFloat(item.tax || 0) : 0), 0)}</Typography> {/* Display the Sub-total */}
                                     </TableCell>
                                 </TableRow>
 
+
                                 <TableRow>
-                                    <TableCell colSpan={7} align="right">
+                                    <TableCell colSpan={8} align="right">
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>Amount Total:</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="h6" sx={{ fontSize: "15px" }}>
                                             {(
-                                                parseFloat(subTotal) +
-                                                (isVatApplicable ? parseFloat(subTotal) * 0.05 : 0)
+                                                parseFloat(rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0)) + rows.reduce((acc, item) => acc + parseFloat(item.tax), 0)
+
                                             ).toFixed(2)}
                                         </Typography>
                                     </TableCell>
@@ -1247,7 +1308,7 @@ function CreatePurchaseInvoice() {
                                 <TableRow>
                                     <TableCell colSpan={10} align="right">
                                         <Grid container gap={2} justifyContent={"center"}>
-                                            {/* <Button
+                                            <Button
                                                 onClick={() => setPayButton(true)}
                                                 disabled={rows?.length == 0}
                                                 variant="contained"
@@ -1261,7 +1322,7 @@ function CreatePurchaseInvoice() {
                                                 }}
                                             >
                                                 Pay
-                                            </Button> */}
+                                            </Button>
                                             {console.log(selectedCustomer, 'selectedCustomer')
                                             }
                                             {!payButton && <Button
@@ -1277,7 +1338,7 @@ function CreatePurchaseInvoice() {
                                                     },
                                                 }}
                                             >
-                                                Submit
+                                                Mark As Unpaid
                                             </Button>}
                                             <Button
                                                 onClick={() => { setPayButton(false); setPayments([]) }}
