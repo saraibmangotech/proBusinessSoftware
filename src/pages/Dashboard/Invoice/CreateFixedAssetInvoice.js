@@ -154,7 +154,7 @@ function CreateFixedAssetInvoice() {
             (parseFloat(centerFee) || 0) +
             (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", parseFloat(finalTotal).toFixed(2));
+        setValue("total", vatToggle ?   parseFloat(parseFloat(finalTotal)+(parseFloat(finalTotal)*0.05 )): parseFloat(finalTotal).toFixed(2));
     }, [govtFee, centerFee, bankCharges, qty]);
     useEffect(() => {
         console.log(rows, 'rowsrowsrows');
@@ -266,6 +266,7 @@ function CreateFixedAssetInvoice() {
         setValue("ref", '');
         setServiceItem(null);
         setValue("quantity", '');
+        setVatToggle(false)
     };
 
     const getTokenNumber = async () => {
@@ -351,7 +352,7 @@ function CreateFixedAssetInvoice() {
                     vendor_id: selectedVendor?.id,
                     vendor_account_id: selectedVendor?.account_id,
                     total_charges: subTotal,
-                    tax: parseFloat(subTotal) * 0.05,
+                    tax: rows.reduce((acc, item) => acc + parseFloat(item?.vat_enabled ? parseFloat(item.tax || 0) : 0), 0),
                     vat_enabled: isVatApplicable,
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
