@@ -155,7 +155,7 @@ function CreatePurchaseInvoice() {
             (parseFloat(centerFee) || 0) +
             (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", parseFloat(finalTotal).toFixed(2));
+        setValue("total", vatToggle ?   parseFloat(parseFloat(finalTotal)+(parseFloat(finalTotal)*0.05 )): parseFloat(finalTotal).toFixed(2));
     }, [govtFee, centerFee, bankCharges, qty]);
     useEffect(() => {
         console.log(rows, 'rowsrowsrows');
@@ -264,6 +264,7 @@ function CreatePurchaseInvoice() {
         setValue("description", '');
         setValue("ref", '');
         setServiceItem(null);
+         setVatToggle(false)
         setValue("quantity", '');
     };
 
@@ -349,7 +350,7 @@ function CreatePurchaseInvoice() {
                     vendor_account_id: selectedVendor?.account_id,
                     debit_account_id: selectedAccount2?.id,
                     total_charges: subTotal,
-                    tax: parseFloat(subTotal) * 0.05,
+                    tax: rows.reduce((acc, item) => acc + parseFloat(item?.vat_enabled ? parseFloat(item.tax || 0) : 0), 0),
                     vat_enabled: isVatApplicable,
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
@@ -1042,6 +1043,10 @@ function CreatePurchaseInvoice() {
                                                         const charges = parseFloat(watch("charges")) || 0;
                                                         const total = quantity * charges;
                                                         let vat = total * 0.05
+                                                           console.log(total);
+                                                        console.log(vat);
+                                                        console.log( parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+                                                        
                                                         setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
 
                                                     }
@@ -1231,14 +1236,14 @@ function CreatePurchaseInvoice() {
 
                                             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                 setSelectedRow(item); setEditState(true)
-                                                console.log(item);
+                                                console.log(item,'itemitemitem');
                                                 setVatToggle(item?.vat_enabled)
                                                 setValue("id", item?.product_id);
                                                 setValue("item_code", item?.product_id);
                                                 setValue("description", item?.description);
                                                 setValue("ref", item?.ref);
                                                 setValue("charges", item?.charge);
-                                                setValue("total", item?.total);
+                                                setValue("total",  item?.vat_enabled ? parseFloat(parseFloat(item?.total)) : parseFloat(item?.total));
                                                 setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                                 setValue("ref_no", item?.ref_no);
                                                 setValue("service", item?.service);

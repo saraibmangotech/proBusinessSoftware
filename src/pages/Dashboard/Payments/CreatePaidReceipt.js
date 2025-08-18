@@ -1515,7 +1515,7 @@ function CreatePaidReceipt() {
                         />
                       </Grid>
                     )}
-                    {selectedMode?.id == "Card" && <Grid item md={3} sm={12} xs={12}>
+                    {(selectedMode?.id == "Card" || selectedMode?.id == "Payment Link") && <Grid item md={3} sm={12} xs={12}>
                       <InputField
                         label="Authorization Code"
                         size="small"
