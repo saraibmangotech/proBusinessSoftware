@@ -154,16 +154,16 @@ function CreateFixedAssetInvoice() {
             (parseFloat(centerFee) || 0) +
             (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", vatToggle ?   parseFloat(parseFloat(finalTotal)+(parseFloat(finalTotal)*0.05 )): parseFloat(finalTotal).toFixed(2));
+        setValue("total", vatToggle ? parseFloat(parseFloat(finalTotal) + (parseFloat(finalTotal) * 0.05)) : parseFloat(finalTotal).toFixed(2));
     }, [govtFee, centerFee, bankCharges, qty]);
     useEffect(() => {
         console.log(rows, 'rowsrowsrows');
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
 
         console.log(grandTotal); // Output: 100
-        setValue1('total', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
+        setValue1('total', parseFloat( parseFloat(grandTotal)).toFixed(2))
+        setValue1('finalTotal', parseFloat( parseFloat(grandTotal)).toFixed(2))
+        setValue1('balance', parseFloat( parseFloat(grandTotal)).toFixed(2))
         setValue1('paidamount', 0)
         // setValue1('depreciation_months', 0)
     }, [rows]);
@@ -273,9 +273,9 @@ function CreateFixedAssetInvoice() {
         try {
 
 
-            const { data } = await CustomerServices.getInvoiceNumberToken({ type: "PE" });
+            const { data } = await CustomerServices.getInvoiceNumberToken({ type: "FA" });
             console.log(data);
-            setValue1('invoiceNumber', "PE-" + data?.number)
+            setValue1('invoiceNumber', "FA-" + data?.number)
 
         } catch (error) {
             showErrorToast(error);
@@ -351,8 +351,8 @@ function CreateFixedAssetInvoice() {
                 const obj = {
                     vendor_id: selectedVendor?.id,
                     vendor_account_id: selectedVendor?.account_id,
-                    total_charges: subTotal,
-                    tax: rows.reduce((acc, item) => acc + parseFloat(item?.vat_enabled ? parseFloat(item.tax || 0) : 0), 0),
+                    total_charges: rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0),
+                    tax: rows.reduce((acc, item) => acc + parseFloat(item.tax || 0), 0),
                     vat_enabled: isVatApplicable,
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
@@ -818,13 +818,13 @@ function CreateFixedAssetInvoice() {
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
 
-        const totalWithVat = isVatApplicable
-            ? parseFloat((grandTotal * 0.05) + grandTotal)
-            : grandTotal;
+        // const totalWithVat = isVatApplicable
+        //     ? parseFloat((grandTotal * 0.05) + grandTotal)
+        //     : grandTotal;
 
-        setValue1('total', totalWithVat.toFixed(2));
-        setValue1('finalTotal', totalWithVat.toFixed(2));
-        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
+        // setValue1('total', totalWithVat.toFixed(2));
+        // setValue1('finalTotal', totalWithVat.toFixed(2));
+        // setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
     }, [isVatApplicable, rows, payments]);
 
 
