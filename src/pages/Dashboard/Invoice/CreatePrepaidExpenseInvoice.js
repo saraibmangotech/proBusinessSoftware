@@ -155,16 +155,16 @@ function CreatePurchaseInvoice() {
             (parseFloat(centerFee) || 0) +
             (parseFloat(bankCharges) || 0);
         const finalTotal = feesTotal * (parseFloat(qty) || 1);
-        setValue("total", vatToggle ?   parseFloat(parseFloat(finalTotal)+(parseFloat(finalTotal)*0.05 )): parseFloat(finalTotal).toFixed(2));
+        setValue("total", vatToggle ? parseFloat(parseFloat(finalTotal) + (parseFloat(finalTotal) * 0.05)) : parseFloat(finalTotal).toFixed(2));
     }, [govtFee, centerFee, bankCharges, qty]);
     useEffect(() => {
         console.log(rows, 'rowsrowsrows');
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
-
-        console.log(grandTotal); // Output: 100
-        setValue1('total', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('finalTotal', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
-        setValue1('balance', parseFloat((parseFloat(grandTotal) * 0.05) + parseFloat(grandTotal)).toFixed(2))
+        const taxTotal = rows.reduce((acc, item) => acc + parseFloat(item.tax), 0);
+        console.log(grandTotal, 'grandTotal'); // Output: 100
+        setValue1('total', parseFloat(parseFloat(grandTotal)).toFixed(2))
+        setValue1('finalTotal', parseFloat(parseFloat(grandTotal)).toFixed(2))
+        setValue1('balance', parseFloat(parseFloat(grandTotal)).toFixed(2))
         setValue1('paidamount', 0)
         // setValue1('amortization_months', 0)
     }, [rows]);
@@ -264,7 +264,7 @@ function CreatePurchaseInvoice() {
         setValue("description", '');
         setValue("ref", '');
         setServiceItem(null);
-         setVatToggle(false)
+        setVatToggle(false)
         setValue("quantity", '');
     };
 
@@ -341,6 +341,8 @@ function CreatePurchaseInvoice() {
 
         getValues1('total')
         let newTotal = parseFloat(getValues1('finalTotal'))
+        console.log(existingTotal, 'existingTotal');
+        console.log(newTotal, 'existingTotal');
         if (existingTotal <= newTotal) {
 
             setButtonDisabled(true)
@@ -789,13 +791,13 @@ function CreatePurchaseInvoice() {
         const grandTotal = rows.reduce((acc, item) => acc + parseFloat(item.total), 0);
         const grandTotal2 = payments.reduce((acc, item) => acc + parseFloat(item.amount), 0);
 
-        const totalWithVat = isVatApplicable
-            ? parseFloat((grandTotal * 0.05) + grandTotal)
-            : grandTotal;
+        // const totalWithVat = isVatApplicable
+        //     ? parseFloat((grandTotal * 0.05) + grandTotal)
+        //     : grandTotal;
 
-        setValue1('total', totalWithVat.toFixed(2));
-        setValue1('finalTotal', totalWithVat.toFixed(2));
-        setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
+        // setValue1('total', totalWithVat.toFixed(2));
+        // setValue1('finalTotal', totalWithVat.toFixed(2));
+        // setValue1('balance', (totalWithVat - grandTotal2).toFixed(2));
     }, [isVatApplicable, rows, payments]);
 
 
@@ -1043,10 +1045,10 @@ function CreatePurchaseInvoice() {
                                                         const charges = parseFloat(watch("charges")) || 0;
                                                         const total = quantity * charges;
                                                         let vat = total * 0.05
-                                                           console.log(total);
+                                                        console.log(total);
                                                         console.log(vat);
-                                                        console.log( parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
-                                                        
+                                                        console.log(parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
+
                                                         setValue("total", parseFloat(parseFloat(total) + parseFloat(vat)).toFixed(2));
 
                                                     }
@@ -1236,14 +1238,14 @@ function CreatePurchaseInvoice() {
 
                                             {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => {
                                                 setSelectedRow(item); setEditState(true)
-                                                console.log(item,'itemitemitem');
+                                                console.log(item, 'itemitemitem');
                                                 setVatToggle(item?.vat_enabled)
                                                 setValue("id", item?.product_id);
                                                 setValue("item_code", item?.product_id);
                                                 setValue("description", item?.description);
                                                 setValue("ref", item?.ref);
                                                 setValue("charges", item?.charge);
-                                                setValue("total",  item?.vat_enabled ? parseFloat(parseFloat(item?.total)) : parseFloat(item?.total));
+                                                setValue("total", item?.vat_enabled ? parseFloat(parseFloat(item?.total)) : parseFloat(item?.total));
                                                 setSelectedCostCenter({ id: item?.cost_center, name: item?.cost_center })
                                                 setValue("ref_no", item?.ref_no);
                                                 setValue("service", item?.service);

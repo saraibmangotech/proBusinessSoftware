@@ -410,8 +410,8 @@ function CreatePurchaseInvoice() {
                 const obj = {
                     vendor_id: selectedVendor?.id,
                     vendor_account_id: selectedVendor?.account_id,
-                    total_charges: subTotal,
-                    tax: parseFloat(subTotal) * 0.05,
+                    total_charges: rows.reduce((acc, item) => acc + parseFloat(item.charge) * parseFloat(item?.quantity), 0),
+                    tax: rows.reduce((acc, item) => acc + parseFloat(item.tax || 0) , 0),
                     vat_enabled: isVatApplicable,
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
