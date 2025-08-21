@@ -914,7 +914,7 @@ function ShiftAllocations() {
                                         <TableCell
                                             key={date}
                                             sx={{
-                                                color: isFriday ? "yellow !important" : "white !important", // 👈 change text color
+                                                color: isFriday ? "#03ff03 !important" : "white !important", // 👈 change text color
                                                 fontWeight: isFriday ? "bold" : "normal", // optional
                                             }}
                                         >
