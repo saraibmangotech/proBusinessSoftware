@@ -837,7 +837,7 @@ function ShiftAllocations() {
                 </Grid>
                 <Grid item xs={12} sm={3} >
                     <DatePicker
-                       
+
                         size="small"
                         minDate={fromDate}
                         label={"To Date"}
@@ -881,7 +881,7 @@ function ShiftAllocations() {
                     </Grid>
                     <Grid item xs={12} sm={3} >
                         <DatePicker
-                          
+
                             size="small"
                             minDate={fromDate}
                             label={"To Date"}
@@ -906,15 +906,27 @@ function ShiftAllocations() {
                                 <TableCell sx={{ width: '200px', minWidth: '200px', maxWidth: '200px' }}>
                                     Employee Name
                                 </TableCell>
-                                {uniqueDates.map(date => (
-                                    <TableCell key={date}>
-                                        {new Date(date).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "2-digit",
-                                            weekday: "short",
-                                        })}
-                                    </TableCell>
-                                ))}
+                                {uniqueDates.map(date => {
+                                    const d = new Date(date);
+                                    const isFriday = d.getDay() === 5; // 0=Sunday, 5=Friday
+
+                                    return (
+                                        <TableCell
+                                            key={date}
+                                            sx={{
+                                                color: isFriday ? "#03ff03 !important" : "white !important", // 👈 change text color
+                                                fontWeight: isFriday ? "bold" : "normal", // optional
+                                            }}
+                                        >
+                                            {d.toLocaleDateString("en-US", {
+                                                month: "short",
+                                                day: "2-digit",
+                                                weekday: "short",
+                                            })}
+                                        </TableCell>
+                                    );
+                                })}
+
                             </TableRow>
                         </TableHead>
                         <TableBody>
