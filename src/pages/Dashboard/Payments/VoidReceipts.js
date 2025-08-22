@@ -768,9 +768,7 @@ function VoidReceipts() {
         worksheet.mergeCells("A1:G1") // Merge cells across all columns
 
         const companyName =
-            agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-                ? "PREMIUM BUSINESSMEN SERVICES"
-                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+            agencyType[process.env.REACT_APP_TYPE]?.name
 
         const companyRow = worksheet.addRow([companyName])
         companyRow.getCell(1).font = {

@@ -454,9 +454,7 @@ function TrialBalanceDetailed() {
   worksheet.mergeCells("A1:G1")
 
   const name =
-    agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+    agencyType[process.env.REACT_APP_TYPE]?.name
   const companyRow = worksheet.addRow([name])
   companyRow.getCell(1).font = {
     name: "Arial",
@@ -893,9 +891,7 @@ const downloadExcel2 = async () => {
   titleRow.getCell(1).alignment = { horizontal: "center" };
   worksheet.mergeCells("A1:G1");
   const name =
-    agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC";
+   agencyType[process.env.REACT_APP_TYPE]?.name
   const companyRow = worksheet.addRow([name]);
   companyRow.getCell(1).font = {
     name: "Arial",

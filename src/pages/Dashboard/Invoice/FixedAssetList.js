@@ -272,9 +272,7 @@ function FixedAssets() {
         titleRow.getCell(1).alignment = { horizontal: "center" }
         worksheet.mergeCells("A1:I1") // Adjusted merge range for new columns
 
-        const companyName = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-            ? "PREMIUM BUSINESSMEN SERVICES"
-            : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+        const companyName = agencyType[process.env.REACT_APP_TYPE]?.name
         const companyRow = worksheet.addRow([companyName])
         companyRow.getCell(1).font = {
             name: "Arial",

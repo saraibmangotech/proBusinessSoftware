@@ -599,9 +599,7 @@ function CategoryList() {
     titleRow.getCell(1).alignment = { horizontal: "center" }
     worksheet.mergeCells("A1:P1")
 
-    const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-          ? "PREMIUM BUSINESSMEN SERVICES"
-          : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"])
+    const companyRow = worksheet.addRow([ agencyType[process.env.REACT_APP_TYPE]?.name])
     companyRow.getCell(1).font = {
       name: "Arial",
       size: 14,

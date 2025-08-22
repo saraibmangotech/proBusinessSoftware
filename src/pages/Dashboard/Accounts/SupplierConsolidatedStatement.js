@@ -241,9 +241,7 @@ function SupplierConsolidatedProStatement() {
         worksheet.addRow(["CONSOLIDATED SUPPLIER  LEDGER REPORT"]).getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } };
         worksheet.mergeCells("A1:G1");
 
-        const company = agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-            ? "PREMIUM BUSINESSMEN SERVICES"
-            : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC";
+        const company = agencyType[process.env.REACT_APP_TYPE]?.name;
         worksheet.addRow([company]).getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } };
         worksheet.mergeCells("A2:G2");
 
