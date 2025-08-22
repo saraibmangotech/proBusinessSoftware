@@ -356,9 +356,7 @@ function AgingReportPayable() {
         worksheet.mergeCells(`A1:${String.fromCharCode(65 + columns.length - 1)}1`);
 
         const companyName =
-            agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-                ? "PREMIUM BUSINESSMEN SERVICES"
-                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC";
+            agencyType[process.env.REACT_APP_TYPE]?.name
 
         const companyRow = worksheet.addRow([companyName]);
         companyRow.font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } };

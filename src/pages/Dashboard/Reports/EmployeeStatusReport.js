@@ -96,9 +96,7 @@ function EmployeeStatusReport() {
 
     // Dynamic company name based on environment
     const name =
-      process.env.NEXT_PUBLIC_TYPE === "TASHEEL"
-        ? "PREMIUM BUSINESSMEN SERVICES"
-        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+       agencyType[process.env.REACT_APP_TYPE]?.name
 
     const companyRow = worksheet.addRow([name])
     companyRow.getCell(1).font = {

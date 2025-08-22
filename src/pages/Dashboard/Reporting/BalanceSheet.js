@@ -629,9 +629,7 @@ function BalanceSheet() {
     worksheet.mergeCells("A1:G1")
 
       const name =
-    agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+    agencyType[process.env.REACT_APP_TYPE]?.name
   const companyRow = worksheet.addRow([name])
     companyRow.getCell(1).font = {
       name: "Arial",
@@ -1050,9 +1048,7 @@ function BalanceSheet() {
     worksheet.mergeCells("A1:G1")
 
       const name =
-    agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+    agencyType[process.env.REACT_APP_TYPE]?.name
   const companyRow = worksheet.addRow([name])
     companyRow.getCell(1).font = {
       name: "Arial",

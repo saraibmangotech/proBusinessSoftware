@@ -210,9 +210,7 @@ function ConsolidatedCustomerReceivables() {
     worksheet.mergeCells("A1:H1")
 
     const company =
-      agencyType[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-        ? "PREMIUM BUSINESSMEN SERVICES"
-        : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+      agencyType[process.env.REACT_APP_TYPE]?.name
 
     worksheet.addRow([company]).getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } }
     worksheet.mergeCells("A2:H2")

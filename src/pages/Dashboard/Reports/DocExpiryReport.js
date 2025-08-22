@@ -9,6 +9,7 @@ import {
     Error as ErrorIcon,
 } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
+import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import * as XLSX from "xlsx"
 import { saveAs } from "file-saver"
 import moment from "moment"
@@ -199,9 +200,7 @@ function DocumentExpiryReport() {
 
         // Dynamic company name based on environment
         const name =
-            process.env.NEXT_PUBLIC_TYPE === "TASHEEL"
-                ? "PREMIUM BUSINESSMEN SERVICES"
-                : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+            agencyType[process.env.REACT_APP_TYPE]?.name
 
         const companyRow = worksheet.addRow([name])
         companyRow.getCell(1).font = {

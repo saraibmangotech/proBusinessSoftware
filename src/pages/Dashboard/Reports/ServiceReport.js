@@ -691,9 +691,7 @@ const downloadInvoiceExcel = (data) => {
   worksheet.mergeCells("A1:Z1");
 
   const companyRow = worksheet.addRow([
-    agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC",
+     agencyType[process.env.REACT_APP_TYPE]?.name
   ]);
   companyRow.getCell(1).font = {
     name: "Arial",
