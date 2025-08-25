@@ -459,9 +459,7 @@ function EmployeeSalesSummary() {
   worksheet.mergeCells(`A1:J1`) // Updated to J1 for 10 columns
 
   const companyName =
-    agencyType?.[process.env.REACT_APP_TYPE]?.category === "TASHEEL"
-      ? "PREMIUM BUSINESSMEN SERVICES"
-      : "PREMIUM PROFESSIONAL GOVERNMENT SERVICES LLC"
+     agencyType[process.env.REACT_APP_TYPE]?.name
 
   const companyRow = worksheet.addRow([companyName])
   companyRow.getCell(1).font = {
