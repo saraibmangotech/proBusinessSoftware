@@ -341,10 +341,10 @@ const getData = async () => {
         transport_allowance: Number.parseFloat(salary?.transport_allowance || 0),
         other_allowance: Number.parseFloat(salary?.other_allowance || 0),
         salaryPackage: Number.parseFloat(
-          (salary?.housing_allowance || 0) +
-          (salary?.transport_allowance || 0) +
-          (salary?.other_allowance || 0) +
-          (employee?.basic_salary || 0),
+          (parseFloat(salary?.housing_allowance) || 0) +
+          (parseFloat(salary?.transport_allowance)|| 0) +
+          (parseFloat(salary?.other_allowance) || 0) +
+          (parseFloat(employee?.basic_salary) || 0),
         ),
         routingCode: employee?.routing || salary?.routing_code || "",
         salaryIban: employee?.iban || salary?.salary_iban || "",
@@ -407,10 +407,10 @@ const getData = async () => {
 
                     // Calculate salary package
                     updatedRow.salaryPackage =
-                        (updatedRow.housing_allowance || 0) +
-                        (updatedRow.transport_allowance || 0) +
-                        (updatedRow.other_allowance || 0) +
-                        (updatedRow.salaryPaid || 0)
+                        (parseFloat(updatedRow.housing_allowance) || 0) +
+                        (parseFloat(updatedRow.transport_allowance) || 0) +
+                        (parseFloat(updatedRow.other_allowance) || 0) +
+                        (parseFloat(updatedRow.salaryPaid) || 0)
 
                     // Calculate total pay
                     const totalPay =
