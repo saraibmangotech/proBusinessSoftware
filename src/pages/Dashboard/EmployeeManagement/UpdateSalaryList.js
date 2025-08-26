@@ -104,7 +104,7 @@ function UpdateSalaryList() {
         { key: "joinDate", header: "Join Date", type: "auto" },
         { key: "division", header: "Division", type: "auto" },
 
-        { key: "workingDays", header: "Working Days", type: "auto" },
+        { key: "workingDays", header: "Working Days", type: "manual" },
         { key: "local", header: "Local/Non Local", type: "auto" },
         { key: "employeeId", header: "Employee ID", type: "auto" },
         { key: "salaryPaid", header: "Salary Basic", type: "auto" },
@@ -242,6 +242,7 @@ function UpdateSalaryList() {
                 other_add: item.otherAdd,
                 al: item.al,
                 sl: item.sl,
+                working_days: item.workingDays,
                 arrear: item.arrear,
                 gpssa_emp: item.gpssaEmp,
                 housing_allowance: item?.housing_allowance,
@@ -300,75 +301,75 @@ function UpdateSalaryList() {
         setSearchText(event.target.value)
     }
 
-const getData = async () => {
-  try {
-    const params = { group_id: id }
-    const { data } = await CustomerServices.getSalaryDetail(params)
-    console.log(data)
+    const getData = async () => {
+        try {
+            const params = { group_id: id }
+            const { data } = await CustomerServices.getSalaryDetail(params)
+            console.log(data)
 
-    const transformedData = data?.details?.rows?.map((salary) => {
-      const employee = salary?.user?.employee || {}
-      const rawJoinDate = employee?.date_of_joining ? new Date(employee?.date_of_joining) : null
+            const transformedData = data?.details?.rows?.map((salary) => {
+                const employee = salary?.user?.employee || {}
+                const rawJoinDate = employee?.date_of_joining ? new Date(employee?.date_of_joining) : null
 
-      return {
-        user_id: salary?.user_id,
-        id: salary?.id,
-        employeeName: employee?.first_name,
-        division: employee?.cost_center ? employee?.cost_center : '-',
-        workingDays: parseFloat(salary?.working_days || 0),
+                return {
+                    user_id: salary?.user_id,
+                    id: salary?.id,
+                    employeeName: employee?.first_name,
+                    division: employee?.cost_center ? employee?.cost_center : '-',
+                    workingDays: parseFloat(salary?.working_days || 0),
 
-        joinDate: rawJoinDate ? moment(rawJoinDate).format("DD-MM-YYYY") : "-", // formatted for UI
-        rawJoinDate, // ✅ keep actual date for sorting
+                    joinDate: rawJoinDate ? moment(rawJoinDate).format("DD-MM-YYYY") : "-", // formatted for UI
+                    rawJoinDate, // ✅ keep actual date for sorting
 
-        local: employee?.is_local ? "Local" : "Non Local",
-        employeeId: employee?.employee_code,
-        salaryPaid: Number.parseFloat(employee?.basic_salary) || 0,
-        commission: Number.parseFloat(salary?.commission) || 0,
-        otherAdd: Number.parseFloat(salary?.other_add) || 0,
-        al: Number.parseFloat(salary?.al) || 0,
-        sl: Number.parseFloat(salary?.sl) || 0,
-        arrear: Number.parseFloat(salary?.arrear) || 0,
-        gpssaEmp: Number.parseFloat(salary?.gpssa_emp) || 0,
-        staffAdvance: Number.parseFloat(salary?.staff_advance) || 0,
-        lateComm: Number.parseFloat(salary?.late_comm) || 0,
-        additional: Number.parseFloat(salary?.additional) || 0,
-        salaryDeduction: Number.parseFloat(salary?.salary_deduction) || 0,
-        unpaidLeave: Number.parseFloat(salary?.unpaid_leave) || 0,
-        totalPay: Number.parseFloat(salary?.total_pay) || 0,
-        commissionFinal: Number.parseFloat(salary?.commission_final) || 0,
-        netSalary: Number.parseFloat(salary?.net_salary) || 0,
-        housing_allowance: Number.parseFloat(salary?.housing_allowance || 0),
-        transport_allowance: Number.parseFloat(salary?.transport_allowance || 0),
-        other_allowance: Number.parseFloat(salary?.other_allowance || 0),
-        salaryPackage: Number.parseFloat(
-          (parseFloat(salary?.housing_allowance) || 0) +
-          (parseFloat(salary?.transport_allowance)|| 0) +
-          (parseFloat(salary?.other_allowance) || 0) +
-          (parseFloat(employee?.basic_salary) || 0),
-        ),
-        routingCode: employee?.routing || salary?.routing_code || "",
-        salaryIban: employee?.iban || salary?.salary_iban || "",
-        workPermit: employee?.work_permit || salary?.work_permit || "",
-        visa: employee?.visa || salary?.visa || "",
-        branch: employee?.branch || salary?.branch || "",
-        remark: salary?.remark || "",
-        minutesLate: Number.parseFloat(salary?.minutes_late) || 0,
-        alDay: Number.parseFloat(salary?.al_day) || 0,
-      }
-    })
+                    local: employee?.is_local ? "Local" : "Non Local",
+                    employeeId: employee?.employee_code,
+                    salaryPaid: Number.parseFloat(employee?.basic_salary) || 0,
+                    commission: Number.parseFloat(salary?.commission) || 0,
+                    otherAdd: Number.parseFloat(salary?.other_add) || 0,
+                    al: Number.parseFloat(salary?.al) || 0,
+                    sl: Number.parseFloat(salary?.sl) || 0,
+                    arrear: Number.parseFloat(salary?.arrear) || 0,
+                    gpssaEmp: Number.parseFloat(salary?.gpssa_emp) || 0,
+                    staffAdvance: Number.parseFloat(salary?.staff_advance) || 0,
+                    lateComm: Number.parseFloat(salary?.late_comm) || 0,
+                    additional: Number.parseFloat(salary?.additional) || 0,
+                    salaryDeduction: Number.parseFloat(salary?.salary_deduction) || 0,
+                    unpaidLeave: Number.parseFloat(salary?.unpaid_leave) || 0,
+                    totalPay: Number.parseFloat(salary?.total_pay) || 0,
+                    commissionFinal: Number.parseFloat(salary?.commission_final) || 0,
+                    netSalary: Number.parseFloat(salary?.net_salary) || 0,
+                    housing_allowance: Number.parseFloat(salary?.housing_allowance || 0),
+                    transport_allowance: Number.parseFloat(salary?.transport_allowance || 0),
+                    other_allowance: Number.parseFloat(salary?.other_allowance || 0),
+                    salaryPackage: Number.parseFloat(
+                        (parseFloat(salary?.housing_allowance) || 0) +
+                        (parseFloat(salary?.transport_allowance) || 0) +
+                        (parseFloat(salary?.other_allowance) || 0) +
+                        (parseFloat(employee?.basic_salary) || 0),
+                    ),
+                    routingCode: employee?.routing || salary?.routing_code || "",
+                    salaryIban: employee?.iban || salary?.salary_iban || "",
+                    workPermit: employee?.work_permit || salary?.work_permit || "",
+                    visa: employee?.visa || salary?.visa || "",
+                    branch: employee?.branch || salary?.branch || "",
+                    remark: salary?.remark || "",
+                    minutesLate: Number.parseFloat(salary?.minutes_late) || 0,
+                    alDay: Number.parseFloat(salary?.al_day) || 0,
+                }
+            })
 
-    // ✅ sort employees by join date
-    const sortedData = transformedData?.sort((a, b) => {
-      if (!a.rawJoinDate) return 1
-      if (!b.rawJoinDate) return -1
-      return a.rawJoinDate - b.rawJoinDate // ascending (oldest → newest)
-    })
+            // ✅ sort employees by join date
+            const sortedData = transformedData?.sort((a, b) => {
+                if (!a.rawJoinDate) return 1
+                if (!b.rawJoinDate) return -1
+                return a.rawJoinDate - b.rawJoinDate // ascending (oldest → newest)
+            })
 
-    setData(sortedData)
-  } catch (error) {
-    console.error("Error fetching employee data:", error)
-  }
-}
+            setData(sortedData)
+        } catch (error) {
+            console.error("Error fetching employee data:", error)
+        }
+    }
 
 
     useEffect(() => {

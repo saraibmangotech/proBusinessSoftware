@@ -120,7 +120,7 @@ function SalaryList() {
     { key: "employeeName", header: "Employee Name", type: "auto" },
     { key: "joinDate", header: "Join Date", type: "auto" },
     { key: "division", header: "Division", type: "auto" },
-    { key: "working_days", header: "Working Days", type: "auto" },
+    { key: "working_days", header: "Working Days", type: "manual" },
     { key: "employeeId", header: "Employee ID", type: "auto" },
     { key: "local", header: "Local/Non Local ", type: "auto" },
     { key: "salaryPaid", header: "Salary Basic", type: "auto" },
