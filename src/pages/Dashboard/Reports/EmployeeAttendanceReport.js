@@ -266,9 +266,9 @@ function EmployeeAttendanceReport() {
         worksheet.mergeCells("A1:J1")
 
         // Dynamic company name based on environment
- 
-   const name =
-       agencyType[process.env.REACT_APP_TYPE]?.name
+
+        const name =
+            agencyType[process.env.REACT_APP_TYPE]?.name
 
         const companyRow = worksheet.addRow([name])
         companyRow.getCell(1).font = {
@@ -353,6 +353,13 @@ function EmployeeAttendanceReport() {
 
         // Add all daily attendance records
         data?.daily?.forEach((day) => {
+            const leaveInfo = day?.leave?.type
+                ? day.leave.type === "Personal Time"
+                    ? `${day.leave.type} (${day.leave.requested_minutes} Minutes)`
+                    : day.leave.type === "Annual" && day.leave.is_halfday
+                        ? `${day.leave.type} (HalfDay)`
+                        : day.leave.type
+                : "N/A";
             const dayType = day.isWeekend ? "Weekend" : day.isHoliday ? "Holiday" : "Workday"
             const status = day.present ? "Present" : day.absent ? "Absent" : day.onLeave ? "On Leave" : "N/A"
 
@@ -361,7 +368,7 @@ function EmployeeAttendanceReport() {
                 moment(day.date).format("ddd"),
                 dayType,
                 status,
-                day.leave?.type || "N/A",
+                leaveInfo || "N/A",
                 day.check_in || "N/A",
                 day.check_out || "N/A",
                 day.worked_hours || 0,
@@ -580,7 +587,15 @@ function EmployeeAttendanceReport() {
         {
             header: "Type",
             accessorKey: "type",
-            cell: ({ row }) => <Box sx={{ fontFamily: "monospace", fontSize: "12px" }}>{row.original.leave?.type || "N/A"}</Box>,
+            cell: ({ row }) => <Box sx={{ fontFamily: "monospace", fontSize: "12px" }}>
+                {row.original.leave?.type || "N/A"}{" "}
+                {row?.original?.leave?.type == "Personal Time"
+                    ? `(${row?.original?.leave?.requested_minutes} Minutes)`
+                    : row?.original?.leave?.type == "Annual" && row?.original?.leave?.is_halfday
+                        ? ` (HalfDay)`
+                        : ""}
+
+            </Box>,
         },
         {
             header: "Check In",

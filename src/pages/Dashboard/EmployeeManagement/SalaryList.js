@@ -148,7 +148,7 @@ function SalaryList() {
     { key: "visa", header: "Visa", type: "auto" },
     { key: "branch", header: "BRANCH", type: "auto" },
     { key: "remarks", header: "Remarks", type: "text" },
-    { key: "minutesLate", header: "Minutes Late", type: "auto" },
+    { key: "minutesLate", header: "Minutes Late", type: "manual" },
     { key: "alDay", header: "AL Day", type: "auto" },
     { key: "actions", header: "Actions", type: "action" },
   ]
