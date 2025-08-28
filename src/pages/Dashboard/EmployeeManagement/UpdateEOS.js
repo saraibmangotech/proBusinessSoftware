@@ -430,7 +430,9 @@ function UpdateEOSList() {
                         (updatedRow.commission || 0) +
                         (updatedRow.otherAdd || 0) +
                         (updatedRow.al || 0) +
-                        (updatedRow.arrear || 0)
+                        (updatedRow.arrear || 0)   +
+                         (updatedRow.eos || 0)+
+                        (updatedRow.leaves_encashment || 0)
 
                     const deductions =
                         (updatedRow.staffAdvance || 0) +

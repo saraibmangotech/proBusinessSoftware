@@ -423,7 +423,7 @@ function DetailEOSList() {
         const headers = [
             "Employee Name", "Join Date", "Division", "Working Days", "Local/Non Local", "Employee ID",
             "Salary Basic", "Housing Allowance", "Transport Allowance", "Others", "Salary Package",
-            "Commission", "Other Add", "AL/SL", "Airfare", "Gratuity","Leave Encash","GPSSA", "Staff Advance", "Late Coming",
+            "Commission", "Other Add", "AL/SL", "Airfare", "Gratuity", "Leave Encash", "GPSSA", "Staff Advance", "Late Coming",
             "Additional", "Salary Deduction", "Unpaid Deduction", "Total pay", "Commission Return",
             "Net Salary", "ROUTING CODE", "SALARY IBAN", "WORK PERMIT", "Visa", "BRANCH",
             "Remarks", "Minutes Late", "AL Day",
@@ -455,7 +455,7 @@ function DetailEOSList() {
                 row.employeeName, row.joinDate, row.division, row.workingDays,
                 row.local, row.employeeId, row.salaryPaid, row.housing_allowance || 0,
                 row.transport_allowance || 0, row.other_allowance || 0, row.salaryPackage || 0,
-                row.commission, row.otherAdd, row.al, row.arrear,row.eos,row.leaves_encashment, row.gpssaEmp,
+                row.commission, row.otherAdd, row.al, row.arrear, row.eos, row.leaves_encashment, row.gpssaEmp,
                 row.staffAdvance, row.lateComm, row.additional, row.salaryDeduction,
                 row.unpaidLeave, row.totalPay, row.commissionFinal, row.netSalary,
                 row.routingCode, row.salaryIban, row.workPermit, row.visa, row.branch,
@@ -578,79 +578,79 @@ function DetailEOSList() {
         setSearchText(event.target.value)
     }
 
-const getData = async () => {
-  try {
-    let params = { group_id: id };
-    const { data } = await CustomerServices.getEOSDetail(params);
-    console.log(data);
+    const getData = async () => {
+        try {
+            let params = { group_id: id };
+            const { data } = await CustomerServices.getEOSDetail(params);
+            console.log(data);
 
-    // ✅ convert object to array first
-    const rowsArray = [data?.details];
+            // ✅ convert object to array first
+            const rowsArray = [data?.details];
 
-    const transformedData = rowsArray.map((salary) => {
-      const employee = salary?.user?.employee || {};
-      const rawJoinDate = employee?.date_of_joining;
+            const transformedData = rowsArray.map((salary) => {
+                const employee = salary?.user?.employee || {};
+                const rawJoinDate = employee?.date_of_joining;
 
-      return {
-        user_id: salary?.user_id,
-        id: salary?.id,
-        employeeName: employee?.first_name,
-        employee_salary_month: salary?.employee_salary?.month,
-        division: employee?.cost_center ? employee?.cost_center : "-",
-        workingDays: parseFloat(salary?.working_days || 0),
-        employeeId: employee?.employee_code,
-        joinDate: rawJoinDate ? moment(rawJoinDate).format("DD-MM-YYYY") : "-",
-        rawJoinDate: rawJoinDate ? new Date(rawJoinDate) : null,
+                return {
+                    user_id: salary?.user_id,
+                    id: salary?.id,
+                    employeeName: employee?.first_name,
+                    employee_salary_month: salary?.employee_salary?.month,
+                    division: employee?.cost_center ? employee?.cost_center : "-",
+                    workingDays: parseFloat(salary?.working_days || 0),
+                    employeeId: employee?.employee_code,
+                    joinDate: rawJoinDate ? moment(rawJoinDate).format("DD-MM-YYYY") : "-",
+                    rawJoinDate: rawJoinDate ? new Date(rawJoinDate) : null,
 
-        local: salary?.employee?.is_local ? "Local" : "Non Local",
-        remark: salary?.remark,
-        salaryPaid: parseFloat(employee?.basic_salary) || 0,
-        commission: parseFloat(salary?.commission) || 0,
-        other_allowance: parseFloat(salary?.other_allowance) || 0,
-        housing_allowance: parseFloat(salary?.housing_allowance) || 0,
-        transport_allowance: parseFloat(salary?.transport_allowance) || 0,
-        salaryPackage: parseFloat(salary?.salary_package) || 0,
-        otherAdd: parseFloat(salary?.other_add) || 0,
-        al: parseFloat(salary?.al) || 0,
-        sl: parseFloat(salary?.sl) || 0,
-        arrear: parseFloat(salary?.arrear) || 0,
-        eos: parseFloat(salary?.eos) || 0,
-        leaves_encashment: parseFloat(salary?.leaves_encashment) || 0,
-        gpssaEmp: parseFloat(salary?.gpssa_emp) || 0,
+                    local: salary?.employee?.is_local ? "Local" : "Non Local",
+                    remark: salary?.remark,
+                    salaryPaid: parseFloat(employee?.basic_salary) || 0,
+                    commission: parseFloat(salary?.commission) || 0,
+                    other_allowance: parseFloat(salary?.other_allowance) || 0,
+                    housing_allowance: parseFloat(salary?.housing_allowance) || 0,
+                    transport_allowance: parseFloat(salary?.transport_allowance) || 0,
+                    salaryPackage: parseFloat(salary?.salary_package) || 0,
+                    otherAdd: parseFloat(salary?.other_add) || 0,
+                    al: parseFloat(salary?.al) || 0,
+                    sl: parseFloat(salary?.sl) || 0,
+                    arrear: parseFloat(salary?.arrear) || 0,
+                    eos: parseFloat(salary?.eos) || 0,
+                    leaves_encashment: parseFloat(salary?.leaves_encashment) || 0,
+                    gpssaEmp: parseFloat(salary?.gpssa_emp) || 0,
 
-        staffAdvance: parseFloat(salary?.staff_advance) || 0,
-        lateComm: parseFloat(salary?.late_comm) || 0,
-        additional: parseFloat(salary?.additional) || 0,
-        salaryDeduction: parseFloat(salary?.salary_deduction) || 0,
-        unpaidLeave: parseFloat(salary?.unpaid_leave) || 0,
-        totalPay: parseFloat(salary?.total_pay) || 0,
-        commissionFinal: parseFloat(salary?.commission_final) || 0,
-        netSalary: parseFloat(salary?.net_salary) || 0,
+                    staffAdvance: parseFloat(salary?.staff_advance) || 0,
+                    lateComm: parseFloat(salary?.late_comm) || 0,
+                    additional: parseFloat(salary?.additional) || 0,
+                    salaryDeduction: parseFloat(salary?.salary_deduction) || 0,
+                    unpaidLeave: parseFloat(salary?.unpaid_leave) || 0,
+                    totalPay: parseFloat(salary?.total_pay) || 0,
+                    commissionFinal: parseFloat(salary?.commission_final) || 0,
+                    netSalary: parseFloat(salary?.net_salary) || 0,
 
-        routingCode: employee?.routing || salary?.routing_code || "",
-        salaryIban: employee?.iban || salary?.salary_iban || "",
-        workPermit: employee?.work_permit || salary?.work_permit || "",
-        visa: employee?.visa || salary?.visa || "",
-        branch: employee?.branch || salary?.branch || "",
-        remark: salary?.remark || "",
-        minutesLate: parseFloat(salary?.minutes_late) || 0,
-        alDay: parseFloat(salary?.al_day) || 0,
-      };
-    });
+                    routingCode: employee?.routing || salary?.routing_code || "",
+                    salaryIban: employee?.iban || salary?.salary_iban || "",
+                    workPermit: employee?.work_permit || salary?.work_permit || "",
+                    visa: employee?.visa || salary?.visa || "",
+                    branch: employee?.branch || salary?.branch || "",
+                    remark: salary?.remark || "",
+                    minutesLate: parseFloat(salary?.minutes_late) || 0,
+                    alDay: parseFloat(salary?.al_day) || 0,
+                };
+            });
 
-    // ✅ Sort by join date
-    const sortedData = transformedData.sort((a, b) => {
-      if (!a.rawJoinDate) return 1;
-      if (!b.rawJoinDate) return -1;
-      return a.rawJoinDate - b.rawJoinDate;
-    });
+            // ✅ Sort by join date
+            const sortedData = transformedData.sort((a, b) => {
+                if (!a.rawJoinDate) return 1;
+                if (!b.rawJoinDate) return -1;
+                return a.rawJoinDate - b.rawJoinDate;
+            });
 
-    console.log(sortedData, "sortedData");
-    setData(sortedData);
-  } catch (error) {
-    console.error("Error fetching employee data:", error);
-  }
-};
+            console.log(sortedData, "sortedData");
+            setData(sortedData);
+        } catch (error) {
+            console.error("Error fetching employee data:", error);
+        }
+    };
 
 
     useEffect(() => {
@@ -675,7 +675,9 @@ const getData = async () => {
                         updatedRow.otherAdd +
                         updatedRow.al +
                         updatedRow.sl +
-                        updatedRow.arrear
+                        updatedRow.arrear +
+                        (updatedRow.eos || 0) +
+                        (updatedRow.leaves_encashment || 0)
 
 
                     // Calculate net salary (total pay minus deductions)
