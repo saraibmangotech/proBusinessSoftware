@@ -11,7 +11,9 @@ const routes = {
   CreateEmployee:'/hrms/employees/add',
   UpdateEmployee:'/hrms/employees/update',
   CreateSalary:'/hrms/payroll/add',
-  UpdateSalary:'/hrms/payroll/update'
+  UpdateSalary:'/hrms/payroll/update',
+  CreateEos:'hrms/eos/add',
+  UpdateEOS:'hrms/eos/update'
   
 };
 

@@ -190,7 +190,11 @@ const routes = {
   AllocateNewShift:'/hrms/shifts/allocate',
   CreateInvoiceDebitNote:'purchases/FPinvoice/debitNote/add',
   deleteInvoiceDebitNote:'purchases/FPinvoice/debitNote/delete',
-  getHRStats:'hrms/stats'
+  getHRStats:'hrms/stats',
+  employeeEOSDetail:'hrms/eos/calculate',
+  getEos:'hrms/eos',
+  updateEOSStatus:'hrms/eos/updateStatus',
+  getEOSDetail:'hrms/eos/details'
 
 
 };

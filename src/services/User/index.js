@@ -6,6 +6,10 @@ const UserServices = {
     const data = await post(routes.CreateSubUser, obj);
     return data;
   },
+   CreateEos: async (obj) => {
+    const data = await post(routes.CreateEos, obj);
+    return data;
+  },
    CreateSalary: async (obj) => {
     const data = await post(routes.CreateSalary, obj);
     return data;
@@ -24,6 +28,10 @@ const UserServices = {
   },
    UpdateSalary: async (obj) => {
     const data = await patch(routes.UpdateSalary, obj);
+    return data;
+  },
+   UpdateEOS: async (obj) => {
+    const data = await patch(routes.UpdateEOS, obj);
     return data;
   },
   getUsers: async (params) => {
