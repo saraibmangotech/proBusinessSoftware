@@ -10,6 +10,7 @@ import {
     InputAdornment,
     TextField,
 } from '@mui/material';
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +23,7 @@ import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
 import { makeStyles } from '@mui/styles';
 import Pagination from 'components/Pagination';
-import { Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
+import { agencyType, Debounce, encryptData, formatPermissionData, handleExportWithComponent } from 'utils';
 import InputField from 'components/Input';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -48,6 +49,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import ExcelJS from 'exceljs';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -222,7 +224,7 @@ function EOSList() {
         try {
 
             let params = {
-                month: date ? moment(date).month() + 1 :  moment(selectedMonth).month() ,
+                month: date ? moment(date).month() + 1 : moment(selectedMonth).month(),
                 year: date ? moment(date).year() : moment().year(),
                 limit: 999999,
 
@@ -240,7 +242,457 @@ function EOSList() {
         }
     }
 
+    const downloadExcel = async (employeeData) => {
+        console.log(employeeData, 'employeeDataemployeeData');
 
+        const workbook = new ExcelJS.Workbook()
+        const worksheet = workbook.addWorksheet("Settlement Agreement")
+
+        // Page setup
+        worksheet.pageSetup = {
+            paperSize: 9,
+            orientation: "portrait",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            margins: { left: 0.7, right: 0.7, top: 1, bottom: 1, header: 0.3, footer: 0.3 },
+        }
+
+        // // Company Logo placeholder (you can add actual logo later)
+        // const logoRow = worksheet.addRow(["LOGO"])
+        // logoRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
+        // logoRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+        // worksheet.mergeCells("A1:F1")
+        // logoRow.height = 40
+
+        // worksheet.addRow([]) // spacing
+
+        // Company Name and Title
+        const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.name])
+        companyRow.getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "000000" } }
+        companyRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A1:F1")
+
+        const titleRow = worksheet.addRow(["Settlement Agreement"])
+        titleRow.getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "000000" } }
+        titleRow.getCell(1).alignment = { horizontal: "center" }
+        worksheet.mergeCells("A2:F2")
+
+        worksheet.addRow([]) // spacing
+
+        // Employee Details Section
+        const employeeDetailsRows = [
+            ["Staff:", employeeData.employeeId || "1090", "", "Basic Salary:", "", employeeData.salaryPaid || "3,000"],
+            [
+                "Employee:",
+                employeeData.employeeName || "Employee Name",
+                "",
+                "Allowance:",
+                "",
+                employeeData.other_allowance || "",
+            ],
+            [
+                "Department:",
+                employeeData.user?.employee?.department || "Department",
+                "",
+                "Housing:",
+                "",
+                employeeData.housing_allowance || "2,100",
+            ],
+            [
+                "Date of Joining:",
+                employeeData.joinDate || "29-Jan-19",
+                "",
+                "Transport:",
+                "",
+                employeeData.transport_allowance || "900",
+            ],
+            [
+                "Date of Resignation:",
+                employeeData.user?.employee?.date_of_leaving
+                    ? new Date(employeeData.user.employee.date_of_leaving).toLocaleDateString("en-GB")
+                    : "31-Jan-25",
+                "",
+                "Total:",
+                "",
+                employeeData.salaryPackage || "6,000",
+            ],
+            [
+                "Date of Separation:",
+                employeeData.user?.employee?.date_of_leaving
+                    ? new Date(employeeData.user.employee.date_of_leaving).toLocaleDateString("en-GB")
+                    : "01-Mar-25",
+                "",
+                "",
+                "",
+                "",
+            ],
+        ]
+
+        employeeDetailsRows.forEach((rowData, index) => {
+            const row = worksheet.addRow(rowData)
+
+            // Style for labels (columns A, D)
+            if (rowData[0]) {
+                row.getCell(1).font = { name: "Arial", size: 10, bold: true }
+                row.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "E0E0E0" } }
+            }
+            if (rowData[3]) {
+                row.getCell(4).font = { name: "Arial", size: 10, bold: true }
+                row.getCell(4).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "E0E0E0" } }
+            }
+
+            // Add borders to all cells
+            row.eachCell((cell, colNumber) => {
+                cell.border = {
+                    top: { style: "thin", color: { argb: "000000" } },
+                    left: { style: "thin", color: { argb: "000000" } },
+                    bottom: { style: "thin", color: { argb: "000000" } },
+                    right: { style: "thin", color: { argb: "000000" } },
+                }
+                cell.alignment = { horizontal: "left", vertical: "middle" }
+            })
+        })
+
+        worksheet.addRow([]) // spacing
+
+        // Salary Section Header
+        const salaryHeaderRow = worksheet.addRow(["Salary"])
+        salaryHeaderRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
+        salaryHeaderRow.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "808080" } }
+        salaryHeaderRow.getCell(1).font.color = { argb: "FFFFFF" }
+        worksheet.mergeCells(`A${salaryHeaderRow.number}:F${salaryHeaderRow.number}`)
+        salaryHeaderRow.getCell(1).border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+        }
+
+        // Salary Details
+        const salaryRows = [
+            ["Salary & commission", "", "", "", "", employeeData.salaryPaid || "Paid"],
+            ["Commission", "", "", "", "", employeeData.commission || "0"],
+            ["Other Allowances", "", "", "", "", employeeData.other_allowance || "0"],
+            ["Arrear", "", "", "", "", employeeData.arrear || "0"],
+        ]
+
+        salaryRows.forEach((rowData) => {
+            const row = worksheet.addRow(rowData)
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: { style: "thin", color: { argb: "000000" } },
+                    left: { style: "thin", color: { argb: "000000" } },
+                    bottom: { style: "thin", color: { argb: "000000" } },
+                    right: { style: "thin", color: { argb: "000000" } },
+                }
+                cell.alignment = { horizontal: "left", vertical: "middle" }
+            })
+        })
+
+        // Total payment row
+        const totalPaymentRow = worksheet.addRow([
+            "Total payment",
+            "",
+            "",
+            "",
+            "",
+            (
+
+                parseFloat(employeeData.commission || 0) +
+                parseFloat(employeeData.other_allowance || 0) +
+                parseFloat(employeeData.arrear || 0)
+            ).toFixed(2)
+            ,
+        ])
+        totalPaymentRow.getCell(1).font = { name: "Arial", size: 10, bold: true }
+        totalPaymentRow.getCell(6).font = { name: "Arial", size: 10, bold: true }
+        totalPaymentRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        worksheet.addRow([]) // spacing
+
+        // Leave Salary Section
+        const leaveSalaryHeaderRow = worksheet.addRow(["Leave salary"])
+        leaveSalaryHeaderRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
+        leaveSalaryHeaderRow.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "808080" } }
+        leaveSalaryHeaderRow.getCell(1).font.color = { argb: "FFFFFF" }
+        worksheet.mergeCells(`A${leaveSalaryHeaderRow.number}:F${leaveSalaryHeaderRow.number}`)
+        leaveSalaryHeaderRow.getCell(1).border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+        }
+
+        const leaveSalaryRow = worksheet.addRow([
+            "Leave Salary",
+            "",
+            "",
+            employeeData.alDay || "15.00",
+            "Days",
+            employeeData.leaves_encashment || "1,500",
+        ])
+        leaveSalaryRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        const totalLeaveSalaryRow = worksheet.addRow([
+            "Total Leave Salary Pay",
+            "",
+            "",
+            "",
+            "",
+            employeeData.leaves_encashment || "1,500",
+        ])
+        totalLeaveSalaryRow.getCell(1).font = { name: "Arial", size: 10, bold: true }
+        totalLeaveSalaryRow.getCell(6).font = { name: "Arial", size: 10, bold: true }
+        totalLeaveSalaryRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        worksheet.addRow([]) // spacing
+
+        // Gratuity Section
+        const gratuityHeaderRow = worksheet.addRow(["Gratuity"])
+        gratuityHeaderRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
+        gratuityHeaderRow.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "808080" } }
+        gratuityHeaderRow.getCell(1).font.color = { argb: "FFFFFF" }
+        worksheet.mergeCells(`A${gratuityHeaderRow.number}:F${gratuityHeaderRow.number}`)
+        gratuityHeaderRow.getCell(1).border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+        }
+
+        const yearsOfService = employeeData.user?.employee?.date_of_joining
+            ? ((new Date() - new Date(employeeData.user.employee.date_of_joining)) / (1000 * 60 * 60 * 24 * 365)).toFixed(2)
+            : "6.09"
+
+        const gratuityRow = worksheet.addRow(["Gratuity", "", "", yearsOfService, "Years", employeeData.eos || "13,770"])
+        gratuityRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        const totalGratuityRow = worksheet.addRow(["Total Gratuity Pay", "", "", "", "", employeeData.eos || "13,770"])
+        totalGratuityRow.getCell(1).font = { name: "Arial", size: 10, bold: true }
+        totalGratuityRow.getCell(6).font = { name: "Arial", size: 10, bold: true }
+        totalGratuityRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        worksheet.addRow([]) // spacing
+
+        // Deductions/Adjustments Section
+        const deductionsHeaderRow = worksheet.addRow(["Deductions/Adjustments"])
+        deductionsHeaderRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
+        deductionsHeaderRow.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "808080" } }
+        deductionsHeaderRow.getCell(1).font.color = { argb: "FFFFFF" }
+        worksheet.mergeCells(`A${deductionsHeaderRow.number}:F${deductionsHeaderRow.number}`)
+        deductionsHeaderRow.getCell(1).border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+        }
+
+        const deductionRow = worksheet.addRow([
+            `Less *Late Comings (${employeeData.minutesLate || 0} Minutes)`,
+            "",
+            "",
+            "",
+            "",
+            employeeData.lateComm || "0",
+        ])
+        deductionRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        const staffAdvanceRow = worksheet.addRow(["Staff Advance", "", "", "", "", employeeData.staffAdvance || "0"])
+        staffAdvanceRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        const salaryDeductionRow = worksheet.addRow([
+            "Salary Deduction",
+            "",
+            "",
+            "",
+            "",
+            // parseFloat(employeeData.staffAdvance || 0) +
+            parseFloat(employeeData.lateComm || 0) +
+            parseFloat(employeeData.additional || 0) +
+            parseFloat(employeeData.salaryDeduction || 0) +
+            parseFloat(employeeData.unpaidLeave || 0) +
+            parseFloat(employeeData.commissionFinal || 0) +
+            parseFloat(employeeData.gpssaEmp || 0)
+        ]);
+
+        salaryDeductionRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        // Empty rows for additional deductions
+        const emptyDeductionRow1 = worksheet.addRow(["", "", "", "", "", ""])
+        const emptyDeductionRow2 = worksheet.addRow(["", "", "", "", "", ""])
+            ;[emptyDeductionRow1, emptyDeductionRow2].forEach((row) => {
+                row.eachCell((cell) => {
+                    cell.border = {
+                        top: { style: "thin", color: { argb: "000000" } },
+                        left: { style: "thin", color: { argb: "000000" } },
+                        bottom: { style: "thin", color: { argb: "000000" } },
+                        right: { style: "thin", color: { argb: "000000" } },
+                    }
+                })
+            })
+
+        const totalDeductions =
+            parseFloat(employeeData.staffAdvance || 0) +
+            parseFloat(employeeData.lateComm || 0) +
+            parseFloat(employeeData.additional || 0) +
+            parseFloat(employeeData.salaryDeduction || 0) +
+            parseFloat(employeeData.unpaidLeave || 0) +
+            parseFloat(employeeData.commissionFinal || 0) +
+            parseFloat(employeeData.gpssaEmp || 0)
+        const totalDeductionRow = worksheet.addRow(["", "", "", "", "", totalDeductions.toFixed(2)])
+        totalDeductionRow.getCell(6).font = { name: "Arial", size: 10, bold: true }
+        totalDeductionRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thin", color: { argb: "000000" } },
+                left: { style: "thin", color: { argb: "000000" } },
+                bottom: { style: "thin", color: { argb: "000000" } },
+                right: { style: "thin", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "left", vertical: "middle" }
+        })
+
+        worksheet.addRow([]) // spacing
+
+        // NET FINAL PAY
+        const netFinalPayRow = worksheet.addRow(["NET FINAL PAY", "", "", "", "", employeeData.netSalary || "15,538"])
+        netFinalPayRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
+        netFinalPayRow.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "000000" } }
+        netFinalPayRow.getCell(1).font.color = { argb: "FFFFFF" }
+        netFinalPayRow.getCell(6).font = { name: "Arial", size: 12, bold: true }
+        netFinalPayRow.getCell(6).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "000000" } }
+        netFinalPayRow.getCell(6).font.color = { argb: "FFFFFF" }
+
+        worksheet.mergeCells(`A${netFinalPayRow.number}:E${netFinalPayRow.number}`)
+        netFinalPayRow.eachCell((cell) => {
+            cell.border = {
+                top: { style: "thick", color: { argb: "000000" } },
+                left: { style: "thick", color: { argb: "000000" } },
+                bottom: { style: "thick", color: { argb: "000000" } },
+                right: { style: "thick", color: { argb: "000000" } },
+            }
+            cell.alignment = { horizontal: "center", vertical: "middle" }
+        })
+
+        worksheet.addRow([]) // spacing
+        worksheet.addRow([]) // spacing
+
+        // Signature sections
+        const signatureRow = worksheet.addRow(["Finance", "", "", "HR"])
+        signatureRow.getCell(1).font = { name: "Arial", size: 10, bold: true }
+        signatureRow.getCell(1).alignment = { horizontal: "center" }
+        signatureRow.getCell(1).border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+        }
+
+        signatureRow.getCell(4).font = { name: "Arial", size: 10, bold: true }
+        signatureRow.getCell(4).alignment = { horizontal: "center" }
+        signatureRow.getCell(4).border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+        }
+
+        worksheet.addRow([]) // spacing
+
+        // Agreement text
+        const agreementText = worksheet.addRow([
+            "Upon the signing of this Settlement Agreement, the Second Party (Employee) shall hereby acknowledge that the employee agrees to the above calculations with all their employment entitlements from the First Party (Employer) including but not limited to any accrued leave pay or any other entitlements as per the UAE Labour Law No. 8 of 1980 and its amendments.",
+        ])
+        agreementText.getCell(1).font = { name: "Arial", size: 9 }
+        agreementText.getCell(1).alignment = { horizontal: "justify", vertical: "top", wrapText: true }
+        worksheet.mergeCells(`A${agreementText.number}:F${agreementText.number}`)
+        agreementText.height = 60
+
+        // Set column widths
+        worksheet.columns = [
+            { width: 25 }, // A
+            { width: 15 }, // B
+            { width: 15 }, // C
+            { width: 15 }, // D
+            { width: 15 }, // E
+            { width: 15 }, // F
+        ]
+
+        // Generate and download the file
+        const buffer = await workbook.xlsx.writeBuffer()
+        const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        })
+
+        const fileName = `Settlement_Agreement_${employeeData.employeeId}_${employeeData.employeeName?.replace(/\s+/g, "_") || "Employee"}_${new Date().toLocaleDateString("en-GB").replace(/\//g, "-")}.xlsx`
+
+        // Using saveAs function (make sure you have file-saver library)
+        saveAs(blob, fileName)
+    }
 
 
 
@@ -253,12 +705,12 @@ function EOSList() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
-  useEffect(() => {
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    useEffect(() => {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-  getCustomerQueue(oneMonthAgo);
-}, []);
+        getCustomerQueue(oneMonthAgo);
+    }, []);
 
     // *For Handle Filter
 
@@ -352,7 +804,7 @@ function EOSList() {
             accessorKey: "id",
 
         },
-         {
+        {
             header: "Employee ID",
             accessorKey: "id",
             cell: ({ row }) => (
@@ -370,7 +822,7 @@ function EOSList() {
                 </Box>
             ),
         },
-  {
+        {
             header: "Date Of joining",
             accessorKey: "doj",
             cell: ({ row }) => (
@@ -379,7 +831,7 @@ function EOSList() {
                 </Box>
             ),
         },
-         {
+        {
             header: "Date Of Leaving",
             accessorKey: "dov",
             cell: ({ row }) => (
@@ -447,9 +899,18 @@ function EOSList() {
         {
             header: "Actions",
             cell: ({ row }) => (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-
-
+                <Box sx={{ display: 'flex', gap: 1,alignItems:'flex-end' }}>
+                    {true && (
+                        <IconButton
+                            onClick={() => {
+                                downloadExcel(row?.original);
+                                localStorage.setItem("currentUrl", "/customer-detail");
+                            }}
+                            sx={{ cursor: "pointer",mt:2 }}
+                        >
+                            <ReceiptIcon sx={{ fontSize: 25 }} />
+                        </IconButton>
+                    )}
                     {true && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/eos-detail/${row?.original?.id}`); localStorage.setItem("currentUrl", '/customer-detail'); }} src={Images.detailIcon} width={'35px'}></Box>}
                     {row?.original?.status == 'Pending' && <Box
                         component="img"
