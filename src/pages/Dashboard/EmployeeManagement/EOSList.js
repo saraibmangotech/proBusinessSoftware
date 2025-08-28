@@ -438,10 +438,10 @@ const downloadExcel = async (employeeData) => {
   }
 
   const salaryRows = [
-    ["Salary & commission (1st)", "", "", "", "Paid", employeeData.salaryPaid || ""],
-    ["Commission (Incentive)", "", "", "", "", employeeData.commission || ""],
-    ["Other Allowances", "", "", "", "", employeeData.other_allowance || ""],
-    ["Arrear", "", "", "", "", employeeData.arrear || ""],
+    ["Salary & Commission", "", "", "", "Paid", employeeData.salaryPaid || ""],
+    ["Salary for", "", "", "", "", employeeData.commission || ""],
+    ["Commission From '2-22-2025' To '2-22-2025'", "", "", "", "", employeeData.other_allowance || ""],
+    ["Arrear", "", -"", "", "", employeeData.arrear || ""],
   ]
 
   salaryRows.forEach((rowData) => {
@@ -593,7 +593,7 @@ const downloadExcel = async (employeeData) => {
   }
 
   const deductionRow = worksheet.addRow([
-    "Less *Late Comings (Deduction)",
+    "Less : Late Comings (89 Minutes)",
     "",
     "",
     "",
