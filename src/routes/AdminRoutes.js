@@ -565,8 +565,20 @@ const AccountPayrollList = lazy(() =>
 const UpdateSalaryList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/UpdateSalaryList")
 );
+const UpdateEOSList = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/UpdateEOS")
+);
 const DetailSalaryList = lazy(() =>
   import("pages/Dashboard/EmployeeManagement/DetailSalaryList")
+);
+const DetailEOSList = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/DetailEOS")
+);
+const EOSCreate = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/EOSCreate")
+);
+const EOSList = lazy(() =>
+  import("pages/Dashboard/EmployeeManagement/EOSList")
 );
 const ConsolidatedProStatement = lazy(() =>
   import("pages/Dashboard/Accounts/ProConsolidatedStatement")
@@ -718,10 +730,18 @@ const AdminRoutes = [
     component: <DetailSalaryList />,
   },
   {
+    path: "/eos-detail/:id",
+    component: <DetailEOSList />,
+  },
+  {
+    path: "/update-eos/:id",
+    component: <UpdateEOSList />,
+  },
+  {
     path: "/salary-list",
     component: <SalariesList />,
   },
-    {
+  {
     path: "/account-payroll-list",
     component: <AccountPayrollList />,
   },
@@ -733,7 +753,7 @@ const AdminRoutes = [
     path: "/create-debit-note",
     component: <CreateDebitNote />,
   },
-   {
+  {
     path: "/create-invoice-debit-note",
     component: <CreateInvoiceDebitNote />,
   },
@@ -809,7 +829,7 @@ const AdminRoutes = [
     path: "/leave-report",
     component: <LeaveReport />,
   },
-    {
+  {
     path: "/employee-status-report",
     component: <EmployeeStatusReport />,
   },
@@ -1185,7 +1205,7 @@ const AdminRoutes = [
     path: "/sales-settlement-list",
     component: <SalesSettlementList />,
   },
-   {
+  {
     path: "/employee-pay-slips",
     component: <EmployeePaySlips />,
   },
@@ -1353,7 +1373,7 @@ const AdminRoutes = [
     path: "/employee-dashboard",
     component: <EmployeeDashboard />,
   },
-   {
+  {
     path: "/balance-sheet",
     component: <BalanceSheetDetailed />,
   },
@@ -1617,6 +1637,14 @@ const AdminRoutes = [
   {
     path: "/prepaid-expenses",
     component: <PrepaidExpenseList />,
+  },
+  {
+    path: "/create-eos",
+    component: <EOSCreate />,
+  },
+  {
+    path: "/eos-list",
+    component: <EOSList />,
   },
   {
     path: "/create-prepaid-expense",

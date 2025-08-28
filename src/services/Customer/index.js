@@ -6,7 +6,7 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
-    deleteInvoiceDebitNote: async (obj) => {
+  deleteInvoiceDebitNote: async (obj) => {
     const data = await deleted(routes.deleteInvoiceDebitNote, obj);
     return data;
   },
@@ -19,12 +19,16 @@ const CustomerServices = {
     const data = await post(routes.CreateLocation, obj);
     return data;
   },
-   CreateInvoiceDebitNote: async (obj) => {
+  CreateInvoiceDebitNote: async (obj) => {
     const data = await post(routes.CreateInvoiceDebitNote, obj);
     return data;
   },
   UpdateLocation: async (obj) => {
     const data = await patch(routes.UpdateLocation, obj);
+    return data;
+  },
+  updateEOSStatus: async (obj) => {
+    const data = await patch(routes.updateEOSStatus, obj);
     return data;
   },
   getSalaries: async (params) => {
@@ -35,8 +39,20 @@ const CustomerServices = {
     const data = await post(routes.PurchaseInvoiceSettlement, obj);
     return data;
   },
+   getEOSDetail: async (params) => {
+    const data = await get(routes.getEOSDetail, params);
+    return data;
+  },
   getLeaveDetail: async (params) => {
     const data = await get(routes.getLeaveDetail, params);
+    return data;
+  },
+    getEos: async (params) => {
+    const data = await get(routes.getEos, params);
+    return data;
+  },
+  employeeEOSDetail: async (params) => {
+    const data = await get(routes.employeeEOSDetail, params);
     return data;
   },
   getFPPayments: async (params) => {
@@ -76,7 +92,7 @@ const CustomerServices = {
     const data = await get(routes.getSalesSettlement, params);
     return data;
   },
-    getHRStats: async (params) => {
+  getHRStats: async (params) => {
     const data = await get(routes.getHRStats, params);
     return data;
   },

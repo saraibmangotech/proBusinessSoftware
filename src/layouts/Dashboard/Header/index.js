@@ -2678,6 +2678,17 @@ const [totalCount, setTotalCount] = useState(0)
               navigation: true,
               order_by: 55,
             },
+             {
+              id: 55,
+              name: "Final Statement Management",
+              icon: "customer",
+              parent_id: 22,
+              api: null,
+              route: "/eos-list",
+              identifier: null,
+              navigation: true,
+              order_by: 55,
+            },
             {
               id: 55,
               name: "Pay Slips",
