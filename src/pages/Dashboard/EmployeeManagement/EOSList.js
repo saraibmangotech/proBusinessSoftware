@@ -259,6 +259,7 @@ function EOSList() {
   })
 }
 
+
 const downloadExcel = async (employeeData) => {
   console.log(employeeData, "employeeDataemployeeData")
 
@@ -272,7 +273,7 @@ const downloadExcel = async (employeeData) => {
       let logoBase64
 
       // Handle agencyType logic with Images import
-      if (agencyType) {
+      if (true) {
         const logoUrl = agencyType === "TASHEEL" ? Images.tasheel : Images.aldeed
         if (logoUrl) {
           console.log("[v0] Converting agency logo URL to base64...")
@@ -343,7 +344,7 @@ const downloadExcel = async (employeeData) => {
   }
 
   // Company Name and Title - matching image layout
-  const companyRow = worksheet.addRow(["Premium Environment Services LLC"])
+  const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.name])
   companyRow.getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "000000" } }
   companyRow.getCell(1).alignment = { horizontal: "center" }
   worksheet.mergeCells("A2:F2")
@@ -356,10 +357,10 @@ const downloadExcel = async (employeeData) => {
   worksheet.addRow([]) // spacing
 
   const employeeDetailsRows = [
-    ["Staff:", employeeData.employee_id || "", "", "Basic Salary:", "", employeeData.user?.employee?.basicSalary || ""],
+    ["Staff:", employeeData?.user?.employee_id || "", "", "Basic Salary:", "", employeeData.user?.employee?.basicSalary || ""],
     [
       "Employee:",
-      employeeData.employeeName || "",
+      employeeData.user?.name || "",
       "",
       "Housing Allowance Quarterly 25%:",
       "",
@@ -382,7 +383,7 @@ const downloadExcel = async (employeeData) => {
       "",
       "Total:",
       "",
-      employeeData.salaryPackage || "6,000",
+      employeeData.salaryPackage || "",
     ],
     [
       "Date of Separation:",
@@ -686,27 +687,31 @@ const downloadExcel = async (employeeData) => {
   })
 
   worksheet.addRow([]) // spacing
+  worksheet.addRow([]) // spacing
 
-  const signatureRow = worksheet.addRow(["Finance", "", "", "HR"])
-  signatureRow.getCell(1).font = { name: "Arial", size: 10, bold: true }
-  signatureRow.getCell(1).alignment = { horizontal: "center" }
-  signatureRow.getCell(1).border = {
+  // Finance and HR section headers
+  const financeHRRow = worksheet.addRow(["",  "Finance", "","", "HR", ""])
+  financeHRRow.getCell(3).font = { name: "Arial", size: 11, bold: true }
+  financeHRRow.getCell(3).alignment = { horizontal: "center", vertical: "middle" }
+  financeHRRow.getCell(3).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D0D0D0" } }
+  financeHRRow.getCell(3).border = {
     top: { style: "thin", color: { argb: "000000" } },
     left: { style: "thin", color: { argb: "000000" } },
     bottom: { style: "thin", color: { argb: "000000" } },
     right: { style: "thin", color: { argb: "000000" } },
   }
-  worksheet.mergeCells(`A${signatureRow.number}:C${signatureRow.number}`)
 
-  signatureRow.getCell(4).font = { name: "Arial", size: 10, bold: true }
-  signatureRow.getCell(4).alignment = { horizontal: "center" }
-  signatureRow.getCell(4).border = {
+  financeHRRow.getCell(5).font = { name: "Arial", size: 11, bold: true }
+  financeHRRow.getCell(5).alignment = { horizontal: "center", vertical: "middle" }
+  financeHRRow.getCell(5).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D0D0D0" } }
+  financeHRRow.getCell(5).border = {
     top: { style: "thin", color: { argb: "000000" } },
     left: { style: "thin", color: { argb: "000000" } },
     bottom: { style: "thin", color: { argb: "000000" } },
     right: { style: "thin", color: { argb: "000000" } },
   }
-  worksheet.mergeCells(`D${signatureRow.number}:F${signatureRow.number}`)
+
+  worksheet.addRow([]) // spacing
 
   const agreementText = worksheet.addRow([
     "Upon the signing of this Settlement Agreement, the Second Party (Employee) shall hereby acknowledge that the employee agrees to the above calculations with all their employment entitlements from the First Party (Employer) including but not limited to any accrued leave pay or end of service or any other benefits and entitlements as per the contract & Labour Law 2021, and that no such monies are owed to them against the First Party. This calculation is true & binding and supercedes all the calculation that was made earlier.",
@@ -734,25 +739,18 @@ const downloadExcel = async (employeeData) => {
 
   worksheet.addRow([]) // spacing
 
-  const acknowledgedRow = worksheet.addRow(["Agreed & Acknowledged by Employee:"])
+  const acknowledgedRow = worksheet.addRow(["Agreed & Acknowledged by Employee:", "", "", "", "", ""])
   acknowledgedRow.getCell(1).font = { name: "Arial", size: 10, bold: true }
   acknowledgedRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
-  worksheet.mergeCells(`A${acknowledgedRow.number}:F${acknowledgedRow.number}`)
-
-  const signatureTableRow1 = worksheet.addRow(["", "", "", "", "", ""])
-  const signatureTableRow2 = worksheet.addRow(["", "", "", "", "", ""])
-  const signatureTableRow3 = worksheet.addRow(["", "", "", "", "", ""])
-  ;[signatureTableRow1, signatureTableRow2, signatureTableRow3].forEach((row) => {
-    row.eachCell((cell) => {
-      cell.border = {
-        top: { style: "thin", color: { argb: "000000" } },
-        left: { style: "thin", color: { argb: "000000" } },
-        bottom: { style: "thin", color: { argb: "000000" } },
-        right: { style: "thin", color: { argb: "000000" } },
-      }
-    })
-    row.height = 25
+  acknowledgedRow.eachCell((cell) => {
+    cell.border = {
+      top: { style: "thin", color: { argb: "000000" } },
+      left: { style: "thin", color: { argb: "000000" } },
+      bottom: { style: "thin", color: { argb: "000000" } },
+      right: { style: "thin", color: { argb: "000000" } },
+    }
   })
+  acknowledgedRow.height = 30
 
   worksheet.addRow([]) // spacing
   worksheet.addRow([]) // spacing
@@ -778,7 +776,6 @@ const downloadExcel = async (employeeData) => {
   // Using saveAs function (make sure you have file-saver library)
   saveAs(blob, fileName)
 }
-
 
     const handleSort = (key) => {
         let data = {
