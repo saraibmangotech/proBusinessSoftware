@@ -352,16 +352,42 @@ function EOSList() {
             accessorKey: "id",
 
         },
-        // {
-        //     header: "Employee Count",
-        //     accessorKey: "employee_count",
-        //     cell: ({ row }) => (
-        //         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-        //             {row?.original?.employee_count}
-        //         </Box>
-        //     ),
-        // },
-
+         {
+            header: "Employee ID",
+            accessorKey: "id",
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.user?.employee_id}
+                </Box>
+            ),
+        },
+        {
+            header: "Employee Name",
+            accessorKey: "name",
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {row?.original?.user?.name}
+                </Box>
+            ),
+        },
+  {
+            header: "Date Of joining",
+            accessorKey: "doj",
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row?.original?.user?.employee?.date_of_joining).format('DD-MM-YYYY')}
+                </Box>
+            ),
+        },
+         {
+            header: "Date Of Leaving",
+            accessorKey: "dov",
+            cell: ({ row }) => (
+                <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+                    {moment(row?.original?.user?.employee?.date_of_leaving).format('DD-MM-YYYY')}
+                </Box>
+            ),
+        },
         {
             header: "Month",
             accessorKey: "month", // ✅ Corrected for search
