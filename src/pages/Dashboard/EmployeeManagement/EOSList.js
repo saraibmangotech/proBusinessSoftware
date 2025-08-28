@@ -50,6 +50,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import ExcelJS from 'exceljs';
+import axios from 'axios';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -247,6 +248,12 @@ function EOSList() {
 
         const workbook = new ExcelJS.Workbook()
         const worksheet = workbook.addWorksheet("Settlement Agreement")
+        const imageBuffer = await axios.get('https://upload.wikimedia.org/wikipedia/fr/0/04/Dunkin%27_Donuts_Logo.png', { responseType: 'arraybuffer' });
+        const imageId = workbook.addImage({
+            buffer: imageBuffer.data,
+            extension: 'png',
+        })
+
 
         // Page setup
         worksheet.pageSetup = {
@@ -258,14 +265,12 @@ function EOSList() {
             margins: { left: 0.7, right: 0.7, top: 1, bottom: 1, header: 0.3, footer: 0.3 },
         }
 
-        // // Company Logo placeholder (you can add actual logo later)
-        // const logoRow = worksheet.addRow(["LOGO"])
-        // logoRow.getCell(1).font = { name: "Arial", size: 12, bold: true }
-        // logoRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
-        // worksheet.mergeCells("A1:F1")
-        // logoRow.height = 40
+        // Company Logo placeholder (you can add actual logo later)
+        // Add company logo image to the worksheet
+        worksheet.addImage(imageId, 'A1:D6');
+        worksheet.addRow([]); // spacing after logo
 
-        // worksheet.addRow([]) // spacing
+        worksheet.addRow([]) // spacing
 
         // Company Name and Title
         const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.name])

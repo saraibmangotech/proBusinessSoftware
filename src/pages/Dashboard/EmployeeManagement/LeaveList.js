@@ -794,7 +794,7 @@ function LeaveList() {
             cell: ({ row }) => {
                 let { document: file, name } = row.original;
                 // Remove starting slash if present
-                if (file && file.startsWith('/')) file = file.substring(1);
+               // if (file && file.startsWith('/')) file = file.substring(1);
                 const extension = file?.split('.').pop().toLowerCase();
 
                 const getIcon = () => {

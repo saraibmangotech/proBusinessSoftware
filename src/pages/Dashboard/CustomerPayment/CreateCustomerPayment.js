@@ -916,7 +916,7 @@ function CreateCustomerPayment() {
                                             </Grid>
                                             <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
-                                                    label="Description"
+                                                    label="Desc / Narration"
                                                     size="small"
                                                     placeholder="Description"
 
@@ -981,7 +981,7 @@ function CreateCustomerPayment() {
                                                 />
                                             </Grid>
 
-                                            <Grid item md={3.8} sm={12} xs={12}>
+                                            {/* <Grid item md={3.8} sm={12} xs={12}>
                                                 <InputField
                                                     label="Narration"
                                                     size="small"
@@ -989,7 +989,7 @@ function CreateCustomerPayment() {
                                                     register={register1("narration")}
                                                     error={errors1?.narration?.message}
                                                 />
-                                            </Grid>
+                                            </Grid> */}
 
 
 

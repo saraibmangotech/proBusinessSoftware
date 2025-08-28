@@ -439,7 +439,7 @@ function PayFpPayments() {
                 total_amount: getValues('total'),
                 final_amount: finalTotal,
                 invoices: selectedInvoice,
-                narration: formData?.narration,
+                //narration: formData?.narration,
                 notes: formData?.notes,
                 payment_date:moment(date).format('MM-DD-YYYY'),
                 payment_mode: paymentModesString,
@@ -885,7 +885,7 @@ function PayFpPayments() {
                             <Grid container spacing={1} p={2} justifyContent={'space-between'} alignItems={'center'}>
                                 <Grid item md={4} sm={12} xs={12}>
                                     <InputField
-                                        label="Notes"
+                                        label="Notes / Narration"
                                         size="small"
                                         placeholder="Notes"
                                         register={register("notes")}
@@ -1018,7 +1018,7 @@ function PayFpPayments() {
                                         />
                                     </Grid>
 
-                                    <Grid item md={3} sm={12} xs={12}>
+                                    {/* <Grid item md={3} sm={12} xs={12}>
                                         <InputField
                                             label="Narration"
                                             size="small"
@@ -1026,7 +1026,7 @@ function PayFpPayments() {
                                             register={register("narration")}
                                             error={errors?.narration?.message}
                                         />
-                                    </Grid>
+                                    </Grid> */}
 
                                     <Grid container p={2} spacing={2}>
                                         <Grid item md={3} sm={12} xs={12}>

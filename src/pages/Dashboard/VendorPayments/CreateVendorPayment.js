@@ -878,7 +878,7 @@ function CreateVendorPayment() {
                                             </Grid>
                                             <Grid item md={3.8} sm={5.5} xs={12}>
                                                 <InputField
-                                                    label="Description"
+                                                    label="Notes / Narration"
                                                     size="small"
                                                     placeholder="Description"
 
@@ -942,7 +942,7 @@ function CreateVendorPayment() {
                                                     error={errors1?.balance?.message}
                                                 />
                                             </Grid>
-
+{/* 
                                             <Grid item md={3.8} sm={12} xs={12}>
                                                 <InputField
                                                     label="Narration"
@@ -951,7 +951,7 @@ function CreateVendorPayment() {
                                                     register={register1("narration")}
                                                     error={errors1?.narration?.message}
                                                 />
-                                            </Grid>
+                                            </Grid> */}
 
 
 

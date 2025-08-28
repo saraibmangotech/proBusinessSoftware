@@ -677,7 +677,7 @@ function CreateEmployee() {
           </Grid>
           <Grid item xs={12} sm={2.8}>
             <InputField
-              label={" Emirates ID :*"}
+              label={" Emirates ID :"}
               size={"small"}
               placeholder={" Emirates ID "}
               error={errors?.emirates?.message}
