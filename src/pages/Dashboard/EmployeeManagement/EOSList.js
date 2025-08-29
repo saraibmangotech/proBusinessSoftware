@@ -439,10 +439,10 @@ const downloadExcel = async (employeeData) => {
   }
 
   const salaryRows = [
-    ["Salary & commission (1st)", "", "", "", "Paid", employeeData.salaryPaid || ""],
-    ["Commission (Incentive)", "", "", "", "", employeeData.commission || ""],
-    ["Other Allowances", "", "", "", "", employeeData.other_allowance || ""],
-    ["Arrear", "", "", "", "", employeeData.arrear || ""],
+    ["Salary & Commission", "", "", "", "Paid", employeeData.salaryPaid || ""],
+    ["Salary for", "", "", "", "", employeeData.commission || ""],
+    ["Commission From '2-22-2025' To '2-22-2025'", "", "", "", "", employeeData.other_allowance || ""],
+    ["Arrear", "", -"", "", "", employeeData.arrear || ""],
   ]
 
   salaryRows.forEach((rowData) => {
@@ -594,7 +594,7 @@ const downloadExcel = async (employeeData) => {
   }
 
   const deductionRow = worksheet.addRow([
-    "Less *Late Comings (Deduction)",
+    "Less : Late Comings (89 Minutes)",
     "",
     "",
     "",
@@ -687,30 +687,33 @@ const downloadExcel = async (employeeData) => {
     cell.alignment = { horizontal: "center", vertical: "middle" }
   })
 
+ worksheet.addRow([]) // spacing
   worksheet.addRow([]) // spacing
   worksheet.addRow([]) // spacing
 
-  // Finance and HR section headers
-  const financeHRRow = worksheet.addRow(["",  "Finance", "","", "HR", ""])
-  financeHRRow.getCell(3).font = { name: "Arial", size: 11, bold: true }
-  financeHRRow.getCell(3).alignment = { horizontal: "center", vertical: "middle" }
-  financeHRRow.getCell(3).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D0D0D0" } }
-  financeHRRow.getCell(3).border = {
+  worksheet.addRow([]) // spacing
+
+  const financeHRRow = worksheet.addRow(["", "Finance", "", "HR", "", ""])
+  financeHRRow.getCell(2).font = { name: "Arial", size: 11, bold: true }
+  financeHRRow.getCell(2).alignment = { horizontal: "center", vertical: "middle" }
+  financeHRRow.getCell(2).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D0D0D0" } }
+  financeHRRow.getCell(2).border = {
     top: { style: "thin", color: { argb: "000000" } },
     left: { style: "thin", color: { argb: "000000" } },
     bottom: { style: "thin", color: { argb: "000000" } },
     right: { style: "thin", color: { argb: "000000" } },
   }
 
-  financeHRRow.getCell(5).font = { name: "Arial", size: 11, bold: true }
-  financeHRRow.getCell(5).alignment = { horizontal: "center", vertical: "middle" }
-  financeHRRow.getCell(5).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D0D0D0" } }
-  financeHRRow.getCell(5).border = {
+  financeHRRow.getCell(4).font = { name: "Arial", size: 11, bold: true }
+  financeHRRow.getCell(4).alignment = { horizontal: "center", vertical: "middle" }
+  financeHRRow.getCell(4).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "D0D0D0" } }
+  financeHRRow.getCell(4).border = {
     top: { style: "thin", color: { argb: "000000" } },
     left: { style: "thin", color: { argb: "000000" } },
     bottom: { style: "thin", color: { argb: "000000" } },
     right: { style: "thin", color: { argb: "000000" } },
   }
+
 
   worksheet.addRow([]) // spacing
 
