@@ -169,12 +169,12 @@ function UpdateUser() {
     }
   }
 
-  const selectedCategoryObjects = categories.filter((category) => selectedCategory.includes(category.id))
+  const selectedCategoryObjects = categories.filter((category) => selectedCategory?.includes(category.id))
 
   // Handle checkbox change
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory((prev) => {
-      if (prev.includes(categoryId)) {
+      if (prev?.includes(categoryId)) {
         // Remove if already selected
         return prev.filter((id) => id !== categoryId)
       } else {
