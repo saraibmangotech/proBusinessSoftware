@@ -144,7 +144,7 @@ function UpdateUser() {
       setLoading(false)
     }
   }
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState([])
   const [categories, setCategories] = useState([])
   // *For Get Customer Queue
   const getCategoryList = async (page, limit, filter) => {
