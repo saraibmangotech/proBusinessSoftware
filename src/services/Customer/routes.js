@@ -194,7 +194,8 @@ const routes = {
   employeeEOSDetail:'hrms/eos/calculate',
   getEos:'hrms/eos',
   updateEOSStatus:'hrms/eos/updateStatus',
-  getEOSDetail:'hrms/eos/details'
+  getEOSDetail:'hrms/eos/details',
+  getUserCategory:'users/profile'
 
 
 };
