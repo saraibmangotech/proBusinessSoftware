@@ -253,6 +253,11 @@ function Dashboard() {
             : user?.role_id == 6
               ? "HR"
               : "",
+           user?.role_id == 1006
+            ? "Typist Reception"
+            : user?.role_id == 6
+              ? "HR"
+              : "",
   )
   const [shift, setShift] = useState(null)
   const [employeeAttendance, setEmployeeAttendance] = useState(null)
@@ -716,7 +721,8 @@ function Dashboard() {
                               {birthday.department} • {birthday.designation}
                             </Typography>
                             <Typography variant="caption" sx={{ display: "block", color: "#9C27B0" }}>
-                              Aug {birthday.dob_day}
+
+                              {moment(birthday.dob_day).format('MMM DD')}
                             </Typography>
                           </Box>
                         </Box>
@@ -795,7 +801,7 @@ function Dashboard() {
                                 {anniversary.department} • {anniversary.designation}
                               </Typography>
                               <Typography variant="caption" sx={{ color: "#4CAF50", display: "block" }}>
-                                Aug {new Date(anniversary.date_of_joining).getDate()}
+                                {moment(anniversary.date_of_joining).format('MMM DD')}
                               </Typography>
                             </Box>
                             <Chip

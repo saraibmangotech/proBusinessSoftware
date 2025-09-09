@@ -161,6 +161,29 @@ function UpdateUser() {
 
       const { data } = await CustomerServices.getCategoryList(params)
       setCategories(data?.categories);
+      getUserCategory(data?.categories)
+
+
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
+  const getUserCategory = async (categories) => {
+
+
+    try {
+
+      let params = {
+        id: state?.id
+
+
+      }
+
+      const { data } = await CustomerServices.getUserCategory(params)
+      console.log(data?.permittedCategories?.map((cat) => cat.category_id) || []);
+      setSelectedCategory(
+        data?.permittedCategories?.map((cat) => cat.category_id) || []
+      );
 
 
 
@@ -168,7 +191,6 @@ function UpdateUser() {
       showErrorToast(error)
     }
   }
-
   const selectedCategoryObjects = categories.filter((category) => selectedCategory?.includes(category.id))
 
   // Handle checkbox change
@@ -183,6 +205,8 @@ function UpdateUser() {
       }
     })
   }
+  console.log(selectedCategory);
+
   useEffect(() => {
     getCategoryList()
     getRoles()

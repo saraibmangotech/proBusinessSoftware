@@ -35,6 +35,10 @@ const CustomerServices = {
     const data = await get(routes.getSalaries, params);
     return data;
   },
+   getUserCategory: async (params) => {
+    const data = await get(routes.getUserCategory, params);
+    return data;
+  },
     getPaymentInvoiceList: async (params) => {
     const data = await get(routes.getPaymentInvoiceList, params);
     return data;
