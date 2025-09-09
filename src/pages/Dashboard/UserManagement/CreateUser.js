@@ -79,7 +79,7 @@ function CreateUser() {
 
     const selected = typeof value === 'string' ? value.split(',') : value;
 
-    const selectedObjects = categories.filter((item) => selected.includes(item.label));
+    const selectedObjects = categories.filter((item) => selected?.includes(item.label));
 
     setPersonName(selectedObjects); // Now you're storing the whole objects
   };
@@ -168,12 +168,12 @@ function CreateUser() {
     getRoles()
   }, [])
 
-  const selectedCategoryObjects = categories.filter((category) => selectedCategory.includes(category.id))
+  const selectedCategoryObjects = categories.filter((category) => selectedCategory?.includes(category.id))
 
   // Handle checkbox change
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory((prev) => {
-      if (prev.includes(categoryId)) {
+      if (prev?.includes(categoryId)) {
         // Remove if already selected
         return prev.filter((id) => id !== categoryId)
       } else {
