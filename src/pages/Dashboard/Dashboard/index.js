@@ -696,7 +696,7 @@ function Dashboard() {
                             </Typography>
                             <Typography variant="caption" sx={{ display: "block", color: "#9C27B0" }}>
 
-                              {moment(birthday.dob_day).format('MMM DD')}
+                              {moment(birthday.date_of_birth).format('MMM DD')}
                             </Typography>
                           </Box>
                         </Box>
