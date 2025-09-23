@@ -145,6 +145,7 @@ function UnsettledReceipts() {
         getValues,
         reset,
     } = useForm();
+    const { register: register3, handleSubmit: handleSubmit3, formState: { errors: errors3 }, setValue: setValue3, control: control3 } = useForm();
     const invoiceRef = useRef(null);
     const invoiceRef2 = useRef(null);
     const invoiceRef3 = useRef(null);
@@ -351,7 +352,7 @@ function UnsettledReceipts() {
                 to_date: toDate ? moment(toDate).format('MM-DD-YYYY') : '',
                 is_paid: true,
                 invoice_number: getValues('invoiceNumber'),
-                unsettled:true,
+                unsettled: true,
 
 
             }
@@ -434,10 +435,11 @@ function UnsettledReceipts() {
     }
     const UnsettledInvoice = async (item) => {
 
-
+setConfirmationDialog(false)
         try {
             let params = {
                 id: selectedData?.id,
+                date: invoiceDate
 
 
             }
@@ -451,6 +453,7 @@ function UnsettledReceipts() {
             showErrorToast(error)
         } finally {
             // setLoader(false)
+            setInvoiceDate(null)
         }
     }
     const handleVoid = async (item) => {
@@ -459,8 +462,8 @@ function UnsettledReceipts() {
         try {
             let params = {
                 id: selectedData?.id,
-                void_type:buttonVal
-                
+                void_type: buttonVal
+
 
 
             }
@@ -617,7 +620,7 @@ function UnsettledReceipts() {
             accessorKey: "id",
             cell: ({ row }) => (
                 <Box variant="contained" color="primary" sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-                    {'RC-'+ row?.original?.id}
+                    {'RC-' + row?.original?.id}
                 </Box>
             ),
         },
@@ -662,7 +665,7 @@ function UnsettledReceipts() {
                     {(
                         row?.original?.payment_entries?.reduce((total2, item) => {
                             return parseFloat(total2) + parseFloat(item?.amount ?? 0);
-                        }, 0) 
+                        }, 0)
                     ).toFixed(2)}
                 </Box>
             ),
@@ -677,7 +680,7 @@ function UnsettledReceipts() {
                 </Box>
             ),
         },
-      
+
         {
             id: "created_at",
             header: "Receipt Date",
@@ -688,7 +691,7 @@ function UnsettledReceipts() {
                 </Box>
             ),
         },
-        
+
         {
             id: "status",
             header: "Status",
@@ -725,9 +728,9 @@ function UnsettledReceipts() {
                     )}
 
 
-              
-                 
-               
+
+
+
                 </Box>
             ),
         },
@@ -800,7 +803,7 @@ function UnsettledReceipts() {
         worksheet.mergeCells("A2:G2")
 
         const dateRow = worksheet.addRow([
-            `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
+            `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
         ])
         dateRow.getCell(1).font = {
             name: "Arial",
@@ -813,7 +816,7 @@ function UnsettledReceipts() {
 
         const periodRow = worksheet.addRow([
             toDate && fromDate
-                ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
+                ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
                 : `Period: All`,
         ])
         periodRow.getCell(1).font = {
@@ -829,7 +832,7 @@ function UnsettledReceipts() {
         worksheet.addRow([])
 
         // Define headers based on the columns structure (excluding Actions column)
-        const headers = ["Receipt No#", "Invoice Number", "Customer Name", "Total Amount", "Invoice Date", "Receipt Date", "Status" ]
+        const headers = ["Receipt No#", "Invoice Number", "Customer Name", "Total Amount", "Invoice Date", "Receipt Date", "Status"]
 
         // Add headers with professional styling
         const headerRow = worksheet.addRow(headers)
@@ -877,7 +880,7 @@ function UnsettledReceipts() {
 
 
             const dataRow = worksheet.addRow([
-                'RC-'+item?.id || "",
+                'RC-' + item?.id || "",
                 item?.payment_items[0]?.invoice?.invoice_number,
                 item?.payment_items[0]?.invoice?.customer_name,
                 calculatedTotalAmount.toFixed(2),
@@ -909,7 +912,7 @@ function UnsettledReceipts() {
                 }
 
 
-               
+
             })
         })
 
@@ -917,7 +920,7 @@ function UnsettledReceipts() {
         worksheet.addRow([])
 
         // Add totals row
-        const totalRow = worksheet.addRow(["", "","",totalAmount.toFixed(2), "", "", ""])
+        const totalRow = worksheet.addRow(["", "", "", totalAmount.toFixed(2), "", "", ""])
 
         // Style totals row
         totalRow.eachCell((cell, colNumber) => {
@@ -1016,11 +1019,11 @@ function UnsettledReceipts() {
             const blob = new Blob([buffer], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             })
-               saveAs(blob,
-                                        toDate && fromDate
-                                            ? `unsettled_receipt : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
-                                            : `unsettled_receipt: Present `,);
-           
+            saveAs(blob,
+                toDate && fromDate
+                    ? `unsettled_receipt : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
+                    : `unsettled_receipt: Present `,);
+
         }
 
         download()
@@ -1035,7 +1038,7 @@ function UnsettledReceipts() {
     return (
         <Box sx={{ p: 3 }}>
 
-            <ConfirmationDialog
+            {/* <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
                 message={"Are You Sure? This action can not be reversed."}
@@ -1044,7 +1047,55 @@ function UnsettledReceipts() {
                     UnsettledInvoice()
 
                 }}
-            />
+            /> */}
+            {console.log(errors3,'errors3')}
+            <SimpleDialog
+                open={confirmationDialog}
+                onClose={() => setConfirmationDialog(false)}
+                title={"Refund?"}
+            >
+                <Box component="form" onSubmit={handleSubmit3(UnsettledInvoice)}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12}>
+                            <DatePicker
+                                label={"Date"}
+
+                                size="small"
+                                value={invoiceDate}
+                                error={errors3?.invoiceDate?.message}
+                                register={register3("invoiceDate", {
+                                    required: invoiceDate ? false : "Please enter  date.",
+                                })}
+                                onChange={(date) => handleFromDate2(date)}
+                            />
+                        </Grid>
+                        <Grid container sx={{ justifyContent: "center" }}>
+                            <Grid
+                                item
+                                xs={6}
+                                sm={6}
+                                sx={{
+                                    mt: 2,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: "25px",
+                                }}
+                            >
+                                <PrimaryButton
+                                    bgcolor={Colors.primary}
+                                    title="Yes,Confirm"
+                                    type="submit"
+                                />
+                                <PrimaryButton
+                                    onClick={() => setConfirmationDialog(false)}
+                                    bgcolor={"#FF1F25"}
+                                    title="No,Cancel"
+                                />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </SimpleDialog>
 
             <ConfirmationDialog
                 open={confirmationDialog2}
@@ -1106,9 +1157,9 @@ function UnsettledReceipts() {
                 title={"Void Invoice"}
             >
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
-                    <Box sx={{display:'flex',justifyContent:'center',gap:2}}>
-                        <Box>Invoice No : {selectedData?.invoice_number ? selectedData?.invoice_number : '-' } </Box>
-                        {selectedData?.payment?.id && <Box>Receipt No : {selectedData?.payment?.id ? 'RC-'+selectedData?.payment?.id : '-'}</Box>}
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                        <Box>Invoice No : {selectedData?.invoice_number ? selectedData?.invoice_number : '-'} </Box>
+                        {selectedData?.payment?.id && <Box>Receipt No : {selectedData?.payment?.id ? 'RC-' + selectedData?.payment?.id : '-'}</Box>}
                     </Box>
                     <Grid container spacing={2}>
 
@@ -1124,18 +1175,18 @@ function UnsettledReceipts() {
                             }}
                         >
                             <PrimaryButton
-                                onClick={() => {setButtonVal('invoice');setConfirmationDialog2(true)}}
+                                onClick={() => { setButtonVal('invoice'); setConfirmationDialog2(true) }}
                                 bgcolor={Colors.primary}
                                 title="Void Invoice"
 
                             />
                             {paid && <PrimaryButton
-                                onClick={() => {setButtonVal('receipt');setConfirmationDialog2(true)}}
+                                onClick={() => { setButtonVal('receipt'); setConfirmationDialog2(true) }}
                                 bgcolor={"#FF1F25"}
                                 title="Void Receipt"
                             />}
                             {paid && <PrimaryButton
-                                onClick={() => {setButtonVal('both');setConfirmationDialog2(true)}}
+                                onClick={() => { setButtonVal('both'); setConfirmationDialog2(true) }}
                                 bgcolor={"#FF1F25"}
                                 title="Void Both"
                             />}
