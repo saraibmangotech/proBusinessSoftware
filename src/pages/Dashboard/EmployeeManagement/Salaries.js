@@ -46,6 +46,8 @@ import FinanceServices from 'services/Finance';
 import BuildIcon from '@mui/icons-material/Build';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import DatePicker2 from 'components/DatePicker';
+
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 // *For Table Style
@@ -198,6 +200,7 @@ function SalariesList() {
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
     const [currentPage, setCurrentPage] = useState(1);
+    const [invoiceDate, setInvoiceDate] = useState(null)
 
 
 
@@ -222,7 +225,7 @@ function SalariesList() {
         try {
 
             let params = {
-                month: date ? moment(date).month() + 1 :  moment(selectedMonth).month() ,
+                month: date ? moment(date).month() + 1 : moment(selectedMonth).month(),
                 year: date ? moment(date).year() : moment().year(),
                 limit: 999999,
 
@@ -253,12 +256,12 @@ function SalariesList() {
         Debounce(() => getCustomerQueue(1, '', data));
     }
 
-  useEffect(() => {
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    useEffect(() => {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-  getCustomerQueue(oneMonthAgo);
-}, []);
+        getCustomerQueue(oneMonthAgo);
+    }, []);
 
     // *For Handle Filter
 
@@ -290,6 +293,7 @@ function SalariesList() {
             let obj = {
                 id: selectedData?.id,
                 status: status?.id,
+                date:invoiceDate
 
             };
 
@@ -309,6 +313,7 @@ function SalariesList() {
                 setStatusDialog(false);
                 setStatus(null)
                 getCustomerQueue();
+                setInvoiceDate(null)
                 reset()
             }
         } catch (error) {
@@ -531,6 +536,19 @@ function SalariesList() {
             >
                 <Box component="form" onSubmit={handleSubmit(UpdateStatus)}>
                     <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12}>
+                            <DatePicker2
+                                label={"Date"}
+
+                                size="small"
+                                value={invoiceDate}
+                                error={errors?.invoiceDate?.message}
+                                register={register("invoiceDate", {
+                                    required: invoiceDate ? false : "Please enter  date.",
+                                })}
+                                onChange={(date) => setInvoiceDate(new Date(date))}
+                            />
+                        </Grid>
                         <Grid item xs={12} sm={12}>
                             <SelectField
                                 size={"small"}
