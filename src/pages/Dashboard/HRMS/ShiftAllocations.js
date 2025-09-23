@@ -140,6 +140,7 @@ function ShiftAllocations() {
             let params = {
                 page: 1,
                 limit: 999999,
+                is_active :true
 
 
             }
