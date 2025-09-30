@@ -115,7 +115,7 @@ function CompleteTransactionReport() {
 
     // *For General Journal
     const [generalJournalAccounts, setGeneralJournalAccounts] = useState();
-
+    const [generalJournalAccounts2, setGeneralJournalAccounts2] = useState();
     // *For Pagination
     const [totalCount, setTotalCount] = useState(0);
     const [pageLimit, setPageLimit] = useState(50);
@@ -229,6 +229,29 @@ function CompleteTransactionReport() {
             const { data } = await FinanceServices.getGeneralJournalLedgers(params)
             setGeneralJournalAccounts(data?.statement?.rows)
             setTotalCount(data?.statement?.count)
+        } catch (error) {
+            ErrorToaster(error)
+        } finally {
+            setLoader(false)
+        }
+    }
+    const getGeneralJournalLedgers2 = async (page, limit, filter) => {
+        setLoader(true)
+        try {
+            const Page = page ? page : currentPage
+            const Limit = limit ? limit : pageLimit
+            const Filter = { ...filters, ...filter }
+            setCurrentPage(Page)
+            setPageLimit(Limit)
+            setFilters(Filter)
+            let params = {
+                page: 1,
+                limit: 999999
+            }
+            params = { ...params, ...Filter }
+            const { data } = await FinanceServices.getGeneralJournalLedgers(params)
+            setGeneralJournalAccounts2(data?.statement?.rows)
+          
         } catch (error) {
             ErrorToaster(error)
         } finally {
@@ -567,6 +590,7 @@ function CompleteTransactionReport() {
 
 
     useEffect(() => {
+        getGeneralJournalLedgers2()
         getGeneralJournalLedgers()
         getAccountsDropDown()
         getMajorCategories()
@@ -595,7 +619,7 @@ function CompleteTransactionReport() {
                 >
                     Complete Transaction Report
                 </Typography>
-                {generalJournalAccounts?.length > 0 && (
+                {generalJournalAccounts2?.length > 0 && (
                     <Box sx={{
                         textAlign: "right", p: 4, display: "flex", gap: 2
 
@@ -608,7 +632,7 @@ function CompleteTransactionReport() {
                         /> */}
                         <PrimaryButton
                             title={"Download Excel"}
-                            onClick={() => downloadExcel(generalJournalAccounts)}
+                            onClick={() => downloadExcel(generalJournalAccounts2)}
                         />
                     </Box>
                 )}
