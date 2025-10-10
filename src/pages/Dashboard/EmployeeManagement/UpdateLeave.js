@@ -385,7 +385,7 @@ function UpdateLeave() {
 
                             file={doc}
                             register={register("doc", {
-                                required: selectedType?.id == 'Sick' ? 'document is required' : false,
+                                required: doc ? false : (selectedType?.id == 'Sick' ? 'document is required' : false),
                                 onChange: async (e) => {
                                     const path = await handleUploadDocument(e);
                                     if (path) {
