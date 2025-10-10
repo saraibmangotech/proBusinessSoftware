@@ -597,7 +597,7 @@ const getData = async () => {
         joinDate: rawJoinDate ? moment(rawJoinDate).format("DD-MM-YYYY") : "-",
         rawJoinDate: rawJoinDate ? new Date(rawJoinDate) : null, // ✅ keep raw for sorting
 
-        local: salary?.employee?.is_local ? "Local" : "Non Local",
+        local: employee?.is_local ? "Local" : "Non Local",
         remark: salary?.remark,
         salaryPaid: parseFloat(employee?.basic_salary) || 0,
         commission: parseFloat(salary?.commission) || 0,

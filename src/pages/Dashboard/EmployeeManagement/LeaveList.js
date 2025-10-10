@@ -484,7 +484,7 @@ function LeaveList() {
 
 
         try {
-            let params = { reception_id: selectedData?.id }
+            let params = { id: selectedData?.id }
 
 
             const { message } = await CustomerServices.deleteLeave(params)
@@ -898,7 +898,7 @@ function LeaveList() {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                    {row?.original?.status?.toLowerCase() == 'pending' && <Box
+                    {(row?.original?.status?.toLowerCase() == 'pending' || user?.role_id == 6) && <Box
                         component={'img'}
                         sx={{ cursor: "pointer" }}
                         onClick={() => {
@@ -913,7 +913,12 @@ function LeaveList() {
                     <Box>
 
 
-                        {/* <Box component={'img'} src={Images.deleteIcon} width={'35px'}></Box>  */}
+                        {user?.role_id == 6 && <Box 
+                            onClick={() => {
+                                setSelectedData(row?.original)
+                          setConfirmationDialog(true)
+                        }}
+                        component={'img'} src={Images.deleteIcon} width={'35px'}></Box> }
                     </Box>
 
                 </Box>
