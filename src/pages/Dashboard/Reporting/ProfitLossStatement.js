@@ -596,7 +596,7 @@ function ProfitLossStatement() {
                 account.account_category ?? "-",
                 account.account_subcategory ?? "-",
                 "",
-                 account?.nature === "debit" ?  Number.parseFloat(childTotal) : -1 * Number.parseFloat(childTotal),
+                account?.nature === "debit" ? Number.parseFloat(childTotal) : -1 * Number.parseFloat(childTotal),
               ])
               // Style account rows
               accountRow.eachCell((cell, colNumber) => {
@@ -634,7 +634,7 @@ function ProfitLossStatement() {
                     child.account_name ?? "-",
                     child.account_category ?? "-",
                     child.account_subcategory ?? "-",
-                    child?.nature =='debit' ? Number.parseFloat(subTotal) : -1 * Number.parseFloat(subTotal),
+                    child?.nature == 'debit' ? Number.parseFloat(subTotal) : -1 * Number.parseFloat(subTotal),
                     "",
                   ])
                   // Style child rows
@@ -769,10 +769,12 @@ function ProfitLossStatement() {
         "",
         "",
         CommaSeparator(
-          (
-            Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost))
-          ).toFixed(2),
-        ),
+                                              (
+                                                Number.parseFloat(
+                                                  Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses),
+                                                )
+                                              ).toFixed(2),
+                                            ),
       ])
       netProfitRow.eachCell((cell, colNumber) => {
         cell.fill = {
@@ -1361,14 +1363,7 @@ function ProfitLossStatement() {
                                           </Typography>
                                         </Cell>
                                         <Cell>
-                                          {console.log(totalRevenue, "asdasd")}
-                                          {console.log(totalExpenses, "asdasd")}
-                                          {console.log(
-                                            Number.parseFloat(
-                                              Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses),
-                                            ).toFixed(2),
-                                            "asdasd",
-                                          )}
+
                                           <Typography
                                             className="pdf-table"
                                             variant="body2"
@@ -1410,7 +1405,7 @@ function ProfitLossStatement() {
                                                 // const accountOpeningBalance = Number.parseFloat(
                                                 //   account?.opening_balance || 0,
                                                 // )
-                                                 const accountOpeningBalance = Number.parseFloat(
+                                                const accountOpeningBalance = Number.parseFloat(
                                                   0,
                                                 )
                                                 // const adjustedAccountOpeningBalance =
