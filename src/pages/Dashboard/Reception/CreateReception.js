@@ -433,6 +433,16 @@ function ReceptionForm() {
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Create Reception</Typography>
+                    <PrimaryButton
+
+                                    disabled={subCustDisable}
+                                   bgcolor={'#001f3f'}
+                                    onClick={() => setCompanyDialog(true)}
+                                    title="Add Customer"
+
+
+
+                                />
             </Box>
 
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
@@ -520,16 +530,7 @@ function ReceptionForm() {
                             />
                         </Grid>
 
-                        <Grid container justifyContent={'flex-end'}>
-                            <PrimaryButton
-                                disabled={buttonDisabled || buttonDisabled3}
-                                bgcolor={'#001f3f'}
-                                title="Create"
-                                type={'submit'}
-
-
-                            />
-                        </Grid>
+                   
                     </Grid>
                 </Box>
             </Box>
@@ -540,7 +541,7 @@ function ReceptionForm() {
                     <Box sx={{ p: 3 }}>
 
 
-                        <Grid container sx={{ gap: "5px 25px" }}>
+                        <Grid container alignItems={'center'} sx={{ gap: "5px 25px" }}>
                             <Grid item xs={2.8}>
                                 <InputField
                                     label={"Mobile *:"}
@@ -653,6 +654,18 @@ function ReceptionForm() {
                                     register={register1("customer")}
                                 />
                             </Grid>
+                            
+                            <Grid item xs={2.8} mt={2} >
+                                <PrimaryButton
+                                    // disabled={buttonDisabled2}
+                                    
+                                    bgcolor={'#001f3f'}
+                                    title="Create"
+                                    type={'submit'}
+
+
+                                />
+                            </Grid>
                             {/* <Grid item xs={2.8} >
                                 <SelectField
                                     size={'small'}
@@ -672,28 +685,8 @@ function ReceptionForm() {
                                 />
                             </Grid> */}
                            
-                            <Grid item xs={2.8} mt={4} >
-                                <PrimaryButton
-
-                                    disabled={subCustDisable}
-                                   bgcolor={'#001f3f'}
-                                    onClick={() => setCompanyDialog(true)}
-                                    title="Add Customer"
-
-
-
-                                />
-                            </Grid>
-                            <Grid container justifyContent={'flex-end'}>
-                                <PrimaryButton
-                                    // disabled={buttonDisabled2}
-                                    bgcolor={'#001f3f'}
-                                    title="Create"
-                                    type={'submit'}
-
-
-                                />
-                            </Grid>
+                        
+                           
                         </Grid>
                     </Box>
                 </Box>}

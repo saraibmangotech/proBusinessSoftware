@@ -769,12 +769,12 @@ function ProfitLossStatement() {
         "",
         "",
         CommaSeparator(
-                                              (
-                                                Number.parseFloat(
-                                                  Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses),
-                                                )
-                                              ).toFixed(2),
-                                            ),
+          (
+            Number.parseFloat(
+              Number.parseFloat(totalRevenue) - Number.parseFloat(totalExpenses),
+            )
+          ).toFixed(2),
+        ),
       ])
       netProfitRow.eachCell((cell, colNumber) => {
         cell.fill = {
