@@ -852,7 +852,7 @@ function CreateCustomerPayment() {
         getBanks()
         getCards()
         getAccounts()
-        getTax()
+        // getTax()
         getCategories()
         getServiceItem()
         setDate(new Date())
