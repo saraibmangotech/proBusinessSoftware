@@ -409,14 +409,20 @@ function ServiceReport() {
       header: "Department",
       accessorKey: "department",
       accessorFn: () =>
-        agencyType[process.env.REACT_APP_TYPE].category == "AL-AHDEED"
+        agencyType[process.env.REACT_APP_TYPE].category === "AL-AHDEED"
           ? "AL-ADHEED"
-          : agencyType[process.env.REACT_APP_TYPE].category,
+          : agencyType[process.env.REACT_APP_TYPE].category === "TASHEEL"
+            ? "Business Set Up"
+            : agencyType[process.env.REACT_APP_TYPE].category
+      ,
       cell: () => (
         <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
-          {agencyType[process.env.REACT_APP_TYPE].category == "AL-AHDEED"
+          {agencyType[process.env.REACT_APP_TYPE].category === "AL-AHDEED"
             ? "AL-ADHEED"
-            : agencyType[process.env.REACT_APP_TYPE].category}
+            : agencyType[process.env.REACT_APP_TYPE].category === "TASHEEL"
+              ? "Business Set Up"
+              : agencyType[process.env.REACT_APP_TYPE].category
+          }
         </Box>
       ),
     },
@@ -843,7 +849,12 @@ function ServiceReport() {
         item?.receipt?.invoice_date ? new Date(moment(item.receipt.invoice_date).format("YYYY-MM-DD")) : null,
         item?.receipt?.token_number || "",
         item?.receipt?.token_date ? new Date(moment(item.receipt.token_date).format("YYYY-MM-DD")) : null,
-        agencyType?.[process.env.REACT_APP_TYPE]?.category || "",
+        agencyType[process.env.REACT_APP_TYPE].category === "AL-AHDEED"
+          ? "AL-ADHEED"
+          : agencyType[process.env.REACT_APP_TYPE].category === "TASHEEL"
+            ? "Business Set Up"
+            : agencyType[process.env.REACT_APP_TYPE].category
+            || "",
         item?.service?.item_code || "",
         item?.service?.name || "",
         item?.service?.category?.name || "",
