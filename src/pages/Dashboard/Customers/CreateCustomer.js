@@ -16,6 +16,7 @@ import DatePicker from 'components/DatePicker';
 import { ErrorToaster } from 'components/Toaster';
 import { FormControl } from '@mui/base';
 import LabelCustomInput from 'components/Input/LabelCustomInput';
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import SelectField from 'components/Select';
 import { CleanTypes, Debounce2, getFileSize, handleDownload } from 'utils';
@@ -28,7 +29,7 @@ import moment from 'moment';
 import { Link, useNavigate } from 'react-router-dom';
 import SystemServices from 'services/System';
 import UploadFileSingle from 'components/UploadFileSingle';
-import { Images } from 'assets';
+import { FontFamily, Images } from 'assets';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import { addMonths } from 'date-fns';
 import { useAuth } from 'context/UseContext';
@@ -41,6 +42,10 @@ function CreateCustomer() {
   const navigate = useNavigate()
   const [formChange, setFormChange] = useState(false)
   const [submit, setSubmit] = useState(false)
+  const [emirates, setEmirates] = useState(null)
+  const [visa, setVisa] = useState(null)
+  const [passport, setPassport] = useState(null)
+  const [signature, setSignature] = useState(null)
 
   const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
   const {
@@ -97,7 +102,14 @@ function CreateCustomer() {
   const [uploadedSize, setUploadedSize] = useState(0);
   const [slipDetail, setSlipDetail] = useState([]);
   const [categories, setCategories] = useState([])
-
+  const [documents, setDocuments] = useState(
+    [
+      { label: "Upload Emirates ID", name: "emirates", doc: '' },
+      { label: "Upload Passport", name: "passport", doc: '' },
+      { label: "Upload Visa", name: "visa", doc: '' },
+      { label: "Upload Signature", name: "signature", doc: '' },
+    ]
+  )
   const [emailVerify, setEmailVerify] = useState(false)
 
 
@@ -135,7 +147,7 @@ function CreateCustomer() {
   const submitForm1 = async (formData) => {
     console.log(formData);
     const simplifiedCategories = categories.map(({ id, commission_value }) => ({
-      category_id:id,
+      category_id: id,
       commission_value,
     }));
     try {
@@ -156,7 +168,11 @@ function CreateCustomer() {
         general_notes: formData?.notes,
         email: formData?.email,
         address: formData?.address,
-        commission_settings:simplifiedCategories
+        commission_settings: simplifiedCategories,
+        emirates_id: emirates,
+        passport: passport,
+        visa: visa,
+        signature: signature,
 
 
       };
@@ -178,6 +194,80 @@ function CreateCustomer() {
       ErrorToaster(error);
     }
   };
+
+
+  const handleUploadDocument5 = async (e, type) => {
+    try {
+      e.preventDefault()
+      const file = e.target.files[0]
+      const arr = [
+        {
+          name: file?.name,
+          file: "",
+          type: file?.type.split("/")[1],
+          size: getFileSize(file.size),
+          isUpload: false,
+        },
+      ]
+      if (type !== "picture" && allowFilesType.includes(file.type)) {
+        handleUpload5(file, arr, type)
+
+
+      } else {
+        ErrorToaster(`Only ${CleanTypes(allowFilesType)} formats is supported`)
+      }
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+
+  const handleUpload5 = async (file, docs, type) => {
+
+    try {
+      const formData = new FormData()
+      formData.append("document", file)
+      const { data } = await instance.post(routes.uploadDocuments, formData, {
+        onUploadProgress: (progressEvent) => {
+          const uploadedBytes = progressEvent.loaded
+          const percentCompleted = Math.round((uploadedBytes * 100) / progressEvent.total)
+
+        },
+      })
+      if (data) {
+        docs[0].isUpload = true
+        docs[0].file = data?.data?.path
+        console.log(data);
+
+        if (type == 'emirates') {
+          setEmirates(data?.data?.path)
+        }
+        if (type == 'passport') {
+          setPassport(data?.data?.path)
+        }
+        if (type == 'visa') {
+          setVisa(data?.data?.path)
+        }
+        if (type == 'signature') {
+          setSignature(data?.data?.path)
+        }
+
+        if (data?.data?.path) {
+          setDocuments((prev) =>
+            prev.map((item) =>
+              item.name === type ? { ...item, doc: data?.data?.path || '' } : item
+            )
+          );
+
+
+        }
+
+
+      }
+    } catch (error) {
+      ErrorToaster(error)
+    }
+  }
+  console.log(documents, 'documents');
 
 
   const getReceiptDetail = async (state) => {
@@ -453,7 +543,108 @@ function CreateCustomer() {
                     })}
                   />
                 </Grid>
-                <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  spacing={2}
+                  p={2}
+                  mt={2}
+                  pt={0}
+                  alignItems={'flex-start'}
+                  sx={{ border: "1px solid black", borderRadius: "12px" }}
+                >
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+
+                  >
+                    <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Upload Documents</Typography>
+                  </Grid>
+
+
+                  {documents?.map((doc, i) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={3}
+                      key={i}
+                      display="flex"
+                      justifyContent="center"
+                      flexDirection="column"
+                      alignItems="center"
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          textAlign: "center",
+                          color: Colors.charcoalGrey,
+                          fontFamily: FontFamily.NunitoRegular,
+                          mt: 1,
+                          mb: 1.5,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {doc.label}
+                      </Typography>
+
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <UploadFile
+                          accept={allowFilesType}
+                          error={errors1?.[doc.name]?.message}
+                          register={register1(doc.name, {
+                            required: false,
+                            onChange: (e) => handleUploadDocument5(e, doc.name),
+                          })}
+                        />
+                      </Box>
+                      {doc.doc && (
+                        <Box display="flex" alignItems="center" gap={2} mt={1}>
+                          <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            sx={{ cursor: "pointer" }}
+                            onClick={() =>
+                              window.open(
+                                process.env.REACT_APP_IMAGE_BASE_URL_NEW + doc.doc,
+                                "_blank",
+                                "noopener,noreferrer"
+                              )
+                            }
+                          >
+                            <Box
+                              sx={{
+                                width: 50,
+                                height: 50,
+                                borderRadius: 2,
+                                bgcolor: "#f5f5f5",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <DescriptionOutlinedIcon sx={{ fontSize: 30, color: "green" }} />
+                            </Box>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                mt: 0.5,
+                                textAlign: "center",
+                                wordBreak: "break-word",
+                                maxWidth: 120,
+                              }}
+                            >
+                              {doc.doc?.split("\\").pop().split("/").pop()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      )}
+                    </Grid>
+                  ))}
+                </Grid>
+                <Grid container item xs={12} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
                   <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Commission Setting</Typography>
                   {categories.map((cat, index) => (
                     <Grid item xs={12} key={index}>
@@ -464,12 +655,12 @@ function CreateCustomer() {
                         type="number"
                         step="any"
                         label="Commission"
-                       register={register1(`categories.${index}.commission_value`, {
+                        register={register1(`categories.${index}.commission_value`, {
                           onChange: (e) => {
                             const newCategories = [...categories];
                             newCategories[index].commission_value = e.target.value;
                             console.log(newCategories);
-                            
+
                             setCategories(newCategories);
                           },
                         })}
@@ -479,6 +670,7 @@ function CreateCustomer() {
                   ))}
 
                 </Grid>
+
 
                 <Grid container justifyContent={'flex-end'}>
                   <PrimaryButton
