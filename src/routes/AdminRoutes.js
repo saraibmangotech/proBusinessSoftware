@@ -310,6 +310,9 @@ const PreSalesList = lazy(() =>
 const UpdatePreSale = lazy(() =>
   import("pages/Dashboard/SalesReciept/UpdatePreSale")
 );
+const UpdatePreSale2 = lazy(() =>
+  import("pages/Dashboard/SalesReciept/UpdatePreSale2")
+);
 const CreateAldeed = lazy(() =>
   import("pages/Dashboard/AlDeed/CreateAldeed")
 );
@@ -1130,6 +1133,10 @@ const AdminRoutes = [
   {
     path: "/update-presale/:id",
     component: <UpdatePreSale />,
+  },
+  {
+    path: "/update-presale-edit/:id",
+    component: <UpdatePreSale2 />,
   },
   {
     path: "/update-alded/:id",

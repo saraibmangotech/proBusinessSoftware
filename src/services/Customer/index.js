@@ -10,6 +10,10 @@ const CustomerServices = {
     const data = await deleted(routes.deleteInvoiceDebitNote, obj);
     return data;
   },
+   deleteUser: async (obj) => {
+    const data = await deleted(routes.deleteUser, obj);
+    return data;
+  },
   AllocateNewShift: async (obj) => {
     const data = await post(routes.AllocateNewShift, obj);
     return data;

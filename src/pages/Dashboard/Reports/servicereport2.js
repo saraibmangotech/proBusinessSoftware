@@ -621,6 +621,26 @@ function ServiceReport() {
       ),
     },
     {
+      header: "PRO Commission",
+      accessorKey: "pro_commission",
+      accessorFn: (row) => row?.pro_commission,
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.pro_commission ? parseFloat(row?.original?.pro_commission).toFixed(2) : '0.00'}
+        </Box>
+      ),
+    },
+    {
+      header: "Typist Commission",
+      accessorKey: "typist_commission",
+      accessorFn: (row) => row?.typist_commission,
+      cell: ({ row }) => (
+        <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
+          {row?.original?.typist_commission ? parseFloat(row?.original?.typist_commission).toFixed(2) : '0.00'}
+        </Box>
+      ),
+    },
+    {
       header: "Line Total",
       accessorFn: (row) =>
         (
@@ -687,161 +707,148 @@ function ServiceReport() {
     "Line Total",
     "Invoice Total",
   ]
-  const downloadInvoiceExcel = (data) => {
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet("Invoice Report")
+const downloadInvoiceExcel = (data) => {
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet("Invoice Report")
 
-    // Set professional header
-    worksheet.headerFooter.oddHeader =
-      '&C&"Arial,Bold"&18INVOICE REPORT\n' +
-      '&C&"Arial,Regular"&12Your Company Name\n' +
-      '&C&"Arial,Regular"&10Period: &D - &T\n' +
-      '&L&"Arial,Regular"&8Generated on: ' +
-      new Date().toLocaleDateString() +
-      "\n" +
-      '&R&"Arial,Regular"&8Page &P of &N'
+  // Set professional header
+  worksheet.headerFooter.oddHeader =
+    '&C&"Arial,Bold"&18INVOICE REPORT\n' +
+    '&C&"Arial,Regular"&12Your Company Name\n' +
+    '&C&"Arial,Regular"&10Period: &D - &T\n' +
+    '&L&"Arial,Regular"&8Generated on: ' +
+    new Date().toLocaleDateString() +
+    "\n" +
+    '&R&"Arial,Regular"&8Page &P of &N'
 
-    // Set custom footer as requested
-    worksheet.headerFooter.oddFooter =
-      '&C&"Arial,Regular"&10\n' + // One line gap
-      '&C&"Arial,Bold"&12This is electronically generated report\n' +
-      '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
+  // Set custom footer
+  worksheet.headerFooter.oddFooter =
+    '&C&"Arial,Regular"&10\n' + // One line gap
+    '&C&"Arial,Bold"&12This is electronically generated report\n' +
+    '&C&"Arial,Regular"&10Powered by MangotechDevs.ae'
 
-    worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
+  worksheet.headerFooter.evenFooter = worksheet.headerFooter.oddFooter
 
-    // Set page setup for professional printing
-    worksheet.pageSetup = {
-      paperSize: 9, // A4
-      orientation: "landscape",
-      fitToPage: true,
-      fitToWidth: 1,
-      fitToHeight: 0,
-      margins: {
-        left: 0.7,
-        right: 0.7,
-        top: 1.0,
-        bottom: 1.0,
-        header: 0.3,
-        footer: 0.5,
-      },
+  // Page setup
+  worksheet.pageSetup = {
+    paperSize: 9,
+    orientation: "landscape",
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
+    margins: {
+      left: 0.7,
+      right: 0.7,
+      top: 1.0,
+      bottom: 1.0,
+      header: 0.3,
+      footer: 0.5,
+    },
+  }
+
+  // Title rows
+  const titleRow = worksheet.addRow(["INVOICE REPORT"])
+  titleRow.getCell(1).font = { name: "Arial", size: 16, bold: true, color: { argb: "2F4F4F" } }
+  titleRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A1:Z1")
+
+  const companyRow = worksheet.addRow([agencyType[process.env.REACT_APP_TYPE]?.name])
+  companyRow.getCell(1).font = { name: "Arial", size: 14, bold: true, color: { argb: "4472C4" } }
+  companyRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A2:Z2")
+
+  const dateRow = worksheet.addRow([
+    `Report Generated: ${new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })} at ${new Date().toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    })}`,
+  ])
+  dateRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } }
+  dateRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A3:Z3")
+
+  const periodRow = worksheet.addRow([
+    toDate && fromDate
+      ? `Period: ${
+          fromDate
+            ? new Date(fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
+            : "-"
+        } To ${
+          toDate
+            ? new Date(toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
+            : "Present"
+        }`
+      : `Period: All`,
+  ])
+  periodRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } }
+  periodRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells("A4:Z4")
+
+  worksheet.addRow([])
+
+  // Headers
+  const headers = [
+    "SR No.",
+    "Inv No.",
+    "Inv Date",
+    "Token Number",
+    "Token Date",
+    "Department",
+    "Stock ID",
+    "Service Name",
+    "Category",
+    "Customer Ref",
+    "Display Customer",
+    "Customer Mobile",
+    "Customer Email",
+    "Quantity",
+    "Service Charge",
+    "Total Service Charge",
+    "Total VAT",
+    "Govt. Fee",
+    "Bank Service Charge",
+    "Other Charge",
+    "Total Govt. Fee",
+    "Transaction ID",
+    "Application/Case ID",
+    "Ref Name",
+    "Payment Status",
+    "Employee ID",
+    "Employee Name",
+    "PRO Commission",
+    "Typist Commission",
+    "Line Total",
+    "Invoice Total",
+  ]
+
+  const headerRow = worksheet.addRow(headers)
+  headerRow.eachCell((cell) => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "2F4F4F" } }
+    cell.font = { name: "Arial", bold: true, color: { argb: "FFFFFF" }, size: 11 }
+    cell.alignment = { horizontal: "center", vertical: "middle" }
+    cell.border = {
+      top: { style: "thin", color: { argb: "000000" } },
+      left: { style: "thin", color: { argb: "000000" } },
+      bottom: { style: "thin", color: { argb: "000000" } },
+      right: { style: "thin", color: { argb: "000000" } },
     }
+  })
 
-    // Add title section at the top of the worksheet
-    const titleRow = worksheet.addRow(["INVOICE REPORT"])
-    titleRow.getCell(1).font = {
-      name: "Arial",
-      size: 16,
-      bold: true,
-      color: { argb: "2F4F4F" },
-    }
-    titleRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A1:Z1")
-
-    const companyRow = worksheet.addRow([
-      agencyType[process.env.REACT_APP_TYPE]?.name])
-    companyRow.getCell(1).font = {
-      name: "Arial",
-      size: 14,
-      bold: true,
-      color: { argb: "4472C4" },
-    }
-    companyRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A2:Z2")
-
-    const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
-    ])
-    dateRow.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    dateRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A3:Z3")
-
-    const periodRow = worksheet.addRow([
-      toDate && fromDate
-        ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
-        : `Period: All`,
-    ])
-    periodRow.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    periodRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells("A4:Z4")
-
-    // Add empty row for spacing
-    worksheet.addRow([])
-
-    // Define headers exactly as in your CSV function
-    const headers = [
-      "SR No.",
-      "Inv No.",
-      "Inv Date",
-      "Token Number",
-      "Token Date",
-      "Department",
-      "Stock ID",
-      "Service Name",
-      "Category",
-      "Customer Ref",
-      "Display Customer",
-      "Customer Mobile",
-      "Customer Email",
-      "Quantity",
-      "Service Charge",
-      "Total Service Charge",
-      "Total VAT",
-      "Govt. Fee",
-      "Bank Service Charge",
-      "Other Charge",
-      "Total Govt. Fee",
-      "Transaction ID",
-      "Application/Case ID",
-      "Ref Name",
-      "Payment Status",
-      "Employee ID",
-      "Employee Name",
-      "Line Total",
-      "Invoice Total",
-    ]
-
-    // Add headers with professional styling
-    const headerRow = worksheet.addRow(headers)
-    headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "2F4F4F" }, // Dark slate gray
-      }
-      cell.font = {
-        name: "Arial",
-        bold: true,
-        color: { argb: "FFFFFF" },
-        size: 11,
-      }
-      cell.alignment = { horizontal: "center", vertical: "middle" }
-      cell.border = {
-        top: { style: "thin", color: { argb: "000000" } },
-        left: { style: "thin", color: { argb: "000000" } },
-        bottom: { style: "thin", color: { argb: "000000" } },
-        right: { style: "thin", color: { argb: "000000" } },
-      }
-    })
-
-    // Process data exactly as in your CSV function
-    data?.forEach((item) => {
-      const quantity = Number.parseFloat(item?.quantity) || 0
-      const centerFee = Number.parseFloat(item?.center_fee) || 0
-      const govtFee = Number.parseFloat(item?.govt_fee) || 0
-      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
-      const totalServiceCharge = centerFee * quantity
-      const totalVAT = Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05
-      const totalGovtFee = (govtFee + bankCharge) * quantity
+  // Data rows
+  data?.forEach((item) => {
+    const quantity = parseFloat(item?.quantity || 0)
+    const centerFee = parseFloat(item?.center_fee || 0)
+    const govtFee = parseFloat(item?.govt_fee || 0)
+    const bankCharge = parseFloat(item?.bank_charge || 0)
+    const totalServiceCharge = centerFee * quantity
+    const totalVAT = centerFee * quantity * 0.05
+    const totalGovtFee = (govtFee + bankCharge) * quantity
 
       const dataRow = worksheet.addRow([
         item.id || "",
@@ -880,218 +887,134 @@ function ServiceReport() {
         (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(5),
       ])
 
-      // Style data rows
-      dataRow.eachCell((cell, colNumber) => {
-        cell.font = { name: "Arial", size: 10 }
-        cell.alignment = {
-          horizontal: [12, 13, 14, 15, 16, 18, 26, 27].includes(colNumber) ? "right" : "left", // Number columns right-aligned
-          vertical: "middle",
-        }
-        cell.border = {
-          top: { style: "hair", color: { argb: "CCCCCC" } },
-          left: { style: "hair", color: { argb: "CCCCCC" } },
-          bottom: { style: "hair", color: { argb: "CCCCCC" } },
-          right: { style: "hair", color: { argb: "CCCCCC" } },
-        }
-
-        // Format number columns
-        if ([12, 13, 14, 15, 16, 18, 26, 27].includes(colNumber)) {
-          if (colNumber === 14 || colNumber === 26 || colNumber === 27) {
-            cell.numFmt = "#,##0.00000" // 5 decimal places for VAT and totals
-          } else {
-            cell.numFmt = "#,##0.00" // 2 decimal places for other amounts
-          }
-        }
-      })
-    })
-
-    // Calculate totals exactly as in your CSV function
-    const totalServiceCharge = data.reduce(
-      (sum, item) => sum + Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity),
-      0,
-    )
-    const totalVat = data.reduce(
-      (sum, item) => sum + Number.parseFloat(item?.center_fee) * Number.parseFloat(item?.quantity) * 0.05,
-      0,
-    )
-    const totalGovtFee = data.reduce((sum, item) => {
-      const govtFee = Number.parseFloat(item?.govt_fee) || 0
-      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
-      const quantity = Number.parseFloat(item?.quantity) || 0
-      return sum + (govtFee + bankCharge) * quantity
-    }, 0)
-    const totalLineTotal = data.reduce((sum, item) => {
-      const centerFee = Number.parseFloat(item?.center_fee) || 0
-      const govtFee = Number.parseFloat(item?.govt_fee) || 0
-      const bankCharge = Number.parseFloat(item?.bank_charge) || 0
-      const quantity = Number.parseFloat(item?.quantity) || 0
-
-      const subtotal = centerFee + govtFee + bankCharge + centerFee * 0.05
-      return sum + subtotal * quantity
-    }, 0)
-    const totalInvoiceTotal = data.reduce(
-      (sum, item) =>
-        sum + (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)),
-      0,
-    )
-
-    // Add empty row before totals
-    worksheet.addRow([])
-
-    // Add totals row
-    const totalRow = worksheet.addRow([
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      totalServiceCharge.toFixed(2),
-      totalVat.toFixed(2),
-      "",
-      "",
-      "0",
-      totalGovtFee.toFixed(2),
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      totalLineTotal.toFixed(2),
-      totalInvoiceTotal.toFixed(2),
-    ])
-
-    // Style totals row
-    totalRow.eachCell((cell, colNumber) => {
-      if ([14, 15, 19, 26, 27].includes(colNumber)) {
-        cell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "000000" }, // Black
-        }
-        cell.font = {
-          name: "Arial",
-          bold: true,
-          color: { argb: "FFFFFF" },
-          size: 11,
-        }
-        cell.border = {
-          top: { style: "medium", color: { argb: "000000" } },
-          left: { style: "medium", color: { argb: "000000" } },
-          bottom: { style: "medium", color: { argb: "000000" } },
-          right: { style: "medium", color: { argb: "000000" } },
-        }
-        cell.alignment = { horizontal: "right", vertical: "middle" }
-
-        if (colNumber === 15 || colNumber === 26 || colNumber === 27) {
-          cell.numFmt = "#,##0.00000" // 5 decimal places
-        } else {
-          cell.numFmt = "#,##0.00" // 2 decimal places
-        }
+    dataRow.eachCell((cell, colNumber) => {
+      cell.font = { name: "Arial", size: 10 }
+      cell.alignment = {
+        horizontal: [14, 15, 16, 17, 18, 27, 28, 29, 30, 31].includes(colNumber) ? "right" : "left",
+        vertical: "middle",
+      }
+      cell.border = {
+        top: { style: "hair", color: { argb: "CCCCCC" } },
+        left: { style: "hair", color: { argb: "CCCCCC" } },
+        bottom: { style: "hair", color: { argb: "CCCCCC" } },
+        right: { style: "hair", color: { argb: "CCCCCC" } },
       }
     })
+  })
 
-    // Add empty rows for spacing before footer
-    worksheet.addRow([])
-    worksheet.addRow([])
+  // Totals
+  const totalServiceCharge = data.reduce((s, i) => s + parseFloat(i?.center_fee || 0) * parseFloat(i?.quantity || 0), 0)
+  const totalVat = data.reduce((s, i) => s + parseFloat(i?.center_fee || 0) * parseFloat(i?.quantity || 0) * 0.05, 0)
+  const totalGovtFee = data.reduce((s, i) => {
+    const govt = parseFloat(i?.govt_fee || 0)
+    const bank = parseFloat(i?.bank_charge || 0)
+    const qty = parseFloat(i?.quantity || 0)
+    return s + (govt + bank) * qty
+  }, 0)
+  const totalLineTotal = data.reduce((s, i) => {
+    const center = parseFloat(i?.center_fee || 0)
+    const govt = parseFloat(i?.govt_fee || 0)
+    const bank = parseFloat(i?.bank_charge || 0)
+    const qty = parseFloat(i?.quantity || 0)
+    return s + (center + govt + bank + center * 0.05) * qty
+  }, 0)
+  const totalInvoiceTotal = data.reduce(
+    (s, i) => s + (parseFloat(i?.receipt?.total_amount || 0) + parseFloat(i?.receipt?.total_vat || 0)),
+    0
+  )
+  const totalProCommission = data.reduce((s, i) => s + parseFloat(i?.original?.pro_commission || 0), 0)
+  const totalTypistCommission = data.reduce((s, i) => s + parseFloat(i?.original?.typist_commission || 0), 0)
 
-    // Add the electronic generated report text with black border as requested
-    const reportRow = worksheet.addRow(["This is electronically generated report"])
-    reportRow.getCell(1).font = {
-      name: "Arial",
-      size: 12,
-      bold: true,
-      color: { argb: "000000" },
-    }
-    reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
-    reportRow.getCell(1).border = {
+  worksheet.addRow([])
+
+const totalRow = worksheet.addRow([
+  "", "", "", "", "", "", "", "", "", "", "", "", "",
+  "", // quantity
+  "", // 🆕 extra column after quantity
+  totalServiceCharge.toFixed(2), // service charge
+  totalVat.toFixed(2), // vat
+  "", "", "", // govt/bank/other
+  totalGovtFee.toFixed(2), // total govt fee
+  "", "", "", "", "", "", // removed one column before PRO Commission
+  totalProCommission.toFixed(2), // pro commission
+  totalTypistCommission.toFixed(2), // typist commission
+  totalLineTotal.toFixed(5), // line total
+  totalInvoiceTotal.toFixed(5), // invoice total
+])
+
+totalRow.eachCell((cell, colNumber) => {
+  // Adjusted indices after removing one column before PRO Commission
+  if ([16, 17, 21, 28, 29, 30, 31].includes(colNumber)) {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "000000" } }
+    cell.font = { name: "Arial", bold: true, color: { argb: "FFFFFF" }, size: 11 }
+    cell.border = {
       top: { style: "medium", color: { argb: "000000" } },
       left: { style: "medium", color: { argb: "000000" } },
       bottom: { style: "medium", color: { argb: "000000" } },
       right: { style: "medium", color: { argb: "000000" } },
     }
-    worksheet.mergeCells(`A${reportRow.number}:Z${reportRow.number}`)
-
-    // Add powered by line
-    const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
-    poweredByRow.getCell(1).font = {
-      name: "Arial",
-      size: 10,
-      italic: true,
-      color: { argb: "666666" },
-    }
-    poweredByRow.getCell(1).alignment = { horizontal: "center" }
-    worksheet.mergeCells(`A${poweredByRow.number}:Z${poweredByRow.number}`)
-
-    // Set column widths
-    worksheet.columns = [
-      { width: 8 }, // SR No.
-      { width: 12 }, // Inv No.
-      { width: 12 }, // Inv Date
-      { width: 15 }, // Department
-      { width: 12 }, // Stock ID
-      { width: 20 }, // Service Name
-      { width: 15 }, // Category
-      { width: 15 }, // Customer Ref
-      { width: 15 }, // Display Customer
-      { width: 15 }, // Customer Mobile
-      { width: 20 }, // Customer Email
-      { width: 10 }, // Quantity
-      { width: 12 }, // Service Charge
-      { width: 15 }, // Total Service Charge
-      { width: 12 }, // Total VAT
-      { width: 12 }, // Govt. Fee
-      { width: 15 }, // Bank Service Charge
-      { width: 12 }, // Other Charge
-      { width: 15 }, // Total Govt. Fee
-      { width: 15 }, // Transaction ID
-      { width: 18 }, // Application/Case ID
-      { width: 12 }, // Ref Name
-      { width: 12 }, // Payment Status
-      { width: 12 }, // Employee ID
-      { width: 15 }, // Employee Name
-      { width: 12 }, // Line Total
-      { width: 15 }, // Invoice Total
-    ]
-
-    // Add workbook properties
-    workbook.creator = "Finance Department"
-    workbook.lastModifiedBy = "Finance System"
-    workbook.created = new Date()
-    workbook.modified = new Date()
-    workbook.lastPrinted = new Date()
-
-    // Set workbook properties
-    workbook.properties = {
-      title: "Invoice Report",
-      subject: "Financial Report",
-      keywords: "invoice, financial, accounting, services",
-      category: "Financial Reports",
-      description: "Invoice report generated from accounting system",
-      company: "PREMIUM BUSINESSMEN SERVICES",
-    }
-
-    const download = async () => {
-      const buffer = await workbook.xlsx.writeBuffer()
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      })
-      saveAs(blob,
-        toDate && fromDate
-          ? `Service_Report : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
-          : `Service_Report: Present `);
-    }
-
-    download()
+    cell.alignment = { horizontal: "right", vertical: "middle" }
+    cell.numFmt = [17, 30, 31].includes(colNumber)
+      ? "#,##0.00000"
+      : "#,##0.00"
   }
+})
+
+
+  worksheet.addRow([])
+  worksheet.addRow([])
+
+  const reportRow = worksheet.addRow(["This is electronically generated report"])
+  reportRow.getCell(1).font = { name: "Arial", size: 12, bold: true, color: { argb: "000000" } }
+  reportRow.getCell(1).alignment = { horizontal: "center", vertical: "middle" }
+  reportRow.getCell(1).border = {
+    top: { style: "medium", color: { argb: "000000" } },
+    left: { style: "medium", color: { argb: "000000" } },
+    bottom: { style: "medium", color: { argb: "000000" } },
+    right: { style: "medium", color: { argb: "000000" } },
+  }
+  worksheet.mergeCells(`A${reportRow.number}:Z${reportRow.number}`)
+
+  const poweredByRow = worksheet.addRow(["Powered by MangotechDevs.ae"])
+  poweredByRow.getCell(1).font = { name: "Arial", size: 10, italic: true, color: { argb: "666666" } }
+  poweredByRow.getCell(1).alignment = { horizontal: "center" }
+  worksheet.mergeCells(`A${poweredByRow.number}:Z${poweredByRow.number}`)
+
+  worksheet.columns = Array(31).fill({ width: 15 })
+
+  workbook.creator = "Finance Department"
+  workbook.lastModifiedBy = "Finance System"
+  workbook.created = new Date()
+  workbook.modified = new Date()
+  workbook.lastPrinted = new Date()
+
+  workbook.properties = {
+    title: "Invoice Report",
+    subject: "Financial Report",
+    keywords: "invoice, financial, accounting, services",
+    category: "Financial Reports",
+    description: "Invoice report generated from accounting system",
+    company: "PREMIUM BUSINESSMEN SERVICES",
+  }
+
+  const download = async () => {
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+    saveAs(
+      blob,
+      toDate && fromDate
+        ? `Service_Report_${new Date(fromDate).toLocaleDateString("en-GB")}_To_${new Date(
+            toDate
+          ).toLocaleDateString("en-GB")}`
+        : `Service_Report_Present`
+    )
+  }
+
+  download()
+}
+
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage)

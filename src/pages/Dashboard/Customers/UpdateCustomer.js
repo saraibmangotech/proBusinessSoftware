@@ -27,352 +27,466 @@ import moment from 'moment';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import SystemServices from 'services/System';
 import UploadFileSingle from 'components/UploadFileSingle';
-import { Images } from 'assets';
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import { FontFamily, Images } from 'assets';
 import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
+
 import { addMonths } from 'date-fns';
 import { useAuth } from 'context/UseContext';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 
 
 function CreateCustomer() {
-const theme = useTheme();
-const { user } = useAuth()
-const navigate = useNavigate()
-const { id } = useParams()
-const [formChange, setFormChange] = useState(false)
-const [submit, setSubmit] = useState(false)
+  const theme = useTheme();
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const { id } = useParams()
+  const [formChange, setFormChange] = useState(false)
+  const [submit, setSubmit] = useState(false)
 
-const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
-const {
-  register: register1,
-  handleSubmit: handleSubmit1,
-  setValue: setValue1,
-  getValues: getValues1,
-  watch,
-  formState: { errors: errors1 },
+  const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+  const {
+    register: register1,
+    handleSubmit: handleSubmit1,
+    setValue: setValue1,
+    getValues: getValues1,
+    watch,
+    formState: { errors: errors1 },
 
-} = useForm();
+  } = useForm();
 
-// Watch all form data
-console.log(watch());
-
-
-const isFormDataEmpty = (data) => {
-  // Check if all form fields are empty
-  return Object.values(data).every((value) => {
-    // If the value is an object (like companyLogo), check if it's empty
-    if (typeof value === 'object' && value !== null) {
-      return Object.keys(value).length === 0;
-    }
-    // Otherwise, check if the value is an empty string
-    return value === "";
-  });
-};
+  // Watch all form data
+  console.log(watch());
 
 
-
-
-
-
-const allowFilesType = [
-  'image/png',
-  'image/jpg',
-  'image/jpeg',
-  'application/pdf',
-  'application/vnd.ms-excel',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-];
-const allowFilesType2 = [
-  'image/png',
-  'image/jpg',
-  'image/jpeg',
-
-];
-const [guarantors, setGuarantors] = useState([])
-const [activeStep, setActiveStep] = React.useState(1);
-
-// *For Deposit Slip
-const [progress, setProgress] = useState(0);
-const [uploadedSize, setUploadedSize] = useState(0);
-const [slipDetail, setSlipDetail] = useState([]);
-
-
-const [selectedDue, setSelectedDue] = useState({ id: 'Instant', name: 'Instant' })
-const [passport, setPassport] = useState()
-const [allocation, setAllocation] = useState(false)
-const [depositError, setDepositError] = useState(false)
-const [loading, setLoading] = useState(false)
-const [emailVerify, setEmailVerify] = useState(false)
-const [isUploading, setIsUploading] = useState(false);
-const [loader, setLoader] = useState(false)
-const [categories, setCategories] = useState([])
-const [fieldsDisabled, setFieldsDisabled] = useState({
-  monthlyVisaServiceCharges: false,
-  vipMedical: false,
-  extraTyping: true,
-});
-
-const [center, setCenter] = useState(null)
-const [status, setStatus] = useState(null)
-
-// *For Stepper Forms Data
-const [stepFormData, setStepFormData] = useState()
-const [step1FormData, setStep1FormData] = useState();
-const [selectedType, setSelectedType] = useState(null)
-const [date, setDate] = useState(null)
-const [balanceType, setBalanceType] = useState(null)
-const [holdState, setHoldState] = useState(false)
-
-//documents array
-
-
-
-
-
-
-const handleNext = () => {
-  setActiveStep((prevActiveStep) => prevActiveStep + 1);
-};
-
-
-
-
-const handleUpload = async (file, docs) => {
-  setProgress(0);
-  try {
-    const formData = new FormData();
-    formData.append("document", file);
-    console.log(file.size);
-    console.log(getFileSize(file.size))
-    const { data } = await instance.post(routes.uploadDocuments, formData, {
-      onUploadProgress: (progressEvent) => {
-        const uploadedBytes = progressEvent.loaded;
-        const percentCompleted = Math.round(
-          (uploadedBytes * 100) / progressEvent.total
-        );
-
-        setProgress(percentCompleted);
-        console.log(getFileSize(uploadedBytes));
-        setUploadedSize(getFileSize(uploadedBytes));
-      },
+  const isFormDataEmpty = (data) => {
+    // Check if all form fields are empty
+    return Object.values(data).every((value) => {
+      // If the value is an object (like companyLogo), check if it's empty
+      if (typeof value === 'object' && value !== null) {
+        return Object.keys(value).length === 0;
+      }
+      // Otherwise, check if the value is an empty string
+      return value === "";
     });
-    if (data) {
-      docs[0].isUpload = true;
-      docs[0].file = data?.data?.nations;
-      setSlipDetail(docs);
-      console.log(data, 'asddasasd');
-      return data?.data?.path
+  };
 
+
+
+
+
+
+  const allowFilesType = [
+    'image/png',
+    'image/jpg',
+    'image/jpeg',
+    'application/pdf',
+    'application/vnd.ms-excel',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+  const allowFilesType2 = [
+    'image/png',
+    'image/jpg',
+    'image/jpeg',
+
+  ];
+  const [guarantors, setGuarantors] = useState([])
+  const [activeStep, setActiveStep] = React.useState(1);
+
+  // *For Deposit Slip
+  const [progress, setProgress] = useState(0);
+  const [uploadedSize, setUploadedSize] = useState(0);
+  const [slipDetail, setSlipDetail] = useState([]);
+
+
+  const [selectedDue, setSelectedDue] = useState({ id: 'Instant', name: 'Instant' })
+  const [passport, setPassport] = useState()
+  const [allocation, setAllocation] = useState(false)
+  const [depositError, setDepositError] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [emailVerify, setEmailVerify] = useState(false)
+  const [isUploading, setIsUploading] = useState(false);
+  const [loader, setLoader] = useState(false)
+  const [categories, setCategories] = useState([])
+  const [fieldsDisabled, setFieldsDisabled] = useState({
+    monthlyVisaServiceCharges: false,
+    vipMedical: false,
+    extraTyping: true,
+  });
+
+  const [center, setCenter] = useState(null)
+  const [status, setStatus] = useState(null)
+
+  // *For Stepper Forms Data
+  const [stepFormData, setStepFormData] = useState()
+  const [step1FormData, setStep1FormData] = useState();
+  const [selectedType, setSelectedType] = useState(null)
+  const [date, setDate] = useState(null)
+  const [balanceType, setBalanceType] = useState(null)
+  const [holdState, setHoldState] = useState(false)
+  const [emirates, setEmirates] = useState(null)
+  const [visa, setVisa] = useState(null)
+
+  const [signature, setSignature] = useState(null)
+  const [documents, setDocuments] = useState(
+    [
+      { label: "Upload Emirates ID", name: "emirates", doc: '' },
+      { label: "Upload Passport", name: "passport", doc: '' },
+      { label: "Upload Visa", name: "visa", doc: '' },
+      { label: "Upload Signature", name: "signature", doc: '' },
+    ]
+  )
+
+  //documents array
+
+
+
+
+
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+
+
+
+  const handleUpload = async (file, docs) => {
+    setProgress(0);
+    try {
+      const formData = new FormData();
+      formData.append("document", file);
+      console.log(file.size);
+      console.log(getFileSize(file.size))
+      const { data } = await instance.post(routes.uploadDocuments, formData, {
+        onUploadProgress: (progressEvent) => {
+          const uploadedBytes = progressEvent.loaded;
+          const percentCompleted = Math.round(
+            (uploadedBytes * 100) / progressEvent.total
+          );
+
+          setProgress(percentCompleted);
+          console.log(getFileSize(uploadedBytes));
+          setUploadedSize(getFileSize(uploadedBytes));
+        },
+      });
+      if (data) {
+        docs[0].isUpload = true;
+        docs[0].file = data?.data?.nations;
+        setSlipDetail(docs);
+        console.log(data, 'asddasasd');
+        return data?.data?.path
+
+      }
+    } catch (error) {
+      ErrorToaster(error);
     }
-  } catch (error) {
-    ErrorToaster(error);
-  }
-};
-const submitForm = async (formData) => {
-  console.log(formData);
-  try {
-    let obj = {
-      name: formData?.companyName,
-
-      phone: formData?.mobile,
-      email: formData?.email,
-      address: formData?.businessAddress,
-      website: formData?.businessWebsite,
-      cp_name: formData?.personName,
-      cp_mobile: formData?.phone,
-
-    };
-
-    setStepFormData(obj);
-    handleNext()
-  } catch (error) {
-    ErrorToaster(error);
-  }
-};
-
-
-
-
-
-const submitForm1 = async (formData) => {
-  console.log(formData);
-  console.log(formData);
-  const simplifiedCategories = categories.map(({ id, commission_value }) => ({
-    category_id:id,
-    commission_value,
-  }));
-  try {
-    let obj = {
-      id:id,
-      name: formData?.name,
-      type: selectedType?.id,
-      mobile: formData?.mobile,
-      trn: formData?.trn,
-      eid: formData?.eid,
-      trade_license_no: formData?.trade,
-      opening_balance: formData?.balance,
-      opening_balance_type: balanceType?.id,
-      opening_balance_date: date,
-      credit_limit: formData?.credit,
-      credit_status: status?.id,
-      cost_center: center?.id,
-      general_notes: formData?.notes,
-      email: formData?.email,
-      address: formData?.address,
-      commission_settings:simplifiedCategories
-
-
-    };
-    const promise = CustomerServices.UpdateCustomer(obj);
-
-    showPromiseToast(
-      promise,
-      'Saving...',
-      'Added Successfully',
-      'Something Went Wrong'
-    );
-    const response = await promise;
-    if (response?.responseCode === 200) {
-      navigate("/customer-list");
-    }
-
-
-  } catch (error) {
-    ErrorToaster(error);
-  }
-};
-
-
-
-
-
-
-const verifyEmail = async (value) => {
-  let Myemail = getValues1('email')
-  if (Myemail) {
-
+  };
+  const submitForm = async (formData) => {
+    console.log(formData);
     try {
       let obj = {
-        email: Myemail.toLowerCase(),
-        validate: true
+        name: formData?.companyName,
 
+        phone: formData?.mobile,
+        email: formData?.email,
+        address: formData?.businessAddress,
+        website: formData?.businessWebsite,
+        cp_name: formData?.personName,
+        cp_mobile: formData?.phone,
 
       };
 
-      console.log(obj);
+      setStepFormData(obj);
+      handleNext()
+    } catch (error) {
+      ErrorToaster(error);
+    }
+  };
 
-      const { status } = await CustomerServices.addCustomer(obj);
 
-      console.log(status);
-      if (status) {
-        setEmailVerify(true)
+
+
+
+  const submitForm1 = async (formData) => {
+    console.log(formData);
+    console.log(formData);
+    const simplifiedCategories = categories.map(({ id, commission_value }) => ({
+      category_id: id,
+      commission_value,
+    }));
+    try {
+      let obj = {
+        id: id,
+        name: formData?.name,
+        type: selectedType?.id,
+        mobile: formData?.mobile,
+        trn: formData?.trn,
+        eid: formData?.eid,
+        trade_license_no: formData?.trade,
+        opening_balance: formData?.balance,
+        opening_balance_type: balanceType?.id,
+        opening_balance_date: date,
+        credit_limit: formData?.credit,
+        credit_status: status?.id,
+        cost_center: center?.id,
+        general_notes: formData?.notes,
+        email: formData?.email,
+        address: formData?.address,
+        commission_settings: simplifiedCategories,
+        emirates_id: emirates,
+        passport: passport,
+        visa: visa,
+        signature: signature,
+
+
+      };
+      const promise = CustomerServices.UpdateCustomer(obj);
+
+      showPromiseToast(
+        promise,
+        'Saving...',
+        'Added Successfully',
+        'Something Went Wrong'
+      );
+      const response = await promise;
+      if (response?.responseCode === 200) {
+        navigate("/customer-list");
       }
 
 
     } catch (error) {
-      console.log(error);
-      setEmailVerify(false)
-      showErrorToast(error)
+      ErrorToaster(error);
+    }
+  };
+
+
+
+
+
+
+  const verifyEmail = async (value) => {
+    let Myemail = getValues1('email')
+    if (Myemail) {
+
+      try {
+        let obj = {
+          email: Myemail.toLowerCase(),
+          validate: true
+
+
+        };
+
+        console.log(obj);
+
+        const { status } = await CustomerServices.addCustomer(obj);
+
+        console.log(status);
+        if (status) {
+          setEmailVerify(true)
+        }
+
+
+      } catch (error) {
+        console.log(error);
+        setEmailVerify(false)
+        showErrorToast(error)
+      }
+    }
+  };
+
+  const handleUploadDocument5 = async (e, type) => {
+    try {
+      e.preventDefault()
+      const file = e.target.files[0]
+      const arr = [
+        {
+          name: file?.name,
+          file: "",
+          type: file?.type.split("/")[1],
+          size: getFileSize(file.size),
+          isUpload: false,
+        },
+      ]
+      if (type !== "picture" && allowFilesType.includes(file.type)) {
+        handleUpload5(file, arr, type)
+
+
+      } else {
+        ErrorToaster(`Only ${CleanTypes(allowFilesType)} formats is supported`)
+      }
+    } catch (error) {
+      ErrorToaster(error)
     }
   }
-};
 
-const getData = async () => {
-  try {
-    let params = {
-      customer_id: id
-    };
+  const handleUpload5 = async (file, docs, type) => {
 
-    const { data } = await CustomerServices.getCustomerDetail(params);
-    const ser = await CustomerServices.getServiceCategories(params);
-    let mainCategories = ser.data?.categories
-    let detail = data?.customer
+    try {
+      const formData = new FormData()
+      formData.append("document", file)
+      const { data } = await instance.post(routes.uploadDocuments, formData, {
+        onUploadProgress: (progressEvent) => {
+          const uploadedBytes = progressEvent.loaded
+          const percentCompleted = Math.round((uploadedBytes * 100) / progressEvent.total)
 
-    const updatedCategories = mainCategories.map(category => {
-      const relatedSetting = detail?.commission_settings.find(setting => setting.category_id === category.id);
-      return {
-      id: category.id,
-      name: category.name,
-      category_id: category.id,
-      commission_value: relatedSetting ? relatedSetting.commission_value : null,
-      };
-    });
-    setCategories(updatedCategories);
-    
-    //setCategories(data?.categories)
- 
-    console.log(detail);
-   // setCategories(detail?.commission_settings)
+        },
+      })
+      if (data) {
+        docs[0].isUpload = true
+        docs[0].file = data?.data?.path
+        console.log(data);
 
-    setValue1('name', detail?.name)
-    setValue1('email', detail?.email)
-    setValue1('mobile', detail?.mobile)
-    setValue1('address', detail?.address)
-  
-    setValue1('trn', detail?.trn)
-    setValue1('eid', detail?.eid)
-    setValue1('trade', detail?.trade_license_no)
-    setValue1('paymentType',{ id: detail?.opening_balance_type, name: detail?.opening_balance_type })
-    setSelectedType({ id: detail?.opening_balance_type, name: detail?.opening_balance_type })
-    setValue1('status',{ id: detail?.credit_status, name: detail?.credit_status })
-    setStatus(detail?.credit_status ? { id: detail?.credit_status, name: detail?.credit_status } : null)
-    setValue1('center',{ id: detail?.cost_center, name: detail?.cost_center })
-    setCenter({ id: detail?.cost_center, name: detail?.cost_center })
-    setValue1('type',{ id: detail?.type, name: detail?.type })
-    setBalanceType({ id: detail?.type, name: detail?.type })
-    setDate(new Date(detail?.opening_balance_date))
-    setValue1('balance', detail?.opening_balance)
-    setValue1('credit', detail?.credit_limit)
-    setValue1('creditBalance', detail?.credit_balance)
-    setValue1('notes', detail?.general_notes)
+        if (type == 'emirates') {
+          setEmirates(data?.data?.path)
+        }
+        if (type == 'passport') {
+          setPassport(data?.data?.path)
+        }
+        if (type == 'visa') {
+          setVisa(data?.data?.path)
+        }
+        if (type == 'signature') {
+          setSignature(data?.data?.path)
+        }
 
-  } catch (error) {
-    console.error("Error fetching location:", error);
+        if (data?.data?.path) {
+          setDocuments((prev) =>
+            prev.map((item) =>
+              item.name === type ? { ...item, doc: data?.data?.path || '' } : item
+            )
+          );
+
+
+        }
+
+
+      }
+    } catch (error) {
+      ErrorToaster(error)
+    }
   }
-};
-//  const getReceiptDetail = async (state) => {
-//     setFieldsDisabled(true);
-//     try {
-//       let params = {
-//         mobile: getValues1("mobile"),
-  
-//       };
 
-//       const { data } = await CustomerServices.getCustomerDetail(params);
-//       console.log(data);
-//       if (data?.customer) {
-//         setHoldState(true);
+  const getData = async () => {
+    try {
+      let params = {
+        customer_id: id
+      };
 
-//         showErrorToast("account already exist with this mobile number");
-//       } else {
-//         console.log(data?.receipt);
+      const { data } = await CustomerServices.getCustomerDetail(params);
+      const ser = await CustomerServices.getServiceCategories(params);
+      let mainCategories = ser.data?.categories
+      let detail = data?.customer
+      setDocuments((prev) =>
+        prev.map((item) =>
+          item.name === 'emirates' ? { ...item, doc: detail?.emirates_id || '' } : item
+        )
+      );
+      setDocuments((prev) =>
+        prev.map((item) =>
+          item.name === 'passport' ? { ...item, doc: detail?.passport || '' } : item
+        )
+      );
+      setDocuments((prev) =>
+        prev.map((item) =>
+          item.name === 'visa' ? { ...item, doc: detail?.visa || '' } : item
+        )
+      );
+      setDocuments((prev) =>
+        prev.map((item) =>
+          item.name === 'signature' ? { ...item, doc: detail?.signature || '' } : item
+        )
+      );
+      setEmirates(detail?.emirates_id)
+      setPassport(detail?.passport)
+      setVisa(detail?.visa)
+      setSignature(detail?.signature)
 
-//         setHoldState(false);
-//       }
-//     } catch (error) {
-//       ErrorToaster(error);
-//     } finally {
-//       // setLoader(false)
-//     }
-//   };
-useEffect(() => {
-  getData()
-}, [])
+      const updatedCategories = mainCategories.map(category => {
+        const relatedSetting = detail?.commission_settings.find(setting => setting.category_id === category.id);
+        return {
+          id: category.id,
+          name: category.name,
+          category_id: category.id,
+          commission_value: relatedSetting ? relatedSetting.commission_value : null,
+        };
+      });
+      setCategories(updatedCategories);
+
+      //setCategories(data?.categories)
+
+      console.log(detail);
+      // setCategories(detail?.commission_settings)
+
+      setValue1('name', detail?.name)
+      setValue1('email', detail?.email)
+      setValue1('mobile', detail?.mobile)
+      setValue1('address', detail?.address)
+
+      setValue1('trn', detail?.trn)
+      setValue1('eid', detail?.eid)
+      setValue1('trade', detail?.trade_license_no)
+      setValue1('paymentType', { id: detail?.opening_balance_type, name: detail?.opening_balance_type })
+      setSelectedType({ id: detail?.opening_balance_type, name: detail?.opening_balance_type })
+      setValue1('status', { id: detail?.credit_status, name: detail?.credit_status })
+      setStatus(detail?.credit_status ? { id: detail?.credit_status, name: detail?.credit_status } : null)
+      setValue1('center', { id: detail?.cost_center, name: detail?.cost_center })
+      setCenter({ id: detail?.cost_center, name: detail?.cost_center })
+      setValue1('type', { id: detail?.type, name: detail?.type })
+      setBalanceType({ id: detail?.type, name: detail?.type })
+      setDate(new Date(detail?.opening_balance_date))
+      setValue1('balance', detail?.opening_balance)
+      setValue1('credit', detail?.credit_limit)
+      setValue1('creditBalance', detail?.credit_balance)
+      setValue1('notes', detail?.general_notes)
+
+    } catch (error) {
+      console.error("Error fetching location:", error);
+    }
+  };
+  //  const getReceiptDetail = async (state) => {
+  //     setFieldsDisabled(true);
+  //     try {
+  //       let params = {
+  //         mobile: getValues1("mobile"),
+
+  //       };
+
+  //       const { data } = await CustomerServices.getCustomerDetail(params);
+  //       console.log(data);
+  //       if (data?.customer) {
+  //         setHoldState(true);
+
+  //         showErrorToast("account already exist with this mobile number");
+  //       } else {
+  //         console.log(data?.receipt);
+
+  //         setHoldState(false);
+  //       }
+  //     } catch (error) {
+  //       ErrorToaster(error);
+  //     } finally {
+  //       // setLoader(false)
+  //     }
+  //   };
+  useEffect(() => {
+    getData()
+  }, [])
 
 
 
 
-return (
-  <>
-    <Box sx={{ width: "100%" }}>
+  return (
+    <>
+      <Box sx={{ width: "100%" }}>
 
 
-    </Box>
-    <Box m={3} sx={{ backgroundColor: 'white', borderRadius: "12px" }} >
-      {<>
+      </Box>
+      <Box m={3} sx={{ backgroundColor: 'white', borderRadius: "12px" }} >
+        {<>
 
-        <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
+          <Box component={'form'} onSubmit={handleSubmit1(submitForm1)}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', p: 3, alignItems: 'flex-end' }}>
               <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Update Customer</Typography>
 
@@ -516,13 +630,13 @@ return (
 
                     })}
                   /></Grid>
-                 
+
                 </Grid>
 
 
 
                 <Grid container item xs={5.5} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
-                <Grid item xs={6}><InputField
+                  <Grid item xs={6}><InputField
                     label={"Credit Limit :*"}
                     size={'small'}
                     type={'number'}
@@ -534,7 +648,7 @@ return (
 
                     })}
                   /></Grid>
-                   <Grid item xs={6}><InputField
+                  <Grid item xs={6}><InputField
                     label={"Credit Balance :*"}
                     size={'small'}
                     type={'number'}
@@ -565,9 +679,9 @@ return (
                       })}
                     />
                   </Grid>
-                 
 
-                 
+
+
                 </Grid>
 
                 <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
@@ -586,7 +700,108 @@ return (
                     })}
                   />
                 </Grid>
-  <Grid container item xs={5.8} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  spacing={2}
+                  p={2}
+                  mt={2}
+                  pt={0}
+                  alignItems={'flex-start'}
+                  sx={{ border: "1px solid black", borderRadius: "12px" }}
+                >
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+
+                  >
+                    <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Upload Documents</Typography>
+                  </Grid>
+
+
+                  {documents?.map((doc, i) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={3}
+                      key={i}
+                      display="flex"
+                      justifyContent="center"
+                      flexDirection="column"
+                      alignItems="center"
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          textAlign: "center",
+                          color: Colors.charcoalGrey,
+                          fontFamily: FontFamily.NunitoRegular,
+                          mt: 1,
+                          mb: 1.5,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {doc.label}
+                      </Typography>
+
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <UploadFile
+                          accept={allowFilesType}
+                          error={errors1?.[doc.name]?.message}
+                          register={register1(doc.name, {
+                            required: false,
+                            onChange: (e) => handleUploadDocument5(e, doc.name),
+                          })}
+                        />
+                      </Box>
+                      {doc.doc && (
+                        <Box display="flex" alignItems="center" gap={2} mt={1}>
+                          <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            sx={{ cursor: "pointer" }}
+                            onClick={() =>
+                              window.open(
+                                process.env.REACT_APP_IMAGE_BASE_URL_NEW + doc.doc,
+                                "_blank",
+                                "noopener,noreferrer"
+                              )
+                            }
+                          >
+                            <Box
+                              sx={{
+                                width: 50,
+                                height: 50,
+                                borderRadius: 2,
+                                bgcolor: "#f5f5f5",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <DescriptionOutlinedIcon sx={{ fontSize: 30, color: "green" }} />
+                            </Box>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                mt: 0.5,
+                                textAlign: "center",
+                                wordBreak: "break-word",
+                                maxWidth: 120,
+                              }}
+                            >
+                              {doc.doc?.split("\\").pop().split("/").pop()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      )}
+                    </Grid>
+                  ))}
+                </Grid>
+                <Grid container item xs={12} spacing={2} p={2} mt={2} sx={{ border: '1px solid black', borderRadius: '12px' }}>
                   <Typography sx={{ fontSize: "22px", fontWeight: 'bold' }} >Commission Setting</Typography>
                   {categories.map((cat, index) => (
                     <Grid item xs={12} key={index}>
@@ -597,12 +812,12 @@ return (
                         type="number"
                         step="any"
                         label="Commission"
-                       register={register1(`categories.${index}.commission_value`, {
+                        register={register1(`categories.${index}.commission_value`, {
                           onChange: (e) => {
                             const newCategories = [...categories];
                             newCategories[index].commission_value = e.target.value;
                             console.log(newCategories);
-                            
+
                             setCategories(newCategories);
                           },
                         })}
@@ -627,9 +842,9 @@ return (
           </Box></>}
 
 
-    </Box>
-  </>
-);
+      </Box>
+    </>
+  );
 }
 
 export default CreateCustomer;

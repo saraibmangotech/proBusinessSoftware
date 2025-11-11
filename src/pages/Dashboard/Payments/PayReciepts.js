@@ -20,6 +20,7 @@ import FinanceStatusDialog from 'components/Dialog/FinanceStatusDialog';
 import AllocateStatusDialog from 'components/Dialog/AllocateStatusDialog';
 import AllocateDialog from 'components/Dialog/AllocateDialog';
 import CustomerServices from 'services/Customer';
+import EditIcon from '@mui/icons-material/Edit';
 import { makeStyles } from '@mui/styles';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Pagination from 'components/Pagination';
@@ -768,6 +769,26 @@ function PayReceipts() {
                             </IconButton>
                         </Tooltip>
                     )}
+                       <Box>
+                                <Tooltip title="Update Sale Receipt">
+                                  <IconButton
+                                   onClick={() => {
+                                  navigate(`/update-presale-edit/${row?.original?.id}`, { state: { edit: true,type:'invoice_id' } });
+                    
+                                  localStorage.setItem("currentUrl", "/update-customer");
+                                }}
+                                    sx={{
+                                      backgroundColor: "#f9f9f9",
+                                      borderRadius: 2,
+                                      border: "1px solid #eee",
+                                      width: 40,
+                                      height: 40,
+                                    }}
+                                  >
+                                    <EditIcon color="black" fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
                     {row?.original?.is_paid && (
                         <Tooltip title="Payment Receipt">
                             <IconButton

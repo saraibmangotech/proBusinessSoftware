@@ -196,7 +196,8 @@ const routes = {
   updateEOSStatus:'hrms/eos/updateStatus',
   getEOSDetail:'hrms/eos/details',
   getUserCategory:'users/profile',
-  deleteLeave:'hrms/leaves/delete'
+  deleteLeave:'hrms/leaves/delete',
+  deleteUser:'users/delete'
 
 
 };

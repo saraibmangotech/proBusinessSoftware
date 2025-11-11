@@ -44,6 +44,7 @@ import SystemServices from 'services/System';
 import LockIcon from '@mui/icons-material/Lock';
 import UserServices from 'services/User';
 import FinanceServices from 'services/Finance';
+import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 
 
 // *For Table Style
@@ -112,27 +113,27 @@ const useStyles = makeStyles({
 
 function UserList() {
   const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
-     const {
-          register: register2,
-          handleSubmit: handleSubmit2,
-          formState: { errors: errors2 },
-          setValue: setValue2,
-          getValues: getValues2,
-          reset: reset2,
-          watch: watch2
-      } = useForm();
+  const {
+    register: register2,
+    handleSubmit: handleSubmit2,
+    formState: { errors: errors2 },
+    setValue: setValue2,
+    getValues: getValues2,
+    reset: reset2,
+    watch: watch2
+  } = useForm();
   const navigate = useNavigate();
   const classes = useStyles();
   const dispatch = useDispatch();
   const contentRef = useRef(null);
-    const [statusDialog, setStatusDialog] = useState(false)
-    const [statusDialog2, setStatusDialog2] = useState(false)
-    const [selectedData, setSelectedData] = useState(null)
-    const [tableLoader, setTableLoader] = useState(false)
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [inputError, setInputError] = useState(false)
-
+  const [statusDialog, setStatusDialog] = useState(false)
+  const [statusDialog2, setStatusDialog2] = useState(false)
+  const [selectedData, setSelectedData] = useState(null)
+  const [tableLoader, setTableLoader] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [inputError, setInputError] = useState(false)
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
   const tableHead = [{ name: 'Create Date', key: '' }, { name: 'User Name ', key: 'name' }, { name: 'Employee ID', key: 'employee_id' }, { name: 'User Role', key: '' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
 
@@ -162,39 +163,39 @@ function UserList() {
 
   // *For Permissions
   const [permissions, setPermissions] = useState();
-    const password = watch2("password")
+  const password = watch2("password")
   const [loading, setLoading] = useState(false)
   const [selectedID, setSelectedID] = useState()
   const UpdateStatus2 = async () => {
-        try {
-            let obj = {
-                user_id: selectedData?.id,
-                password: getValues2('password'),
-               
-            };
+    try {
+      let obj = {
+        user_id: selectedData?.id,
+        password: getValues2('password'),
 
-            const promise = CustomerServices.updateEmployeePassword(obj);
-            console.log(promise);
+      };
 
-            showPromiseToast(
-                promise,
-                "Saving...",
-                "Added Successfully",
-                "Something Went Wrong"
-            );
+      const promise = CustomerServices.updateEmployeePassword(obj);
+      console.log(promise);
 
-            // Await the promise and then check its response
-            const response = await promise;
-            if (response?.responseCode === 200) {
-                setStatusDialog2(false);
-                
-                getUserRole();
-                reset2()
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+      showPromiseToast(
+        promise,
+        "Saving...",
+        "Added Successfully",
+        "Something Went Wrong"
+      );
+
+      // Await the promise and then check its response
+      const response = await promise;
+      if (response?.responseCode === 200) {
+        setStatusDialog2(false);
+
+        getUserRole();
+        reset2()
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // *For Get Customer Queue
   const getUserRole = async (page, limit, filter) => {
     setLoader(true)
@@ -226,6 +227,19 @@ function UserList() {
       showErrorToast(error)
     } finally {
       setLoader(false)
+    }
+  }
+
+  const handleDelete = async (item) => {
+    try {
+      let params = { user_id: selectedData?.id }
+      const { message } = await CustomerServices.deleteUser(params)
+      SuccessToaster(message);
+      getUserRole()
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      // setLoader(false)
     }
   }
 
@@ -330,74 +344,83 @@ function UserList() {
 
   return (
     <Box sx={{ p: 3 }}>
-         <SimpleDialog open={statusDialog2} onClose={() => setStatusDialog2(false)} title={"Change Password?"}>
-                      <Box component="form" onSubmit={handleSubmit2(UpdateStatus2)}>
-                          <Grid container spacing={2}>
-      
-                              <Grid item xs={12} sm={12}>
-                                  <InputField
-                                      size="small"
-                                      label="Password :*"
-                                      type={showPassword ? "text" : "password"}
-                                      placeholder="Enter Your Password"
-                                      InputProps={{
-                                          endAdornment: (
-                                              <InputAdornment position="end">
-                                                  <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
-                                                      {showPassword ? <Visibility color="primary" /> : <VisibilityOff color="primary" />}
-                                                  </IconButton>
-                                              </InputAdornment>
-                                          ),
-                                      }}
-                                      error={errors2.password?.message || (inputError && "You have entered an invalid email or password.")}
-                                      register={register2("password", {
-                                          required: "Please enter the password.",
-                                      })}
-                                  />
-                              </Grid>
-                              <Grid item xs={12} sm={12}>
-                                  <InputField
-                                      size="small"
-                                      label="Confirm Password :*"
-                                      type={showConfirmPassword ? "text" : "password"}
-                                      placeholder="Enter Your Confirm Password"
-                                      InputProps={{
-                                          endAdornment: (
-                                              <InputAdornment position="end">
-                                                  <IconButton edge="end" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                                                      {showConfirmPassword ? <Visibility color="primary" /> : <VisibilityOff color="primary" />}
-                                                  </IconButton>
-                                              </InputAdornment>
-                                          ),
-                                      }}
-                                      error={
-                                          errors2.confirmpassword?.message || (inputError && "You have entered an invalid email or password.")
-                                      }
-                                      register={register2("confirmpassword", {
-                                          required: "Please enter the confirm password.",
-                                          validate: (value) => value === password || "Passwords do not match.",
-                                      })}
-                                  />
-                              </Grid>
-                              <Grid container sx={{ justifyContent: "center" }}>
-                                  <Grid
-                                      item
-                                      xs={6}
-                                      sm={6}
-                                      sx={{
-                                          mt: 2,
-                                          display: "flex",
-                                          justifyContent: "space-between",
-                                          gap: "25px",
-                                      }}
-                                  >
-                                      <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
-                                      <PrimaryButton onClick={() => setStatusDialog2(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
-                                  </Grid>
-                              </Grid>
-                          </Grid>
-                      </Box>
-                  </SimpleDialog>
+      <ConfirmationDialog
+        open={confirmationDialog}
+        onClose={() => setConfirmationDialog(false)}
+        message={"Are You Sure?"}
+        action={() => {
+          setConfirmationDialog(false);
+          handleDelete()
+        }}
+      />
+      <SimpleDialog open={statusDialog2} onClose={() => setStatusDialog2(false)} title={"Change Password?"}>
+        <Box component="form" onSubmit={handleSubmit2(UpdateStatus2)}>
+          <Grid container spacing={2}>
+
+            <Grid item xs={12} sm={12}>
+              <InputField
+                size="small"
+                label="Password :*"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter Your Password"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <Visibility color="primary" /> : <VisibilityOff color="primary" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                error={errors2.password?.message || (inputError && "You have entered an invalid email or password.")}
+                register={register2("password", {
+                  required: "Please enter the password.",
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <InputField
+                size="small"
+                label="Confirm Password :*"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Enter Your Confirm Password"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton edge="end" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        {showConfirmPassword ? <Visibility color="primary" /> : <VisibilityOff color="primary" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                error={
+                  errors2.confirmpassword?.message || (inputError && "You have entered an invalid email or password.")
+                }
+                register={register2("confirmpassword", {
+                  required: "Please enter the confirm password.",
+                  validate: (value) => value === password || "Passwords do not match.",
+                })}
+              />
+            </Grid>
+            <Grid container sx={{ justifyContent: "center" }}>
+              <Grid
+                item
+                xs={6}
+                sm={6}
+                sx={{
+                  mt: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "25px",
+                }}
+              >
+                <PrimaryButton bgcolor={Colors.primary} title="Yes,Confirm" type="submit" />
+                <PrimaryButton onClick={() => setStatusDialog2(false)} bgcolor={"#FF1F25"} title="No,Cancel" />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>
+      </SimpleDialog>
       <SimpleDialog
         open={deleteDialog}
         onClose={() => setDeleteDialog(false)}
@@ -541,16 +564,16 @@ function UserList() {
                                 </Cell>
                                 <Cell style={{ textAlign: 'left' }} className="pdf-table">
                                   <Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
-                                     <Tooltip title="Update Password" arrow>
-                                              <IconButton
-                                                onClick={() => {
-                                                  setSelectedData(item);
-                                                  setStatusDialog2(true);
-                                                }}
-                                              >
-                                                <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
-                                              </IconButton>
-                                            </Tooltip>
+                                    <Tooltip title="Update Password" arrow>
+                                      <IconButton
+                                        onClick={() => {
+                                          setSelectedData(item);
+                                          setStatusDialog2(true);
+                                        }}
+                                      >
+                                        <VpnKeyIcon sx={{ color: 'black', fontSize: '14px' }} />
+                                      </IconButton>
+                                    </Tooltip>
                                     <Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
                                       {true && <Box component={'div'} onClick={() => {
                                         if (item?.name != 'Staff' || item?.name != 'Customer' || item?.name != "Agent") {
@@ -567,7 +590,12 @@ function UserList() {
                                       { state: item }
                                     )} width={'35px'}></Box>}
 
+                                    {true && <Box component={'img'} src={Images.deleteIcon} onClick={() => {
+                                      setSelectedData(item)
+                                      setConfirmationDialog(true)
+                                    }
 
+                                    } width={'35px'}></Box>}
                                   </Box>
                                 </Cell>
 

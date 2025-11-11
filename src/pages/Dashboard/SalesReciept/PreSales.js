@@ -34,6 +34,7 @@ import {
   PendingIcon,
   RequestBuyerIdIcon,
 } from "assets";
+
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import Colors from "assets/Style/Colors";
@@ -46,6 +47,7 @@ import CustomerServices from "services/Customer";
 import { makeStyles } from "@mui/styles";
 import Pagination from "components/Pagination";
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import EditIcon from '@mui/icons-material/Edit';
 import {
   agencyType,
   Debounce,
@@ -734,6 +736,26 @@ function PreSalesList() {
               </IconButton>
             </Tooltip>
           )}
+          <Box>
+            <Tooltip title="Update Sale Receipt">
+              <IconButton
+               onClick={() => {
+              navigate(`/update-presale-edit/${row?.original?.id}`, { state: { edit: true,type:'service_id' } });
+
+              localStorage.setItem("currentUrl", "/update-customer");
+            }}
+                sx={{
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: 2,
+                  border: "1px solid #eee",
+                  width: 40,
+                  height: 40,
+                }}
+              >
+                <EditIcon color="black" fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
 
           <Box>
             <Tooltip title="Sales Request">

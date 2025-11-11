@@ -578,15 +578,21 @@ function ProfitLossStatement() {
                 const periodDifferenceChildrenSum =
                   account?.nature === "debit"
                     ? Number.parseFloat(result?.debit) - Number.parseFloat(result?.credit)
-                    : Number.parseFloat(result?.credit) - Number.parseFloat(result?.debit)
+                    :-1 * ( Number.parseFloat(result?.credit) - Number.parseFloat(result?.debit))
+                    
+                    
                 childTotal = adjustedAccountOpeningBalance + periodDifferenceChildrenSum
+                console.log(childTotal,'childTotalchildTotal');
               } else {
                 const periodDifferenceAccount =
                   account?.nature === "debit"
                     ? Number.parseFloat(account?.total_debit) - Number.parseFloat(account?.total_credit)
-                    : Number.parseFloat(account?.total_credit) - Number.parseFloat(account?.total_debit)
+                    : -1 *   (Number.parseFloat(account?.total_credit) - Number.parseFloat(account?.total_debit))
                 childTotal = adjustedAccountOpeningBalance + periodDifferenceAccount
+                console.log(childTotal,'childTotalchildTotal');
               }
+              console.log(childTotal,'childTotalchildTotal');
+              
               Total += Number.parseFloat(childTotal)
               GrandTotal += Number.parseFloat(childTotal)
               // Account row
@@ -595,8 +601,8 @@ function ProfitLossStatement() {
                 account.account_name ?? "-",
                 account.account_category ?? "-",
                 account.account_subcategory ?? "-",
-                "",
-                account?.nature === "debit" ? Number.parseFloat(childTotal) : -1 * Number.parseFloat(childTotal),
+                '',
+                account?.nature === "debit" ? Number.parseFloat(childTotal) :  Number.parseFloat(childTotal),
               ])
               // Style account rows
               accountRow.eachCell((cell, colNumber) => {
@@ -634,7 +640,7 @@ function ProfitLossStatement() {
                     child.account_name ?? "-",
                     child.account_category ?? "-",
                     child.account_subcategory ?? "-",
-                    child?.nature == 'debit' ? Number.parseFloat(subTotal) : -1 * Number.parseFloat(subTotal),
+                    child?.nature == 'debit' ? Number.parseFloat(subTotal) : -1 * (Number.parseFloat(subTotal)) ,
                     "",
                   ])
                   // Style child rows

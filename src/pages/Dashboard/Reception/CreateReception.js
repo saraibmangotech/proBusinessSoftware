@@ -13,9 +13,11 @@ import { showErrorToast, showPromiseToast } from "components/NewToaster"
 import SimpleDialog from "components/Dialog/SimpleDialog"
 import { ErrorToaster } from "components/Toaster"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "context/UseContext"
 
 function ReceptionForm() {
     const navigate = useNavigate()
+        const { user } = useAuth();
     const [customerType, setCustomerType] = useState("company")
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [buttonDisabled2, setButtonDisabled2] = useState(true)
@@ -144,18 +146,18 @@ function ReceptionForm() {
 
             const { data } = await CustomerServices.getCustomerQueue(params)
             setCustomers(data?.rows)
-            if(!id){
+            if (!id) {
                 let filter = await data?.rows.find(item => item?.name == 'Walk-In Customer')
                 setSelectedCustomer(filter)
             }
-            else{
+            else {
                 let filter = await data?.rows.find(item => item?.id == id)
                 setSelectedCustomer(filter)
                 setValue1('customerName', filter?.name)
                 setValue1('email', filter?.email)
                 setValue1('mobile', filter?.mobile)
             }
-           
+
         } catch (error) {
             showErrorToast(error)
         }
@@ -303,10 +305,10 @@ function ReceptionForm() {
         console.log(formData);
         try {
             let obj = {
-         
+
                 name: formData?.name,
-                mobile:formData?.mobileVal,
-                email:formData?.emailVal
+                mobile: formData?.mobileVal,
+                email: formData?.emailVal
 
 
             };
@@ -321,9 +323,9 @@ function ReceptionForm() {
             const response = await promise;
             if (response?.responseCode === 200) {
                 console.log(response);
-                
+
                 getCustomerQueue(response?.data?.id)
-                
+
                 setCompanyDialog(false)
             }
 
@@ -359,7 +361,7 @@ function ReceptionForm() {
                                     })}
                                 />
                             </Grid>
-                        
+
                             <Grid item xs={12}>
                                 <InputField
                                     label={"Mobile *:"}
@@ -433,16 +435,16 @@ function ReceptionForm() {
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Create Reception</Typography>
-                    <PrimaryButton
+                {user?.role_id !=1005 && <PrimaryButton
 
-                                    disabled={subCustDisable}
-                                   bgcolor={'#001f3f'}
-                                    onClick={() => setCompanyDialog(true)}
-                                    title="Add Customer"
+                    disabled={subCustDisable}
+                    bgcolor={'#001f3f'}
+                    onClick={() => setCompanyDialog(true)}
+                    title="Add Customer"
 
 
 
-                                />
+                />}
             </Box>
 
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
@@ -530,7 +532,7 @@ function ReceptionForm() {
                             />
                         </Grid>
 
-                   
+
                     </Grid>
                 </Box>
             </Box>
@@ -633,7 +635,7 @@ function ReceptionForm() {
                                     onSelect={(value) => {
                                         setSelectedCustomer(value)
                                         if (value?.name == 'Walk-In Customer') {
-                                         
+
                                             setValue1('customerName', '')
                                             setValue1('email', '')
                                             setValue1('mobile', '')
@@ -654,11 +656,11 @@ function ReceptionForm() {
                                     register={register1("customer")}
                                 />
                             </Grid>
-                            
+
                             <Grid item xs={2.8} mt={2} >
                                 <PrimaryButton
                                     // disabled={buttonDisabled2}
-                                    
+
                                     bgcolor={'#001f3f'}
                                     title="Create"
                                     type={'submit'}
@@ -684,9 +686,9 @@ function ReceptionForm() {
                                     })}
                                 />
                             </Grid> */}
-                           
-                        
-                           
+
+
+
                         </Grid>
                     </Box>
                 </Box>}
