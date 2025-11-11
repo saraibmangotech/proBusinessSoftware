@@ -26,6 +26,8 @@ import {
   Collapse,
   CardMedia,
   Badge,
+  Dialog,
+  Grid,
 } from "@mui/material"
 import {
   Logout,
@@ -74,6 +76,16 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import SystemServices from "services/System"
+import DatePicker from "components/DatePicker"
+import { Controller, useForm } from "react-hook-form"
+import SelectField from "components/Select"
+import CustomerServices from "services/Customer"
+import { showErrorToast, showPromiseToast, showSuccessToast } from "components/NewToaster"
+import UserServices from "services/User"
+import moment from "moment"
+import InputField from "components/Input"
+import Colors from "assets/Style/Colors"
+import { PrimaryButton } from "components/Buttons"
 
 
 
@@ -196,10 +208,17 @@ function Header() {
     role: <SecurityIcon fontSize="small" />,
     settings: <SettingsIcon fontSize="small" />
   };
+  const { control, handleSubmit, watch, reset, getValues, formState: { errors }, register } = useForm({
+    defaultValues: {
+      fromDate: null,
+      toDate: null,
+    },
+  });
 
   const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const [open, setOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
   const openDropdown = Boolean(anchorEl)
   const [notificationCount, setNotificationCount] = useState(2)
@@ -210,7 +229,10 @@ function Header() {
   const [openDropdownId, setOpenDropdownId] = useState(null)
   const isMobile = useMediaQuery("(max-width:960px)")
   const [navigationData, setNavigationData] = useState([])
-
+  const [fromDate, setFromDate] = useState();
+  const [toDate, setToDate] = useState();
+  const [customerQueue, setCustomerQueue] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
   const handleDropdownOpen = (event, id) => {
     if (openDropdownId === id) {
       setOpenDropdownId(null);
@@ -276,22 +298,22 @@ function Header() {
 
     setCurrentPage(getCurrentPageName())
   }, [location.pathname])
-const [totalCount, setTotalCount] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
   const getNotificationsCount = async (page, limit, filter) => {
-    
-      try {
-       
-       
-       
-        const { data } =  SystemServices.getNotificationsCount()
-  
-        setTotalCount(data?.notifications)
-     
-  
-      } catch (error) {
-        console.log(error)
-      } 
+
+    try {
+
+
+
+      const { data } = SystemServices.getNotificationsCount()
+
+      setTotalCount(data?.notifications)
+
+
+    } catch (error) {
+      console.log(error)
     }
+  }
 
 
   useEffect(() => {
@@ -2678,7 +2700,7 @@ const [totalCount, setTotalCount] = useState(0)
               navigation: true,
               order_by: 55,
             },
-             {
+            {
               id: 55,
               name: "Final Statement Management",
               icon: "customer",
@@ -3376,6 +3398,18 @@ const [totalCount, setTotalCount] = useState(0)
               parent_id: 9,
               api: null,
               route: "/snapshot-employee-service-report",
+              identifier: null,
+              navigation: true,
+              order_by: 33,
+            },
+            {
+              id: 33,
+              name: "Bulk Invoice Download",
+              icon: "customer",
+              parent_id: 9,
+              api: null,
+              route: "",
+              modal: true,
               identifier: null,
               navigation: true,
               order_by: 33,
@@ -5589,6 +5623,7 @@ const [totalCount, setTotalCount] = useState(0)
               navigation: true,
               order_by: 33,
             },
+
           ],
         },
         {
@@ -6228,8 +6263,18 @@ const [totalCount, setTotalCount] = useState(0)
                           {item.children.map((child) => (
                             <React.Fragment key={child.id}>
                               <MenuItem
-                                component="a"
-                                href={child.route}
+                                onClick={() => {
+                                  if (child?.modal) {
+                                    setOpenDropdownId(null);
+                                    setDropdownAnchorEl(null);
+                                    setOpen(true)
+                                  }
+                                  else {
+                                    window.location.href = child.route
+                                  }
+                                }}
+
+                                // href={child.route}
                                 target="_self"
                                 sx={{
                                   backgroundColor: isActive(child.route)
@@ -6286,7 +6331,65 @@ const [totalCount, setTotalCount] = useState(0)
       </List>
     </Box>
   )
+  const getCustomerQueue = async (page, limit, filter) => {
+    // setLoader(true)
+    try {
 
+
+      let params = {
+        page: 1,
+        limit: 999999,
+      }
+      params = { ...params }
+      const { data } = await CustomerServices.getCustomerQueue(params)
+
+      setCustomerQueue(data?.rows)
+
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      // setLoader(false)
+    }
+  }
+
+  const BulkDownload = async (formData) => {
+    showSuccessToast('Your invoices are being generated. You’ll receive an email in brief time according to selected timeframe.')
+    setOpen(false)
+    console.log(formData);
+    try {
+      let obj = {
+
+        customer_id: user?.customer_id,
+        email: getValues('email'),
+        from_date: fromDate ? moment(new Date(fromDate)).format('MM-DD-YYYY') : '',
+        to_date: toDate ? moment(new Date(toDate)).format('MM-DD-YYYY') : '',
+
+      }
+
+
+      // console.log(obj);
+      // const promise = UserServices.BulkDownload(obj);
+
+      // showPromiseToast(
+      //   promise,
+      //   'Saving ...',
+      //   'Success',
+      //   'Something Went Wrong'
+      // );
+      // const response = await promise;
+      // if (response?.responseCode === 200) {
+      //   setOpen(false)
+      // }
+
+
+    } catch (error) {
+
+      // showErrorToast(error)
+    }
+  }
+  useEffect(() => {
+    getCustomerQueue()
+  }, [])
 
 
   return (
@@ -6300,6 +6403,83 @@ const [totalCount, setTotalCount] = useState(0)
           borderBottom: "1px solid #f0f0f0",
         }}
       >
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          sx={{
+            "& .MuiDialog-paper": {
+              width: "40%",
+              height: "auto",
+              borderRadius: 2,
+              py: { xs: 2, md: 4 },
+              px: { xs: 3, md: 6 },
+            },
+          }}
+        >
+          <form onSubmit={handleSubmit(BulkDownload)}>
+            <Grid container spacing={2}>
+
+              <Grid item xs={12} >
+                <SelectField
+                  size={'small'}
+                  label={'Select Customer :'}
+
+                  options={customerQueue}
+                  selected={selectedCustomer}
+                  onSelect={(value) => {
+                    setSelectedCustomer(value)
+
+
+
+                  }}
+
+                />
+              </Grid>
+              <Grid item xs={12} sm={12}>
+                <InputField
+                  size={"small"}
+                  label={'Email'}
+                  type={'email'}
+                  placeholder={'Email Address'}
+                  error={errors?.email?.message}
+                  register={register("email", {
+                    required: 'Please enter your email.',
+
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <DatePicker
+                  label={"From Date"}
+                  disableFuture={true}
+                  size="small"
+                  value={fromDate}
+                  onChange={(date) => setFromDate(new Date(date))}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <DatePicker
+                  label={"To Date"}
+
+                  disableFuture={true}
+                  size="small"
+                  value={toDate}
+                  onChange={(date) => setToDate(new Date(date))}
+                />
+              </Grid>
+
+              {/* Action Buttons */}
+              <Grid item xs={12} display="flex" justifyContent="center" gap={2} mt={2}>
+                <PrimaryButton
+                  title={"Bulk Download"}
+                  type="submit"
+                  style={{ backgroundColor: Colors.primary }}
+                />
+
+              </Grid>
+            </Grid>
+          </form>
+        </Dialog>
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ minHeight: "64px", justifyContent: "space-between" }}>
             {/* Logo */}
@@ -6497,8 +6677,18 @@ const [totalCount, setTotalCount] = useState(0)
                                     {item.children.map((child) => (
                                       <React.Fragment key={child.id}>
                                         <MenuItem
-                                          component="a"
-                                          href={child.route}
+
+                                          onClick={() => {
+                                            if (child?.modal) {
+                                              setOpenDropdownId(null);
+                                              setDropdownAnchorEl(null);
+                                              setOpen(true)
+                                            }
+                                            else {
+                                              window.location.href = child.route
+                                            }
+                                          }}
+                                          // href={child.route}
                                           target="_self"
                                           sx={{
                                             backgroundColor: isActive(child.route)

@@ -197,7 +197,8 @@ const routes = {
   getEOSDetail:'hrms/eos/details',
   getUserCategory:'users/profile',
   deleteLeave:'hrms/leaves/delete',
-  deleteUser:'users/delete'
+  deleteUser:'users/delete',
+  getPrepaidInvoiceDetail:'/purchases/fpInvoice/details'
 
 
 };

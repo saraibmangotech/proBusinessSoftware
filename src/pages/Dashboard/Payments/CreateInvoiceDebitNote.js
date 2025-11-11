@@ -66,6 +66,8 @@ const CreateInvoiceDebitNote = () => {
                 date: moment(date).format('MM-DD-YYYY'),
                 notes: formData?.notes,
                 amount: formData?.totalCreditAmount,
+                tax_amount: formData?.Vat,
+                total_amount: formData?.totalAmount,
 
                 cost_center: selectedCostCenter?.name,
 
@@ -216,7 +218,7 @@ const CreateInvoiceDebitNote = () => {
                                 error={errors?.costcenter?.message}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={2}>
                             <InputField
                                 label="Total Debit Amount"
                                 size="small"
@@ -249,6 +251,52 @@ const CreateInvoiceDebitNote = () => {
                                 helperText={errors?.totalCreditAmount?.message}
                             />
 
+                        </Grid>
+                        <Grid item xs={12} md={1}>
+                            <InputLabel sx={{ textTransform: "capitalize", textAlign: 'left', fontWeight: 700, color: Colors.gray }}>
+
+                                Enable VAT
+                            </InputLabel>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={isVatEnabled}
+                                        {...register("vatEnabled")}
+                                        onChange={(e) => {
+                                            setIsVatEnabled(e.target.checked)
+                                            if (!e.target.checked) {
+                                                setValue("Vat", 0); // Set VAT to 0 if unchecked
+
+                                                console.log(e.target.checked);
+
+                                                let total = parseFloat(0) + parseFloat(getValues('totalCreditAmount'))
+                                                console.log(total);
+                                                setValue("totalAmount", total);
+                                            } else {
+                                                let vat = parseFloat(getValues('totalCreditAmount') * 0.05)
+                                                setValue("Vat", vat); // Set VAT to 0 if unchecked
+                                                console.log(e.target.checked);
+                                                let total = parseFloat(getValues('totalCreditAmount') * 0.05) + parseFloat(getValues('totalCreditAmount'))
+                                                console.log(total);
+                                                setValue("totalAmount", total);
+
+                                            }
+                                        }}
+                                    />
+                                }
+
+                            />
+
+                        </Grid>
+                        <Grid item xs={12} md={2}>
+                            <InputField
+                                label="Vat"
+                                size="small"
+                                disabled
+                                placeholder="Vat"
+                                register={register("Vat", { required: false })}
+
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Grid container spacing={2}>

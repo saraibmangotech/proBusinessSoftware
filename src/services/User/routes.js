@@ -13,7 +13,8 @@ const routes = {
   CreateSalary:'/hrms/payroll/add',
   UpdateSalary:'/hrms/payroll/update',
   CreateEos:'hrms/eos/add',
-  UpdateEOS:'hrms/eos/update'
+  UpdateEOS:'hrms/eos/update',
+  BulkDownload:''
   
 };
 
