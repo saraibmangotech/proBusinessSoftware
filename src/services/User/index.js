@@ -6,6 +6,10 @@ const UserServices = {
     const data = await post(routes.CreateSubUser, obj);
     return data;
   },
+    BulkDownload: async (obj) => {
+    const data = await post(routes.BulkDownload, obj);
+    return data;
+  },
    CreateEos: async (obj) => {
     const data = await post(routes.CreateEos, obj);
     return data;

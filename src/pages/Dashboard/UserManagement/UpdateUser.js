@@ -146,6 +146,7 @@ function UpdateUser() {
   }
   const [selectedCategory, setSelectedCategory] = useState([])
   const [categories, setCategories] = useState([])
+  const [categories2, setCategories2] = useState([])
   // *For Get Customer Queue
   const getCategoryList = async (page, limit, filter) => {
 
@@ -160,7 +161,34 @@ function UpdateUser() {
       }
 
       const { data } = await CustomerServices.getCategoryList(params)
-      setCategories(data?.categories);
+
+
+      const filteredItems = data?.categories
+        ?.filter(item => {
+          // Keep only TASHEEL with id = 16
+          if (item.name.startsWith("TASHEEL")) {
+            return item.id === 16;
+          }
+
+          // Remove all TAWJEEH
+          if (item.name.startsWith("TAWJEEH")) {
+            return false;
+          }
+
+          // Keep everything else
+          return true;
+        })
+        ?.map(item => {
+          // Rename TASHEEL - 17.1 to TASHEEL
+          if (item.id === 16) {
+            return { ...item, name: "TASHEEL" };
+          }
+          return item;
+        });
+      setCategories(filteredItems);
+      console.log(filteredItems, 'filteredItems');
+
+      setCategories2(data?.categories)
       getUserCategory(data?.categories)
 
 
@@ -191,20 +219,39 @@ function UpdateUser() {
       showErrorToast(error)
     }
   }
-  const selectedCategoryObjects = categories.filter((category) => selectedCategory?.includes(category.id))
+  const selectedCategoryObjects = categories2.filter((category) => selectedCategory?.includes(category.id))
+console.log(selectedCategoryObjects,'selectedCategoryObjects');
 
   // Handle checkbox change
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory((prev) => {
-      if (prev?.includes(categoryId)) {
-        // Remove if already selected
-        return prev.filter((id) => id !== categoryId)
+ const handleCategoryChange = (categoryId) => {
+  setSelectedCategory((prev) => {
+    const isAlreadySelected = prev.includes(categoryId);
+
+    // Get all TASHEEL + TAWJEEH ids
+    const relatedIds = categories2
+      ?.filter(item => item.name.startsWith("TASHEEL") || item.name.startsWith("TAWJEEH"))
+      ?.map(item => item.id) || [];
+
+    if (isAlreadySelected) {
+      // If deselecting 16, remove it and all related TASHEEL/TAWJEEH ids
+      if (categoryId === 16) {
+        return prev.filter(id => !relatedIds.includes(id));
       } else {
-        // Add if not selected
-        return [...prev, categoryId]
+        return prev.filter(id => id !== categoryId);
       }
-    })
-  }
+    } else {
+      // If selecting 16, add all TASHEEL + TAWJEEH ids
+      if (categoryId === 16) {
+        const newSelection = [...new Set([...prev, ...relatedIds])];
+        return newSelection;
+      } else {
+        // Normal add
+        return [...prev, categoryId];
+      }
+    }
+  });
+};
+
   console.log(selectedCategory);
 
   useEffect(() => {

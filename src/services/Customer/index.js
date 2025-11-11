@@ -39,6 +39,10 @@ const CustomerServices = {
     const data = await get(routes.getSalaries, params);
     return data;
   },
+   getPrepaidInvoiceDetail: async (params) => {
+    const data = await get(routes.getPrepaidInvoiceDetail, params);
+    return data;
+  },
    getUserCategory: async (params) => {
     const data = await get(routes.getUserCategory, params);
     return data;

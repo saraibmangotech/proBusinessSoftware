@@ -467,6 +467,9 @@ const PurchaseInvoices = lazy(() =>
 const UpdatePurchaseInvoice = lazy(() =>
   import("pages/Dashboard/Invoice/UpdatePurchaseInvoice")
 );
+const UpdatePrepaidExpense = lazy(() =>
+  import("pages/Dashboard/Invoice/UpdatePrepaidExpense")
+);
 const CreatePaymentInvoice = lazy(() =>
   import("pages/Dashboard/Payments/CreatePaymentInvoice")
 );
@@ -658,6 +661,9 @@ const PrepaidExpensePaymentList = lazy(() =>
 
 const CreateFixedAsset = lazy(() =>
   import("pages/Dashboard/Invoice/CreateFixedAssetInvoice")
+);
+const UpdateFixedAssetInvoice = lazy(() =>
+  import("pages/Dashboard/Invoice/UpdateFixedAsset")
 );
 const FixedAssetList = lazy(() =>
   import("pages/Dashboard/Invoice/FixedAssetList")
@@ -892,6 +898,14 @@ const AdminRoutes = [
   {
     path: "/create-purchase-invoice",
     component: <CreatePurchaseInvoice />,
+  },
+    {
+    path: "/update-expense-invoice/:id",
+    component: <UpdatePrepaidExpense />,
+  },
+  {
+    path: "/update-fixed-asset/:id",
+    component: <UpdateFixedAssetInvoice />,
   },
   {
     path: "/purchase-invoices",

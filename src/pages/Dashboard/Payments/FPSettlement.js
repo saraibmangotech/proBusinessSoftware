@@ -85,7 +85,7 @@ function FPSettlement() {
     const { register, formState: { errors }, handleSubmit, setValue, getValues, trigger, watch } = useForm();
     const { register: register2, getValues: getValues2 } = useForm();
     const { register: register3, handleSubmit: handleSubmit3 } = useForm();
-    const { register: register4, getValues: getValues4, errors: errors4, setValue: setValue4, trigger: trigger4 } = useForm();
+    const { register: register4, getValues: getValues4, formState: { errors: errors4 }, setValue: setValue4, trigger: trigger4 } = useForm();
     const [loader, setLoader] = useState(false);
     const [loading, setLoading] = useState(false);
     const [payments, setPayments] = useState([])
@@ -493,7 +493,34 @@ function FPSettlement() {
             ErrorToaster(error);
         }
     };
+    const handleReceive3 = (value, id, balance) => {
+        try {
+            const shallowCopy = [...selectedInvoice2];
+            const currentIndex = shallowCopy.findIndex(e => e.invoiceId === id);
 
+            if (currentIndex === -1) return; // Safeguard: invoice not found
+
+            const numericValue = parseFloat(value);
+            const numericBalance = parseFloat(balance);
+
+            if (numericValue > numericBalance) {
+                shallowCopy[currentIndex].receiveAmount = numericBalance;
+                setValue4(`receiving${id}`, numericBalance.toFixed(2));
+            } else {
+                shallowCopy[currentIndex].receiveAmount = numericValue;
+            }
+            const totalAmountUnpaid = shallowCopy.reduce((total, invoice) => total + (parseFloat(invoice?.receiveAmount || 0)), 0);
+
+            console.log(shallowCopy, 'totalAmount');
+
+            console.log(totalAmountUnpaid, 'totalAmount');
+
+            setTotalAmount2(parseFloat(totalAmountUnpaid).toFixed(2))
+            setSelectedInvoice2(shallowCopy);
+        } catch (error) {
+            ErrorToaster(error);
+        }
+    };
     // *For Get Payment Accounts
     const getPaymentAccounts = async () => {
         try {
@@ -572,7 +599,10 @@ function FPSettlement() {
         setLoading(true);
         console.log(selectedInvoice);
         console.log(selectedInvoice2);
-
+        if (!date) {
+            showErrorToast('Payment Date is required')
+            return;
+        }
         if (totalAmount !== totalAmount2) {
             showErrorToast(`Remaining amount must be paid. Remaining: ${(totalAmount - totalAmount2).toFixed(2)}`);
             setLoading(false);
@@ -583,7 +613,7 @@ function FPSettlement() {
 
         try {
             let obj = {
-                type:'fp',
+                type: 'fp',
                 vendor_id: selectedInvoice2[0]?.vendor_id,
                 vendor_name: selectedInvoice2[0]?.vendor_name,
                 payments: selectedInvoice,
@@ -744,7 +774,7 @@ function FPSettlement() {
         if (selectedInvoice2.length > 0) {
 
             console.log(selectedInvoice2, 'selectedInvoice2');
-            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + (parseFloat(invoice.total_amount || 0)-parseFloat(invoice.paid_amount || 0)), 0);
+            const totalAmountUnpaid = selectedInvoice2.reduce((total, invoice) => total + (parseFloat(invoice.receiveAmount || 0)), 0);
 
             console.log(totalAmountUnpaid);
 
@@ -1004,7 +1034,7 @@ function FPSettlement() {
                                                             <Typography variant="body2">
                                                                 {parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) === 0
                                                                     ? 'Full'
-                                                                    : parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0) === parseFloat(item?.total_amount || 0)
+                                                                    : (parseFloat(item?.total_amount || 0) - parseFloat(item?.adjustment_balance || 0)) === parseFloat(item?.total_amount || 0)
                                                                         ? 'UnSettled'
                                                                         : 'Partial'}
                                                             </Typography>
@@ -1144,31 +1174,31 @@ function FPSettlement() {
                                                         {parseFloat(item?.settled_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {parseFloat(item?.total_amount || 0) - parseFloat(item?.settled_amount || 0) ?? '-'}
+                                                        {parseFloat(parseFloat(item?.total_amount || 0) - parseFloat(item?.settled_amount || 0)).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
                                                         <Box
                                                             sx={{
                                                                 path: {
                                                                     fill:
-                                                                        (item?.settled_amount ?? 0) !== (item?.total_amount ?? 0) &&
-                                                                        (item?.settled_amount ?? 0) !== 0 &&
+                                                                        parseFloat(item?.settled_amount || 0) !== parseFloat(item?.total_amount || 0) &&
+                                                                        parseFloat(item?.settled_amount || 0) !== 0 &&
                                                                         Colors.bluishCyan,
                                                                 },
                                                             }}
                                                         >
-                                                            {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0) ? (
+                                                            {parseFloat(item?.settled_amount || 0) === parseFloat(item?.total_amount || 0) ? (
                                                                 <CheckIcon />
-                                                            ) : (item?.settled_amount ?? 0) === 0 ? (
+                                                            ) : parseFloat(item?.settled_amount || 0) === 0 ? (
                                                                 <PendingIcon />
                                                             ) : (
                                                                 <CheckIcon />
                                                             )}
 
                                                             <Typography variant="body2">
-                                                                {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0)
+                                                                {parseFloat(item?.settled_amount || 0) === parseFloat(item?.total_amount || 0)
                                                                     ? 'Full'
-                                                                    : (item?.settled_amount ?? 0) === 0
+                                                                    : parseFloat(item?.settled_amount || 0) === 0
                                                                         ? 'UnSettled'
                                                                         : 'Partial'}
                                                             </Typography>
@@ -1335,33 +1365,33 @@ function FPSettlement() {
                                                         {parseFloat(item?.paid_amount || 0).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0) ?? '-'}
+                                                        {parseFloat(parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0)).toFixed(2) ?? '-'}
                                                     </Cell>
                                                     <Cell>
                                                         <Box
                                                             sx={{
                                                                 path: {
                                                                     fill:
-                                                                        (item?.settled_amount ?? 0) !== (item?.total_amount ?? 0) &&
-                                                                        (item?.settled_amount ?? 0) !== 0 &&
+                                                                        parseFloat(item?.paid_amount || 0) !== parseFloat(item?.total_amount || 0) &&
+                                                                        parseFloat(item?.paid_amount || 0) !== 0 &&
                                                                         Colors.bluishCyan,
                                                                 },
                                                             }}
                                                         >
-                                                            {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0) ? (
+                                                            {parseFloat(item?.paid_amount || 0) === parseFloat(item?.total_amount || 0) ? (
                                                                 <CheckIcon />
-                                                            ) : (item?.settled_amount ?? 0) === 0 ? (
+                                                            ) : parseFloat(item?.paid_amount || 0) === 0 ? (
                                                                 <PendingIcon />
                                                             ) : (
                                                                 <CheckIcon />
                                                             )}
 
                                                             <Typography variant="body2">
-                                                                {(item?.settled_amount ?? 0) === (item?.total_amount ?? 0)
+                                                                {parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0) === 0
                                                                     ? 'Full'
-                                                                    : (item?.settled_amount ?? 0) === 0
+                                                                    : (parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0)) === parseFloat(item?.total_amount || 0)
                                                                         ? 'UnSettled'
-                                                                        : 'Partial '}
+                                                                        : 'Partial'}
                                                             </Typography>
                                                         </Box>
 
@@ -1369,42 +1399,41 @@ function FPSettlement() {
                                                     <Cell>
                                                         <Box sx={{ width: '150px' }}>
                                                             <InputField
-                                                                disabled={true}
+                                                                disabled={selectedInvoice2.findIndex(e => e.invoiceId === item?.id) === -1}
                                                                 size="small"
                                                                 type="number"
-                                                                value={parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0) || 0}
                                                                 placeholder="Receiving"
                                                                 InputProps={{ inputProps: { min: 0 } }}
-
-                                                            // error={!!errors4[`receiving${item?.id}`]}
-                                                            // helperText={errors4[`receiving${item?.id}`]?.message}
-                                                            // register={register4(`receiving${item?.id}`, {
-                                                            //     required:
-                                                            //         selectedInvoice.findIndex(e => e.invoiceId === item?.id) === -1
-                                                            //             ? false
-                                                            //             : 'Please enter receive amount',
-                                                            //     validate:
-                                                            //         selectedInvoice.findIndex(e => e.invoiceId === item?.id) === -1
-                                                            //             ? false
-                                                            //             : value => {
-                                                            //                 const num = Number(value);
-                                                            //                 if (num < 0) return 'Amount cannot be negative';
-                                                            //                 if (num > (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))) {
-                                                            //                     return 'Amount cannot be greater than balance amount';
-                                                            //                 }
-                                                            //                 return true;
-                                                            //             },
-                                                            //     // onChange: e => {
-                                                            //     //     const num = Number(e.target.value);
-                                                            //     //     trigger(`receiving${item?.id}`);
-                                                            //     //     if (
-                                                            //     //         num >= 0 &&
-                                                            //     //         num <= (parseFloat(item?.total_amount) - parseFloat(item?.paid_amount))
-                                                            //     //     ) {
-                                                            //     //         handleReceive(num, item?.id, item?.balance);
-                                                            //     //     }
-                                                            //     // },
-                                                            // })}
+                                                                error={!!errors4[`receiving${item?.id}`]}
+                                                                helperText={errors4[`receiving${item?.id}`]?.message}
+                                                                register={register4(`receiving${item?.id}`, {
+                                                                    required:
+                                                                        selectedInvoice2.findIndex(e => e.invoiceId === item?.id) === -1
+                                                                            ? false
+                                                                            : 'Please enter receive amount',
+                                                                    validate:
+                                                                        selectedInvoice2.findIndex(e => e.invoiceId === item?.id) === -1
+                                                                            ? false
+                                                                            : value => {
+                                                                                const num = Number(value);
+                                                                                if (num < 0) return 'Amount cannot be negative';
+                                                                                if (num > (parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0))) {
+                                                                                    return 'Amount cannot be greater than balance amount';
+                                                                                }
+                                                                                return true;
+                                                                            },
+                                                                    onChange: e => {
+                                                                        const num = Number(e.target.value);
+                                                                        let balance = parseFloat(item?.total_amount || 0) - parseFloat(item?.settled_amount || 0)
+                                                                        trigger4(`receiving${item?.id}`);
+                                                                        if (
+                                                                            num >= 0 &&
+                                                                            num <= (parseFloat(item?.total_amount || 0) - parseFloat(item?.paid_amount || 0))
+                                                                        ) {
+                                                                            handleReceive3(num, item?.id, balance);
+                                                                        }
+                                                                    },
+                                                                })}
                                                             />
 
 
