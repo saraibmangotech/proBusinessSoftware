@@ -445,6 +445,7 @@ function UpadateJournalVoucher() {
           ? {
             ...row,
             ...data,
+            selectedAccount:selectedAccount,
             account_id: selectedAccount?.id,
             name: selectedAccount?.account_code + ' ' + selectedAccount?.account_name,
             cost_center: selectedCostCenter?.name
