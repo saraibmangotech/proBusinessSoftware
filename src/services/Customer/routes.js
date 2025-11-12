@@ -198,7 +198,8 @@ const routes = {
   getUserCategory:'users/profile',
   deleteLeave:'hrms/leaves/delete',
   deleteUser:'users/delete',
-  getPrepaidInvoiceDetail:'/purchases/fpInvoice/details'
+  getPrepaidInvoiceDetail:'/purchases/fpInvoice/details',
+  VoidInvoice:'purchases/invoice/void'
 
 
 };
