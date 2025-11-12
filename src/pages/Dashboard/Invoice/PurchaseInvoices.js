@@ -13,6 +13,7 @@ import {
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
+import DoNotDisturbAltIcon from '@mui/icons-material/DoNotDisturbAlt';
 import Colors from 'assets/Style/Colors';
 import { CircleLoading } from 'components/Loaders';
 import { ErrorToaster, SuccessToaster } from 'components/Toaster';
@@ -241,14 +242,14 @@ function PurchaseInvoices() {
         }
         Debounce(() => getCustomerQueue(1, '', data));
     }
-    const handleDelete = async (item) => {
+    const handleVoid = async (item) => {
 
 
         try {
-            let params = { id: selectedData?.id }
+            let params = { invoice_id: selectedData?.id }
 
 
-            const { message } = await CustomerServices.DeleteProductCategory(params)
+            const { message } = await CustomerServices.VoidInvoice(params)
 
             SuccessToaster(message);
             getCustomerQueue()
@@ -449,6 +450,23 @@ function PurchaseInvoices() {
                             <ReceiptIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
+                    <Tooltip title="Void Invoice">
+                        <IconButton
+                            onClick={() => {
+                                setSelectedData(row?.original)
+                        setConfirmationDialog(true)
+                            }}
+                            sx={{
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 2,
+                                border: "1px solid #eee",
+                                width: 40,
+                                height: 40,
+                            }}
+                        >
+                            <DoNotDisturbAltIcon color="black" fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
                 </Box>
             ),
@@ -468,10 +486,10 @@ function PurchaseInvoices() {
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
-                message={"Are You Sure?"}
+                message={"Are You Sure You Want to Void This Invoice/Receipt?"}
                 action={() => {
                     setConfirmationDialog(false);
-                    handleDelete()
+                    handleVoid()
 
                 }}
             />

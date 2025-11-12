@@ -6352,41 +6352,50 @@ function Header() {
     }
   }
 
-  const BulkDownload = async (formData) => {
-    showSuccessToast('Your invoices are being generated. You’ll receive an email in brief time according to selected timeframe.')
-    setOpen(false)
-    console.log(formData);
-    try {
-      let obj = {
+const BulkDownload = async (formData) => {
+  // showSuccessToast(
+  //   "Your invoices are being generated. You’ll receive an email shortly according to the selected timeframe."
+  // );
+  setOpen(false);
 
-        customer_id: user?.customer_id,
-        email: getValues('email'),
-        from_date: fromDate ? moment(new Date(fromDate)).format('MM-DD-YYYY') : '',
-        to_date: toDate ? moment(new Date(toDate)).format('MM-DD-YYYY') : '',
+  try {
+    const obj = {
+      customer_id: selectedCustomer?.id,
+      email: getValues("email"),
+      from_date: fromDate ? moment(new Date(fromDate)).format("MM-DD-YYYY") : "",
+      to_date: toDate ? moment(new Date(toDate)).format("MM-DD-YYYY") : "",
+      instance: process.env.REACT_APP_TYPE
+    };
 
-      }
+    const API_URL = `${process.env.REACT_APP_BULK_DOWNLOAD}`; 
+    // 👆 Make sure .env has something like: VITE_API_URL=https://yourapi.com/api
 
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`, // optional, if token-based auth
+      },
+      body: JSON.stringify(obj),
+    });
 
-      // console.log(obj);
-      // const promise = UserServices.BulkDownload(obj);
+    const data = await response.json();
 
-      // showPromiseToast(
-      //   promise,
-      //   'Saving ...',
-      //   'Success',
-      //   'Something Went Wrong'
-      // );
-      // const response = await promise;
-      // if (response?.responseCode === 200) {
-      //   setOpen(false)
-      // }
-
-
-    } catch (error) {
-
-      // showErrorToast(error)
+    if (response.ok && data?.responseCode === 200) {
+      showSuccessToast("Invoices request submitted successfully!");
+      setOpen(false);
+      reset()
+      setSelectedCustomer(null)
+      setFromDate(null)
+      setToDate(null)
+    } else {
+      showErrorToast(data?.message || "Something went wrong.");
     }
+  } catch (error) {
+    console.error("BulkDownload Error:", error);
+    showErrorToast("An error occurred while generating invoices.");
   }
+};
   useEffect(() => {
     getCustomerQueue()
   }, [])

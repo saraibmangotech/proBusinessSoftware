@@ -6,6 +6,10 @@ const CustomerServices = {
     const data = await post(routes.requestBuyerId, obj);
     return data;
   },
+   VoidInvoice: async (obj) => {
+    const data = await post(routes.VoidInvoice, obj);
+    return data;
+  },
   deleteInvoiceDebitNote: async (obj) => {
     const data = await deleted(routes.deleteInvoiceDebitNote, obj);
     return data;
