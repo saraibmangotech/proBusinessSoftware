@@ -350,7 +350,7 @@ function UpdatePrepaidExpense() {
             setButtonDisabled(true)
             try {
                 const obj = {
-                    id:id,
+                    id: id,
                     vendor_id: selectedVendor?.id,
                     vendor_account_id: selectedVendor?.account_id,
                     debit_account_id: selectedAccount2?.id,
@@ -361,6 +361,7 @@ function UpdatePrepaidExpense() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     total_months: formData?.amortization_months,
+                    log: formData?.log,
                     months_recorded: 0,
                     invoice_type: "Prepaid Expense",
                     invoice_prefix: "PE",
@@ -782,7 +783,7 @@ function UpdatePrepaidExpense() {
             let find = array?.find((item => item?.id == detail?.debit_account_id))
             console.log(find, 'find');
             setSelectedAccount2(find)
-            setValue1('expenseAccount',find)
+            setValue1('expenseAccount', find)
 
             //setCategories(data?.categories)
 
@@ -1005,7 +1006,20 @@ function UpdatePrepaidExpense() {
                                         error={errors1?.email?.message}
                                     />
                                 </Grid>
+                                <Grid item md={6} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="Update Reason :*"
+                                        size="small"
+                                        placeholder="Update Reason"
 
+
+
+                                        register={register1("log", {
+                                            required: 'update reason is required'
+                                        })}
+                                        error={errors1?.log?.message}
+                                    />
+                                </Grid>
 
 
 

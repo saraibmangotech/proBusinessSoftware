@@ -81,7 +81,7 @@ function UpdatePreSale() {
     const [selectedRow, setSelectedRow] = useState(null)
     const [editState, setEditState] = useState(false)
     const [settings, setSettings] = useState({})
-    
+
 
     console.log(rows, "data")
     const [items, setItems] = useState([
@@ -141,89 +141,89 @@ function UpdatePreSale() {
 
     const addItem = (data) => {
         console.log(data, 'datadata');
-      
+
         const newSalesId = serviceItem?.sales_account_id;
         const newRow = { ...data, service: serviceItem, sales_id: newSalesId, service_id: serviceItem.id };
-      
+
         setRows((prevRows) => {
-          // If not the first row, enforce that all sales_ids must match
-          if (prevRows.length > 0) {
-            // const existingSalesId = prevRows[0].sales_id ?  prevRows[0].sales_id  : prevRows[0].service.sales_account_id;
-            // console.log(prevRows,"prev")
-            // if (existingSalesId !== newSalesId) {
-            //   showErrorToast("Only items with the same sales account ID can be added.");
-            //   return prevRows; // Don't add if sales_id is different
-            // }
-          }
-      
-          // Add the item since it's the first one or has the same sales_id
-          const updatedRows = [...prevRows, newRow];
-      
-          const newSubTotal = updatedRows.reduce(
-            (sum, row) => sum + parseFloat(row.total || 0),
-            0
-          );
-          setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-      
-          return updatedRows;
+            // If not the first row, enforce that all sales_ids must match
+            if (prevRows.length > 0) {
+                // const existingSalesId = prevRows[0].sales_id ?  prevRows[0].sales_id  : prevRows[0].service.sales_account_id;
+                // console.log(prevRows,"prev")
+                // if (existingSalesId !== newSalesId) {
+                //   showErrorToast("Only items with the same sales account ID can be added.");
+                //   return prevRows; // Don't add if sales_id is different
+                // }
+            }
+
+            // Add the item since it's the first one or has the same sales_id
+            const updatedRows = [...prevRows, newRow];
+
+            const newSubTotal = updatedRows.reduce(
+                (sum, row) => sum + parseFloat(row.total || 0),
+                0
+            );
+            setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+
+            return updatedRows;
         });
-      
+
         reset();
         setServiceItem("");
-      };
+    };
 
 
-      const updateItem = (data) => {
+    const updateItem = (data) => {
         console.log("Raw data passed to updateItem:", data);
         console.log("Current serviceItem:", serviceItem);
-      
+
         if (!data?.id) {
-          console.warn("No valid ID found in data. Skipping update.");
-          return;
+            console.warn("No valid ID found in data. Skipping update.");
+            return;
         }
-      
+
         const updatedSalesId = serviceItem?.sales_account_id;
         const updatedItem = { ...data, service: serviceItem, sales_id: updatedSalesId };
         console.log("Updated item to be saved:", updatedItem);
-      
+
         setRows(prevItems => {
-          console.log("Previous rows:", prevItems);
-      
-          // Get the existing sales_id from the list (any one is enough)
-        //   const existingSalesId = prevItems.length > 0 ?  prevItems[0].sales_id ? prevItems[0].sales_id  : prevItems[0].service.sales_account_id : null;
-        //     console.log(existingSalesId,"existing")
-        //   // Check if the updated item has a different sales_id
-        //   if (existingSalesId && existingSalesId !== updatedSalesId) {
-        //     showErrorToast("You can only update with the same sales account ID.");
-        //     return prevItems; // Don't update
-        //   }
-      
-          const updatedRows = prevItems.map(item => {
-            if (item.id === data.id) {
-              console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
-              return updatedItem;
-            }
-            return item;
-          });
-      
-          console.log("Rows after update:", updatedRows);
-      
-          // Calculate new subtotal
-          const newSubTotal = updatedRows.reduce((sum, row) => {
-            const total = parseFloat(row.total || 0);
-            return sum + (isNaN(total) ? 0 : total);
-          }, 0);
-      
-          setSubTotal(parseFloat(newSubTotal.toFixed(2)));
-          return updatedRows;
+            console.log("Previous rows:", prevItems);
+
+            // Get the existing sales_id from the list (any one is enough)
+            //   const existingSalesId = prevItems.length > 0 ?  prevItems[0].sales_id ? prevItems[0].sales_id  : prevItems[0].service.sales_account_id : null;
+            //     console.log(existingSalesId,"existing")
+            //   // Check if the updated item has a different sales_id
+            //   if (existingSalesId && existingSalesId !== updatedSalesId) {
+            //     showErrorToast("You can only update with the same sales account ID.");
+            //     return prevItems; // Don't update
+            //   }
+
+            const updatedRows = prevItems.map(item => {
+                if (item.id === data.id) {
+                    console.log(`Item with ID ${item.id} matched. Replacing with updated item.`);
+                    return updatedItem;
+                }
+                return item;
+            });
+
+            console.log("Rows after update:", updatedRows);
+
+            // Calculate new subtotal
+            const newSubTotal = updatedRows.reduce((sum, row) => {
+                const total = parseFloat(row.total || 0);
+                return sum + (isNaN(total) ? 0 : total);
+            }, 0);
+
+            setSubTotal(parseFloat(newSubTotal.toFixed(2)));
+            return updatedRows;
         });
-       
-      
+
+
         console.log("Resetting form and states...");
         reset();
         setServiceItem(null);
         setEditState(false);
-      };
+    };
 
 
     const getInvoiceNumber = async () => {
@@ -240,22 +240,22 @@ function UpdatePreSale() {
         }
     };
 
-      const getSystemSettings = async () => {
+    const getSystemSettings = async () => {
         // setLoader(true)
         try {
-          const { data } = await CustomerServices.getSystemSettings();
-    
-          console.log(data,"settings");
-          setSettings(data?.settings)
-          setValue1("cost_center", { id: data?.settings?.cost_center, name: data?.settings?.cost_center })
-    
-         // setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
+            const { data } = await CustomerServices.getSystemSettings();
+
+            console.log(data, "settings");
+            setSettings(data?.settings)
+            setValue1("cost_center", { id: data?.settings?.cost_center, name: data?.settings?.cost_center })
+
+            // setValue1("invoice_no", `DED/${data?.next_invoice_number}`);
         } catch (error) {
-          ErrorToaster(error);
+            ErrorToaster(error);
         } finally {
-          // setLoader(false)
+            // setLoader(false)
         }
-      };
+    };
 
     const isFormDataEmpty = (data) => {
         // Check if all form fields are empty
@@ -351,6 +351,7 @@ function UpdatePreSale() {
                 token_date: moment(date).format('MM-DD-YYYY'),
                 invoice_prefix: "DED",
                 trn: formData?.trn,
+                log: formData?.log,
                 case_no: formData?.caseno,
                 customer_address: formData?.address,
                 cost_center: formData?.cost_center,
@@ -426,9 +427,9 @@ function UpdatePreSale() {
             const mappedServices = data?.rows.map(item => ({
                 ...item,
                 name: `${item.name} - ${item.name_ar}`,
-              }));
-        
-              setServices(mappedServices);
+            }));
+
+            setServices(mappedServices);
         } catch (error) {
             ErrorToaster(error);
         } finally {
@@ -452,13 +453,13 @@ function UpdatePreSale() {
                 setValue("center_fee", data?.service?.center_fee);
                 setValue("bank_charge", data?.service?.bank_service_charge);
 
-                let serviceItem = {...data?.service}
+                let serviceItem = { ...data?.service }
                 serviceItem.name = data?.service?.name + "-" + data?.service?.name_ar;
                 // setValue("transaction_id", data?.transaction_id);
                 setServiceItem({
                     ...data?.service,
                     name: `${data?.service?.name} - ${data?.service?.name_ar}`,
-                  });
+                });
                 //setServiceItem(serviceItem);
                 setValue("quantity", 1);
             } catch (error) {
@@ -568,7 +569,7 @@ function UpdatePreSale() {
             setValue1('caseno', data?.receipt?.case_no)
             setValue1('ref', data?.receipt?.ref)
             setValue1('address', data?.receipt?.customer_address)
-           // setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
+            // setValue1("customer", { id: "walkin", name: "Walk-in Customer" })
             setSelectedCustomer({ id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name });
             setValue1("customer", { id: data?.receipt?.customer_id, name: data?.receipt?.customer?.name });
 
@@ -692,7 +693,20 @@ function UpdatePreSale() {
                                                     })}
                                                 />
                                             </Grid>
+                                            <Grid item xs={12}>
+                                                <InputField
+                                                    label={"Update Reason *:"}
+                                                    size={'small'}
 
+
+                                                    placeholder={"Update Reason"}
+                                                  
+                                                    register={register1("log", {
+                                                        required: 'please enter update reason .'
+                                                    })}
+                                                    error={errors1?.log?.message}
+                                                />
+                                            </Grid>
 
 
                                         </Grid>
@@ -733,7 +747,7 @@ function UpdatePreSale() {
                                                         pattern: {
                                                             value: /^05[0-9]{8}$/,
                                                             message: "Please enter a valid UAE phone number (starting with 05 and 8 digits)."
-                                                          },
+                                                        },
                                                     })}
                                                     error={errors1?.mobile?.message}
                                                 />
@@ -914,10 +928,10 @@ function UpdatePreSale() {
                                                     placeholder="Quantity"
                                                     type="number"
                                                     onKeyDown={(e) => {
-                                                        if (["e", "E", "+", "-",",","."].includes(e.key)) {
-                                                          e.preventDefault();
+                                                        if (["e", "E", "+", "-", ",", "."].includes(e.key)) {
+                                                            e.preventDefault();
                                                         }
-                                                      }}
+                                                    }}
                                                     register={register("quantity", { required: "Quantity is required" })}
                                                 />
                                                 {errors.quantity && <span style={{ color: "red" }}>{errors.quantity.message}</span>}
@@ -928,10 +942,10 @@ function UpdatePreSale() {
                                                     disabled={detail?.is_paid || !serviceItem?.govt_fee_enable}
                                                     placeholder="Govt fee"
                                                     onKeyDown={(e) => {
-                                                        if (["e", "E", "+", "-",","].includes(e.key)) {
-                                                          e.preventDefault();
+                                                        if (["e", "E", "+", "-", ","].includes(e.key)) {
+                                                            e.preventDefault();
                                                         }
-                                                      }}
+                                                    }}
 
                                                     register={register("govt_fee", { required: "Govt fee is required" })}
                                                 />
@@ -943,10 +957,10 @@ function UpdatePreSale() {
                                                     disabled={detail?.is_paid || !serviceItem?.center_fee_enable}
                                                     placeholder="Center Fee"
                                                     onKeyDown={(e) => {
-                                                        if (["e", "E", "+", "-",","].includes(e.key)) {
-                                                          e.preventDefault();
+                                                        if (["e", "E", "+", "-", ","].includes(e.key)) {
+                                                            e.preventDefault();
                                                         }
-                                                      }}
+                                                    }}
 
                                                     register={register("center_fee", { required: "Center fee is required" })}
                                                 />
@@ -958,10 +972,10 @@ function UpdatePreSale() {
                                                     disabled={detail?.is_paid || !serviceItem?.bank_charges_enable}
                                                     placeholder="Bank Charges"
                                                     onKeyDown={(e) => {
-                                                        if (["e", "E", "+", "-",","].includes(e.key)) {
-                                                          e.preventDefault();
+                                                        if (["e", "E", "+", "-", ","].includes(e.key)) {
+                                                            e.preventDefault();
                                                         }
-                                                      }}
+                                                    }}
 
                                                     register={register("bank_charge", { required: "Bank charges are required" })}
 
@@ -974,9 +988,9 @@ function UpdatePreSale() {
                                                     size="small"
                                                     placeholder="Transaction Id"
                                                     disabled={!!getValues("transaction_id")}
-                                                    register={register("transaction_id", { 
+                                                    register={register("transaction_id", {
                                                         required: settings?.required_trans_id ? 'Transaction id is required' : false,
-                                                      })}
+                                                    })}
                                                 />
                                                 {errors.transaction_id && <span style={{ color: "red" }}>{errors.transaction_id.message}</span>}
 
@@ -988,7 +1002,7 @@ function UpdatePreSale() {
 
                                                     register={register("application_id", {
                                                         required: settings?.required_app_id ? 'Application id is required' : false,
-                                                      })}
+                                                    })}
                                                 />
                                                 {errors.application_id && (
                                                     <span style={{ color: "red" }}>
@@ -1003,7 +1017,7 @@ function UpdatePreSale() {
 
                                                     register={register("ref_no", {
                                                         required: settings?.required_ref_no ? 'Reference no is required' : false,
-                                                      })}
+                                                    })}
                                                 />
                                                 {errors.ref_no && (
                                                     <span style={{ color: "red" }}>
@@ -1087,7 +1101,7 @@ function UpdatePreSale() {
 
                                         {rows?.length > 0 && rows?.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell  sx={{ display: "none" }}>{item?.id}</TableCell>
+                                                <TableCell sx={{ display: "none" }}>{item?.id}</TableCell>
                                                 <TableCell>{item?.service?.item_code}</TableCell>
                                                 <TableCell>{item?.service?.name + "-" + item?.service?.name_ar}</TableCell>
                                                 <TableCell>{item?.quantity}</TableCell>

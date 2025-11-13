@@ -10,6 +10,7 @@ import {
     InputAdornment,
     Button,
 } from '@mui/material';
+import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import CloseIcon from "@mui/icons-material/Close";
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
@@ -46,6 +47,7 @@ import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
 import FPInvoiceServices from 'services/FPInvoice';
+import LogTimelineDialog from 'components/Dialog/TimelineDialog';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -122,6 +124,7 @@ function PrepaidExpenses() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [open, setOpen] = useState(false)
     const {
         register,
         handleSubmit,
@@ -348,7 +351,7 @@ function PrepaidExpenses() {
 
 
         // },
-  {
+        {
             header: "Debit Note",
             accessorKey: "debit_note",
             cell: ({ row }) => (
@@ -387,7 +390,7 @@ function PrepaidExpenses() {
 
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
                     <Box>
-                        {(!row?.original?.is_paid && row?.original?.months_recorded == 0) &&  <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-expense-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                        {(!row?.original?.is_paid && row?.original?.months_recorded == 0) && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-expense-invoice/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     </Box>
 
 
@@ -424,13 +427,30 @@ function PrepaidExpenses() {
                             <ReceiptIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
-
+                    {row?.original?.update_logs?.length>0 &&
+                        <Tooltip title="Logs">
+                            <IconButton
+                                onClick={() => {
+                                    setSelectedData(row?.original)
+                                    setOpen(true)
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <ViewTimelineIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>}
                 </Box>
             ),
         },
 
     ]
-     const handleDelete = async (item) => {
+    const handleDelete = async (item) => {
 
 
         try {
@@ -459,7 +479,11 @@ function PrepaidExpenses() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <LogTimelineDialog
+                open={open}
+                onClose={() => setOpen(false)}
+                logs={selectedData?.update_logs}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}

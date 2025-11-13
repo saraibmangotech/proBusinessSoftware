@@ -13,6 +13,7 @@ import {
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
+import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import Colors from 'assets/Style/Colors';
 import { CircleLoading } from 'components/Loaders';
 import { ErrorToaster, SuccessToaster } from 'components/Toaster';
@@ -49,6 +50,7 @@ import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
 import FPInvoiceServices from 'services/FPInvoice';
 import ExcelJS from "exceljs";
+import LogTimelineDialog from 'components/Dialog/TimelineDialog';
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
     border: 0,
@@ -124,6 +126,7 @@ function FixedAssets() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [open, setOpen] = useState(false)
     const {
         register,
         handleSubmit,
@@ -621,9 +624,9 @@ function FixedAssets() {
             cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
-                      <Box>
-                                           {(!row?.original?.is_paid && row?.original?.months_recorded == 0) &&  <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-fixed-asset/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
-                                       </Box>
+                    <Box>
+                        {(!row?.original?.is_paid && row?.original?.months_recorded == 0) && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-fixed-asset/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                    </Box>
 
 
                     {/* <PrimaryButton
@@ -659,7 +662,24 @@ function FixedAssets() {
                             <ReceiptIcon color="black" fontSize="10px" />
                         </IconButton>
                     </Tooltip>
-
+                    {row?.original?.update_logs?.length>0 &&
+                        <Tooltip title="Logs">
+                            <IconButton
+                                onClick={() => {
+                                    setSelectedData(row?.original)
+                                    setOpen(true)
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <ViewTimelineIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>}
                 </Box>
             ),
         },
@@ -674,7 +694,11 @@ function FixedAssets() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <LogTimelineDialog
+                open={open}
+                onClose={() => setOpen(false)}
+                logs={selectedData?.update_logs}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
