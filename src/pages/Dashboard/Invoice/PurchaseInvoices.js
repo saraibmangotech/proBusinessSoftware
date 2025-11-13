@@ -132,6 +132,14 @@ function PurchaseInvoices() {
         getValues,
         reset,
     } = useForm();
+    const {
+        register: register2,
+        handleSubmit : handleSubmit2,
+        formState: { errors :errors2 },
+        setValue :setValue2,
+        getValues : getValues2,
+        reset :reset2,
+    } = useForm();
 
     const tableHead = [{ name: 'SR No.', key: '' }, { name: 'Customer ', key: 'name' }, { name: 'Registration Date', key: 'visa_eligibility' }, { name: 'Deposit Amount', key: 'deposit_total' }, { name: 'Status', key: '' }, { name: 'Actions', key: '' }]
 
@@ -247,20 +255,23 @@ function PurchaseInvoices() {
     }
     const handleVoid = async (item) => {
 
-
         try {
-            let params = { invoice_id: selectedData?.id }
+            let params = { invoice_id: selectedData?.id ,void_reason : item?.void_reason}
 
 
             const { message } = await CustomerServices.VoidInvoice(params)
 
             SuccessToaster(message);
             getCustomerQueue()
+            setConfirmationDialog(false)
+            setValue2("")
+            reset2()
         } catch (error) {
             showErrorToast(error)
         } finally {
             // setLoader(false)
         }
+    
     }
     const UpdateStatus = async () => {
         try {
@@ -508,7 +519,7 @@ function PurchaseInvoices() {
                 onClose={() => setOpen(false)}
                 logs={selectedData?.update_logs}
             />
-            <ConfirmationDialog
+            {/* <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}
                 message={"Are You Sure You Want to Void This Invoice/Receipt?"}
@@ -517,7 +528,57 @@ function PurchaseInvoices() {
                     handleVoid()
 
                 }}
-            />
+            /> */}
+            <SimpleDialog
+                open={confirmationDialog}
+                onClose={() => setConfirmationDialog(false)}
+                title={"Are You Sure You Want to Void This Invoice/Receipt?"}
+            >
+                <Box component="form" onSubmit={handleSubmit2(handleVoid)}>
+                    <Grid container spacing={2}>
+                       
+                    <Grid item xs={12} sm={12}>
+              <InputField
+                size={"small"}
+                label={"Void Reason"}
+                placeholder={"Void Reason"}
+                
+                register={register2("void_reason", {
+                    required: "Please enter Void Reason",
+                })}
+                    error={errors2?.void_reason?.message}
+                
+              />
+                    </Grid>
+
+                        <Grid container sx={{ justifyContent: "center" }}>
+                            <Grid
+                                item
+                                xs={6}
+                                sm={6}
+                                sx={{
+                                    mt: 2,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: "25px",
+                                }}
+                            >
+                                <PrimaryButton
+                                    bgcolor={Colors.primary}
+                                    title="Yes,Confirm"
+                                    type="submit"
+                                />
+                                <PrimaryButton
+                                    onClick={() => setConfirmationDialog(false)}
+                                    bgcolor={"#FF1F25"}
+                                    title="No,Cancel"
+                                />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </SimpleDialog>
+            
             <SimpleDialog
                 open={statusDialog}
                 onClose={() => setStatusDialog(false)}

@@ -453,28 +453,34 @@ function PayReceipts() {
         }
     }
     const handleVoid = async (item) => {
+const value = getValues("void_reason")
+if (!value){
+    ErrorToaster("Please Enter Reason")
+}else{
 
-
-        try {
-            let params = {
-                id: selectedData?.id,
-                void_type: buttonVal
-
-
-
-            }
-
-
-            const { message } = await CustomerServices.handleVoid(params)
-
-            SuccessToaster(message);
-            setStatusDialog2(false)
-            getCustomerQueue()
-        } catch (error) {
-            showErrorToast(error)
-        } finally {
-            // setLoader(false)
+    try {
+        let params = {
+            id: selectedData?.id,
+            void_type: buttonVal,
+            void_reason:value
+    
+    
         }
+    
+    
+        const { message } = await CustomerServices.handleVoid(params)
+    
+        SuccessToaster(message);
+        setStatusDialog2(false)
+        getCustomerQueue()
+        setValue("void_reason" , '')
+    } catch (error) {
+        showErrorToast(error)
+    } finally {
+        // setLoader(false)
+    }
+}
+
     }
     const getData = async (id) => {
         try {
@@ -565,7 +571,8 @@ function PayReceipts() {
             const obj = {
                 id: selectedData?.id,
                 invoice_date: invoiceDate,
-                receipt: action === "invoiceAndReceipt" ? true : false
+                receipt: action === "invoiceAndReceipt" ? true : false,
+                
             };
 
             const promise = CustomerServices.invoiceDateUpdate(obj);
@@ -1306,7 +1313,16 @@ function PayReceipts() {
                             />}
                         </Grid>
 
-
+                        <Grid item xs={12} sm={12}>
+              <InputField
+                size={"small"}
+                label={"Void Reason"}
+                placeholder={"Void Reason"}
+                register={register("void_reason", {
+                  required: "Please enter Void Reason",
+                })}
+              />
+            </Grid>
                     </Grid>
                 </Box>
             </SimpleDialog>
