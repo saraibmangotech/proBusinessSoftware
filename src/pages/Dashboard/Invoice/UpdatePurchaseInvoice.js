@@ -418,11 +418,7 @@ function UpdatePurchaseInvoice() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
-<<<<<<< HEAD
-                    comments: formData?.comments,
-=======
                     log: formData?.log,
->>>>>>> 20599f6839438638dbf3ab5b9ba7755f7fc4e7c1
                     invoice_prefix: formData?.invoicePrefix,
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
@@ -1171,18 +1167,6 @@ function UpdatePurchaseInvoice() {
                                         error={errors1?.address?.message}
                                     />
                                 </Grid>
-<<<<<<< HEAD
-
-                                 <Grid item md={12} sm={12} xs={12}>
-                                    <InputField
-                                        label="Comments"
-                                        size="small"
-                                        placeholder="Comments"
-
-
-                                        register={register1("comments")}
-                                        error={errors1?.comments?.message}
-=======
                                       <Grid item md={6} sm={5.5} xs={12}>
                                     <InputField
                                         label="Update Reason :*"
@@ -1195,7 +1179,6 @@ function UpdatePurchaseInvoice() {
                                         required:'update reason is required'
                                         })}
                                         error={errors1?.log?.message}
->>>>>>> 20599f6839438638dbf3ab5b9ba7755f7fc4e7c1
                                     />
                                 </Grid>
                             </Grid>
