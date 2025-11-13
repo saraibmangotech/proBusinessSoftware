@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { AllocateIcon, CheckIcon, EyeIcon, FontFamily, Images, MessageIcon, PendingIcon, RequestBuyerIdIcon } from 'assets';
 import styled from '@emotion/styled';
+import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import { useNavigate } from 'react-router-dom';
 import DoNotDisturbAltIcon from '@mui/icons-material/DoNotDisturbAlt';
 import Colors from 'assets/Style/Colors';
@@ -45,6 +46,7 @@ import { useCallbackPrompt } from 'hooks/useCallBackPrompt';
 import DataTable from 'components/DataTable';
 import ConfirmationDialog from 'components/Dialog/ConfirmationDialog';
 import DatePicker from 'components/DatePicker';
+import LogTimelineDialog from 'components/Dialog/TimelineDialog';
 
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
@@ -121,6 +123,7 @@ function PurchaseInvoices() {
     const [statusDialog, setStatusDialog] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [tableLoader, setTableLoader] = useState(false)
+    const [open, setOpen] = useState(false)
     const {
         register,
         handleSubmit,
@@ -454,7 +457,7 @@ function PurchaseInvoices() {
                         <IconButton
                             onClick={() => {
                                 setSelectedData(row?.original)
-                        setConfirmationDialog(true)
+                                setConfirmationDialog(true)
                             }}
                             sx={{
                                 backgroundColor: "#f9f9f9",
@@ -467,6 +470,24 @@ function PurchaseInvoices() {
                             <DoNotDisturbAltIcon color="black" fontSize="small" />
                         </IconButton>
                     </Tooltip>
+                    {row?.original?.update_logs?.length>0 &&
+                        <Tooltip title="Logs">
+                            <IconButton
+                                onClick={() => {
+                                    setSelectedData(row?.original)
+                                    setOpen(true)
+                                }}
+                                sx={{
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 2,
+                                    border: "1px solid #eee",
+                                    width: 40,
+                                    height: 40,
+                                }}
+                            >
+                                <ViewTimelineIcon color="black" fontSize="small" />
+                            </IconButton>
+                        </Tooltip>}
 
                 </Box>
             ),
@@ -482,7 +503,11 @@ function PurchaseInvoices() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <LogTimelineDialog
+                open={open}
+                onClose={() => setOpen(false)}
+                logs={selectedData?.update_logs}
+            />
             <ConfirmationDialog
                 open={confirmationDialog}
                 onClose={() => setConfirmationDialog(false)}

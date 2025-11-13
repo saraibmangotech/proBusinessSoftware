@@ -360,6 +360,7 @@ function UpdateFixedAssetInvoice() {
                     items: rows,
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
+                    log: formData?.log,
                     total_months: formData?.depreciation_months,
                     debit_account_id: selectedAccount2?.id,
                     credit_account_id: selectedAccount3?.id,
@@ -851,9 +852,9 @@ function UpdateFixedAssetInvoice() {
     };
     useEffect(() => {
         console.log(detail);
-        
+
         console.log(accounts2);
-        
+
         let find = accounts2?.find((item => item?.id == detail?.debit_account_id))
         console.log(find, 'find');
         setSelectedAccount2(find)
@@ -1051,7 +1052,20 @@ function UpdateFixedAssetInvoice() {
                                         error={errors1?.depreciation_months?.message}
                                     />
                                 </Grid>
+                                <Grid item md={6} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="Update Reason :*"
+                                        size="small"
+                                        placeholder="Update Reason"
 
+
+
+                                        register={register1("log", {
+                                            required: 'update reason is required'
+                                        })}
+                                        error={errors1?.log?.message}
+                                    />
+                                </Grid>
 
 
 

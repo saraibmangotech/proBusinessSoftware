@@ -34,7 +34,7 @@ import {
   PendingIcon,
   RequestBuyerIdIcon,
 } from "assets";
-
+import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import Colors from "assets/Style/Colors";
@@ -80,6 +80,7 @@ import html2canvas from "html2canvas";
 import Barcode from "react-barcode";
 import DatePicker from 'components/DatePicker';
 import ExcelJS from "exceljs";
+import LogTimelineDialog from "components/Dialog/TimelineDialog";
 // *For Table Style
 const Row = styled(TableRow)(({ theme }) => ({
   border: 0,
@@ -189,6 +190,7 @@ function PreSalesList() {
   const [invoiceData, setInvoiceData] = useState(null);
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
+  const [open, setOpen] = useState(false)
 
   // *For Filters
   const [filters, setFilters] = useState({});
@@ -736,7 +738,7 @@ function PreSalesList() {
               </IconButton>
             </Tooltip>
           )}
-          <Box>
+          {/* <Box>
             <Tooltip title="Update Sale Receipt">
               <IconButton
                onClick={() => {
@@ -755,7 +757,7 @@ function PreSalesList() {
                 <EditIcon color="black" fontSize="small" />
               </IconButton>
             </Tooltip>
-          </Box>
+          </Box> */}
 
           <Box>
             <Tooltip title="Sales Request">
@@ -798,6 +800,26 @@ function PreSalesList() {
                   }}
                 >
                   <PaymentIcon color="black" fontSize="small" />
+                </IconButton>
+              </Tooltip>}
+          </Box>
+          <Box>
+            {row?.original?.update_logs?.length > 0 &&
+              <Tooltip title="Logs">
+                <IconButton
+                  onClick={() => {
+                    setSelectedData(row?.original)
+                    setOpen(true)
+                  }}
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: 2,
+                    border: "1px solid #eee",
+                    width: 40,
+                    height: 40,
+                  }}
+                >
+                  <ViewTimelineIcon color="black" fontSize="small" />
                 </IconButton>
               </Tooltip>}
           </Box>
@@ -860,7 +882,7 @@ function PreSalesList() {
     worksheet.mergeCells("A1:G1") // Merge cells across all columns
 
     const companyName =
-       agencyType[process.env.REACT_APP_TYPE]?.name
+      agencyType[process.env.REACT_APP_TYPE]?.name
 
     const companyRow = worksheet.addRow([companyName])
     companyRow.getCell(1).font = {
@@ -873,7 +895,7 @@ function PreSalesList() {
     worksheet.mergeCells("A2:G2")
 
     const dateRow = worksheet.addRow([
-      `Report Generated: ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})} at ${new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})}`,
+      `Report Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
     ])
     dateRow.getCell(1).font = {
       name: "Arial",
@@ -886,7 +908,7 @@ function PreSalesList() {
 
     const periodRow = worksheet.addRow([
       toDate && fromDate
-        ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
+        ? `Period: ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
         : `Period: All`,
     ])
     periodRow.getCell(1).font = {
@@ -1112,9 +1134,9 @@ function PreSalesList() {
       })
       saveAs(blob,
         toDate && fromDate
-            ? `sales_requests : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : "Present"}`
-            : `sales_requests: Present `,);
- 
+          ? `sales_requests : ${fromDate ? new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"} To ${toDate ? new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Present"}`
+          : `sales_requests: Present `,);
+
     }
 
     download()
@@ -1134,6 +1156,11 @@ function PreSalesList() {
 
   return (
     <Box sx={{ p: 3 }}>
+      <LogTimelineDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        logs={selectedData?.update_logs}
+      />
       <ConfirmationDialog
         open={confirmationDialog}
         onClose={() => setConfirmationDialog(false)}

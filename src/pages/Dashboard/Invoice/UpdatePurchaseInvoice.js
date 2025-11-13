@@ -418,6 +418,7 @@ function UpdatePurchaseInvoice() {
                     purchase_date: moment(date).format('MM-DD-YYYY'),
                     invoice_number: formData?.invoiceNumber,
                     ref_invoice_number: formData?.refInvoiceNumber,
+                    log: formData?.log,
                     invoice_prefix: formData?.invoicePrefix,
                     additional_charges_percentage: formData?.percentage,
                     additional_charges_value: formData?.additionalCharges,
@@ -437,7 +438,7 @@ function UpdatePurchaseInvoice() {
                     const response = await promise
                     showPromiseToast(promise, "Saving...", "Added Successfully", "Something Went Wrong")
                     if (response?.responseCode === 200) {
-                        navigate('/prepaid-invoices')
+                        navigate('/purchase-invoices')
                     }
                 }
             } catch (error) {
@@ -1161,7 +1162,22 @@ function UpdatePurchaseInvoice() {
                                         disabled={true}
 
                                         register={register1("address")}
+                                        
                                         error={errors1?.address?.message}
+                                    />
+                                </Grid>
+                                      <Grid item md={6} sm={5.5} xs={12}>
+                                    <InputField
+                                        label="Update Reason :*"
+                                        size="small"
+                                        placeholder="Update Reason"
+
+                                       
+
+                                         register={register1("log", {
+                                        required:'update reason is required'
+                                        })}
+                                        error={errors1?.log?.message}
                                     />
                                 </Grid>
                             </Grid>
