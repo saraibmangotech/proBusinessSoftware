@@ -1072,7 +1072,7 @@ function UpdateEmployee() {
                 <Grid container spacing={2} sx={{ mb: 3 }}>
                     {documents?.length > 0 &&
                         documents.map((item, index) => (
-                            <Grid item xs={12} md={4} key={item.key}>
+                            <Grid item xs={12} md={6} key={item.key}>
                                 {/* Upload Section */}
                                 <Typography
                                     variant="subtitle1"
