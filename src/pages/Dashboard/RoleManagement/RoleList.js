@@ -378,13 +378,16 @@ console.log(params);
 																<Cell style={{ textAlign: 'left' }} className="pdf-table">
 																	{!item?.system_default ?
 																		<Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
-																			{true &&  <Box component={'div'} onClick={() => {
+																			{true && ( <>
+																			<Box component={'div'} onClick={() => {
 																				if(item?.name != 'Staff' || item?.name !='Customer' || item?.name !="Agent"){
 																					navigate(`/permission/${item?.id}`)
 																				}
 																				}}>
 																				<LockIcon />
-																			</Box>}
+																			</Box>
+																			<Box component={'img'} src={Images.deleteIcon} onClick={() => {setDeleteDialog(true); setSelectedID(item?.id)}} width={'35px'}></Box>
+												</>	)}
 																		</Box>
 																		: <Box sx={{ display: 'flex !important', justifyContent: 'flex-start !important' }}>
 																			{permissions?.permission && <Box component={'div'} onClick={() => {
@@ -399,7 +402,9 @@ console.log(params);
 																				{ state: item }
 																			)} width={'35px'}></Box>}
 
-																			{permissions?.delete &&  <Box component={'img'} src={Images.deleteIcon} onClick={() => {setDeleteDialog(true); setSelectedID(item?.id)}} width={'35px'}></Box>}
+																			{/* {permissions?.delete &&   */}
+																			{/* <Box component={'img'} src={Images.deleteIcon} onClick={() => {setDeleteDialog(true); setSelectedID(item?.id)}} width={'35px'}></Box> */}
+																			{/* } */}
 																		</Box>}
 																</Cell>
 
