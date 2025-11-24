@@ -286,6 +286,7 @@ function CreateLeave() {
                             label="Select Type :"
                             options={[{ id: 'Annual', name: 'Annual' },
                             { id: 'Sick', name: 'Sick' },
+                             { id: 'Unpaid', name: 'Unpaid' },
                             { id: 'Maternity', name: 'Maternity (Only for females)' },
                             { id: 'Paternal', name: 'Paternal (Only for males)' },
                             { id: 'Bereavement', name: 'Bereavement' },
