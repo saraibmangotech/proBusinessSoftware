@@ -766,7 +766,7 @@ function CreatePaymentInvoice() {
                                                         {item?.id ?? '-'}
                                                     </Cell>
                                                     <Cell>
-                                                        {item?.invoice_number ?? '-'}
+                                                        {item?.ref_invoice_number ?? '-'}
                                                     </Cell>
                                                     <Cell>
                                                         <Tooltip

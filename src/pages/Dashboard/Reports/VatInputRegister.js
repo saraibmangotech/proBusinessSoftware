@@ -173,7 +173,7 @@ function VatInputRegister() {
       }
 
       const { data } = await CustomerServices.getVatInputReport(params)
-      setCustomerQueue(data?.report)
+      setCustomerQueue(data?.detailedEntries)
     //   setData(data?.totals)
       
 
@@ -304,12 +304,12 @@ function VatInputRegister() {
            ),
     },
         {
-            header: "Transaction Count",
-            accessorKey: "transactionCount",
+            header: "Supplier Name",
+            accessorKey: "supplierName",
             total: true,
-            accessorFn: (row) => row?.transactionCount,
+            accessorFn: (row) => row?.supplierName,
             cell: ({ row }) => {
-              const value = parseFloat(row?.original?.transactionCount || 0).toFixed(2);
+              const value = row?.original?.supplierName || '';
               return (
                 <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
                   {value}
@@ -322,9 +322,9 @@ function VatInputRegister() {
         header: "Total Charges",
         accessorKey: "totalCharges",
         total: true,
-        accessorFn: (row) => row?.totalCharges,
+        accessorFn: (row) => row?.totalCharge,
         cell: ({ row }) => {
-          const value = parseFloat(row?.original?.totalCharges || 0).toFixed(2);
+          const value = parseFloat(row?.original?.totalCharge || 0).toFixed(2);
           return (
             <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
               {value}
@@ -336,9 +336,9 @@ function VatInputRegister() {
         header: "Input Vat",
         accessorKey: "totalVat",
         total: true,
-        accessorFn: (row) => parseFloat(row?.totalVat).toFixed(2),
+        accessorFn: (row) => parseFloat(row?.vat).toFixed(2),
         cell: ({ row }) => {
-          const value = parseFloat(row?.original?.totalVat || 0).toFixed(2);
+          const value = parseFloat(row?.original?.vat || 0).toFixed(2);
           return (
             <Box sx={{ cursor: "pointer", display: "flex", gap: 2 }}>
               {value}

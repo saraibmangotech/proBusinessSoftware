@@ -870,21 +870,23 @@ const downloadInvoiceExcel = (data) => {
         item?.receipt?.customer_mobile || "",
         item?.receipt?.customer_email || "",
         quantity,
-        centerFee.toFixed(2),
-        totalServiceCharge.toFixed(2),
-        totalVAT.toFixed(5),
-        govtFee.toFixed(2),
-        bankCharge.toFixed(2),
-        "0", // Static
-        totalGovtFee.toFixed(2),
+        parseFloat(centerFee.toFixed(2)),
+        parseFloat(totalServiceCharge.toFixed(2)),
+        parseFloat(totalVAT.toFixed(2)),
+        parseFloat(govtFee.toFixed(2)),
+        parseFloat(bankCharge.toFixed(2)),
+        0, // Static
+        parseFloat(totalGovtFee.toFixed(2)),
         item.transaction_id || "",
         item.application_id || "",
         item.ref_no || "",
         item?.receipt?.is_paid ? "Paid" : "UnPaid",
         item?.receipt?.creator?.employee_id || "",
         item?.receipt?.creator?.name || "",
-        ((centerFee + bankCharge + govtFee + centerFee * 0.05) * quantity).toFixed(5),
-        (Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(5),
+        item?.pro_commission ? parseFloat(parseFloat(item?.pro_commission).toFixed(2)) : 0,
+        item?.typist_commission ? parseFloat(parseFloat(item?.typist_commission).toFixed(2)) : 0,
+        parseFloat(((centerFee + bankCharge + govtFee + centerFee * 0.05) * quantity).toFixed(2)),
+        parseFloat((Number.parseFloat(item?.receipt?.total_amount) + Number.parseFloat(item?.receipt?.total_vat)).toFixed(2)),
       ])
 
     dataRow.eachCell((cell, colNumber) => {

@@ -625,7 +625,7 @@ function FixedAssets() {
 
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '300px' }}>
                     <Box>
-                        {(!row?.original?.is_paid && row?.original?.months_recorded == 0) && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-fixed-asset/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
+                        {(true) && <Box component={'img'} sx={{ cursor: "pointer" }} onClick={() => { navigate(`/update-fixed-asset/${row?.original?.id}`); localStorage.setItem("currentUrl", '/update-customer') }} src={Images.editIcon} width={'35px'}></Box>}
                     </Box>
 
 

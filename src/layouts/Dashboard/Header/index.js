@@ -11126,7 +11126,7 @@ const BulkDownload = async (formData) => {
     // 👆 Make sure .env has something like: VITE_API_URL=https://yourapi.com/api
 
     const response = await fetch(API_URL, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`, // optional, if token-based auth

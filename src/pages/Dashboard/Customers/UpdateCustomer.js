@@ -765,7 +765,7 @@ function CreateCustomer() {
                             sx={{ cursor: "pointer" }}
                             onClick={() =>
                               window.open(
-                                process.env.REACT_APP_IMAGE_BASE_URL_NEW + doc.doc,
+                                process.env.REACT_APP_IMAGE_BASE_URL + doc.doc,
                                 "_blank",
                                 "noopener,noreferrer"
                               )
