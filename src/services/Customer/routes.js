@@ -199,7 +199,8 @@ const routes = {
   deleteLeave:'hrms/leaves/delete',
   deleteUser:'users/delete',
   getPrepaidInvoiceDetail:'/purchases/fpInvoice/details',
-  VoidInvoice:'purchases/invoice/void'
+  VoidInvoice:'purchases/invoice/void',
+  UpdateSaleReceipt2:'/receipts/update/paid'
 
 
 };

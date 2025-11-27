@@ -368,6 +368,10 @@ const CustomerServices = {
     const data = await patch(routes.UpdateSaleReceipt, obj);
     return data;
   },
+    UpdateSaleReceipt2: async (obj) => {
+    const data = await patch(routes.UpdateSaleReceipt2, obj);
+    return data;
+  },
   UpdateAddOnService: async (obj) => {
     const data = await patch(routes.UpdateAddOnService, obj);
     return data;
