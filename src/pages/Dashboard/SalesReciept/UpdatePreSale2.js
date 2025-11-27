@@ -373,7 +373,7 @@ function UpdatePreSale2() {
                 };
             }
             console.log(formData, "formData");
-            const promise = CustomerServices.UpdateSaleReceipt(obj);
+            const promise = CustomerServices.UpdateSaleReceipt2(obj);
 
             showPromiseToast(
                 promise,
