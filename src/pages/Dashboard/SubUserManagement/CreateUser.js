@@ -56,6 +56,8 @@ function CreateUser() {
         customer_id:user?.customer_id
       };
       const { data } = await SystemServices.getRoles(params);
+      console.log(data?.roles?.rows,'data?.roles?.rows');
+      
       setRoles(data?.roles?.rows)
     } catch (error) {
       showErrorToast(error);

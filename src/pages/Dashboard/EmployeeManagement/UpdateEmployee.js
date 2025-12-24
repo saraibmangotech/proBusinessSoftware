@@ -282,12 +282,15 @@ function UpdateEmployee() {
                     date_of_joining: doj,
                     id: newDetails?.id,
                     date_of_birth: dob,
+                     emirates_id: getValues("emirates"),
+                    religion: formData?.religion,
+                    marital_status: formData?.maritalStatus,
                     probation_period_months: formData?.probation,
                     probation_end_date: probEndDate,
                     employment_status: formData?.status,
                     shift_start: moment(formData?.shiftStartTime).format('HH:mm'),
                     shift_end: moment(formData?.shiftEndTime).format('HH:mm'),
-
+                    passport_number: formData?.passportnumber,
                     grace_period_minutes: formData?.graceMonths,
                     minimum_required_minutes: formData?.minHours,
                     short_time_deduction_type: selectedTimeDetection?.id,
@@ -311,9 +314,9 @@ function UpdateEmployee() {
                     branch: formData?.branch,
                     visa: formData?.visa,
                     work_permit: formData?.work_permit,
-                    pension_percentage: formData?.pensionPercentage,
-                    pension_applicable: isApplicable == 'yes' ? true : false,
-                    pension_percentage_employer: formData?.pensionPercentageEmp,
+                    pension_percentage: parseFloat(formData?.pensionPercentage || 0),
+                    pension_applicable: isApplicable == "yes" ? true : false,
+                    pension_percentage_employer: parseFloat(formData?.pensionPercentageEmp || 0),
                     iban: formData?.iban,
                     routing: formData?.routing,
                     is_local: isLocal,
@@ -521,15 +524,17 @@ function UpdateEmployee() {
 
             const employee = data2 || {};
             const details = data2 || {};
-            console.log(details, 'details');
+            console.log(data, 'details');
             setNewDetails(details)
             getShifts(details?.shift_id)
             setValue('name', employee?.user?.name || '');
             setValue('id', employee?.user?.employee_id || '');
             setValue('email', employee?.user?.email || '');
-            setValue('emirates', employee?.emirates_id || '');
+            setValue('emirates', data2?.emirates_id || '');
             setValue('airfareAmount', employee?.airfare_amount || '');
             setValue('phone', employee?.user?.phone || '');
+            setValue('maritalStatus', data2?.marital_status || '');
+            setValue('religion', data2?.religion || '');
             setValue('password', ''); // Usually not returned
             console.log(details?.leave_approver_2, 'details?.leave_approver_2');
             if (employee?.documents?.length > 0) {
@@ -552,7 +557,7 @@ function UpdateEmployee() {
             setValue('shiftEndTime', details?.shift_end ? moment(details?.shift_end, 'HH:mm') : null);
             setValue('probation', details?.probation_period_months || '');
             setValue('status', details?.employment_status || '');
-            setValue('passportnumber', details?.passport_number || '');
+            setValue('passportnumber', data2?.passport_number || '');
             setValue('graceMonths', details?.grace_period_minutes || '');
             setValue('minHours', details?.minimum_required_minutes || '');
             setValue('timedetection', details?.short_time_deduction_type || '');
@@ -899,7 +904,28 @@ function UpdateEmployee() {
 
                     </Grid>
 
-
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Marital Status :"}
+                            size={"small"}
+                            placeholder={"Marital Status"}
+                            error={errors?.maritalStatus?.message}
+                            register={register("maritalStatus", {
+                                required: false,
+                            })}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2.8}>
+                        <InputField
+                            label={"Religion :"}
+                            size={"small"}
+                            placeholder={"Religion"}
+                            error={errors?.religion?.message}
+                            register={register("religion", {
+                                required: false,
+                            })}
+                        />
+                    </Grid>
 
                     <Grid item xs={12} sm={2.8}>
                         <DatePicker

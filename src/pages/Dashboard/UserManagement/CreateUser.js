@@ -143,6 +143,8 @@ function CreateUser() {
         search: search,
       };
       const { data } = await SystemServices.getRoles(params);
+      console.log(data?.roles?.rows,'data?.roles?.rows');
+      
       setRoles(data?.roles?.rows)
     } catch (error) {
       showErrorToast(error);
@@ -384,14 +386,14 @@ console.log(selectedCategoryObjects,'selectedCategoryObjects');
             />
 
           </Grid>
-          {(selectedRole?.id === 1003 || selectedRole?.id === 1006) && (
+          {(selectedRole?.id === 1003 || selectedRole?.id === 1006 ||  selectedRole?.is_typist || selectedRole?.is_manager ) && (
             <Grid item xs={12} sm={12}>
 
               <Typography variant="h5" gutterBottom>
                 Select Categories
               </Typography>
 
-              {(selectedRole?.id === 1003 || selectedRole?.id === 1006) && (
+              {(selectedRole?.id === 1003 || selectedRole?.id === 1006 ||  selectedRole?.is_typist || selectedRole?.is_manager ) && (
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={5}>
                     <FormGroup>

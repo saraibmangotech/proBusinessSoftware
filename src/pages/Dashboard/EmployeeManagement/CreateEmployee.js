@@ -370,7 +370,7 @@ function CreateEmployee() {
         name: getValues("name"),
         employee_id: getValues("id"),
         emirates_id: getValues("emirates"),
-        airfare_amount:getValues("airfareAmount"),
+        airfare_amount: getValues("airfareAmount"),
         email: getValues("email"),
         phone: getValues("phone"),
         password: getValues("password"),
@@ -380,6 +380,9 @@ function CreateEmployee() {
         employee_detail: {
           date_of_joining: doj,
           date_of_birth: dob,
+          religion: formData?.religion,
+           emirates_id: getValues("emirates"),
+          marital_status: formData?.maritalStatus,
           passport_number: formData?.passportnumber,
           probation_period_months: formData?.probation,
           probation_end_date: probEndDate,
@@ -413,9 +416,9 @@ function CreateEmployee() {
           work_permit: formData?.work_permit,
           iban: formData?.iban,
           routing: formData?.routing,
-          pension_percentage: formData?.pensionPercentage,
+          pension_percentage: parseFloat(formData?.pensionPercentage || 0),
           pension_applicable: isApplicable == "yes" ? true : false,
-          pension_percentage_employer: formData?.pensionPercentageEmp,
+          pension_percentage_employer: parseFloat(formData?.pensionPercentageEmp || 0),
           is_local: isLocal,
           cost_center: selectedCostCenter?.name,
           shift_type: shiftType?.id,
@@ -728,7 +731,28 @@ function CreateEmployee() {
               })}
             />
           </Grid>
-
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Marital Status :"}
+              size={"small"}
+              placeholder={"Marital Status"}
+              error={errors?.maritalStatus?.message}
+              register={register("maritalStatus", {
+                required: false,
+              })}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2.8}>
+            <InputField
+              label={"Religion :"}
+              size={"small"}
+              placeholder={"Religion"}
+              error={errors?.religion?.message}
+              register={register("religion", {
+                required: false,
+              })}
+            />
+          </Grid>
           <Grid item xs={12} sm={2.8}>
             <DatePicker
               label={"DOB:*"}
