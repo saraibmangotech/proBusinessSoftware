@@ -13,8 +13,8 @@ const useStyle = makeStyles({
     borderRadius: 8,
     textAlign: "center",
 
-    width: "220px",
-    height: "140px",
+    width: "265px",
+    height: "160px",
     position: "relative",
     display: "flex",
     justifyContent: "center",
@@ -22,6 +22,7 @@ const useStyle = makeStyles({
 
     border: "2px dashed #9BA3AF",
     backgroundColor: "#F8FAFC",
+    padding:'20px',
     px: '80px',
     transition: "0.3s ease",
     cursor: "pointer",
@@ -116,7 +117,7 @@ function UploadFile({ inputRef, error, accept, register, multiple, style, custom
         )}
       </Box>
       {/* {loader && <CircularProgress />}  */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '2px', flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '2px', flexWrap: 'wrap',mt:2 }}>
         {loader == fileId ? <CircularProgress /> : fileAvailable?.length > 0 && fileAvailable.map((item, index) => (
           <Box key={index} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} >
             {item?.extension &&
