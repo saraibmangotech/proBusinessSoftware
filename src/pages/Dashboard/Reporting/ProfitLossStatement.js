@@ -225,14 +225,66 @@ function ProfitLossStatement() {
           })
         }
       }
+      const calculateTotal2 = (data, category) => {
+  let total = 0
+
+  data?.forEach((item) => {
+    try {
+      if (item?.name === category) {
+        processSubItems(item?.sub)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  return total.toFixed(2)
+
+  function processSubItems(subItems) {
+    subItems?.forEach((subItem) => {
+
+      // Case 1: accounts
+      if (subItem?.accounts?.length) {
+        subItem.accounts.forEach((account) => {
+          const credit = parseFloat(account.total_credit) || 0
+          const debit = parseFloat(account.total_debit) || 0
+
+          // ✅ P&L logic (NO opening balance)
+          total += account.nature === "debit"
+            ? debit - credit
+            : credit - debit
+        })
+      }
+
+      // Case 2: childAccounts
+      if (subItem?.childAccounts?.length) {
+        subItem.childAccounts.forEach((account) => {
+          const credit = parseFloat(account.total_credit) || 0
+          const debit = parseFloat(account.total_debit) || 0
+
+          // ✅ P&L logic (NO opening balance)
+          total += account.nature === "debit"
+            ? debit - credit
+            : credit - debit
+        })
+      }
+
+      // 🔁 Recursive traversal
+      if (subItem?.sub?.length) {
+        processSubItems(subItem.sub)
+      }
+    })
+  }
+}
+
       // Usage
-      const revenueTotal = calculateTotal(myData, "Revenue")
-      const totalEnxpensesVal = calculateTotal(myData, "Expenses")
+      const revenueTotal = calculateTotal2(myData, "Revenue")
+      const totalEnxpensesVal = calculateTotal2(myData, "Expenses")
       const costData = myData.filter((item) => item?.name == "Expenses")
       console.log(costData, "costDatacostData")
       console.log(costData[0]?.sub?.filter((item) => item?.type_number == 1))
       console.log(totalEnxpensesVal, "totalEnxpensesVal")
-      console.log(revenueTotal, "revenueTotalrevenueTotalrevenueTotalrevenueTotal")
+      console.log(revenueTotal, myData,"revenueTotalrevenueTotalrevenueTotalrevenueTotal")
       setTotalRevenue(revenueTotal)
       setTotalExpenses(totalEnxpensesVal)
       console.log(revenueTotal)
@@ -1306,6 +1358,8 @@ function ProfitLossStatement() {
                                                           variant="body2"
                                                           sx={{ fontWeight: 700, color: Colors.white }}
                                                         >
+                                                          {console.log(totalCost,totalRevenue,'totalCost')}
+                                                          
                                                           {CommaSeparator(
                                                             Number.parseFloat(
                                                               Number.parseFloat(totalRevenue) -
