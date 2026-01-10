@@ -279,7 +279,7 @@ function ProfitLossStatement() {
 
       // Usage
       const revenueTotal = calculateTotal2(myData, "Revenue")
-      const totalEnxpensesVal = calculateTotal(myData, "Expenses")
+      const totalEnxpensesVal = calculateTotal2(myData, "Expenses")
       const costData = myData.filter((item) => item?.name == "Expenses")
       console.log(costData, "costDatacostData")
       console.log(costData[0]?.sub?.filter((item) => item?.type_number == 1))
