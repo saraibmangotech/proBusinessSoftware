@@ -809,7 +809,7 @@ function ProfitLossStatement() {
                                                     <Row sx={{ bgcolor: Colors.primary }}>
                                                       <Cell colSpan={5}>
                                                         <Typography className='pdf-table' variant="body2" sx={{ fontWeight: 700, color: Colors.white }}>
-                                                          Gross Profit
+                                                          Gross Profitxxxx
                                                         </Typography>
                                                       </Cell>
                                                       <Cell>
