@@ -591,232 +591,200 @@ function ProfitLossStatement() {
         size: 12,
       }
       categoryRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
-      if (item.sub) {
-        item.sub.forEach((subItem) => {
-          let Total = 0
-          // Subcategory row
-          const subCategoryRow = worksheet.addRow([subItem.name, "", "", "", "", ""])
-          subCategoryRow.getCell(1).fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "E6E6FA" }, // Lavender
-          }
-          subCategoryRow.getCell(1).font = {
-            name: "Arial",
-            bold: true,
-            size: 11,
-            color: { argb: "2F4F4F" },
-          }
-          subCategoryRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" }
-          if (subItem.accounts) {
-            subItem.accounts.forEach((account) => {
-              let childFinalTotal = 0
-              let childTotal = 0
-              // const accountOpeningBalance = Number.parseFloat(account?.opening_balance || 0)
-              const accountOpeningBalance = Number.parseFloat(0)
-              // const adjustedAccountOpeningBalance =
-              //   account?.nature === "credit" ? accountOpeningBalance * -1 : accountOpeningBalance
-              const adjustedAccountOpeningBalance = 0
-              if (account?.childAccounts?.length > 0) {
-                const initialValue = { credit: 0, debit: 0 }
-                const result = account?.childAccounts?.reduce((accumulator, transaction) => {
-                  const credit = isNaN(transaction?.total_credit) ? 0 : transaction?.total_credit
-                  const debit = isNaN(transaction?.total_debit) ? 0 : transaction?.total_debit
-                  return {
-                    credit: Number.parseFloat(accumulator.credit) + Number.parseFloat(credit),
-                    debit: Number.parseFloat(accumulator.debit) + Number.parseFloat(debit),
-                  }
-                }, initialValue)
-                const periodDifferenceChildrenSum =
-                  account?.nature === "debit"
-                    ? Number.parseFloat(result?.debit) - Number.parseFloat(result?.credit)
-                    :-1 * ( Number.parseFloat(result?.credit) - Number.parseFloat(result?.debit))
-                    
-                    
-                childTotal = adjustedAccountOpeningBalance + periodDifferenceChildrenSum
-                console.log(childTotal,'childTotalchildTotal');
-              } else {
-                const periodDifferenceAccount =
-                  account?.nature === "debit"
-                    ? Number.parseFloat(account?.total_debit) - Number.parseFloat(account?.total_credit)
-                    : -1 *   (Number.parseFloat(account?.total_credit) - Number.parseFloat(account?.total_debit))
-                childTotal = adjustedAccountOpeningBalance + periodDifferenceAccount
-                console.log(childTotal,'childTotalchildTotal');
-              }
-              console.log(childTotal,'childTotalchildTotal');
-              
-              Total += Number.parseFloat(childTotal)
-              GrandTotal += Number.parseFloat(childTotal)
-              // Account row
-              const accountRow = worksheet.addRow([
-                account.account_code ?? "-",
-                account.account_name ?? "-",
-                account.account_category ?? "-",
-                account.account_subcategory ?? "-",
-                '',
-                account?.nature === "debit" ? Number.parseFloat(childTotal) :  Number.parseFloat(childTotal),
-              ])
-              // Style account rows
-              accountRow.eachCell((cell, colNumber) => {
-                cell.font = { name: "Arial", size: 10 }
-                cell.alignment = {
-                  horizontal: colNumber > 4 ? "right" : "left",
-                  vertical: "middle",
-                }
-                cell.border = {
-                  top: { style: "hair", color: { argb: "CCCCCC" } },
-                  left: { style: "hair", color: { argb: "CCCCCC" } },
-                  bottom: { style: "hair", color: { argb: "CCCCCC" } },
-                  right: { style: "hair", color: { argb: "CCCCCC" } },
-                }
-              })
-              if (account.childAccounts) {
-                account.childAccounts.forEach((child) => {
-                  const credit = isNaN(child?.total_credit) ? 0 : child?.total_credit
-                  const debit = isNaN(child?.total_debit) ? 0 : child?.total_debit
-                  const childPeriodDifference =
-                    child?.nature === "debit"
-                      ? Number.parseFloat(debit) - Number.parseFloat(credit)
-                      : Number.parseFloat(credit) - Number.parseFloat(debit)
-                  // const childOpeningBalance = Number.parseFloat(child?.opening_balance || 0)
-                  const childOpeningBalance = Number.parseFloat(0)
-                  // const adjustedChildOpeningBalance =
-                  //   child?.nature === "credit" ? childOpeningBalance * -1 : childOpeningBalance
-                  const adjustedChildOpeningBalance = 0
+    if (item.sub) {
+  item.sub.forEach((subItem) => {
+    let Total = 0;
+    // Subcategory row
+    const subCategoryRow = worksheet.addRow([subItem.name, "", "", "", "", ""]);
+    subCategoryRow.getCell(1).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "E6E6FA" }, // Lavender
+    };
+    subCategoryRow.getCell(1).font = {
+      name: "Arial",
+      bold: true,
+      size: 11,
+      color: { argb: "2F4F4F" },
+    };
+    subCategoryRow.getCell(1).alignment = { horizontal: "left", vertical: "middle" };
 
-                  const subTotal = (adjustedChildOpeningBalance + childPeriodDifference).toFixed(2)
-                  childFinalTotal += Number.parseFloat(subTotal)
-                  // Child account row
-                  const childRow = worksheet.addRow([
-                    child.account_code ?? "-",
-                    child.account_name ?? "-",
-                    child.account_category ?? "-",
-                    child.account_subcategory ?? "-",
-                    child?.nature == 'debit' ? Number.parseFloat(subTotal) : -1 * (Number.parseFloat(subTotal)) ,
-                    "",
-                  ])
-                  // Style child rows
-                  childRow.eachCell((cell, colNumber) => {
-                    cell.font = { name: "Arial", size: 9, italic: true }
-                    cell.alignment = {
-                      horizontal: colNumber > 4 ? "right" : "left",
-                      vertical: "middle",
-                    }
-                    cell.border = {
-                      top: { style: "hair", color: { argb: "CCCCCC" } },
-                      left: { style: "hair", color: { argb: "CCCCCC" } },
-                      bottom: { style: "hair", color: { argb: "CCCCCC" } },
-                      right: { style: "hair", color: { argb: "CCCCCC" } },
-                    }
-                  })
-                })
-              }
-            })
-          }
-          // Subcategory total row
-          if (subItem?.accounts?.length > 0) {
-            const subTotalRow = worksheet.addRow([
-              `Total of ${subItem?.accounts[0]?.type_code}`,
-              "",
-              `Total of ${subItem?.name}`,
-              "",
-              "",
-              Number.parseFloat(Total),
-            ])
-            subTotalRow.eachCell((cell, colNumber) => {
-              cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "FFD700" }, // Gold
-              }
-              cell.font = {
-                name: "Arial",
-                bold: true,
-                size: 10,
-                color: { argb: "2F4F4F" },
-              }
-              cell.alignment = {
-                horizontal: colNumber > 4 ? "right" : "left",
-                vertical: "middle",
-              }
-              cell.border = {
-                top: { style: "medium", color: { argb: "000000" } },
-                left: { style: "medium", color: { argb: "000000" } },
-                bottom: { style: "medium", color: { argb: "000000" } },
-                right: { style: "medium", color: { argb: "000000" } },
-              }
-            })
-          }
-          // Gross Profit row
-          if (subItem?.accounts?.length > 0 && subItem?.accounts[0]?.type_code == "E1") {
-            const grossProfitRow = worksheet.addRow([
-              "",
-              "",
-              "Gross Profit",
-              "",
-              "",
-              Number.parseFloat(Number.parseFloat(totalRevenue) - Number.parseFloat(totalCost)).toFixed(2),
-            ])
-            grossProfitRow.eachCell((cell, colNumber) => {
-              cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "90EE90" }, // Light green
-              }
-              cell.font = {
-                name: "Arial",
-                bold: true,
-                size: 11,
-                color: { argb: "2F4F4F" },
-              }
-              cell.alignment = {
-                horizontal: colNumber > 4 ? "right" : "center",
-                vertical: "middle",
-              }
-              cell.border = {
-                top: { style: "medium", color: { argb: "000000" } },
-                left: { style: "medium", color: { argb: "000000" } },
-                bottom: { style: "medium", color: { argb: "000000" } },
-                right: { style: "medium", color: { argb: "000000" } },
-              }
-            })
-          }
-        })
-        // Category total row
-        if (item?.sub?.length > 0) {
-          const categoryTotalRow = worksheet.addRow([
-            "Total",
-            "",
-            `Total ${item?.name}ss`,
-            "",
-            "",
-            Number.parseFloat(GrandTotal).toFixed(2),
-          ])
-          categoryTotalRow.eachCell((cell, colNumber) => {
-            cell.fill = {
-              type: "pattern",
-              pattern: "solid",
-              fgColor: { argb: "FFA500" }, // Orange
-            }
-            cell.font = {
-              name: "Arial",
-              bold: true,
-              size: 11,
-              color: { argb: "FFFFFF" },
-            }
-            cell.alignment = {
-              horizontal: colNumber > 4 ? "right" : "left",
-              vertical: "middle",
-            }
-            cell.border = {
-              top: { style: "medium", color: { argb: "000000" } },
-              left: { style: "medium", color: { argb: "000000" } },
-              bottom: { style: "medium", color: { argb: "000000" } },
-              right: { style: "medium", color: { argb: "000000" } },
-            }
-          })
+    if (subItem.accounts) {
+      subItem.accounts.forEach((account) => {
+        let childTotal = 0;
+
+        // Calculate parent or single account total
+        if (account?.childAccounts?.length > 0) {
+          childTotal = account.childAccounts.reduce((sum, child) => {
+            const credit = Number(child.total_credit || 0);
+            const debit = Number(child.total_debit || 0);
+            // Only debit - credit OR credit - debit
+            return sum + (child.nature === "debit" ? debit - credit : credit - debit);
+          }, 0);
+        } else {
+          const credit = Number(account.total_credit || 0);
+          const debit = Number(account.total_debit || 0);
+          childTotal = account.nature === "debit" ? debit - credit : credit - debit;
         }
-      }
+
+        Total += childTotal;        // Subcategory total
+        GrandTotal += childTotal;   // Category total
+
+        const accountRow = worksheet.addRow([
+          account.account_code ?? "-",
+          account.account_name ?? "-",
+          account.account_category ?? "-",
+          account.account_subcategory ?? "-",
+          "",
+          Number(childTotal.toFixed(2)),
+        ]);
+        accountRow.eachCell((cell, colNumber) => {
+          cell.font = { name: "Arial", size: 10 };
+          cell.alignment = { horizontal: colNumber > 4 ? "right" : "left", vertical: "middle" };
+          cell.border = {
+            top: { style: "hair", color: { argb: "CCCCCC" } },
+            left: { style: "hair", color: { argb: "CCCCCC" } },
+            bottom: { style: "hair", color: { argb: "CCCCCC" } },
+            right: { style: "hair", color: { argb: "CCCCCC" } },
+          };
+        });
+
+        // Child Accounts
+        if (account.childAccounts) {
+          account.childAccounts.forEach((child) => {
+            const credit = Number(child.total_credit || 0);
+            const debit = Number(child.total_debit || 0);
+            const childValue = child.nature === "debit" ? debit - credit : credit - debit;
+            const childRow = worksheet.addRow([
+              child.account_code ?? "-",
+              child.account_name ?? "-",
+              child.account_category ?? "-",
+              child.account_subcategory ?? "-",
+              Number(childValue.toFixed(2)),
+              "",
+            ]);
+            childRow.eachCell((cell, colNumber) => {
+              cell.font = { name: "Arial", size: 9, italic: true };
+              cell.alignment = { horizontal: colNumber > 4 ? "right" : "left", vertical: "middle" };
+              cell.border = {
+                top: { style: "hair", color: { argb: "CCCCCC" } },
+                left: { style: "hair", color: { argb: "CCCCCC" } },
+                bottom: { style: "hair", color: { argb: "CCCCCC" } },
+                right: { style: "hair", color: { argb: "CCCCCC" } },
+              };
+            });
+          });
+        }
+      });
+    }
+
+    // Subcategory total row
+    if (subItem?.accounts?.length > 0) {
+      const subTotalRow = worksheet.addRow([
+        `Total of ${subItem?.accounts[0]?.type_code}`,
+        "",
+        `Total of ${subItem?.name}`,
+        "",
+        "",
+        Number(Total.toFixed(2)), // Only debit-credit / credit-debit
+      ]);
+      subTotalRow.eachCell((cell, colNumber) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFD700" }, // Gold
+        };
+        cell.font = {
+          name: "Arial",
+          bold: true,
+          size: 10,
+          color: { argb: "2F4F4F" },
+        };
+        cell.alignment = {
+          horizontal: colNumber > 4 ? "right" : "left",
+          vertical: "middle",
+        };
+        cell.border = {
+          top: { style: "medium", color: { argb: "000000" } },
+          left: { style: "medium", color: { argb: "000000" } },
+          bottom: { style: "medium", color: { argb: "000000" } },
+          right: { style: "medium", color: { argb: "000000" } },
+        };
+      });
+    }
+
+    // Gross Profit row
+    if (subItem?.accounts?.length > 0 && subItem?.accounts[0]?.type_code == "E1") {
+      const grossProfitRow = worksheet.addRow([
+        "",
+        "",
+        "Gross Profit",
+        "",
+        "",
+        Number((Number(totalRevenue) - Number(totalCost)).toFixed(2)),
+      ]);
+      grossProfitRow.eachCell((cell, colNumber) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "90EE90" }, // Light green
+        };
+        cell.font = {
+          name: "Arial",
+          bold: true,
+          size: 11,
+          color: { argb: "2F4F4F" },
+        };
+        cell.alignment = {
+          horizontal: colNumber > 4 ? "right" : "center",
+          vertical: "middle",
+        };
+        cell.border = {
+          top: { style: "medium", color: { argb: "000000" } },
+          left: { style: "medium", color: { argb: "000000" } },
+          bottom: { style: "medium", color: { argb: "000000" } },
+          right: { style: "medium", color: { argb: "000000" } },
+        };
+      });
+    }
+  });
+
+  // Category total row
+  if (item?.sub?.length > 0) {
+    const categoryTotalRow = worksheet.addRow([
+      "Total",
+      "",
+      `Total ${item?.name}`,
+      "",
+      "",
+      Number(GrandTotal.toFixed(2)), // Only debit-credit / credit-debit
+    ]);
+    categoryTotalRow.eachCell((cell, colNumber) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFA500" }, // Orange
+      };
+      cell.font = {
+        name: "Arial",
+        bold: true,
+        size: 11,
+        color: { argb: "FFFFFF" },
+      };
+      cell.alignment = {
+        horizontal: colNumber > 4 ? "right" : "left",
+        vertical: "middle",
+      };
+      cell.border = {
+        top: { style: "medium", color: { argb: "000000" } },
+        left: { style: "medium", color: { argb: "000000" } },
+        bottom: { style: "medium", color: { argb: "000000" } },
+        right: { style: "medium", color: { argb: "000000" } },
+      };
+    });
+  }
+}
+
     })
     // Net Profit row
     if (filteredProfitLossStatement.length > 0) {
