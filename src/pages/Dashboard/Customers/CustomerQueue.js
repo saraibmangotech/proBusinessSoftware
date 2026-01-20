@@ -516,11 +516,12 @@ function CustomerQueue() {
   const UpdateStatus = async () => {
     try {
       let obj = {
-        customer_id: selectedData?.id,
+        id: selectedData?.id,
         is_active: status?.id,
+    
       };
 
-      const promise = CustomerServices.CustomerStatus(obj);
+      const promise = CustomerServices.UpdateCustomer(obj);
       console.log(promise);
 
       showPromiseToast(
@@ -589,7 +590,8 @@ function CustomerQueue() {
       cell: ({ row }) => (
 
         <Box component={'div'} sx={{ cursor: 'pointer' }} onClick={() => {
-          if (permissions?.status_update) {
+          setSelectedData(row?.original)
+          if (true) {
             setStatusDialog(true)
           }
         }}>
