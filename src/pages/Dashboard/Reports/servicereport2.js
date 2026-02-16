@@ -363,6 +363,19 @@ function ServiceReport() {
       header: "SR No.",
       accessorKey: "id",
     },
+      {
+          header: "Service Code",
+          accessorFn: (row) =>  row?.service?.item_code,
+           cell: ({ row }) => (
+            <Box
+              variant="contained"
+              color="primary"
+              sx={{ cursor: "pointer", display: "flex", gap: 2 }}
+            >
+              {row.original?.service?.item_code}
+            </Box>
+          ),
+        },
     {
       header: "Inv No.",
       accessorKey: "invoice_number",
@@ -789,6 +802,7 @@ const downloadInvoiceExcel = (data) => {
   // Headers
   const headers = [
     "SR No.",
+     "Service Code",
     "Inv No.",
     "Inv Date",
     "Token Number",
@@ -846,6 +860,7 @@ const downloadInvoiceExcel = (data) => {
 
     const dataRow = worksheet.addRow([
       item.id || "",
+      item?.service?.item_code || "",
       item?.receipt?.invoice_number || "",
       item?.receipt?.invoice_date ? new Date(moment(item.receipt.invoice_date).format("YYYY-MM-DD")) : null,
       item?.receipt?.token_number || "",
