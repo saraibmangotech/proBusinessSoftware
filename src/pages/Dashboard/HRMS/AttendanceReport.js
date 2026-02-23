@@ -149,6 +149,7 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                 const remarks = dayAttendance?.logs?.[0]?.remarks;
                 const logs = dayAttendance?.logs?.[0] || {};
                 const shift = dayAttendance?.shift_time;
+              
 
                 const { bg, border, color } =
                     logs.check_in && !logs.check_out
@@ -207,7 +208,7 @@ const EmployeeRow = memo(({ employee, daysInMonth, onCellClick }) => {
                                 )}
 
                                 {status === "Present" && (
-                                    <Box sx={{ fontSize: "0.7rem" }}>Shift: {shift}</Box>
+                                    <Box sx={{ fontSize: "0.7rem" }}>Shift :  {dayAttendance?.shift_name == "No shift added" ? <span style={{fontWeight:'bold',color:'black'}}>No Shift</span> : `${shift}`}</Box>
                                 )}
 
                                 {/* Remarks Info Icon */}
@@ -506,6 +507,7 @@ export default function AttendanceTable() {
                         date: day.date,
                         status: day.logs ? "Present" : day.status,
                         logs: day?.logs,
+                        shift_name: day.shift_name,
                         shift_time: day.shift_time,
                         duration: day.totalDuration,
                     })) || [],

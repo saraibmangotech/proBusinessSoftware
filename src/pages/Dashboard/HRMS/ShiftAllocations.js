@@ -826,6 +826,13 @@ function ShiftAllocations() {
                         </FormControl>
                     </Box>
                 </Grid>
+                  <Grid item xs={9} sx={{pt:'25px !important'}}>
+                    <PrimaryButton
+                        title={"Clear"}
+                        onClick={() =>
+                            setSelectedEmployeeIds([])}
+                    />
+                </Grid>
 
                 <Grid item xs={12} sm={3}>
                     <DatePicker
