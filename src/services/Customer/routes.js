@@ -200,7 +200,7 @@ const routes = {
   deleteUser:'users/delete',
   getPrepaidInvoiceDetail:'/purchases/fpInvoice/details',
   VoidInvoice:'purchases/invoice/void',
-  UpdateSaleReceipt2:'/receipts/update/paid'
+  UpdateSaleReceipt2:'sales/receipts/update/paid'
 
 
 };

@@ -298,6 +298,7 @@ function CollectionReport() {
       header: "SR No.",
       accessorKey: "id",
     },
+    
     {
       header: "Category",
       accessorKey: "category",

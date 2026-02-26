@@ -2834,7 +2834,17 @@ function Header() {
                 navigation: true,
                 order_by: 55,
               },
-  
+              {
+                id: 56,
+                name: "Employee  Sales Summary Report",
+                icon: "customer",
+                parent_id: 9,
+                api: null,
+                route: "/employee-sales-summary-report",
+                identifier: null,
+                navigation: true,
+                order_by: 56,
+              },
             ],
           },
   

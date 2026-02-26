@@ -198,6 +198,7 @@ function CreatePaidReceipt() {
   const [chargesDisabled, setChargesDisabled] = useState(false)
   const [paymentTotal, setPaymentTotal] = useState(0)
   const [creditButton, setCreditButton] = useState(false)
+  const [creditButtonDisabled, setCreditButtonDisabled] = useState(false)
   //documents array
 
   const handleNext = () => {
@@ -268,6 +269,7 @@ function CreatePaidReceipt() {
     console.log(detail, 'detail');
 
     try {
+      setCreditButtonDisabled(true)
       const obj = {
         id: detail?.id,
         customer: selectedCustomer?.id,
@@ -297,6 +299,8 @@ function CreatePaidReceipt() {
       ErrorToaster(error)
     } finally {
       setButtonDisabled(false)
+      setCreditButtonDisabled(false)
+
     }
   }
 
@@ -1309,6 +1313,7 @@ function CreatePaidReceipt() {
                             onClick={() => handleCredit()}
 
                             variant="contained"
+                            disabled={creditButtonDisabled}
                             sx={{
                               textTransform: "capitalize",
                               backgroundColor: "#001f3f",

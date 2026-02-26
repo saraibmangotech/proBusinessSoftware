@@ -435,16 +435,18 @@ function ReceptionForm() {
             </SimpleDialog>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: "10px", p: 3, alignItems: "flex-end" }}>
                 <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Create Reception</Typography>
-                {user?.role_id !=1005 && <PrimaryButton
-
-                    disabled={subCustDisable}
-                    bgcolor={'#001f3f'}
-                    onClick={() => setCompanyDialog(true)}
-                    title="Add Customer"
-
-
-
-                />}
+                {(user?.role_id === 1000 ||
+                    user?.role_id === 1001 ||
+                    (user?.role_id != 1005 &&
+                        (process.env.REACT_APP_TYPE !== "TASHEEL" ||
+                            [109, 142, 140].includes(user?.id)))) && (
+                        <PrimaryButton
+                            disabled={subCustDisable}
+                            bgcolor={"#001f3f"}
+                            onClick={() => setCompanyDialog(true)}
+                            title="Add Customer"
+                        />
+                    )}
             </Box>
 
             {customerType == 'individual' ? <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>

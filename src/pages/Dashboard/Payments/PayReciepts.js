@@ -551,12 +551,14 @@ if (!value){
     };
     const UpdateStatus = async (data, event) => {
         // Ensure invoiceDate is present
+        console.log("here", data, event);
         if (!invoiceDate) {
             showErrorToast('Date is required');
             return;
         }
 
         const action = event?.nativeEvent?.submitter?.value;
+
 
         if (action === "invoiceOnly") {
             console.log("Updating Invoice Date only", data);
@@ -1318,9 +1320,7 @@ if (!value){
                 size={"small"}
                 label={"Void Reason"}
                 placeholder={"Void Reason"}
-                register={register("void_reason", {
-                  required: "Please enter Void Reason",
-                })}
+                register={register("void_reason")}
               />
             </Grid>
                     </Grid>
