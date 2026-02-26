@@ -589,7 +589,44 @@ function LeaveList() {
                 }
 
             }
+ else if (newData?.type == 'Unpaid') {
+                console.log(data, 'leavesleaves');
+                if (newData?.is_halfday) {
 
+                    let leaveBalance = parseFloat(leaves?.sick_leave_unpaid_balance)
+                    let appliedDays = parseFloat(newData?.total_days)
+                    let approvedDays = appliedDays > leaveBalance ?
+                        leaveBalance :
+                        appliedDays
+                    console.log(appliedDays, 'appliedDays');
+                    setValue('leaves', leaveBalance)
+                    setValue('applied', 0.5)
+                    setValue('approved',
+                        0.5)
+                    setValue('balanced',
+                        leaveBalance - appliedDays < 0 ? 0 : leaveBalance - 0.5)
+                    setValue('absent',
+                        appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                }
+                else {
+
+                    let leaveBalance = parseFloat(leaves?.sick_leave_unpaid_balance)
+                    let appliedDays = parseFloat(newData?.total_days)
+                    let approvedDays = appliedDays > leaveBalance ?
+                        leaveBalance :
+                        appliedDays
+                    console.log(appliedDays, 'appliedDays');
+                    setValue('leaves', leaveBalance)
+                    setValue('applied', appliedDays)
+                    setValue('approved',
+                        approvedDays)
+                    setValue('balanced',
+                        leaveBalance - appliedDays < 0 ? 0 : leaveBalance - appliedDays)
+                    setValue('absent',
+                        appliedDays - leaveBalance < 0 ? 0 : appliedDays - leaveBalance)
+                }
+
+            }
             else if (newData?.type == 'Sick') {
                 console.log(leaves, 'leavesleaves');
 
